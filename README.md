@@ -1,29 +1,66 @@
 # 🏛️ Mayasura
 
-> *Named after the divine architect from the Mahabharata who built the Maya Sabha — the palace of illusions that amazed even the gods.*
+**Build your brand's digital palace in minutes.**
 
-**An open-source framework for brands to instantiate their complete digital consumer communication ecosystem.**
+Mayasura is an open-source framework that lets any brand instantiate their complete digital consumer communication ecosystem — website, chatbot, e-commerce, content, and more — all AI-powered, all in one click.
 
-## Vision
+## Features
 
-Every brand needs the same things: a website, chatbot, e-commerce, push notifications, mobile app, CRM. Today, they stitch together dozens of SaaS tools, each with its own dashboard, its own data silo, its own integration headaches.
+- **🧙 AI-Guided Wizard** — 6-step brand creation with AI assistance at every step
+- **🌐 Website Generation** — Landing pages, product pages, about & contact
+- **🤖 AI Chatbot** — Intelligent customer support that knows your brand
+- **🛒 E-Commerce** — Product catalog and storefront
+- **📧 Email Templates** — Welcome sequences, newsletters
+- **📊 Dashboard** — Manage your entire brand ecosystem
+- **🎨 Swiss-Style Design** — Clean, professional, beautiful
 
-Mayasura changes that. One framework. Protocol-native (MCP, A2A, UCP). Agent-orchestrated. A brand goes from zero to full stack in minutes — not months.
+## Tech Stack
 
-**We're building palaces, not huts.**
+- **Frontend**: Next.js 15 (App Router), Tailwind CSS, shadcn/ui components
+- **Backend**: Next.js API Routes
+- **AI**: Anthropic Claude API
+- **Database**: SQLite via better-sqlite3
+- **Deployment**: Railway
 
-## Principles
+## Getting Started
 
-1. **Composable over monolithic** — every piece should be swappable
-2. **Protocol-native** — MCP, A2A, UCP are first-class citizens, not afterthoughts
-3. **Open source first** — build on and contribute to the ecosystem
-4. **Instantiate, don't configure** — zero to full stack in minutes
-5. **Agent-orchestrated** — AI agents manage the stack, not humans clicking dashboards
+```bash
+# Clone
+git clone https://github.com/vikramgorla/mayasura.git
+cd mayasura
 
-## Status
+# Install dependencies
+npm install
 
-🚧 Early stage — architecture and research phase.
+# Set up environment
+cp .env.example .env
+# Add your ANTHROPIC_API_KEY
+
+# Run development server
+npm run dev
+```
+
+Open [http://localhost:3000](http://localhost:3000) to start building your brand.
+
+## Environment Variables
+
+| Variable | Description |
+|----------|------------|
+| `ANTHROPIC_API_KEY` | Anthropic API key for AI features |
+| `DATABASE_PATH` | Path to SQLite database (default: `./data/mayasura.db`) |
+
+## Architecture
+
+See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architectural decisions.
+
+## Roadmap
+
+See [ROADMAP.md](./ROADMAP.md) for development phases.
 
 ## License
 
-TBD
+MIT — see [LICENSE](./LICENSE).
+
+---
+
+*Named after Mayasura, the divine architect from the Mahabharata who built the Maya Sabha — the palace of illusions that amazed even the gods.*
