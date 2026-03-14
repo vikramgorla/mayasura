@@ -1,5 +1,5 @@
 @import "tailwindcss";
-@import "../../src/styles/templates.css";
+@import "../styles/templates.css";
 
 /* ==================== Design Tokens (2026) ==================== */
 :root {

@@ -48,19 +48,19 @@ export const WEBSITE_TEMPLATES: WebsiteTemplate[] = [
     fonts: {
       heading: 'Plus Jakarta Sans',
       body: 'Inter',
-      headingWeight: '500',
+      headingWeight: '300',
     },
     colors: {
-      light: { text: '#18181B', background: '#FAFAFA', accent: '#6366F1', surface: '#FFFFFF', muted: '#71717A', border: '#E4E4E7' },
+      light: { text: '#18181B', background: '#FFFFFF', accent: '#6366F1', surface: '#FFFFFF', muted: '#71717A', border: '#E4E4E7' },
       dark: { text: '#FAFAFA', background: '#09090B', accent: '#818CF8', surface: '#18181B', muted: '#71717A', border: '#27272A' },
     },
     preview: {
       heroStyle: 'left-aligned',
       cardStyle: 'minimal',
       navStyle: 'minimal',
-      typography: { headingWeight: '500', headingTracking: '-0.02em', headingCase: 'normal', bodySize: '15px' },
+      typography: { headingWeight: '300', headingTracking: '-0.03em', headingCase: 'normal', bodySize: '15px' },
       spacing: 'spacious',
-      borderRadius: '8px',
+      borderRadius: '0px',
       accentUsage: 'minimal',
     },
   },
@@ -100,7 +100,7 @@ export const WEBSITE_TEMPLATES: WebsiteTemplate[] = [
     },
     colors: {
       light: { text: '#000000', background: '#FFFFFF', accent: '#EF4444', surface: '#FAFAFA', muted: '#6B7280', border: '#E5E7EB' },
-      dark: { text: '#FFFFFF', background: '#000000', accent: '#F87171', surface: '#111111', muted: '#9CA3AF', border: '#1F1F1F' },
+      dark: { text: '#FFFFFF', background: '#000000', accent: '#EF4444', surface: '#111111', muted: '#9CA3AF', border: '#222222' },
     },
     preview: {
       heroStyle: 'full-width',
@@ -156,7 +156,7 @@ export const WEBSITE_TEMPLATES: WebsiteTemplate[] = [
       navStyle: 'playful',
       typography: { headingWeight: '700', headingTracking: '-0.01em', headingCase: 'normal', bodySize: '16px' },
       spacing: 'generous',
-      borderRadius: '16px',
+      borderRadius: '24px',
       accentUsage: 'bold',
     },
   },
