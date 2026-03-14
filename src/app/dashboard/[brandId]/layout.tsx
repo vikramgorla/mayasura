@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Globe, MessageSquare, Package, FileText,
   BarChart3, ArrowLeft, HeadphonesIcon, Sparkles, Menu, X,
-  Download, Moon, Sun
+  Download, Moon, Sun, Settings, ShoppingBag, Newspaper
 } from 'lucide-react';
 import { PageLoader } from '@/components/ui/loading';
 import { Brand } from '@/lib/types';
@@ -19,15 +19,15 @@ import { useToast } from '@/components/ui/toast';
 const navItems = [
   { href: '', icon: LayoutDashboard, label: 'Overview' },
   { href: '/website', icon: Globe, label: 'Website' },
-  { href: '/blog', icon: FileText, label: 'Blog' },
-  { href: '/orders', icon: Package, label: 'Orders' },
+  { href: '/blog', icon: Newspaper, label: 'Blog' },
+  { href: '/orders', icon: ShoppingBag, label: 'Orders' },
   { href: '/chatbot', icon: MessageSquare, label: 'Chatbot' },
   { href: '/products', icon: Package, label: 'Products' },
   { href: '/content', icon: FileText, label: 'Content' },
   { href: '/support', icon: HeadphonesIcon, label: 'Support' },
   { href: '/strategy', icon: Sparkles, label: 'AI Strategy' },
   { href: '/analytics', icon: BarChart3, label: 'Analytics' },
-  { href: '/settings', icon: BarChart3, label: 'Settings' },
+  { href: '/settings', icon: Settings, label: 'Settings' },
 ];
 
 export default function BrandDashboardLayout({ children }: { children: React.ReactNode }) {
