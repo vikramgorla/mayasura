@@ -38,4 +38,11 @@ export const TEMPLATE_FONTS: Record<string, string[]> = {
   bold: ['Space Grotesk', 'Inter'],
   classic: ['Source Serif 4', 'Inter'],
   playful: ['DM Sans', 'Inter'],
+  startup: ['Sora', 'Inter'],
+  portfolio: ['Outfit', 'Inter'],
+  magazine: ['Lora', 'Source Serif 4'],
+  boutique: ['Cormorant Garamond', 'Inter'],
+  tech: ['JetBrains Mono', 'Inter'],
+  wellness: ['Raleway', 'Nunito'],
+  restaurant: ['Playfair Display', 'Lato'],
 };

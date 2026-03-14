@@ -713,3 +713,580 @@
   filter: invert(1);
   transition: filter 0.2s ease;
 }
+
+/* =====================================================================
+   NEW TEMPLATES — Startup, Portfolio, Magazine, Boutique, Tech, Wellness, Restaurant
+   ===================================================================== */
+
+/* ==================== STARTUP — gradient, modern SaaS ==================== */
+[data-template="startup"] .t-hero {
+  padding: 6rem 0 4rem;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  [data-template="startup"] .t-hero {
+    padding: 8rem 0 6rem;
+  }
+}
+
+[data-template="startup"] .t-hero-heading {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 600;
+  letter-spacing: -0.025em;
+  line-height: 1.1;
+}
+
+[data-template="startup"] .t-hero-desc {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  max-width: 560px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1.5rem;
+}
+
+[data-template="startup"] .t-section {
+  padding: 4rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="startup"] .t-section {
+    padding: 6rem 0;
+  }
+}
+
+[data-template="startup"] .t-section-heading {
+  font-size: 1.75rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+[data-template="startup"] .t-card {
+  padding: 1.5rem;
+  border-radius: 12px;
+  border: 1px solid;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+[data-template="startup"] .t-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 12px 40px rgba(99, 102, 241, 0.08);
+}
+
+[data-template="startup"] .t-btn-primary {
+  padding: 0.75rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(99, 102, 241, 0.25);
+}
+[data-template="startup"] .t-btn-primary:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99, 102, 241, 0.35);
+}
+
+[data-template="startup"] .t-btn-secondary {
+  padding: 0.75rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: transparent;
+}
+
+[data-template="startup"] .t-product-card {
+  border-radius: 12px;
+  overflow: hidden;
+  border: 1px solid;
+}
+[data-template="startup"] .t-product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* ==================== PORTFOLIO — full-bleed, minimal ==================== */
+[data-template="portfolio"] .t-hero {
+  padding: 4rem 0 3rem;
+  min-height: 80vh;
+  display: flex;
+  align-items: flex-end;
+}
+@media (min-width: 768px) {
+  [data-template="portfolio"] .t-hero {
+    padding: 6rem 0 4rem;
+    min-height: 90vh;
+  }
+}
+
+[data-template="portfolio"] .t-hero-heading {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 400;
+  letter-spacing: -0.02em;
+}
+
+[data-template="portfolio"] .t-hero-desc {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-top: 2rem;
+  max-width: 420px;
+  font-weight: 300;
+}
+
+[data-template="portfolio"] .t-section {
+  padding: 5rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="portfolio"] .t-section {
+    padding: 7rem 0;
+  }
+}
+
+[data-template="portfolio"] .t-section-heading {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+}
+
+[data-template="portfolio"] .t-card {
+  padding: 0;
+  border: none;
+}
+
+[data-template="portfolio"] .t-btn-primary {
+  padding: 0.625rem 1.75rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  border-radius: 0;
+}
+
+[data-template="portfolio"] .t-btn-secondary {
+  padding: 0.625rem 1.75rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-template="portfolio"] .t-product-card {
+  overflow: hidden;
+}
+[data-template="portfolio"] .t-product-card:hover {
+  opacity: 0.85;
+}
+
+/* ==================== MAGAZINE — multi-column, editorial ==================== */
+[data-template="magazine"] .t-hero {
+  padding: 4rem 0 3rem;
+  min-height: 55vh;
+  display: flex;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  [data-template="magazine"] .t-hero {
+    padding: 5rem 0 4rem;
+  }
+}
+
+[data-template="magazine"] .t-hero-heading {
+  font-size: clamp(2.5rem, 6vw, 4.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.08;
+}
+
+[data-template="magazine"] .t-hero-desc {
+  font-size: 1.125rem;
+  line-height: 1.7;
+  max-width: 540px;
+  margin-top: 1.5rem;
+  font-family: inherit;
+}
+
+[data-template="magazine"] .t-section {
+  padding: 3.5rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="magazine"] .t-section {
+    padding: 4.5rem 0;
+  }
+}
+
+[data-template="magazine"] .t-section-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+[data-template="magazine"] .t-card {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid;
+}
+[data-template="magazine"] .t-card:last-child {
+  border-bottom: none;
+}
+
+[data-template="magazine"] .t-btn-primary {
+  padding: 0.75rem 2rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 0;
+  letter-spacing: 0.02em;
+}
+
+[data-template="magazine"] .t-btn-secondary {
+  padding: 0.75rem 2rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 0;
+  background: transparent;
+  letter-spacing: 0.02em;
+}
+
+[data-template="magazine"] .t-product-card:hover {
+  opacity: 0.85;
+}
+
+/* ==================== BOUTIQUE — luxury, serif, gold ==================== */
+[data-template="boutique"] .t-hero {
+  padding: 8rem 0 6rem;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  [data-template="boutique"] .t-hero {
+    padding: 10rem 0 8rem;
+  }
+}
+
+[data-template="boutique"] .t-hero-heading {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 500;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  line-height: 1.15;
+}
+
+[data-template="boutique"] .t-hero-desc {
+  font-size: 0.9375rem;
+  line-height: 1.7;
+  max-width: 480px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2rem;
+  font-weight: 300;
+  letter-spacing: 0.01em;
+}
+
+[data-template="boutique"] .t-section {
+  padding: 5rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="boutique"] .t-section {
+    padding: 7rem 0;
+  }
+}
+
+[data-template="boutique"] .t-section-heading {
+  font-size: 1.25rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+[data-template="boutique"] .t-card {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid;
+}
+[data-template="boutique"] .t-card:last-child {
+  border-bottom: none;
+}
+
+[data-template="boutique"] .t-btn-primary {
+  padding: 0.875rem 2.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+[data-template="boutique"] .t-btn-primary:hover {
+  opacity: 0.85;
+}
+
+[data-template="boutique"] .t-btn-secondary {
+  padding: 0.875rem 2.5rem;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-template="boutique"] .t-product-card {
+  overflow: hidden;
+}
+[data-template="boutique"] .t-product-card:hover {
+  opacity: 0.8;
+}
+
+/* ==================== TECH — dark, terminal, monospace ==================== */
+[data-template="tech"] .t-hero {
+  padding: 6rem 0 4rem;
+  min-height: 70vh;
+  display: flex;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  [data-template="tech"] .t-hero {
+    padding: 8rem 0 5rem;
+  }
+}
+
+[data-template="tech"] .t-hero-heading {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+[data-template="tech"] .t-hero-desc {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 520px;
+  margin-top: 1.5rem;
+}
+
+[data-template="tech"] .t-section {
+  padding: 4rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="tech"] .t-section {
+    padding: 5rem 0;
+  }
+}
+
+[data-template="tech"] .t-section-heading {
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+[data-template="tech"] .t-card {
+  padding: 1.5rem;
+  border: 1px solid;
+  border-radius: 8px;
+  transition: border-color 0.2s ease;
+}
+[data-template="tech"] .t-card:hover {
+  border-color: #10B981;
+}
+
+[data-template="tech"] .t-btn-primary {
+  padding: 0.75rem 2rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 8px;
+}
+[data-template="tech"] .t-btn-primary:hover {
+  opacity: 1;
+  box-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+}
+
+[data-template="tech"] .t-btn-secondary {
+  padding: 0.75rem 2rem;
+  font-size: 0.8125rem;
+  font-weight: 600;
+  border-radius: 8px;
+  background: transparent;
+}
+
+[data-template="tech"] .t-product-card {
+  border: 1px solid;
+  border-radius: 8px;
+  overflow: hidden;
+}
+[data-template="tech"] .t-product-card:hover {
+  transform: translateY(-2px);
+  border-color: #10B981;
+}
+
+[data-template="tech"] input,
+[data-template="tech"] textarea {
+  border-radius: 8px !important;
+  font-family: 'JetBrains Mono', monospace !important;
+}
+
+/* ==================== WELLNESS — calm, zen, breathing room ==================== */
+[data-template="wellness"] .t-hero {
+  padding: 8rem 0 6rem;
+  min-height: 65vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  [data-template="wellness"] .t-hero {
+    padding: 10rem 0 7rem;
+  }
+}
+
+[data-template="wellness"] .t-hero-heading {
+  font-size: clamp(2rem, 5vw, 3.5rem);
+  font-weight: 300;
+  letter-spacing: 0.03em;
+  line-height: 1.2;
+}
+
+[data-template="wellness"] .t-hero-desc {
+  font-size: 1rem;
+  line-height: 1.8;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 2rem;
+  font-weight: 300;
+}
+
+[data-template="wellness"] .t-section {
+  padding: 5rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="wellness"] .t-section {
+    padding: 7rem 0;
+  }
+}
+
+[data-template="wellness"] .t-section-heading {
+  font-size: 1.375rem;
+  font-weight: 300;
+  letter-spacing: 0.02em;
+}
+
+[data-template="wellness"] .t-card {
+  padding: 2rem;
+  border-radius: 16px;
+  transition: transform 0.3s ease;
+}
+[data-template="wellness"] .t-card:hover {
+  transform: translateY(-2px);
+}
+
+[data-template="wellness"] .t-btn-primary {
+  padding: 0.875rem 2.5rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  border-radius: 9999px;
+}
+
+[data-template="wellness"] .t-btn-secondary {
+  padding: 0.875rem 2.5rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.04em;
+  border-radius: 9999px;
+  background: transparent;
+}
+
+[data-template="wellness"] .t-product-card {
+  border-radius: 16px;
+  overflow: hidden;
+}
+[data-template="wellness"] .t-product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+[data-template="wellness"] input,
+[data-template="wellness"] textarea {
+  border-radius: 16px !important;
+}
+
+/* ==================== RESTAURANT — warm, inviting, menu-style ==================== */
+[data-template="restaurant"] .t-hero {
+  padding: 5rem 0 3rem;
+  min-height: 65vh;
+  display: flex;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  [data-template="restaurant"] .t-hero {
+    padding: 6rem 0 4rem;
+    min-height: 70vh;
+  }
+}
+
+[data-template="restaurant"] .t-hero-heading {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+[data-template="restaurant"] .t-hero-desc {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  max-width: 520px;
+  margin-top: 1.25rem;
+}
+
+[data-template="restaurant"] .t-section {
+  padding: 4rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="restaurant"] .t-section {
+    padding: 5rem 0;
+  }
+}
+
+[data-template="restaurant"] .t-section-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+[data-template="restaurant"] .t-card {
+  padding: 1.5rem;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+[data-template="restaurant"] .t-card:hover {
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.08);
+}
+
+[data-template="restaurant"] .t-btn-primary {
+  padding: 0.75rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 4px;
+}
+
+[data-template="restaurant"] .t-btn-secondary {
+  padding: 0.75rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 4px;
+  background: transparent;
+}
+
+[data-template="restaurant"] .t-product-card {
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+[data-template="restaurant"] .t-product-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+[data-template="restaurant"] input,
+[data-template="restaurant"] textarea {
+  border-radius: 4px !important;
+}

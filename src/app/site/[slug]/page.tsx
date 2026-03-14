@@ -15,9 +15,9 @@ export default function BrandHomePage() {
   const templateId = template?.id || 'minimal';
   const tp = template?.preview;
 
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
-  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
 
   const headingStyle: React.CSSProperties = {
@@ -168,7 +168,237 @@ export default function BrandHomePage() {
       );
     }
 
-    // PLAYFUL — Rounded, friendly, with blob decorations
+    // STARTUP — Gradient pill style, centered
+    if (templateId === 'startup') {
+      return (
+        <section className="t-hero relative overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.03]" style={{ background: `radial-gradient(ellipse at 30% 50%, ${accentColor}, transparent 70%), radial-gradient(ellipse at 70% 50%, #818CF8, transparent 70%)` }} />
+          <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center relative z-10">
+            {brand.industry && (
+              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium mb-8" style={{ backgroundColor: `${accentColor}10`, color: accentColor, border: `1px solid ${accentColor}20` }}>
+                🚀 {brand.industry}
+              </span>
+            )}
+            <h1 className="t-hero-heading mb-6" style={headingStyle}>
+              {brand.tagline || brand.name}
+            </h1>
+            <p className="t-hero-desc" style={{ color: `${textColor}55` }}>
+              {brand.description || `Welcome to ${brand.name}.`}
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mt-10">
+              {channels.includes('ecommerce') && (
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                  Get Started
+                </Link>
+              )}
+              <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}15`, color: textColor }}>
+                Learn More →
+              </Link>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // PORTFOLIO — Full-bleed, left-aligned minimal
+    if (templateId === 'portfolio') {
+      return (
+        <section className="t-hero">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8">
+            <div className="max-w-2xl">
+              <h1 className="t-hero-heading mb-8" style={{ ...headingStyle, fontWeight: 400 }}>
+                {brand.tagline || brand.name}
+              </h1>
+              <p className="t-hero-desc" style={{ color: `${textColor}40` }}>
+                {brand.description || `Welcome to ${brand.name}.`}
+              </p>
+              <div className="flex flex-wrap gap-4 mt-12">
+                <Link href={`/site/${slug}/products`} className="t-btn-primary" style={{ backgroundColor: textColor, color: bgColor }}>
+                  View Work
+                </Link>
+                <Link href={`/site/${slug}/contact`} className="t-btn-secondary border" style={{ borderColor: `${textColor}15`, color: textColor }}>
+                  Contact
+                </Link>
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // MAGAZINE — Split with serif focus
+    if (templateId === 'magazine') {
+      return (
+        <section className="t-hero">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8">
+            <div className="t-hero-split">
+              <div>
+                <div className="h-0.5 w-10 mb-6" style={{ backgroundColor: accentColor }} />
+                <h1 className="t-hero-heading mb-6" style={headingStyle}>
+                  {brand.tagline || brand.name}
+                </h1>
+                <p className="t-hero-desc" style={{ color: `${textColor}55`, fontFamily: brand.font_body }}>
+                  {brand.description || `Welcome to ${brand.name}.`}
+                </p>
+                <div className="flex flex-wrap gap-4 mt-10">
+                  {channels.includes('ecommerce') && (
+                    <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                      Explore
+                    </Link>
+                  )}
+                  <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}15`, color: textColor }}>
+                    About Us
+                  </Link>
+                </div>
+              </div>
+              <div className="t-hero-image flex items-center justify-center" style={{ backgroundColor: `${textColor}04` }}>
+                {brand.logo_url ? (
+                  <img src={brand.logo_url} alt={brand.name} className="max-w-[60%] max-h-[60%] object-contain" />
+                ) : (
+                  <BrandPlaceholder color={textColor} className="w-full h-full" variant="hero" />
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // BOUTIQUE — Luxury, centered, spacious
+    if (templateId === 'boutique') {
+      return (
+        <section className="t-hero">
+          <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center">
+            {brand.industry && (
+              <span className="inline-block text-[10px] font-medium uppercase tracking-[0.2em] mb-8" style={{ color: accentColor }}>
+                {brand.industry}
+              </span>
+            )}
+            <h1 className="t-hero-heading mb-8" style={{ ...headingStyle, letterSpacing: '0.04em' }}>
+              {(brand.tagline || brand.name).toUpperCase()}
+            </h1>
+            <div className="h-px w-16 mx-auto mb-8" style={{ backgroundColor: accentColor }} />
+            <p className="t-hero-desc mx-auto" style={{ color: `${textColor}45`, letterSpacing: '0.01em' }}>
+              {brand.description || `Welcome to ${brand.name}.`}
+            </p>
+            <div className="flex flex-wrap justify-center gap-6 mt-12">
+              {channels.includes('ecommerce') && (
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: textColor, color: bgColor }}>
+                  SHOP COLLECTION
+                </Link>
+              )}
+              <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}15`, color: textColor }}>
+                OUR STORY
+              </Link>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // TECH — Terminal-style, left-aligned
+    if (templateId === 'tech') {
+      return (
+        <section className="t-hero" style={{ backgroundColor: '#0A0F1A' }}>
+          <div className="max-w-6xl mx-auto px-5 sm:px-8">
+            <span className="inline-block text-xs font-mono mb-6" style={{ color: accentColor }}>
+              {'>'} {brand.industry || brand.name} _
+            </span>
+            <h1 className="t-hero-heading mb-6" style={{ ...headingStyle, color: '#E2E8F0' }}>
+              {brand.tagline || brand.name}
+            </h1>
+            <p className="t-hero-desc" style={{ color: '#64748B' }}>
+              {brand.description || `Welcome to ${brand.name}.`}
+            </p>
+            <div className="flex flex-wrap gap-4 mt-10">
+              {channels.includes('ecommerce') && (
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#0A0F1A' }}>
+                  Get Started
+                </Link>
+              )}
+              <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: '#1E293B', color: '#94A3B8' }}>
+                Learn More →
+              </Link>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // WELLNESS — Zen, centered, breathing room
+    if (templateId === 'wellness') {
+      return (
+        <section className="t-hero">
+          <div className="max-w-3xl mx-auto px-5 sm:px-8 text-center">
+            {brand.industry && (
+              <span className="inline-block text-xs font-light tracking-[0.15em] mb-8" style={{ color: accentColor }}>
+                {brand.industry}
+              </span>
+            )}
+            <h1 className="t-hero-heading mb-8" style={{ ...headingStyle, fontWeight: 300 }}>
+              {brand.tagline || brand.name}
+            </h1>
+            <p className="t-hero-desc mx-auto" style={{ color: `${textColor}50`, fontWeight: 300 }}>
+              {brand.description || `Welcome to ${brand.name}.`}
+            </p>
+            <div className="flex flex-wrap justify-center gap-4 mt-12">
+              {channels.includes('ecommerce') && (
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                  Explore
+                </Link>
+              )}
+              <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}12`, color: textColor }}>
+                Our Story
+              </Link>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // RESTAURANT — Split with warm vibes
+    if (templateId === 'restaurant') {
+      return (
+        <section className="t-hero">
+          <div className="max-w-6xl mx-auto px-5 sm:px-8">
+            <div className="t-hero-split">
+              <div>
+                {brand.industry && (
+                  <span className="text-xs font-medium uppercase tracking-[0.15em] mb-6 block" style={{ color: accentColor }}>
+                    {brand.industry}
+                  </span>
+                )}
+                <h1 className="t-hero-heading mb-6" style={headingStyle}>
+                  {brand.tagline || brand.name}
+                </h1>
+                <p className="t-hero-desc" style={{ color: `${textColor}50` }}>
+                  {brand.description || `Welcome to ${brand.name}.`}
+                </p>
+                <div className="flex flex-wrap gap-4 mt-10">
+                  <Link href={`/site/${slug}/contact`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                    Reserve a Table
+                  </Link>
+                  {channels.includes('ecommerce') && (
+                    <Link href={`/shop/${slug}`} className="t-btn-secondary border" style={{ borderColor: `${textColor}12`, color: textColor }}>
+                      View Menu
+                    </Link>
+                  )}
+                </div>
+              </div>
+              <div className="t-hero-image flex items-center justify-center rounded" style={{ backgroundColor: `${textColor}04`, borderRadius: '4px' }}>
+                {brand.logo_url ? (
+                  <img src={brand.logo_url} alt={brand.name} className="max-w-[60%] max-h-[60%] object-contain" />
+                ) : (
+                  <BrandPlaceholder color={textColor} className="w-full h-full" variant="hero" />
+                )}
+              </div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // PLAYFUL — Rounded, friendly, with blob decorations (default fallback)
     return (
       <section className="t-hero relative">
         <div className="t-blob" style={{ width: 300, height: 300, top: '-15%', right: '-10%', backgroundColor: accentColor }} />
@@ -613,10 +843,10 @@ export default function BrandHomePage() {
 
   // Divider between sections
   const Divider = () => {
-    if (templateId === 'bold') return null; // Bold doesn't use dividers
-    if (templateId === 'playful') return null; // Playful uses section spacing instead
+    if (templateId === 'bold' || templateId === 'tech') return null;
+    if (templateId === 'playful' || templateId === 'wellness' || templateId === 'startup') return null;
     return (
-      <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
+      <div className={`${templateId === 'bold' || templateId === 'tech' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
         <div className="t-divider" style={{ backgroundColor: `${textColor}06` }} />
       </div>
     );
