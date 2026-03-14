@@ -33,24 +33,24 @@ const item = {
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-white dark:bg-slate-900">
+    <div className="min-h-screen bg-white dark:bg-[#0B0F1A]">
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-100 dark:border-slate-800">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-white/80 dark:bg-[#0B0F1A]/80 backdrop-blur-xl border-b border-slate-100 dark:border-slate-800/50">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-slate-900 dark:bg-white flex items-center justify-center">
-              <span className="text-white dark:text-slate-900 text-sm font-bold">M</span>
+            <div className="h-8 w-8 rounded-lg bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center shadow-md shadow-indigo-500/20">
+              <span className="text-white text-sm font-bold">M</span>
             </div>
-            <span className="font-semibold text-lg tracking-tight hidden sm:inline">Mayasura</span>
+            <span className="font-semibold text-lg tracking-tight hidden sm:inline text-slate-900 dark:text-white">Mayasura</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-4">
-            <Link href="/templates" className="text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white hidden sm:inline">
+            <Link href="/templates" className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hidden sm:inline transition-colors">
               Templates
             </Link>
-            <Link href="/dashboard" className="text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white">
+            <Link href="/dashboard" className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white transition-colors">
               Dashboard
             </Link>
-            <Link href="/login" className="text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white hidden sm:inline">
+            <Link href="/login" className="text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white hidden sm:inline transition-colors">
               Sign In
             </Link>
             <Link href="/create">
@@ -65,13 +65,20 @@ export default function Home() {
       </nav>
 
       {/* Hero */}
-      <section className="pt-28 sm:pt-32 pb-16 sm:pb-20 px-4 sm:px-6">
-        <div className="max-w-4xl mx-auto text-center">
+      <section className="relative pt-28 sm:pt-36 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden">
+        {/* Background orbs */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-40 -right-40 w-[500px] h-[500px] rounded-full bg-indigo-500/10 dark:bg-indigo-500/5 blur-3xl animate-float" />
+          <div className="absolute -bottom-40 -left-40 w-[500px] h-[500px] rounded-full bg-violet-500/10 dark:bg-violet-500/5 blur-3xl animate-float-delayed" />
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] rounded-full bg-purple-500/5 dark:bg-purple-500/3 blur-3xl animate-float-slow" />
+        </div>
+        
+        <div className="max-w-4xl mx-auto text-center relative">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
-            className="inline-flex items-center gap-2 rounded-full bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-4 py-1.5 text-sm text-slate-600 dark:text-slate-400 mb-6 sm:mb-8"
+            className="inline-flex items-center gap-2 rounded-full bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/50 dark:border-indigo-800/50 px-4 py-1.5 text-sm text-indigo-600 dark:text-indigo-400 mb-6 sm:mb-8"
           >
             <Sparkles className="h-3.5 w-3.5" />
             Open-source brand ecosystem builder
@@ -80,17 +87,17 @@ export default function Home() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.05 }}
-            className="text-4xl sm:text-5xl lg:text-7xl font-bold tracking-tight leading-[1.1] mb-4 sm:mb-6"
+            className="text-5xl sm:text-6xl lg:text-8xl font-bold tracking-tight leading-[1.05] mb-4 sm:mb-6 text-slate-900 dark:text-white"
           >
             Build your brand&apos;s
             <br />
-            <span className="text-blue-600">digital palace</span>
+            <span className="gradient-text">digital palace</span>
           </motion.h1>
           <motion.p
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.4, delay: 0.1 }}
-            className="text-base sm:text-lg lg:text-xl text-slate-500 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed"
+            className="text-base sm:text-lg lg:text-xl text-slate-500 dark:text-slate-400 max-w-2xl mx-auto mb-8 sm:mb-10 leading-relaxed"
           >
             Go from zero to a complete digital presence in minutes. 
             Website, chatbot, e-commerce, content — all AI-powered, 
@@ -122,10 +129,10 @@ export default function Home() {
       <section className="py-12 px-4 sm:px-6 overflow-hidden">
         <div className="max-w-6xl mx-auto">
           <div className="text-center mb-8">
-            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2">
+            <h2 className="text-2xl sm:text-3xl font-bold tracking-tight mb-2 text-slate-900 dark:text-white">
               10 industry templates
             </h2>
-            <p className="text-slate-500">Pick a template, customize with AI, launch in minutes</p>
+            <p className="text-slate-500 dark:text-slate-400">Pick a template, customize with AI, launch in minutes</p>
           </div>
           <motion.div
             variants={container}
@@ -137,13 +144,13 @@ export default function Home() {
             {STARTER_TEMPLATES.slice(0, 5).map((t) => (
               <motion.div key={t.id} variants={item} className="snap-center">
                 <Link href={`/create?template=${t.id}`}>
-                  <div className="w-36 sm:w-40 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 overflow-hidden hover:shadow-lg transition-all flex-shrink-0">
+                  <div className="w-36 sm:w-40 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 overflow-hidden hover:shadow-lg hover:shadow-indigo-500/5 transition-all flex-shrink-0 card-hover gradient-border">
                     <div className="h-12 p-3 flex items-center gap-2" style={{ backgroundColor: t.primaryColor }}>
                       <span className="text-lg">{t.emoji}</span>
                       <span className="text-xs font-medium truncate" style={{ color: t.secondaryColor }}>{t.name}</span>
                     </div>
                     <div className="p-3">
-                      <p className="text-[10px] text-slate-400 truncate">{t.category}</p>
+                      <p className="text-[10px] text-slate-400 dark:text-slate-500 truncate">{t.category}</p>
                     </div>
                   </div>
                 </Link>
@@ -151,7 +158,7 @@ export default function Home() {
             ))}
             <motion.div variants={item} className="snap-center">
               <Link href="/templates">
-                <div className="w-36 sm:w-40 h-full bg-slate-50 dark:bg-slate-800 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-700 flex items-center justify-center text-sm text-slate-400 hover:text-slate-600 hover:border-slate-300 transition-all flex-shrink-0 min-h-[88px]">
+                <div className="w-36 sm:w-40 h-full bg-slate-50 dark:bg-slate-900 rounded-xl border-2 border-dashed border-slate-200 dark:border-slate-800 flex items-center justify-center text-sm text-slate-400 dark:text-slate-500 hover:text-indigo-600 dark:hover:text-indigo-400 hover:border-indigo-300 dark:hover:border-indigo-800 transition-all flex-shrink-0 min-h-[88px]">
                   View all →
                 </div>
               </Link>
@@ -161,13 +168,14 @@ export default function Home() {
       </section>
 
       {/* Channels Grid */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-slate-50 dark:bg-slate-800/50">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-16 sm:py-24 px-4 sm:px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-50 to-white dark:from-slate-900/50 dark:to-[#0B0F1A] pointer-events-none" />
+        <div className="max-w-6xl mx-auto relative">
           <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
-              Every channel. One click.
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-slate-900 dark:text-white">
+              Every channel. <span className="gradient-text">One click.</span>
             </h2>
-            <p className="text-slate-500 text-base sm:text-lg max-w-xl mx-auto">
+            <p className="text-slate-500 dark:text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
               Your brand gets a complete digital ecosystem, not just a website.
             </p>
           </div>
@@ -180,12 +188,12 @@ export default function Home() {
           >
             {channels.map((channel) => (
               <motion.div key={channel.name} variants={item}>
-                <div className="group bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 p-6 hover:shadow-lg hover:border-slate-300 dark:hover:border-slate-600 transition-all duration-300">
-                  <div className="h-10 w-10 rounded-lg bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center mb-4 group-hover:bg-blue-100 dark:group-hover:bg-blue-900/50 transition-colors">
-                    <channel.icon className="h-5 w-5 text-blue-600" />
+                <div className="group bg-white dark:bg-slate-900/80 rounded-xl border border-slate-200 dark:border-slate-800 p-6 hover:shadow-xl hover:shadow-indigo-500/5 dark:hover:border-slate-700 transition-all duration-300 card-hover gradient-border backdrop-blur-sm">
+                  <div className="h-10 w-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 flex items-center justify-center mb-4 group-hover:bg-indigo-100 dark:group-hover:bg-indigo-900/30 transition-colors">
+                    <channel.icon className="h-5 w-5 text-indigo-600 dark:text-indigo-400" />
                   </div>
-                  <h3 className="font-semibold text-lg mb-2">{channel.name}</h3>
-                  <p className="text-sm text-slate-500 leading-relaxed">{channel.desc}</p>
+                  <h3 className="font-semibold text-lg mb-2 text-slate-900 dark:text-white">{channel.name}</h3>
+                  <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed">{channel.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -194,13 +202,13 @@ export default function Home() {
       </section>
 
       {/* How It Works */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6">
+      <section className="py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-4xl mx-auto">
           <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
-              Three steps to launch
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-slate-900 dark:text-white">
+              Three steps to <span className="gradient-text">launch</span>
             </h2>
-            <p className="text-slate-500 text-base sm:text-lg max-w-xl mx-auto">
+            <p className="text-slate-500 dark:text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
               Our AI-guided wizard makes brand creation effortless.
             </p>
           </div>
@@ -214,12 +222,12 @@ export default function Home() {
                 transition={{ delay: i * 0.1 }}
                 className="flex gap-4 sm:gap-8 items-start"
               >
-                <div className="flex-shrink-0 w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl bg-slate-900 dark:bg-white text-white dark:text-slate-900 flex items-center justify-center text-xl sm:text-2xl font-bold">
+                <div className="flex-shrink-0 w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-br from-indigo-600 to-violet-600 text-white flex items-center justify-center text-xl sm:text-2xl font-bold shadow-lg shadow-indigo-500/20">
                   {step.number}
                 </div>
                 <div className="pt-1 sm:pt-2">
-                  <h3 className="text-lg sm:text-xl font-semibold mb-2">{step.title}</h3>
-                  <p className="text-slate-500 leading-relaxed text-sm sm:text-base">{step.desc}</p>
+                  <h3 className="text-lg sm:text-xl font-semibold mb-2 text-slate-900 dark:text-white">{step.title}</h3>
+                  <p className="text-slate-500 dark:text-slate-400 leading-relaxed text-sm sm:text-base">{step.desc}</p>
                 </div>
               </motion.div>
             ))}
@@ -228,10 +236,12 @@ export default function Home() {
       </section>
 
       {/* Features */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-slate-900 text-white">
-        <div className="max-w-6xl mx-auto">
+      <section className="relative py-16 sm:py-24 px-4 sm:px-6 overflow-hidden">
+        <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-indigo-950 to-slate-900" />
+        <div className="absolute inset-0 noise-overlay" />
+        <div className="max-w-6xl mx-auto relative z-10">
           <div className="text-center mb-12 sm:mb-16">
-            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
+            <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-white">
               Built for the modern brand
             </h2>
             <p className="text-slate-400 text-base sm:text-lg max-w-xl mx-auto">
@@ -244,11 +254,11 @@ export default function Home() {
               { icon: Shield, title: 'Open Source', desc: 'Fully open-source. Own your data, customize everything, deploy anywhere.' },
               { icon: Layers, title: 'Composable', desc: 'Every component is modular. Swap, extend, or replace any piece of the stack.' },
             ].map((feature) => (
-              <div key={feature.title} className="text-center">
-                <div className="mx-auto h-12 w-12 rounded-xl bg-blue-600 flex items-center justify-center mb-4">
-                  <feature.icon className="h-6 w-6" />
+              <div key={feature.title} className="text-center group">
+                <div className="mx-auto h-14 w-14 rounded-2xl bg-gradient-to-br from-indigo-500 to-violet-500 flex items-center justify-center mb-4 group-hover:shadow-lg group-hover:shadow-indigo-500/30 transition-all">
+                  <feature.icon className="h-6 w-6 text-white" />
                 </div>
-                <h3 className="font-semibold text-lg mb-2">{feature.title}</h3>
+                <h3 className="font-semibold text-lg mb-2 text-white">{feature.title}</h3>
                 <p className="text-sm text-slate-400 leading-relaxed">{feature.desc}</p>
               </div>
             ))}
@@ -257,12 +267,12 @@ export default function Home() {
       </section>
 
       {/* CTA */}
-      <section className="py-16 sm:py-20 px-4 sm:px-6">
+      <section className="py-16 sm:py-24 px-4 sm:px-6">
         <div className="max-w-3xl mx-auto text-center">
-          <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold tracking-tight mb-4">
-            Ready to build your palace?
+          <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-slate-900 dark:text-white">
+            Ready to build your <span className="gradient-text">palace</span>?
           </h2>
-          <p className="text-slate-500 text-base sm:text-lg mb-6 sm:mb-8">
+          <p className="text-slate-500 dark:text-slate-400 text-base sm:text-lg mb-6 sm:mb-8">
             Start creating your brand ecosystem in minutes. No credit card required.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
@@ -285,15 +295,15 @@ export default function Home() {
       <footer className="border-t border-slate-200 dark:border-slate-800 py-8 sm:py-12 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2">
-            <div className="h-6 w-6 rounded bg-slate-900 dark:bg-white flex items-center justify-center">
-              <span className="text-white dark:text-slate-900 text-xs font-bold">M</span>
+            <div className="h-6 w-6 rounded bg-gradient-to-br from-indigo-600 to-violet-600 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">M</span>
             </div>
-            <span className="text-sm text-slate-500">
+            <span className="text-sm text-slate-500 dark:text-slate-400">
               Mayasura — The divine architect of digital ecosystems
             </span>
           </div>
-          <div className="flex items-center gap-6 text-sm text-slate-500">
-            <a href="https://github.com/vikramgorla/mayasura" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 dark:hover:text-white">
+          <div className="flex items-center gap-6 text-sm text-slate-500 dark:text-slate-400">
+            <a href="https://github.com/vikramgorla/mayasura" target="_blank" rel="noopener noreferrer" className="hover:text-slate-900 dark:hover:text-white transition-colors">
               GitHub
             </a>
             <span>MIT License</span>
