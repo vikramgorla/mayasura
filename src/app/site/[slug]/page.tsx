@@ -167,11 +167,11 @@ export default function BrandHomePage() {
               </p>
               <div className="flex flex-wrap justify-center gap-4 mt-10">
                 {channels.includes('ecommerce') && (
-                  <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                  <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
                     Shop Now
                   </Link>
                 )}
-                <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}12`, color: textColor }}>
+                <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
                   Learn More
                 </Link>
               </div>
@@ -430,11 +430,11 @@ export default function BrandHomePage() {
           </p>
           <div className="flex flex-wrap justify-center gap-4 mt-10">
             {channels.includes('ecommerce') && (
-              <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+              <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
                 Shop Now 🛍️
               </Link>
             )}
-            <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}12`, color: textColor }}>
+            <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
               Learn More
             </Link>
           </div>
@@ -825,24 +825,25 @@ export default function BrandHomePage() {
             <div className="flex flex-wrap justify-center gap-4">
               {channels.includes('ecommerce') && (
                 <Link href={`/shop/${slug}`} className="t-btn-primary" style={{
+                  ...primaryBtnStyle,
                   backgroundColor: isDark ? accentColor : textColor,
                   color: isDark ? '#FFFFFF' : bgColor,
                 }}>
                   {templateId === 'bold' ? 'VISIT SHOP' : templateId === 'playful' ? 'Visit Shop 🛍️' : 'Visit Shop'}
                 </Link>
               )}
-              <Link href={`/site/${slug}/contact`} className="t-btn-secondary border" style={{
+              <Link href={`/site/${slug}/contact`} className="t-btn-secondary" style={{
+                ...secondaryBtnStyle,
                 borderColor: `${textColor}${isDark ? '20' : '12'}`,
                 color: textColor,
-                borderWidth: templateId === 'bold' ? '2px' : '1px',
               }}>
                 {templateId === 'bold' ? 'CONTACT US' : templateId === 'playful' ? 'Contact Us 💬' : 'Contact Us'}
               </Link>
               {channels.includes('chatbot') && (
-                <Link href={`/chat/${slug}`} className="t-btn-secondary border" style={{
+                <Link href={`/chat/${slug}`} className="t-btn-secondary" style={{
+                  ...secondaryBtnStyle,
                   borderColor: `${textColor}${isDark ? '20' : '12'}`,
                   color: textColor,
-                  borderWidth: templateId === 'bold' ? '2px' : '1px',
                 }}>
                   {templateId === 'bold' ? 'CHAT NOW' : templateId === 'playful' ? 'Chat Now 🤖' : 'Chat Now'}
                 </Link>
