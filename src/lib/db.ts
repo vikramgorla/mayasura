@@ -135,27 +135,33 @@ function initializeDatabase(db: Database.Database) {
   runMigrations(db);
 }
 
+function hasColumn(db: Database.Database, table: string, column: string): boolean {
+  const cols = db.prepare(`PRAGMA table_info(${table})`).all() as Array<{ name: string }>;
+  return cols.some(c => c.name === column);
+}
+
 function runMigrations(db: Database.Database) {
+  console.log('[DB] Running migrations...');
+  
   // Add industry column if missing
-  try {
-    db.prepare("SELECT industry FROM brands LIMIT 1").get();
-  } catch {
-    try { db.exec("ALTER TABLE brands ADD COLUMN industry TEXT"); } catch { /* already exists */ }
+  if (!hasColumn(db, 'brands', 'industry')) {
+    console.log('[DB] Adding industry column to brands');
+    db.exec("ALTER TABLE brands ADD COLUMN industry TEXT");
   }
   
-  // Add user_id column if missing (no REFERENCES in ALTER TABLE for SQLite compatibility)
-  try {
-    db.prepare("SELECT user_id FROM brands LIMIT 1").get();
-  } catch {
-    try { db.exec("ALTER TABLE brands ADD COLUMN user_id TEXT"); } catch { /* already exists */ }
+  // Add user_id column if missing
+  if (!hasColumn(db, 'brands', 'user_id')) {
+    console.log('[DB] Adding user_id column to brands');
+    db.exec("ALTER TABLE brands ADD COLUMN user_id TEXT");
   }
 
   // Add sort_order column to products if missing
-  try {
-    db.prepare("SELECT sort_order FROM products LIMIT 1").get();
-  } catch {
-    try { db.exec("ALTER TABLE products ADD COLUMN sort_order INTEGER DEFAULT 0"); } catch { /* already exists */ }
+  if (!hasColumn(db, 'products', 'sort_order')) {
+    console.log('[DB] Adding sort_order column to products');
+    db.exec("ALTER TABLE products ADD COLUMN sort_order INTEGER DEFAULT 0");
   }
+  
+  console.log('[DB] Migrations complete');
 }
 
 // ==================== User operations ====================
