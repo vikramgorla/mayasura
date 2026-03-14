@@ -65,59 +65,59 @@ export default function OrdersPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8">
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center">
-                  <ShoppingBag className="h-5 w-5 text-blue-600" />
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-blue-50 dark:bg-blue-900/30 flex items-center justify-center flex-shrink-0">
+                  <ShoppingBag className="h-4 w-4 sm:h-5 sm:w-5 text-blue-600" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">{orders.length}</p>
-                  <p className="text-xs text-zinc-400">Total Orders</p>
+                <div className="min-w-0">
+                  <p className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">{orders.length}</p>
+                  <p className="text-[10px] sm:text-xs text-zinc-400">Total Orders</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center">
-                  <Clock className="h-5 w-5 text-yellow-600" />
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-yellow-50 dark:bg-yellow-900/30 flex items-center justify-center flex-shrink-0">
+                  <Clock className="h-4 w-4 sm:h-5 sm:w-5 text-yellow-600" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">{pendingOrders}</p>
-                  <p className="text-xs text-zinc-400">Pending</p>
+                <div className="min-w-0">
+                  <p className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">{pendingOrders}</p>
+                  <p className="text-[10px] sm:text-xs text-zinc-400">Pending</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
-                  <DollarSign className="h-5 w-5 text-green-600" />
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                  <DollarSign className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">
+                <div className="min-w-0">
+                  <p className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">
                     ${totalRevenue.toFixed(0)}
                   </p>
-                  <p className="text-xs text-zinc-400">Revenue</p>
+                  <p className="text-[10px] sm:text-xs text-zinc-400">Revenue</p>
                 </div>
               </div>
             </CardContent>
           </Card>
           <Card>
-            <CardContent className="p-4">
-              <div className="flex items-center gap-3">
-                <div className="h-10 w-10 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center">
-                  <CheckCircle className="h-5 w-5 text-green-600" />
+            <CardContent className="p-3 sm:p-4">
+              <div className="flex items-center gap-2 sm:gap-3">
+                <div className="h-8 w-8 sm:h-10 sm:w-10 rounded-xl bg-green-50 dark:bg-green-900/30 flex items-center justify-center flex-shrink-0">
+                  <CheckCircle className="h-4 w-4 sm:h-5 sm:w-5 text-green-600" />
                 </div>
-                <div>
-                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">
+                <div className="min-w-0">
+                  <p className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">
                     {orders.filter(o => o.status === 'delivered').length}
                   </p>
-                  <p className="text-xs text-zinc-400">Delivered</p>
+                  <p className="text-[10px] sm:text-xs text-zinc-400">Delivered</p>
                 </div>
               </div>
             </CardContent>
@@ -231,7 +231,7 @@ export default function OrdersPage() {
                             key={s}
                             onClick={() => updateStatus(selectedOrder.id, s)}
                             disabled={selectedOrder.status === s}
-                            className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
+                            className={`px-3 py-2 min-h-[44px] rounded-lg text-xs font-medium transition-colors ${
                               selectedOrder.status === s
                                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
                                 : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-600'

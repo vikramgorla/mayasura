@@ -209,7 +209,7 @@ export default function ContentPage() {
                           {new Date(item.created_at).toLocaleDateString()}
                         </p>
                       </div>
-                      <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity flex-shrink-0">
+                      <div className="flex items-center gap-1 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity flex-shrink-0">
                         <button
                           onClick={() => setPreviewItem(item)}
                           className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-600"

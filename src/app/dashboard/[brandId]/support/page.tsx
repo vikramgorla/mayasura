@@ -162,22 +162,22 @@ export default function SupportPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-zinc-400 mb-1">Total Tickets</p>
-          <p className="text-2xl font-bold text-zinc-900 dark:text-white">{stats.total}</p>
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4 mb-8">
+        <Card><CardContent className="p-3 sm:p-4">
+          <p className="text-[10px] sm:text-xs text-zinc-400 mb-1">Total Tickets</p>
+          <p className="text-xl sm:text-2xl font-bold text-zinc-900 dark:text-white">{stats.total}</p>
         </CardContent></Card>
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-zinc-400 mb-1">Open</p>
-          <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.open}</p>
+        <Card><CardContent className="p-3 sm:p-4">
+          <p className="text-[10px] sm:text-xs text-zinc-400 mb-1">Open</p>
+          <p className="text-xl sm:text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.open}</p>
         </CardContent></Card>
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-zinc-400 mb-1">Resolved</p>
-          <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.resolved}</p>
+        <Card><CardContent className="p-3 sm:p-4">
+          <p className="text-[10px] sm:text-xs text-zinc-400 mb-1">Resolved</p>
+          <p className="text-xl sm:text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.resolved}</p>
         </CardContent></Card>
-        <Card><CardContent className="p-4">
-          <p className="text-xs text-zinc-400 mb-1">Satisfaction</p>
-          <p className="text-2xl font-bold flex items-center gap-1">
+        <Card><CardContent className="p-3 sm:p-4">
+          <p className="text-[10px] sm:text-xs text-zinc-400 mb-1">Satisfaction</p>
+          <p className="text-xl sm:text-2xl font-bold flex items-center gap-1">
             {stats.satisfaction ? <>{stats.satisfaction}<Star className="h-4 w-4 text-amber-400" /></> : '—'}
           </p>
         </CardContent></Card>
@@ -239,9 +239,9 @@ export default function SupportPage() {
       <div className="flex flex-col lg:flex-row gap-6">
         {/* Ticket List */}
         <div className="flex-1">
-          <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+          <div className="flex gap-2 mb-4 overflow-x-auto pb-2 -mx-1 px-1">
             {['all', 'open', 'in-progress', 'resolved', 'closed'].map(s => (
-              <Button key={s} variant={filter === s ? 'default' : 'ghost'} size="sm" onClick={() => setFilter(s)} className="capitalize whitespace-nowrap">
+              <Button key={s} variant={filter === s ? 'default' : 'ghost'} size="sm" onClick={() => setFilter(s)} className="capitalize whitespace-nowrap min-h-[44px]">
                 {s === 'all' ? 'All' : s}
               </Button>
             ))}
@@ -285,13 +285,13 @@ export default function SupportPage() {
           )}
         </div>
 
-        {/* Ticket Detail Panel */}
+        {/* Ticket Detail Panel — fixed overlay on mobile, sidebar on desktop */}
         {selectedTicket && selectedTicketData && (
           <motion.div
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="lg:w-[400px] bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl overflow-hidden flex flex-col"
-            style={{ maxHeight: 'calc(100vh - 200px)' }}
+            className="fixed inset-0 z-40 lg:relative lg:inset-auto lg:z-auto lg:w-[400px] bg-white dark:bg-zinc-800 border-none lg:border border-zinc-200 dark:border-zinc-700 rounded-none lg:rounded-xl overflow-hidden flex flex-col"
+            style={{ maxHeight: 'calc(100vh - 0px)' }}
           >
             <div className="p-4 border-b border-zinc-100 dark:border-zinc-700">
               <div className="flex items-center justify-between mb-2">

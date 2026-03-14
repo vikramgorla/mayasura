@@ -342,15 +342,15 @@ export default function ProductsPage() {
                       </div>
                     </div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed line-clamp-2">{product.description}</p>
-                    <div className="flex items-center gap-1 mt-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <Button variant="ghost" size="sm" onClick={() => startEdit(product)} className="h-7 text-xs">
+                    <div className="flex items-center gap-1 mt-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <Button variant="ghost" size="sm" onClick={() => startEdit(product)} className="h-9 sm:h-7 text-xs min-w-[44px]">
                         <Edit className="h-3 w-3 mr-1" /> Edit
                       </Button>
                       <Button
                         variant="ghost"
                         size="sm"
                         onClick={() => deleteProduct(product.id)}
-                        className="h-7 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30"
+                        className="h-9 sm:h-7 text-xs text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 min-w-[44px]"
                       >
                         <Trash2 className="h-3 w-3 mr-1" /> Delete
                       </Button>

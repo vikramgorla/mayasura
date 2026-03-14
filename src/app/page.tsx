@@ -120,7 +120,7 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between py-5 text-left group"
+        className="w-full flex items-center justify-between py-5 text-left group min-h-[44px]"
       >
         <span className="font-medium text-[15px] text-[var(--text-primary)] group-hover:text-violet-600 transition-colors pr-4">{q}</span>
         <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
@@ -443,11 +443,15 @@ export default function Home() {
           </motion.div>
 
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
-            {/* Template selector */}
-            <div className="lg:col-span-4 space-y-3">
-              {templatePreviews.map((t, i) => (
-                <TemplateCard key={t.id} t={t} isActive={activeTemplate === i} onClick={() => setActiveTemplate(i)} />
-              ))}
+            {/* Template selector — horizontal scroll on mobile, vertical on desktop */}
+            <div className="lg:col-span-4">
+              <div className="flex lg:flex-col gap-3 overflow-x-auto pb-2 lg:pb-0 lg:overflow-x-visible snap-x snap-mandatory lg:snap-none">
+                {templatePreviews.map((t, i) => (
+                  <div key={t.id} className="snap-start shrink-0 w-[200px] lg:w-auto">
+                    <TemplateCard t={t} isActive={activeTemplate === i} onClick={() => setActiveTemplate(i)} />
+                  </div>
+                ))}
+              </div>
               <div className="pt-3">
                 <Link href="/templates">
                   <Button variant="outline" size="lg" className="w-full">
@@ -556,14 +560,14 @@ export default function Home() {
             </p>
           </motion.div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 max-w-4xl mx-auto">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {/* Free Tier */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0 }}
-              className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-7"
+              className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-6 sm:p-7"
             >
               <h3 className="font-display font-semibold text-lg mb-1 text-[var(--text-primary)]">Free</h3>
               <p className="text-sm text-[var(--text-secondary)] mb-5">Perfect for getting started</p>
@@ -592,7 +596,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="bg-[var(--bg-surface)] rounded-2xl border-2 border-violet-600 p-7 relative shadow-xl shadow-violet-500/10"
+              className="bg-[var(--bg-surface)] rounded-2xl border-2 border-violet-600 p-6 sm:p-7 relative shadow-xl shadow-violet-500/10 sm:col-span-2 lg:col-span-1"
             >
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="px-3 py-1 rounded-full bg-violet-600 text-white text-xs font-medium shadow-lg">
@@ -627,7 +631,7 @@ export default function Home() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-7"
+              className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-6 sm:p-7"
             >
               <h3 className="font-display font-semibold text-lg mb-1 text-[var(--text-primary)]">Enterprise</h3>
               <p className="text-sm text-[var(--text-secondary)] mb-5">For large organizations</p>
@@ -667,7 +671,7 @@ export default function Home() {
               Hear from the founders and creators who built their brands with Mayasura.
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
             {testimonials.map((t, i) => (
               <motion.div
                 key={i}
@@ -675,7 +679,7 @@ export default function Home() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
-                className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-7 hover:shadow-lg transition-shadow duration-300"
+                className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-6 sm:p-7 hover:shadow-lg transition-shadow duration-300"
               >
                 <div className="flex gap-0.5 mb-5">
                   {Array.from({ length: 5 }).map((_, j) => (
@@ -807,7 +811,7 @@ export default function Home() {
       {/* ═══════════ FOOTER ═══════════ */}
       <footer className="border-t border-[var(--border-primary)] py-16 px-4 sm:px-6 bg-[var(--bg-primary)]">
         <div className="max-w-6xl mx-auto">
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-8 mb-12">
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-8 mb-12">
             {/* Brand */}
             <div className="col-span-2 sm:col-span-1">
               <div className="flex items-center gap-2 mb-4">

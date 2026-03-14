@@ -196,7 +196,7 @@ export default function AnalyticsPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-4 mb-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3 sm:gap-4 mb-8">
           {stats.map((stat, i) => (
             <motion.div
               key={stat.label}
@@ -205,11 +205,11 @@ export default function AnalyticsPage() {
               transition={{ delay: i * 0.05 }}
             >
               <Card>
-                <CardContent className="p-4">
-                  <div className={`h-9 w-9 rounded-lg flex items-center justify-center mb-3 ${stat.color}`}>
-                    <stat.icon className="h-4 w-4" />
+                <CardContent className="p-3 sm:p-4">
+                  <div className={`h-8 w-8 sm:h-9 sm:w-9 rounded-lg flex items-center justify-center mb-2 sm:mb-3 ${stat.color}`}>
+                    <stat.icon className="h-3.5 w-3.5 sm:h-4 sm:w-4" />
                   </div>
-                  <p className="text-xl font-bold text-zinc-900 dark:text-white">
+                  <p className="text-lg sm:text-xl font-bold text-zinc-900 dark:text-white">
                     <AnimatedCounter value={Math.round(stat.value)} prefix={stat.prefix} suffix={(stat as { suffix?: string }).suffix || ''} />
                   </p>
                   <div className="flex items-center gap-2 mt-1">
@@ -235,7 +235,7 @@ export default function AnalyticsPage() {
               {data?.pageViews.byDay && data.pageViews.byDay.length > 0 ? (
                 <div>
                   {/* Mini sparkline chart */}
-                  <div className="mb-4">
+                  <div className="mb-4 overflow-x-auto">
                     <Sparkline
                       data={data.pageViews.byDay.map(d => d.count)}
                       width={480}
@@ -335,7 +335,7 @@ export default function AnalyticsPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-6">
+              <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
                 <DonutChart
                   data={[
                     { label: 'Desktop', value: data?.devices.desktop || 0, color: '#06b6d4' },
@@ -344,7 +344,7 @@ export default function AnalyticsPage() {
                   ]}
                   size={110}
                 />
-                <div className="space-y-3">
+                <div className="space-y-3 w-full sm:w-auto">
                   {[
                     { label: 'Desktop', value: data?.devices.desktop || 0, icon: Monitor, color: '#06b6d4' },
                     { label: 'Mobile', value: data?.devices.mobile || 0, icon: Smartphone, color: '#8b5cf6' },
