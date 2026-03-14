@@ -253,6 +253,39 @@ export default function BrandDashboardPage() {
         ))}
       </div>
 
+      {/* Live Ecosystem Links */}
+      {data.brand.status === 'launched' && data.brand.slug && (
+        <>
+          <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">🏛️ Live Ecosystem</h2>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+            {[
+              { href: `/site/${data.brand.slug}`, icon: Globe, label: 'Website', desc: 'Live brand website', color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30' },
+              { href: `/shop/${data.brand.slug}`, icon: ShoppingBag, label: 'Shop', desc: 'E-commerce store', color: 'text-amber-600 bg-amber-50 dark:bg-amber-900/30' },
+              { href: `/blog/${data.brand.slug}`, icon: FileText, label: 'Blog', desc: 'Live blog', color: 'text-purple-600 bg-purple-50 dark:bg-purple-900/30' },
+              { href: `/chat/${data.brand.slug}`, icon: MessageSquare, label: 'Chatbot', desc: 'AI assistant', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30' },
+            ].map((link) => (
+              <a
+                key={link.href}
+                href={link.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="block"
+              >
+                <Card className="hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer group h-full">
+                  <CardContent className="p-4">
+                    <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-3 ${link.color}`}>
+                      <link.icon className="h-5 w-5" />
+                    </div>
+                    <p className="font-medium text-sm text-slate-900 dark:text-white">{link.label}</p>
+                    <p className="text-xs text-slate-400 mt-0.5">{link.desc}</p>
+                  </CardContent>
+                </Card>
+              </a>
+            ))}
+          </div>
+        </>
+      )}
+
       {/* Active Channels */}
       <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Active Channels</h2>
       <Card>

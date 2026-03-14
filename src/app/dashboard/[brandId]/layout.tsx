@@ -19,12 +19,15 @@ import { useToast } from '@/components/ui/toast';
 const navItems = [
   { href: '', icon: LayoutDashboard, label: 'Overview' },
   { href: '/website', icon: Globe, label: 'Website' },
+  { href: '/blog', icon: FileText, label: 'Blog' },
+  { href: '/orders', icon: Package, label: 'Orders' },
   { href: '/chatbot', icon: MessageSquare, label: 'Chatbot' },
   { href: '/products', icon: Package, label: 'Products' },
   { href: '/content', icon: FileText, label: 'Content' },
   { href: '/support', icon: HeadphonesIcon, label: 'Support' },
   { href: '/strategy', icon: Sparkles, label: 'AI Strategy' },
   { href: '/analytics', icon: BarChart3, label: 'Analytics' },
+  { href: '/settings', icon: BarChart3, label: 'Settings' },
 ];
 
 export default function BrandDashboardLayout({ children }: { children: React.ReactNode }) {
