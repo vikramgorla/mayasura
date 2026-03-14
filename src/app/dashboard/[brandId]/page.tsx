@@ -13,6 +13,8 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { Sparkline } from '@/components/ui/sparkline';
 import { Brand } from '@/lib/types';
 import { useToast } from '@/components/ui/toast';
 
@@ -89,10 +91,10 @@ export default function BrandDashboardPage() {
   const healthScore = calculateHealthScore(data);
 
   const stats = [
-    { label: 'Channels', value: channels.length, icon: Globe, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/30' },
-    { label: 'Products', value: data.productCount, icon: Package, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/30' },
-    { label: 'Content', value: data.contentCount, icon: FileText, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/30' },
-    { label: 'Tickets', value: data.ticketStats.total, icon: HeadphonesIcon, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/30' },
+    { label: 'Channels', value: channels.length, icon: Globe, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/30', sparkColor: '#2563EB', sparkData: [1, 2, 2, 3, channels.length] },
+    { label: 'Products', value: data.productCount, icon: Package, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/30', sparkColor: '#D97706', sparkData: [0, 1, 2, 3, data.productCount] },
+    { label: 'Content', value: data.contentCount, icon: FileText, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/30', sparkColor: '#7C3AED', sparkData: [0, 1, 1, 2, data.contentCount] },
+    { label: 'Tickets', value: data.ticketStats.total, icon: HeadphonesIcon, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/30', sparkColor: '#059669', sparkData: [0, 1, 2, 1, data.ticketStats.total] },
   ];
 
   const quickLinks = [
@@ -117,6 +119,15 @@ export default function BrandDashboardPage() {
 
   return (
     <div className="p-4 sm:p-8">
+      {/* Breadcrumbs */}
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: data.brand.name },
+        ]}
+        className="mb-4"
+      />
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -143,8 +154,11 @@ export default function BrandDashboardPage() {
           >
             <Card className="hover:shadow-md transition-shadow">
               <CardContent className="p-4">
-                <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-3 ${stat.bg}`}>
-                  <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                <div className="flex items-start justify-between mb-3">
+                  <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${stat.bg}`}>
+                    <stat.icon className={`h-5 w-5 ${stat.color}`} />
+                  </div>
+                  <Sparkline data={stat.sparkData} color={stat.sparkColor} width={60} height={24} />
                 </div>
                 <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                   <AnimatedCounter value={stat.value} />
@@ -285,6 +299,35 @@ export default function BrandDashboardPage() {
           </div>
         </>
       )}
+
+      {/* Recent Activity */}
+      <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white flex items-center gap-2">
+        <Clock className="h-4 w-4 text-zinc-400" />
+        Recent Activity
+      </h2>
+      <Card className="mb-8">
+        <CardContent className="p-5">
+          <div className="space-y-4">
+            {[
+              { icon: '🚀', text: 'Brand created', time: data.brand.created_at ? new Date(data.brand.created_at).toLocaleDateString() : 'Recently', color: 'bg-violet-100 dark:bg-violet-900/30' },
+              ...(data.brand.status === 'launched' ? [{ icon: '🏛️', text: 'Brand launched and live', time: 'Active', color: 'bg-emerald-100 dark:bg-emerald-900/30' }] : []),
+              ...(data.productCount > 0 ? [{ icon: '📦', text: `${data.productCount} product${data.productCount > 1 ? 's' : ''} added`, time: 'Up to date', color: 'bg-amber-100 dark:bg-amber-900/30' }] : []),
+              ...(data.contentCount > 0 ? [{ icon: '✍️', text: `${data.contentCount} content piece${data.contentCount > 1 ? 's' : ''} created`, time: 'Up to date', color: 'bg-purple-100 dark:bg-purple-900/30' }] : []),
+              ...(data.ticketStats.open > 0 ? [{ icon: '🎫', text: `${data.ticketStats.open} open ticket${data.ticketStats.open > 1 ? 's' : ''} need attention`, time: 'Action needed', color: 'bg-rose-100 dark:bg-rose-900/30' }] : []),
+            ].slice(0, 5).map((activity, i) => (
+              <div key={i} className="flex items-center gap-3">
+                <div className={`h-8 w-8 rounded-lg flex items-center justify-center text-sm ${activity.color}`}>
+                  {activity.icon}
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm text-zinc-700 dark:text-zinc-300">{activity.text}</p>
+                </div>
+                <span className="text-xs text-zinc-400 flex-shrink-0">{activity.time}</span>
+              </div>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
 
       {/* Active Channels */}
       <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">Active Channels</h2>
