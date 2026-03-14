@@ -5,6 +5,7 @@ export interface Product {
   price?: number;
   currency?: string;
   category?: string;
+  sort_order?: number;
 }
 
 export interface BrandData {
@@ -13,6 +14,7 @@ export interface BrandData {
   tagline: string;
   industry: string;
   description: string;
+  templateId?: string;
   
   // Step 2: Identity
   primaryColor: string;
@@ -41,6 +43,7 @@ export interface Brand {
   name: string;
   tagline: string | null;
   description: string | null;
+  industry: string | null;
   logo_url: string | null;
   primary_color: string;
   secondary_color: string;
@@ -50,8 +53,56 @@ export interface Brand {
   brand_voice: string | null;
   channels: string;
   status: string;
+  user_id: string | null;
   created_at: string;
   updated_at: string;
+}
+
+export interface User {
+  id: string;
+  email: string;
+  name: string;
+  password_hash: string;
+  avatar_url: string | null;
+  created_at: string;
+}
+
+export interface Ticket {
+  id: string;
+  brand_id: string;
+  customer_name: string;
+  customer_email: string;
+  subject: string;
+  category: string | null;
+  priority: 'low' | 'medium' | 'high' | 'urgent';
+  status: 'open' | 'in-progress' | 'resolved' | 'closed';
+  satisfaction_rating: number | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TicketMessage {
+  id: string;
+  ticket_id: string;
+  role: 'customer' | 'agent' | 'ai';
+  content: string;
+  created_at: string;
+}
+
+export interface ActivityItem {
+  id: string;
+  brand_id: string;
+  type: string;
+  description: string;
+  metadata: string;
+  created_at: string;
+}
+
+// API Response envelope
+export interface ApiResponse<T = unknown> {
+  success: boolean;
+  data?: T;
+  error?: string;
 }
 
 export const AVAILABLE_CHANNELS = [
@@ -84,4 +135,17 @@ export const FONT_OPTIONS = [
   'Manrope',
   'Sora',
   'Geist',
+] as const;
+
+export const INDUSTRY_CATEGORIES = [
+  { id: 'restaurant', name: 'Restaurant/Food & Beverage', emoji: '🍕' },
+  { id: 'fashion', name: 'Fashion/Clothing', emoji: '👗' },
+  { id: 'tech', name: 'Tech/SaaS', emoji: '💻' },
+  { id: 'fitness', name: 'Fitness/Wellness', emoji: '🏋️' },
+  { id: 'education', name: 'Education/Courses', emoji: '📚' },
+  { id: 'realestate', name: 'Real Estate', emoji: '🏠' },
+  { id: 'beauty', name: 'Beauty/Salon', emoji: '✂️' },
+  { id: 'music', name: 'Music/Entertainment', emoji: '🎵' },
+  { id: 'retail', name: 'General Retail', emoji: '🛒' },
+  { id: 'healthcare', name: 'Healthcare', emoji: '🏥' },
 ] as const;
