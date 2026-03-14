@@ -72,6 +72,7 @@ function CreatePageContent() {
   const handleLaunch = async () => {
     setIsLaunching(true);
     try {
+      // Step 1: Create the brand
       const res = await fetch('/api/brands', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -90,19 +91,36 @@ function CreatePageContent() {
           status: 'launched',
         }),
       });
-      const result = await res.json();
-      const brandId = result.brand.id;
 
-      // Create products (batched)
-      for (const product of data.products) {
-        await fetch(`/api/brands/${brandId}/products`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(product),
-        });
+      if (!res.ok) {
+        const errData = await res.json().catch(() => ({}));
+        throw new Error(errData.error || `Server error: ${res.status}`);
       }
 
-      // Generate initial content (non-blocking)
+      const result = await res.json();
+
+      if (!result.brand?.id) {
+        throw new Error('Brand creation failed — no ID returned');
+      }
+
+      const brandId = result.brand.id;
+
+      // Step 2: Create products (batched with error handling)
+      if (data.products.length > 0) {
+        const productPromises = data.products.map(product =>
+          fetch(`/api/brands/${brandId}/products`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(product),
+          }).catch(err => {
+            console.error('Product creation error:', err);
+            return null;
+          })
+        );
+        await Promise.all(productPromises);
+      }
+
+      // Step 3: Generate initial content (non-blocking)
       fetch(`/api/brands/${brandId}/generate`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -130,7 +148,8 @@ function CreatePageContent() {
       router.push(`/dashboard/${brandId}`);
     } catch (error) {
       console.error('Launch error:', error);
-      toast.error('Launch failed', 'Please try again');
+      const message = error instanceof Error ? error.message : 'Unknown error occurred';
+      toast.error('Launch failed', message);
       setIsLaunching(false);
     }
   };

@@ -47,6 +47,7 @@ export async function POST(request: NextRequest) {
     return NextResponse.json({ brand }, { status: 201 });
   } catch (error) {
     console.error('Error creating brand:', error);
-    return NextResponse.json({ error: 'Failed to create brand' }, { status: 500 });
+    const message = error instanceof Error ? error.message : 'Failed to create brand';
+    return NextResponse.json({ error: message }, { status: 500 });
   }
 }
