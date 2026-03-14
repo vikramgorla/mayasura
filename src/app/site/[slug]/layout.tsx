@@ -31,6 +31,56 @@ interface BrandSiteData {
 }
 
 const BrandSiteContext = createContext<BrandSiteData | null>(null);
+/**
+ * SVG placeholder for images throughout the brand site.
+ */
+export function BrandPlaceholder({
+  color = '#ccc',
+  className = '',
+  variant = 'default',
+}: {
+  color?: string;
+  className?: string;
+  variant?: 'default' | 'hero' | 'about';
+}) {
+  return (
+    <svg
+      className={className}
+      viewBox="0 0 400 300"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+      style={{ opacity: 0.15 }}
+    >
+      {variant === 'hero' ? (
+        <>
+          <rect width="400" height="300" rx="8" fill={color} fillOpacity="0.08" />
+          <circle cx="200" cy="110" r="50" fill={color} fillOpacity="0.12" />
+          <circle cx="140" cy="170" r="30" fill={color} fillOpacity="0.08" />
+          <circle cx="260" cy="180" r="25" fill={color} fillOpacity="0.06" />
+          <rect x="120" y="230" width="160" height="16" rx="8" fill={color} fillOpacity="0.1" />
+        </>
+      ) : variant === 'about' ? (
+        <>
+          <rect width="400" height="300" rx="8" fill={color} fillOpacity="0.06" />
+          <rect x="60" y="60" width="120" height="120" rx="60" fill={color} fillOpacity="0.1" />
+          <rect x="220" y="80" width="140" height="10" rx="5" fill={color} fillOpacity="0.12" />
+          <rect x="220" y="105" width="100" height="10" rx="5" fill={color} fillOpacity="0.08" />
+          <rect x="220" y="130" width="120" height="10" rx="5" fill={color} fillOpacity="0.06" />
+          <rect x="60" y="220" width="280" height="8" rx="4" fill={color} fillOpacity="0.06" />
+          <rect x="60" y="240" width="200" height="8" rx="4" fill={color} fillOpacity="0.04" />
+        </>
+      ) : (
+        <>
+          <rect width="400" height="300" rx="8" fill={color} fillOpacity="0.06" />
+          <circle cx="200" cy="120" r="35" fill={color} fillOpacity="0.12" />
+          <rect x="140" y="180" width="120" height="10" rx="5" fill={color} fillOpacity="0.1" />
+          <rect x="160" y="205" width="80" height="8" rx="4" fill={color} fillOpacity="0.06" />
+        </>
+      )}
+    </svg>
+  );
+}
+
 export function useBrandSite() {
   return useContext(BrandSiteContext);
 }
@@ -39,6 +89,11 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
   const slug = brand.slug || brand.id;
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const templateId = template?.id || 'minimal';
+  const isDark = templateId === 'bold';
+  const textColor = isDark ? '#FFFFFF' : brand.primary_color;
+  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const accentColor = brand.accent_color || textColor;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 20);
@@ -50,27 +105,78 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
     { href: `/site/${slug}`, label: 'Home' },
     { href: `/site/${slug}/about`, label: 'About' },
     { href: `/site/${slug}/products`, label: 'Products' },
-    { href: `/blog/${slug}`, label: 'Blog' },
+    { href: `/blog/${slug}`, label: templateId === 'editorial' ? 'Journal' : 'Blog' },
     { href: `/site/${slug}/contact`, label: 'Contact' },
   ];
 
+  // Template-specific nav styles
+  const navBg = (() => {
+    if (!scrolled && templateId === 'minimal') return 'transparent';
+    if (isDark) return scrolled ? '#000000e8' : '#000000';
+    return scrolled ? `${bgColor}f0` : bgColor;
+  })();
+
+  const navBorder = scrolled ? `${textColor}08` : 'transparent';
+  const navHeight = templateId === 'minimal' ? 'h-20' : templateId === 'bold' ? 'h-14' : 'h-16';
+  const containerWidth = templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl';
+
+  // Link styles per template
+  const linkClass = (() => {
+    if (templateId === 'minimal') return 'text-[13px] font-normal tracking-wide';
+    if (templateId === 'editorial') return 'text-[13px] font-medium';
+    if (templateId === 'bold') return 'text-[11px] font-bold uppercase tracking-[0.12em]';
+    if (templateId === 'classic') return 'text-[13px] font-medium';
+    if (templateId === 'playful') return 'text-[13px] font-semibold';
+    return 'text-[13px] font-medium';
+  })();
+
+  // Shop button style
+  const shopBtnStyle: React.CSSProperties = (() => {
+    if (templateId === 'bold') return {
+      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '0',
+      padding: '0.5rem 1.25rem', fontSize: '0.6875rem', fontWeight: 700,
+      letterSpacing: '0.12em', textTransform: 'uppercase',
+    };
+    if (templateId === 'playful') return {
+      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '9999px',
+      padding: '0.5rem 1.5rem', fontSize: '0.8125rem', fontWeight: 600,
+    };
+    if (templateId === 'classic') return {
+      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '8px',
+      padding: '0.5rem 1.5rem', fontSize: '0.8125rem', fontWeight: 500,
+    };
+    return {
+      backgroundColor: textColor, color: bgColor, borderRadius: '0',
+      padding: '0.5rem 1.5rem', fontSize: '0.8125rem', fontWeight: 500,
+    };
+  })();
+
+  // Logo style per template
+  const logoStyle: React.CSSProperties = (() => {
+    if (templateId === 'minimal') return { fontWeight: 400, fontSize: '1rem', letterSpacing: '-0.01em' };
+    if (templateId === 'editorial') return { fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.02em' };
+    if (templateId === 'bold') return { fontWeight: 700, fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const };
+    if (templateId === 'classic') return { fontWeight: 600, fontSize: '1.125rem', letterSpacing: '0' };
+    if (templateId === 'playful') return { fontWeight: 700, fontSize: '1.125rem', letterSpacing: '-0.01em' };
+    return {};
+  })();
+
   return (
     <nav
-      className={`sticky top-0 z-50 transition-all duration-300 ${
-        scrolled ? 'border-b shadow-sm' : ''
-      }`}
+      className={`sticky top-0 z-50 transition-all duration-300 ${scrolled ? 'border-b' : ''}`}
       style={{
-        backgroundColor: scrolled ? `${brand.secondary_color}f5` : brand.secondary_color,
-        borderColor: `${brand.primary_color}08`,
-        backdropFilter: scrolled ? 'blur(12px)' : undefined,
+        backgroundColor: navBg,
+        borderColor: navBorder,
+        backdropFilter: scrolled ? 'blur(16px) saturate(180%)' : undefined,
+        boxShadow: scrolled && !isDark ? '0 1px 3px rgba(0,0,0,0.04)' : undefined,
       }}
     >
-      <div className="max-w-6xl mx-auto px-5 sm:px-8">
-        <div className="flex items-center justify-between h-16">
+      <div className={`${containerWidth} mx-auto px-5 sm:px-8`}>
+        <div className={`flex items-center justify-between ${navHeight}`}>
           <Link
             href={`/site/${slug}`}
-            className="text-lg font-semibold tracking-tight transition-opacity hover:opacity-70"
-            style={{ color: brand.primary_color, fontFamily: brand.font_heading }}
+            className="transition-opacity hover:opacity-70"
+            style={{ color: textColor, fontFamily: brand.font_heading, ...logoStyle }}
           >
             {brand.logo_url ? (
               <img src={brand.logo_url} alt={brand.name} className="h-7" />
@@ -80,29 +186,25 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
           </Link>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-8">
+          <div className={`hidden md:flex items-center ${templateId === 'bold' ? 'gap-6' : 'gap-8'}`}>
             {navLinks.map((link) => (
               <Link
                 key={link.href}
                 href={link.href}
-                className="text-[13px] font-medium tracking-wide uppercase transition-colors hover:opacity-100"
-                style={{ color: `${brand.primary_color}88` }}
-                onMouseEnter={(e) => (e.currentTarget.style.color = brand.primary_color)}
-                onMouseLeave={(e) => (e.currentTarget.style.color = `${brand.primary_color}88`)}
+                className={`${linkClass} transition-colors hover:opacity-100`}
+                style={{ color: `${textColor}77` }}
+                onMouseEnter={(e) => (e.currentTarget.style.color = textColor)}
+                onMouseLeave={(e) => (e.currentTarget.style.color = `${textColor}77`)}
               >
-                {link.label}
+                {templateId === 'bold' ? link.label.toUpperCase() : link.label}
               </Link>
             ))}
             <Link
               href={`/shop/${slug}`}
-              className="px-5 py-2 text-[13px] font-medium tracking-wide transition-all hover:opacity-90"
-              style={{
-                backgroundColor: brand.primary_color,
-                color: brand.secondary_color,
-                borderRadius: template?.preview.borderRadius || '0px',
-              }}
+              className="transition-all hover:opacity-90"
+              style={shopBtnStyle}
             >
-              Shop
+              {templateId === 'bold' ? 'SHOP' : templateId === 'playful' ? 'Shop 🛍️' : 'Shop'}
             </Link>
           </div>
 
@@ -110,9 +212,9 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
           <button
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden p-2 -mr-2"
-            style={{ color: brand.primary_color }}
+            style={{ color: textColor }}
           >
-            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={templateId === 'bold' ? 2 : 1.5}>
               {menuOpen ? (
                 <path strokeLinecap="round" strokeLinejoin="round" d="M6 18L18 6M6 6l12 12" />
               ) : (
@@ -128,8 +230,8 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
         <div
           className="md:hidden border-t px-5 py-5 space-y-4"
           style={{
-            borderColor: `${brand.primary_color}08`,
-            backgroundColor: brand.secondary_color,
+            borderColor: `${textColor}08`,
+            backgroundColor: bgColor,
           }}
         >
           {[...navLinks, { href: `/shop/${slug}`, label: 'Shop' }].map((link) => (
@@ -137,10 +239,10 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
               key={link.href}
               href={link.href}
               onClick={() => setMenuOpen(false)}
-              className="block text-sm font-medium tracking-wide"
-              style={{ color: `${brand.primary_color}99` }}
+              className={`block ${linkClass}`}
+              style={{ color: `${textColor}88` }}
             >
-              {link.label}
+              {templateId === 'bold' ? link.label.toUpperCase() : link.label}
             </Link>
           ))}
         </div>
@@ -359,6 +461,7 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
     <BrandSiteContext.Provider value={data}>
       <div
         className="min-h-screen flex flex-col"
+        data-template={data.websiteTemplate?.id || 'minimal'}
         style={{
           backgroundColor: data.brand.secondary_color || '#fafafa',
           color: data.brand.primary_color || '#0f172a',

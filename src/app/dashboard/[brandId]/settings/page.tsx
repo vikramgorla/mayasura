@@ -1,115 +1,542 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { useParams } from 'next/navigation';
-import { motion } from 'framer-motion';
-import { Globe, ShoppingBag, FileText, MessageSquare, Settings, ExternalLink, Copy, Check } from 'lucide-react';
+import { useEffect, useState, useCallback } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  Settings, Palette, Globe, Plug, AlertTriangle, Save, Loader2,
+  Check, Copy, ExternalLink, Eye, Trash2, MessageSquare,
+  ShoppingBag, FileText, Mail, Share2, ChevronRight,
+  Newspaper
+} from 'lucide-react';
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
-import { Brand } from '@/lib/types';
+import { Brand, INDUSTRY_CATEGORIES, FONT_OPTIONS, TONE_OPTIONS } from '@/lib/types';
+import { WEBSITE_TEMPLATES } from '@/lib/website-templates';
 
-export default function SettingsPage() {
-  const params = useParams();
-  const brandId = params.brandId as string;
-  const [brand, setBrand] = useState<Brand | null>(null);
-  const [settings, setSettings] = useState<Record<string, string>>({});
-  const [saving, setSaving] = useState<string | null>(null);
+// ─── General Tab ─────────────────────────────────────────────────
+function GeneralTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<string, unknown>) => Promise<boolean> }) {
+  const [form, setForm] = useState({
+    name: brand.name || '',
+    tagline: brand.tagline || '',
+    description: brand.description || '',
+    industry: brand.industry || '',
+    brand_voice: brand.brand_voice || '',
+    slug: brand.slug || '',
+    status: brand.status || 'draft',
+  });
+  const [saving, setSaving] = useState(false);
+  const [slugError, setSlugError] = useState('');
+
+  const validateSlug = (slug: string) => {
+    const cleaned = slug.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    if (cleaned.length < 2) return 'Slug must be at least 2 characters';
+    if (cleaned.length > 64) return 'Slug must be under 64 characters';
+    return '';
+  };
+
+  const handleSlugChange = (value: string) => {
+    const cleaned = value.toLowerCase().replace(/[^a-z0-9-]/g, '');
+    setForm(f => ({ ...f, slug: cleaned }));
+    setSlugError(validateSlug(cleaned));
+  };
+
+  const handleSave = async () => {
+    if (slugError) return;
+    setSaving(true);
+    await onSave(form);
+    setSaving(false);
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Brand Details</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Brand Name</label>
+            <input
+              type="text"
+              value={form.name}
+              onChange={e => setForm(f => ({ ...f, name: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Tagline</label>
+            <input
+              type="text"
+              value={form.tagline}
+              onChange={e => setForm(f => ({ ...f, tagline: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+              placeholder="A short tagline for your brand"
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Description</label>
+            <textarea
+              value={form.description}
+              onChange={e => setForm(f => ({ ...f, description: e.target.value }))}
+              rows={3}
+              className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none resize-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+              placeholder="Describe your brand..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Industry</label>
+            <select
+              value={form.industry}
+              onChange={e => setForm(f => ({ ...f, industry: e.target.value }))}
+              className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+            >
+              <option value="">Select industry</option>
+              {INDUSTRY_CATEGORIES.map(cat => (
+                <option key={cat.id} value={cat.id}>{cat.emoji} {cat.name}</option>
+              ))}
+            </select>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Brand Voice & Tone</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Brand Voice</label>
+            <textarea
+              value={form.brand_voice}
+              onChange={e => setForm(f => ({ ...f, brand_voice: e.target.value }))}
+              rows={3}
+              className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none resize-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+              placeholder="Describe how your brand communicates..."
+            />
+          </div>
+          <div>
+            <label className="block text-sm font-medium mb-2 text-zinc-600 dark:text-zinc-300">Tone Keywords</label>
+            <div className="flex flex-wrap gap-2">
+              {TONE_OPTIONS.map(tone => {
+                const isSelected = form.brand_voice?.includes(tone);
+                return (
+                  <button
+                    key={tone}
+                    onClick={() => {
+                      const current = form.brand_voice || '';
+                      if (isSelected) {
+                        setForm(f => ({ ...f, brand_voice: current.replace(tone + ', ', '').replace(', ' + tone, '').replace(tone, '') }));
+                      } else {
+                        setForm(f => ({ ...f, brand_voice: current ? `${current}, ${tone}` : tone }));
+                      }
+                    }}
+                    className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                      isSelected
+                        ? 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400'
+                        : 'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                    }`}
+                  >
+                    {tone}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">URL Slug</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Brand Slug</label>
+            <div className="flex items-center gap-2">
+              <span className="text-sm text-zinc-400 font-mono">/site/</span>
+              <input
+                type="text"
+                value={form.slug}
+                onChange={e => handleSlugChange(e.target.value)}
+                className={`flex-1 px-3 py-2 rounded-lg border bg-white dark:bg-zinc-800 text-sm outline-none font-mono focus:ring-2 focus:ring-violet-500/20 ${
+                  slugError ? 'border-red-400 focus:border-red-500' : 'border-zinc-200 dark:border-zinc-700 focus:border-violet-500'
+                }`}
+                placeholder="my-brand"
+              />
+            </div>
+            {slugError && <p className="text-xs text-red-500 mt-1">{slugError}</p>}
+            <p className="text-xs text-zinc-400 mt-1">Used in all your public URLs (website, shop, blog, chatbot)</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Brand Status</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="flex gap-3">
+            {(['draft', 'launched', 'paused'] as const).map(status => (
+              <button
+                key={status}
+                onClick={() => setForm(f => ({ ...f, status }))}
+                className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
+                  form.status === status
+                    ? status === 'launched'
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                      : status === 'paused'
+                      ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                      : 'bg-zinc-200 text-zinc-700 dark:bg-zinc-700 dark:text-zinc-300'
+                    : 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                }`}
+              >
+                {status === 'launched' && '🟢 '}{status === 'paused' && '🟡 '}{status === 'draft' && '⚪ '}{status}
+              </button>
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-end">
+        <Button onClick={handleSave} disabled={saving || !!slugError}>
+          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+          Save Changes
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Design Tab ──────────────────────────────────────────────────
+function DesignTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<string, unknown>) => Promise<boolean> }) {
+  const [form, setForm] = useState({
+    website_template: brand.website_template || 'minimal',
+    primary_color: brand.primary_color || '#0f172a',
+    secondary_color: brand.secondary_color || '#f8fafc',
+    accent_color: brand.accent_color || '#3b82f6',
+    font_heading: brand.font_heading || 'Inter',
+    font_body: brand.font_body || 'Inter',
+    custom_css: brand.custom_css || '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    await onSave(form);
+    setSaving(false);
+  };
+
+  const selectedTemplate = WEBSITE_TEMPLATES.find(t => t.id === form.website_template);
+
+  return (
+    <div className="space-y-6">
+      {/* Template Selection */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Website Template</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {WEBSITE_TEMPLATES.map(template => (
+              <button
+                key={template.id}
+                onClick={() => setForm(f => ({ ...f, website_template: template.id }))}
+                className={`relative p-4 rounded-xl border-2 text-left transition-all ${
+                  form.website_template === template.id
+                    ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/10'
+                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
+                }`}
+              >
+                {form.website_template === template.id && (
+                  <div className="absolute top-2 right-2">
+                    <Check className="h-4 w-4 text-violet-600" />
+                  </div>
+                )}
+                {/* Mini template preview */}
+                <div
+                  className="h-20 rounded-lg mb-3 flex flex-col items-center justify-center gap-1 overflow-hidden"
+                  style={{
+                    backgroundColor: template.colors.light.background,
+                    border: `1px solid ${template.colors.light.border}`,
+                  }}
+                >
+                  <div
+                    className="w-3/4 h-2 rounded"
+                    style={{ backgroundColor: template.colors.light.text }}
+                  />
+                  <div
+                    className="w-1/2 h-1.5 rounded"
+                    style={{ backgroundColor: template.colors.light.muted }}
+                  />
+                  <div
+                    className="w-16 h-4 rounded mt-1"
+                    style={{
+                      backgroundColor: template.colors.light.accent,
+                      borderRadius: template.preview.borderRadius,
+                    }}
+                  />
+                </div>
+                <p className="font-medium text-sm text-zinc-900 dark:text-white">{template.name}</p>
+                <p className="text-xs text-zinc-400 mt-0.5">{template.description}</p>
+              </button>
+            ))}
+          </div>
+          {selectedTemplate && (
+            <p className="text-xs text-zinc-400 mt-3">
+              Best for: {selectedTemplate.bestFor.join(', ')}
+            </p>
+          )}
+        </CardContent>
+      </Card>
+
+      {/* Colors */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Colors</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {([
+              { key: 'primary_color', label: 'Primary' },
+              { key: 'secondary_color', label: 'Secondary' },
+              { key: 'accent_color', label: 'Accent' },
+            ] as const).map(({ key, label }) => (
+              <div key={key}>
+                <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">{label}</label>
+                <div className="flex items-center gap-2">
+                  <div className="relative">
+                    <input
+                      type="color"
+                      value={form[key]}
+                      onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                      className="h-10 w-10 rounded-lg cursor-pointer border border-zinc-200 dark:border-zinc-700"
+                    />
+                  </div>
+                  <input
+                    type="text"
+                    value={form[key]}
+                    onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
+                    className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-mono outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                  />
+                </div>
+              </div>
+            ))}
+          </div>
+          {/* Color preview */}
+          <div className="mt-4 p-4 rounded-xl border border-zinc-200 dark:border-zinc-700">
+            <p className="text-xs text-zinc-400 mb-2">Preview</p>
+            <div className="flex items-center gap-3">
+              <div className="h-12 w-12 rounded-lg" style={{ backgroundColor: form.primary_color }} />
+              <div className="h-12 w-12 rounded-lg border border-zinc-200 dark:border-zinc-600" style={{ backgroundColor: form.secondary_color }} />
+              <div className="h-12 w-12 rounded-lg" style={{ backgroundColor: form.accent_color }} />
+              <div className="ml-4 flex-1">
+                <div className="h-3 w-24 rounded" style={{ backgroundColor: form.primary_color }} />
+                <div className="h-2 w-16 rounded mt-1.5" style={{ backgroundColor: form.accent_color, opacity: 0.6 }} />
+                <div
+                  className="inline-block px-3 py-1 rounded text-white text-xs mt-2"
+                  style={{ backgroundColor: form.accent_color }}
+                >
+                  Button
+                </div>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Fonts */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Typography</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div>
+              <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Heading Font</label>
+              <select
+                value={form.font_heading}
+                onChange={e => setForm(f => ({ ...f, font_heading: e.target.value }))}
+                className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+              >
+                {FONT_OPTIONS.map(font => (
+                  <option key={font} value={font}>{font}</option>
+                ))}
+                {/* Add template-specific fonts */}
+                {selectedTemplate && !FONT_OPTIONS.includes(selectedTemplate.fonts.heading as typeof FONT_OPTIONS[number]) && (
+                  <option value={selectedTemplate.fonts.heading}>{selectedTemplate.fonts.heading} (template)</option>
+                )}
+              </select>
+            </div>
+            <div>
+              <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Body Font</label>
+              <select
+                value={form.font_body}
+                onChange={e => setForm(f => ({ ...f, font_body: e.target.value }))}
+                className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+              >
+                {FONT_OPTIONS.map(font => (
+                  <option key={font} value={font}>{font}</option>
+                ))}
+                {selectedTemplate && !FONT_OPTIONS.includes(selectedTemplate.fonts.body as typeof FONT_OPTIONS[number]) && (
+                  <option value={selectedTemplate.fonts.body}>{selectedTemplate.fonts.body} (template)</option>
+                )}
+              </select>
+            </div>
+          </div>
+          <div className="mt-3 p-4 rounded-xl border border-zinc-200 dark:border-zinc-700">
+            <p className="text-xs text-zinc-400 mb-2">Typography Preview</p>
+            <h3 className="text-xl font-bold text-zinc-900 dark:text-white" style={{ fontFamily: form.font_heading }}>
+              {form.font_heading} Heading
+            </h3>
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1" style={{ fontFamily: form.font_body }}>
+              Body text using {form.font_body}. The quick brown fox jumps over the lazy dog.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Custom CSS */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Custom CSS</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-xs text-zinc-400 mb-2">Inject custom CSS into your public-facing pages</p>
+          <textarea
+            value={form.custom_css}
+            onChange={e => setForm(f => ({ ...f, custom_css: e.target.value }))}
+            rows={6}
+            className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-900 text-green-400 text-xs font-mono outline-none resize-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+            placeholder={`/* Your custom CSS here */\n.hero-section {\n  padding: 4rem 0;\n}`}
+          />
+        </CardContent>
+      </Card>
+
+      <div className="flex justify-end">
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+          Save Design
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Channels Tab ────────────────────────────────────────────────
+function ChannelsTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<string, unknown>) => Promise<boolean> }) {
+  const [channels, setChannels] = useState<string[]>(() => {
+    try { return JSON.parse(brand.channels || '[]'); } catch { return []; }
+  });
+  const [saving, setSaving] = useState(false);
   const [copied, setCopied] = useState<string | null>(null);
-  const toast = useToast();
-
-  useEffect(() => {
-    fetch(`/api/brands/${brandId}`).then(r => r.json()).then(d => setBrand(d.brand));
-    fetch(`/api/brands/${brandId}/settings`).then(r => r.json()).then(d => setSettings(d.settings || {}));
-  }, [brandId]);
-
-  const saveSetting = async (key: string, value: string) => {
-    setSaving(key);
-    try {
-      await fetch(`/api/brands/${brandId}/settings`, {
-        method: 'PUT',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ key, value }),
-      });
-      setSettings(s => ({ ...s, [key]: value }));
-      toast.success('Setting saved');
-    } catch {
-      toast.error('Failed to save');
-    }
-    setSaving(null);
-  };
-
-  const copyToClipboard = (text: string, key: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(key);
-    setTimeout(() => setCopied(null), 2000);
-  };
-
-  if (!brand) return null;
 
   const slug = brand.slug || brand.id;
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : '';
 
-  const liveUrls = [
-    { label: 'Website', url: `/site/${slug}`, icon: Globe, color: 'text-blue-600' },
-    { label: 'Shop', url: `/shop/${slug}`, icon: ShoppingBag, color: 'text-amber-600' },
-    { label: 'Blog', url: `/blog/${slug}`, icon: FileText, color: 'text-purple-600' },
-    { label: 'Chatbot', url: `/chat/${slug}`, icon: MessageSquare, color: 'text-emerald-600' },
+  const allChannels = [
+    { id: 'website', name: 'Website', icon: Globe, color: 'text-blue-600', url: `/site/${slug}` },
+    { id: 'ecommerce', name: 'Shop', icon: ShoppingBag, color: 'text-amber-600', url: `/shop/${slug}` },
+    { id: 'blog', name: 'Blog', icon: Newspaper, color: 'text-purple-600', url: `/blog/${slug}` },
+    { id: 'chatbot', name: 'AI Chatbot', icon: MessageSquare, color: 'text-emerald-600', url: `/chat/${slug}` },
+    { id: 'email', name: 'Email Marketing', icon: Mail, color: 'text-rose-600', url: null },
+    { id: 'social', name: 'Social Media', icon: Share2, color: 'text-cyan-600', url: null },
   ];
 
-  const widgetCode = `<script src="${baseUrl}/api/public/brand/${slug}/widget"></script>`;
+  const toggleChannel = (id: string) => {
+    setChannels(ch =>
+      ch.includes(id) ? ch.filter(c => c !== id) : [...ch, id]
+    );
+  };
+
+  const handleSave = async () => {
+    setSaving(true);
+    await onSave({ channels });
+    setSaving(false);
+  };
+
+  const copyUrl = (url: string, id: string) => {
+    navigator.clipboard.writeText(`${baseUrl}${url}`);
+    setCopied(id);
+    setTimeout(() => setCopied(null), 2000);
+  };
 
   return (
-    <div className="p-4 sm:p-8">
-      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
-        <div className="mb-8">
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Settings</h1>
-          <p className="text-sm text-zinc-400 mt-1">Configure integrations and manage your brand</p>
-        </div>
-
-        {/* Live URLs */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Globe className="h-4 w-4 text-blue-600" />
-              Live URLs
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              {liveUrls.map((item) => (
-                <div key={item.label} className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Active Channels</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="space-y-3">
+            {allChannels.map(ch => {
+              const isActive = channels.includes(ch.id);
+              return (
+                <div
+                  key={ch.id}
+                  className={`flex items-center justify-between p-4 rounded-xl border transition-colors ${
+                    isActive
+                      ? 'border-violet-200 dark:border-violet-800 bg-violet-50/50 dark:bg-violet-900/10'
+                      : 'border-zinc-200 dark:border-zinc-700'
+                  }`}
+                >
                   <div className="flex items-center gap-3">
-                    <item.icon className={`h-4 w-4 ${item.color}`} />
+                    <ch.icon className={`h-5 w-5 ${isActive ? ch.color : 'text-zinc-300 dark:text-zinc-600'}`} />
                     <div>
-                      <p className="text-sm font-medium text-zinc-900 dark:text-white">{item.label}</p>
-                      <p className="text-xs text-zinc-400 font-mono">{item.url}</p>
+                      <p className={`text-sm font-medium ${isActive ? 'text-zinc-900 dark:text-white' : 'text-zinc-400'}`}>
+                        {ch.name}
+                      </p>
+                      {isActive && ch.url && (
+                        <p className="text-xs text-zinc-400 font-mono mt-0.5">{ch.url}</p>
+                      )}
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
+                    {isActive && ch.url && (
+                      <>
+                        <button
+                          onClick={() => copyUrl(ch.url!, ch.id)}
+                          className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-400"
+                          title="Copy URL"
+                        >
+                          {copied === ch.id ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                        </button>
+                        <a
+                          href={ch.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-400"
+                          title="Open"
+                        >
+                          <ExternalLink className="h-4 w-4" />
+                        </a>
+                      </>
+                    )}
                     <button
-                      onClick={() => copyToClipboard(`${baseUrl}${item.url}`, item.label)}
-                      className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-400"
+                      onClick={() => toggleChannel(ch.id)}
+                      className={`relative w-11 h-6 rounded-full transition-colors ${
+                        isActive ? 'bg-violet-600' : 'bg-zinc-200 dark:bg-zinc-700'
+                      }`}
                     >
-                      {copied === item.label ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                      <motion.div
+                        className="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-sm"
+                        animate={{ x: isActive ? 20 : 0 }}
+                        transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+                      />
                     </button>
-                    <a
-                      href={item.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-400"
-                    >
-                      <ExternalLink className="h-4 w-4" />
-                    </a>
                   </div>
                 </div>
-              ))}
-            </div>
-          </CardContent>
-        </Card>
+              );
+            })}
+          </div>
+        </CardContent>
+      </Card>
 
-        {/* Embed Widget */}
-        <Card className="mb-6">
+      {/* Chatbot Widget Embed */}
+      {channels.includes('chatbot') && (
+        <Card>
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
               <MessageSquare className="h-4 w-4 text-emerald-600" />
@@ -117,15 +544,17 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">
-              Add this script tag to any website to embed your chatbot widget:
-            </p>
+            <p className="text-xs text-zinc-400 mb-2">Add this script to any website to embed the chatbot widget:</p>
             <div className="relative">
               <pre className="p-3 rounded-lg bg-zinc-900 text-green-400 text-xs overflow-x-auto font-mono">
-                {widgetCode}
+                {`<script src="${baseUrl}/api/public/brand/${slug}/widget"></script>`}
               </pre>
               <button
-                onClick={() => copyToClipboard(widgetCode, 'widget')}
+                onClick={() => {
+                  navigator.clipboard.writeText(`<script src="${baseUrl}/api/public/brand/${slug}/widget"></script>`);
+                  setCopied('widget');
+                  setTimeout(() => setCopied(null), 2000);
+                }}
                 className="absolute top-2 right-2 p-1.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300"
               >
                 {copied === 'widget' ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
@@ -133,77 +562,502 @@ export default function SettingsPage() {
             </div>
           </CardContent>
         </Card>
+      )}
 
-        {/* Integration Settings */}
-        <Card className="mb-6">
-          <CardHeader>
-            <CardTitle className="text-sm flex items-center gap-2">
-              <Settings className="h-4 w-4 text-zinc-500" />
-              Integrations
-            </CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-6">
-            {[
-              { key: 'stripe_publishable_key', label: 'Stripe Publishable Key', placeholder: 'pk_test_...' },
-              { key: 'stripe_secret_key', label: 'Stripe Secret Key', placeholder: 'sk_test_...', sensitive: true },
-              { key: 'google_analytics_id', label: 'Google Analytics ID', placeholder: 'G-XXXXXXXXXX' },
-              { key: 'smtp_host', label: 'SMTP Host', placeholder: 'smtp.gmail.com' },
-              { key: 'smtp_port', label: 'SMTP Port', placeholder: '587' },
-              { key: 'smtp_user', label: 'SMTP User', placeholder: 'your@email.com' },
-              { key: 'smtp_pass', label: 'SMTP Password', placeholder: '••••••', sensitive: true },
-            ].map((field) => (
-              <div key={field.key}>
-                <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">
-                  {field.label}
-                </label>
-                <div className="flex gap-2">
-                  <input
-                    type={field.sensitive ? 'password' : 'text'}
-                    value={settings[field.key] || ''}
-                    onChange={(e) => setSettings(s => ({ ...s, [field.key]: e.target.value }))}
-                    className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none font-mono"
-                    placeholder={field.placeholder}
-                  />
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => saveSetting(field.key, settings[field.key] || '')}
-                    disabled={saving === field.key}
-                  >
-                    {saving === field.key ? '...' : 'Save'}
-                  </Button>
+      <div className="flex justify-end">
+        <Button onClick={handleSave} disabled={saving}>
+          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+          Save Channels
+        </Button>
+      </div>
+    </div>
+  );
+}
+
+// ─── Integrations Tab ────────────────────────────────────────────
+function IntegrationsTab({ brandId, settings: initialSettings }: { brandId: string; settings: Record<string, string> }) {
+  const [settings, setSettings] = useState<Record<string, string>>(initialSettings);
+  const [saving, setSaving] = useState<string | null>(null);
+  const [copied, setCopied] = useState<string | null>(null);
+  const toast = useToast();
+
+  const saveSetting = async (key: string, value: string) => {
+    setSaving(key);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value }),
+      });
+      if (res.ok) {
+        setSettings(s => ({ ...s, [key]: value }));
+        toast.success('Setting saved');
+      } else {
+        toast.error('Failed to save');
+      }
+    } catch {
+      toast.error('Failed to save');
+    }
+    setSaving(null);
+  };
+
+  const saveBulk = async (keys: string[]) => {
+    const bulk: Record<string, string> = {};
+    for (const key of keys) {
+      bulk[key] = settings[key] || '';
+    }
+    setSaving(keys[0]);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ settings: bulk }),
+      });
+      if (res.ok) {
+        toast.success('Settings saved');
+      } else {
+        toast.error('Failed to save');
+      }
+    } catch {
+      toast.error('Failed to save');
+    }
+    setSaving(null);
+  };
+
+  const copyText = (text: string, key: string) => {
+    navigator.clipboard.writeText(text);
+    setCopied(key);
+    setTimeout(() => setCopied(null), 2000);
+  };
+
+  const IntegrationSection = ({ title, icon, children }: { title: string; icon: React.ReactNode; children: React.ReactNode }) => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm flex items-center gap-2">{icon}{title}</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">{children}</CardContent>
+    </Card>
+  );
+
+  const SettingField = ({ settingKey, label, placeholder, sensitive, type }: {
+    settingKey: string; label: string; placeholder: string; sensitive?: boolean; type?: string;
+  }) => (
+    <div>
+      <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">{label}</label>
+      <div className="flex gap-2">
+        <input
+          type={sensitive ? 'password' : type || 'text'}
+          value={settings[settingKey] || ''}
+          onChange={e => setSettings(s => ({ ...s, [settingKey]: e.target.value }))}
+          className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none font-mono focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+          placeholder={placeholder}
+        />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => saveSetting(settingKey, settings[settingKey] || '')}
+          disabled={saving === settingKey}
+        >
+          {saving === settingKey ? <Loader2 className="h-4 w-4 animate-spin" /> : 'Save'}
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Stripe */}
+      <IntegrationSection title="Stripe Payments" icon={<div className="h-4 w-4 bg-violet-600 rounded text-white text-[8px] flex items-center justify-center font-bold">S</div>}>
+        <SettingField settingKey="stripe_publishable_key" label="Publishable Key" placeholder="pk_test_..." />
+        <SettingField settingKey="stripe_secret_key" label="Secret Key" placeholder="sk_test_..." sensitive />
+        <div>
+          <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Mode</label>
+          <div className="flex gap-2">
+            {['test', 'live'].map(mode => (
+              <button
+                key={mode}
+                onClick={() => {
+                  setSettings(s => ({ ...s, stripe_mode: mode }));
+                  saveSetting('stripe_mode', mode);
+                }}
+                className={`px-4 py-2 rounded-lg text-sm font-medium capitalize transition-colors ${
+                  (settings.stripe_mode || 'test') === mode
+                    ? mode === 'live'
+                      ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
+                      : 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400'
+                    : 'bg-zinc-100 text-zinc-400 dark:bg-zinc-800 dark:text-zinc-500'
+                }`}
+              >
+                {mode}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div>
+          <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Webhook URL</label>
+          <div className="flex items-center gap-2">
+            <code className="flex-1 px-3 py-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 text-xs font-mono text-zinc-600 dark:text-zinc-400 truncate">
+              {typeof window !== 'undefined' ? `${window.location.origin}/api/public/brand/${brandId}/webhook/stripe` : '...'}
+            </code>
+            <button
+              onClick={() => copyText(`${window.location.origin}/api/public/brand/${brandId}/webhook/stripe`, 'webhook')}
+              className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-400"
+            >
+              {copied === 'webhook' ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+            </button>
+          </div>
+        </div>
+      </IntegrationSection>
+
+      {/* SMTP */}
+      <IntegrationSection title="Email / SMTP" icon={<Mail className="h-4 w-4 text-rose-500" />}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SettingField settingKey="smtp_host" label="SMTP Host" placeholder="smtp.gmail.com" />
+          <SettingField settingKey="smtp_port" label="SMTP Port" placeholder="587" type="number" />
+          <SettingField settingKey="smtp_user" label="SMTP User" placeholder="your@email.com" />
+          <SettingField settingKey="smtp_pass" label="SMTP Password" placeholder="••••••" sensitive />
+          <SettingField settingKey="smtp_from_address" label="From Address" placeholder="hello@yourbrand.com" />
+          <SettingField settingKey="smtp_from_name" label="From Name" placeholder="Your Brand" />
+        </div>
+      </IntegrationSection>
+
+      {/* Google Analytics */}
+      <IntegrationSection title="Google Analytics" icon={<div className="h-4 w-4 rounded text-[8px] flex items-center justify-center font-bold bg-orange-500 text-white">G</div>}>
+        <SettingField settingKey="google_analytics_id" label="Tracking ID" placeholder="G-XXXXXXXXXX" />
+      </IntegrationSection>
+
+      {/* Custom Domain */}
+      <IntegrationSection title="Custom Domain" icon={<Globe className="h-4 w-4 text-blue-500" />}>
+        <SettingField settingKey="custom_domain" label="Domain" placeholder="yourbrand.com" />
+        <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800">
+          <p className="text-xs font-medium text-amber-800 dark:text-amber-400 mb-1">CNAME Setup</p>
+          <p className="text-xs text-amber-600 dark:text-amber-500">
+            Point your domain&apos;s CNAME record to <code className="font-mono bg-amber-100 dark:bg-amber-900/30 px-1 rounded">cname.mayasura.app</code>
+          </p>
+        </div>
+      </IntegrationSection>
+
+      {/* Social Media */}
+      <IntegrationSection title="Social Media Links" icon={<Share2 className="h-4 w-4 text-cyan-500" />}>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <SettingField settingKey="social_facebook" label="Facebook" placeholder="https://facebook.com/yourbrand" />
+          <SettingField settingKey="social_instagram" label="Instagram" placeholder="https://instagram.com/yourbrand" />
+          <SettingField settingKey="social_twitter" label="Twitter / X" placeholder="https://x.com/yourbrand" />
+          <SettingField settingKey="social_linkedin" label="LinkedIn" placeholder="https://linkedin.com/company/yourbrand" />
+          <SettingField settingKey="social_tiktok" label="TikTok" placeholder="https://tiktok.com/@yourbrand" />
+          <SettingField settingKey="social_youtube" label="YouTube" placeholder="https://youtube.com/@yourbrand" />
+        </div>
+      </IntegrationSection>
+
+      {/* Webhooks */}
+      <IntegrationSection title="Webhooks" icon={<Plug className="h-4 w-4 text-zinc-500" />}>
+        <p className="text-xs text-zinc-400 mb-2">
+          Receive POST notifications when events occur. URLs must be HTTPS.
+        </p>
+        <SettingField settingKey="webhook_order_created" label="Order Created" placeholder="https://your-server.com/webhooks/order" />
+        <SettingField settingKey="webhook_contact_new" label="New Contact Submission" placeholder="https://your-server.com/webhooks/contact" />
+        <SettingField settingKey="webhook_newsletter_subscribe" label="Newsletter Subscribe" placeholder="https://your-server.com/webhooks/newsletter" />
+      </IntegrationSection>
+    </div>
+  );
+}
+
+// ─── Danger Zone Tab ─────────────────────────────────────────────
+function DangerZoneTab({ brand, brandId }: { brand: Brand; brandId: string }) {
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [counts, setCounts] = useState<Record<string, number> | null>(null);
+  const [loadingCounts, setLoadingCounts] = useState(false);
+  const router = useRouter();
+  const toast = useToast();
+
+  const loadCounts = async () => {
+    setLoadingCounts(true);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/counts`);
+      const data = await res.json();
+      setCounts(data.counts);
+    } catch {
+      // ignore
+    }
+    setLoadingCounts(false);
+  };
+
+  const openDeleteModal = () => {
+    setShowDeleteModal(true);
+    loadCounts();
+  };
+
+  const handleDelete = async () => {
+    if (confirmText !== brand.name) return;
+    setDeleting(true);
+    try {
+      const res = await fetch(`/api/brands/${brandId}`, { method: 'DELETE' });
+      if (res.ok) {
+        toast.success('Brand deleted', 'All data has been permanently removed');
+        router.push('/dashboard');
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Failed to delete brand');
+      }
+    } catch {
+      toast.error('Failed to delete brand');
+    }
+    setDeleting(false);
+  };
+
+  const totalItems = counts ? Object.values(counts).reduce((a, b) => a + b, 0) : 0;
+
+  return (
+    <div className="space-y-6">
+      <Card className="border-red-200 dark:border-red-900/50">
+        <CardHeader>
+          <CardTitle className="text-sm text-red-600 dark:text-red-400 flex items-center gap-2">
+            <AlertTriangle className="h-4 w-4" />
+            Danger Zone
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <p className="text-sm text-zinc-600 dark:text-zinc-400">
+            Once you delete a brand, there is no going back. This will permanently delete all data
+            associated with <strong className="text-zinc-900 dark:text-white">{brand.name}</strong> — 
+            including products, orders, blog posts, content, chatbot FAQs, tickets, contact submissions,
+            newsletter subscribers, analytics data, and all settings.
+          </p>
+          <Button
+            variant="destructive"
+            onClick={openDeleteModal}
+            className="bg-red-600 hover:bg-red-700 text-white"
+          >
+            <Trash2 className="h-4 w-4 mr-2" />
+            Delete This Brand
+          </Button>
+        </CardContent>
+      </Card>
+
+      {/* Brand Info */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Brand Info</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <div className="flex justify-between text-sm">
+            <span className="text-zinc-400">Brand ID</span>
+            <span className="font-mono text-zinc-900 dark:text-white text-xs">{brandId}</span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-zinc-400">Created</span>
+            <span className="text-zinc-900 dark:text-white">
+              {new Date(brand.created_at).toLocaleDateString()}
+            </span>
+          </div>
+          <div className="flex justify-between text-sm">
+            <span className="text-zinc-400">Last Updated</span>
+            <span className="text-zinc-900 dark:text-white">
+              {new Date(brand.updated_at).toLocaleDateString()}
+            </span>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Delete Confirmation Modal */}
+      <AnimatePresence>
+        {showDeleteModal && (
+          <>
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-50 bg-black/50 backdrop-blur-sm"
+              onClick={() => setShowDeleteModal(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.95 }}
+              className="fixed left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-50 w-[90%] max-w-md bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl p-6 border border-zinc-200 dark:border-zinc-700"
+            >
+              <div className="flex items-center gap-3 mb-4">
+                <div className="h-10 w-10 rounded-full bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+                  <AlertTriangle className="h-5 w-5 text-red-600" />
+                </div>
+                <div>
+                  <h3 className="font-semibold text-zinc-900 dark:text-white">Delete &quot;{brand.name}&quot;?</h3>
+                  <p className="text-xs text-zinc-400">This action cannot be undone</p>
                 </div>
               </div>
-            ))}
-          </CardContent>
-        </Card>
 
-        {/* Brand Info */}
-        <Card>
-          <CardHeader>
-            <CardTitle className="text-sm">Brand Info</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-3">
-            <div className="flex justify-between text-sm">
-              <span className="text-zinc-400">Brand ID</span>
-              <span className="font-mono text-zinc-900 dark:text-white">{brandId}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-zinc-400">Slug</span>
-              <span className="font-mono text-zinc-900 dark:text-white">{slug}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-zinc-400">Status</span>
-              <span className="text-zinc-900 dark:text-white capitalize">{brand.status}</span>
-            </div>
-            <div className="flex justify-between text-sm">
-              <span className="text-zinc-400">Created</span>
-              <span className="text-zinc-900 dark:text-white">
-                {new Date(brand.created_at).toLocaleDateString()}
-              </span>
-            </div>
-          </CardContent>
-        </Card>
+              {/* Show what will be deleted */}
+              {loadingCounts ? (
+                <div className="flex items-center gap-2 text-sm text-zinc-400 mb-4">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  Loading data counts...
+                </div>
+              ) : counts && (
+                <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-900/30">
+                  <p className="text-xs font-medium text-red-800 dark:text-red-400 mb-2">
+                    This will permanently delete {totalItems} items:
+                  </p>
+                  <div className="grid grid-cols-2 gap-1">
+                    {Object.entries(counts)
+                      .filter(([, count]) => count > 0)
+                      .map(([table, count]) => (
+                        <p key={table} className="text-xs text-red-600 dark:text-red-500">
+                          • {count} {table.replace(/_/g, ' ')}
+                        </p>
+                      ))}
+                  </div>
+                </div>
+              )}
+
+              <div className="mb-4">
+                <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">
+                  Type <strong className="text-zinc-900 dark:text-white">{brand.name}</strong> to confirm
+                </label>
+                <input
+                  type="text"
+                  value={confirmText}
+                  onChange={e => setConfirmText(e.target.value)}
+                  className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-red-500/20 focus:border-red-500"
+                  placeholder={brand.name}
+                  autoFocus
+                />
+              </div>
+
+              <div className="flex gap-3 justify-end">
+                <Button variant="ghost" onClick={() => { setShowDeleteModal(false); setConfirmText(''); }}>
+                  Cancel
+                </Button>
+                <Button
+                  variant="destructive"
+                  onClick={handleDelete}
+                  disabled={confirmText !== brand.name || deleting}
+                  className="bg-red-600 hover:bg-red-700 text-white disabled:opacity-50"
+                >
+                  {deleting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Trash2 className="h-4 w-4 mr-2" />}
+                  Delete Forever
+                </Button>
+              </div>
+            </motion.div>
+          </>
+        )}
+      </AnimatePresence>
+    </div>
+  );
+}
+
+// ─── Main Settings Page ──────────────────────────────────────────
+export default function SettingsPage() {
+  const params = useParams();
+  const brandId = params.brandId as string;
+  const [brand, setBrand] = useState<Brand | null>(null);
+  const [settings, setSettings] = useState<Record<string, string>>({});
+  const [activeTab, setActiveTab] = useState('general');
+  const toast = useToast();
+
+  useEffect(() => {
+    fetch(`/api/brands/${brandId}`).then(r => r.json()).then(d => setBrand(d.brand));
+    fetch(`/api/brands/${brandId}/settings`).then(r => r.json()).then(d => setSettings(d.settings || {}));
+  }, [brandId]);
+
+  const saveBrand = useCallback(async (updates: Record<string, unknown>): Promise<boolean> => {
+    try {
+      const res = await fetch(`/api/brands/${brandId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(updates),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setBrand(data.brand);
+        toast.success('Saved successfully');
+        return true;
+      } else {
+        const data = await res.json();
+        toast.error(data.error || 'Failed to save');
+        return false;
+      }
+    } catch {
+      toast.error('Failed to save');
+      return false;
+    }
+  }, [brandId, toast]);
+
+  if (!brand) return null;
+
+  const tabs = [
+    { id: 'general', label: 'General', icon: Settings },
+    { id: 'design', label: 'Design', icon: Palette },
+    { id: 'channels', label: 'Channels', icon: Globe },
+    { id: 'integrations', label: 'Integrations', icon: Plug },
+    { id: 'danger', label: 'Danger Zone', icon: AlertTriangle },
+  ];
+
+  return (
+    <div className="p-4 sm:p-8">
+      <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
+        <div className="mb-6">
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Settings</h1>
+          <p className="text-sm text-zinc-400 mt-1">Manage your brand configuration, design, channels, and integrations</p>
+        </div>
+
+        {/* Tab Navigation */}
+        <div className="mb-6">
+          {/* Desktop tabs */}
+          <div className="hidden sm:block">
+            <Tabs value={activeTab} onValueChange={setActiveTab}>
+              <TabsList className="dark:bg-zinc-800">
+                {tabs.map(tab => (
+                  <TabsTrigger key={tab.id} value={tab.id} className={tab.id === 'danger' ? 'text-red-500' : ''}>
+                    <tab.icon className="h-3.5 w-3.5 mr-1.5 inline" />
+                    {tab.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+            </Tabs>
+          </div>
+
+          {/* Mobile tab list */}
+          <div className="sm:hidden space-y-1">
+            {tabs.map(tab => (
+              <button
+                key={tab.id}
+                onClick={() => setActiveTab(tab.id)}
+                className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-colors ${
+                  activeTab === tab.id
+                    ? tab.id === 'danger'
+                      ? 'bg-red-50 dark:bg-red-900/10 text-red-600 dark:text-red-400'
+                      : 'bg-violet-50 dark:bg-violet-900/10 text-violet-600 dark:text-violet-400'
+                    : 'text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800'
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <tab.icon className="h-4 w-4" />
+                  {tab.label}
+                </div>
+                <ChevronRight className="h-4 w-4" />
+              </button>
+            ))}
+          </div>
+        </div>
+
+        {/* Tab Content */}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 5 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -5 }}
+            transition={{ duration: 0.2 }}
+          >
+            {activeTab === 'general' && <GeneralTab brand={brand} onSave={saveBrand} />}
+            {activeTab === 'design' && <DesignTab brand={brand} onSave={saveBrand} />}
+            {activeTab === 'channels' && <ChannelsTab brand={brand} onSave={saveBrand} />}
+            {activeTab === 'integrations' && <IntegrationsTab brandId={brandId} settings={settings} />}
+            {activeTab === 'danger' && <DangerZoneTab brand={brand} brandId={brandId} />}
+          </motion.div>
+        </AnimatePresence>
       </motion.div>
     </div>
   );

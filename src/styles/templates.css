@@ -1,0 +1,715 @@
+/* =====================================================================
+   TEMPLATE CSS SYSTEM — Mayasura Brand Website Templates
+   Each [data-template] provides radically different visual treatment.
+   ===================================================================== */
+
+/* ==================== Animations ==================== */
+@keyframes template-fade-up {
+  from { opacity: 0; transform: translateY(24px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes template-slide-in-left {
+  from { opacity: 0; transform: translateX(-30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes template-slide-in-right {
+  from { opacity: 0; transform: translateX(30px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes template-scale-in {
+  from { opacity: 0; transform: scale(0.96); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes template-bounce-in {
+  0% { opacity: 0; transform: scale(0.9) translateY(10px); }
+  60% { transform: scale(1.02) translateY(-2px); }
+  100% { opacity: 1; transform: scale(1) translateY(0); }
+}
+
+@keyframes template-underline-grow {
+  from { transform: scaleX(0); }
+  to { transform: scaleX(1); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .t-animate,
+  .t-animate-delay-1,
+  .t-animate-delay-2,
+  .t-animate-delay-3 {
+    animation: none !important;
+    opacity: 1 !important;
+    transform: none !important;
+  }
+}
+
+/* ==================== Base Template Classes ==================== */
+
+/* --- Hero Section --- */
+.t-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+/* Minimal: massive whitespace */
+[data-template="minimal"] .t-hero {
+  padding: 8rem 0 6rem;
+  min-height: 70vh;
+  display: flex;
+  align-items: flex-end;
+}
+@media (min-width: 768px) {
+  [data-template="minimal"] .t-hero {
+    padding: 10rem 0 8rem;
+  }
+}
+
+/* Editorial: generous but structured */
+[data-template="editorial"] .t-hero {
+  padding: 5rem 0 4rem;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  [data-template="editorial"] .t-hero {
+    padding: 6rem 0 5rem;
+  }
+}
+
+/* Bold: full viewport impact */
+[data-template="bold"] .t-hero {
+  padding: 6rem 0 4rem;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  [data-template="bold"] .t-hero {
+    padding: 8rem 0 5rem;
+    min-height: 85vh;
+  }
+}
+
+/* Classic: centered, dignified */
+[data-template="classic"] .t-hero {
+  padding: 5rem 0 4rem;
+  min-height: 50vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  [data-template="classic"] .t-hero {
+    padding: 6rem 0 5rem;
+  }
+}
+
+/* Playful: bouncy, centered */
+[data-template="playful"] .t-hero {
+  padding: 5rem 0 3rem;
+  min-height: 60vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  [data-template="playful"] .t-hero {
+    padding: 6rem 0 4rem;
+  }
+}
+
+/* --- Hero Heading --- */
+.t-hero-heading {
+  line-height: 1.05;
+  margin: 0;
+}
+
+[data-template="minimal"] .t-hero-heading {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 300;
+  letter-spacing: -0.03em;
+}
+
+[data-template="editorial"] .t-hero-heading {
+  font-size: clamp(2.2rem, 5vw, 3.8rem);
+  font-weight: 700;
+  letter-spacing: -0.03em;
+  line-height: 1.1;
+}
+
+[data-template="bold"] .t-hero-heading {
+  font-size: clamp(2.8rem, 9vw, 7rem);
+  font-weight: 700;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  line-height: 0.95;
+}
+
+[data-template="classic"] .t-hero-heading {
+  font-size: clamp(2rem, 4.5vw, 3.2rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.15;
+}
+
+[data-template="playful"] .t-hero-heading {
+  font-size: clamp(2.2rem, 5.5vw, 3.5rem);
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  line-height: 1.12;
+}
+
+/* --- Hero Description --- */
+.t-hero-desc {
+  margin: 0;
+  max-width: 600px;
+}
+
+[data-template="minimal"] .t-hero-desc {
+  font-size: 1rem;
+  line-height: 1.7;
+  margin-top: 2rem;
+  max-width: 480px;
+  font-weight: 300;
+}
+
+[data-template="editorial"] .t-hero-desc {
+  font-size: 1.0625rem;
+  line-height: 1.65;
+  max-width: 520px;
+}
+
+[data-template="bold"] .t-hero-desc {
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  max-width: 560px;
+  font-weight: 400;
+}
+
+[data-template="classic"] .t-hero-desc {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 540px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1.25rem;
+}
+
+[data-template="playful"] .t-hero-desc {
+  font-size: 1.0625rem;
+  line-height: 1.6;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+/* --- Hero Split Layout (Editorial) --- */
+.t-hero-split {
+  display: grid;
+  gap: 2rem;
+  align-items: center;
+}
+@media (min-width: 768px) {
+  .t-hero-split {
+    grid-template-columns: 1fr 1fr;
+    gap: 4rem;
+  }
+}
+
+.t-hero-image {
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+}
+@media (max-width: 767px) {
+  .t-hero-image {
+    aspect-ratio: 16 / 10;
+  }
+}
+
+/* --- Hero Container (Classic neumorphic) --- */
+.t-hero-container {
+  padding: 3rem 2rem;
+  border-radius: 12px;
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.04),
+    -8px -8px 16px rgba(255, 255, 255, 0.7);
+}
+@media (min-width: 768px) {
+  .t-hero-container {
+    padding: 4rem 3rem;
+  }
+}
+
+/* ==================== Section ==================== */
+.t-section {
+  position: relative;
+}
+
+[data-template="minimal"] .t-section {
+  padding: 6rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="minimal"] .t-section {
+    padding: 8rem 0;
+  }
+}
+
+[data-template="editorial"] .t-section {
+  padding: 4rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="editorial"] .t-section {
+    padding: 5rem 0;
+  }
+}
+
+[data-template="bold"] .t-section {
+  padding: 4rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="bold"] .t-section {
+    padding: 5rem 0;
+  }
+}
+
+[data-template="classic"] .t-section {
+  padding: 4rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="classic"] .t-section {
+    padding: 5rem 0;
+  }
+}
+
+[data-template="playful"] .t-section {
+  padding: 3.5rem 0;
+}
+@media (min-width: 768px) {
+  [data-template="playful"] .t-section {
+    padding: 5rem 0;
+  }
+}
+
+/* --- Section Heading --- */
+.t-section-heading {
+  margin: 0 0 0.5rem;
+}
+
+[data-template="minimal"] .t-section-heading {
+  font-size: 1.125rem;
+  font-weight: 400;
+  letter-spacing: -0.01em;
+}
+
+[data-template="editorial"] .t-section-heading {
+  font-size: 1.75rem;
+  font-weight: 700;
+  letter-spacing: -0.025em;
+}
+
+[data-template="bold"] .t-section-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+}
+
+[data-template="classic"] .t-section-heading {
+  font-size: 1.5rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+}
+
+[data-template="playful"] .t-section-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+}
+
+/* ==================== Cards ==================== */
+.t-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+[data-template="minimal"] .t-card {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid;
+}
+[data-template="minimal"] .t-card:last-child {
+  border-bottom: none;
+}
+
+[data-template="editorial"] .t-card {
+  padding: 1.5rem 0;
+  border-bottom: 1px solid;
+}
+[data-template="editorial"] .t-card:last-child {
+  border-bottom: none;
+}
+
+[data-template="bold"] .t-card {
+  padding: 1.5rem;
+  border: 2px solid;
+  border-radius: 0;
+}
+[data-template="bold"] .t-card:hover {
+  transform: translateY(-2px);
+}
+
+[data-template="classic"] .t-card {
+  padding: 1.5rem;
+  border-radius: 10px;
+  box-shadow:
+    6px 6px 12px rgba(0, 0, 0, 0.04),
+    -6px -6px 12px rgba(255, 255, 255, 0.7);
+}
+[data-template="classic"] .t-card:hover {
+  box-shadow:
+    8px 8px 16px rgba(0, 0, 0, 0.06),
+    -8px -8px 16px rgba(255, 255, 255, 0.8);
+}
+
+[data-template="playful"] .t-card {
+  padding: 1.5rem;
+  border-radius: 20px;
+  transition: transform 0.25s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+[data-template="playful"] .t-card:hover {
+  transform: translateY(-4px) scale(1.01);
+}
+
+/* ==================== Buttons ==================== */
+.t-btn-primary,
+.t-btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+  transition: all 0.15s ease;
+  cursor: pointer;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.t-btn-primary:hover,
+.t-btn-secondary:hover {
+  opacity: 0.85;
+}
+
+.t-btn-primary:active,
+.t-btn-secondary:active {
+  transform: scale(0.98);
+}
+
+/* Minimal buttons */
+[data-template="minimal"] .t-btn-primary {
+  padding: 0.625rem 1.75rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  border-radius: 0;
+}
+
+[data-template="minimal"] .t-btn-secondary {
+  padding: 0.625rem 1.75rem;
+  font-size: 0.8125rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+  border-radius: 0;
+  background: transparent;
+}
+
+/* Editorial buttons */
+[data-template="editorial"] .t-btn-primary {
+  padding: 0.75rem 2rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 0;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+[data-template="editorial"] .t-btn-secondary {
+  padding: 0.75rem 2rem;
+  font-size: 0.8125rem;
+  font-weight: 500;
+  border-radius: 0;
+  background: transparent;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+/* Bold buttons */
+[data-template="bold"] .t-btn-primary {
+  padding: 0.875rem 2.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 0;
+}
+[data-template="bold"] .t-btn-primary:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 20px rgba(255, 255, 255, 0.1);
+}
+
+[data-template="bold"] .t-btn-secondary {
+  padding: 0.875rem 2.25rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border-radius: 0;
+  background: transparent;
+}
+[data-template="bold"] .t-btn-secondary:hover {
+  opacity: 1;
+  background: rgba(255, 255, 255, 0.06);
+}
+
+/* Classic buttons */
+[data-template="classic"] .t-btn-primary {
+  padding: 0.75rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 8px;
+  box-shadow:
+    3px 3px 6px rgba(0, 0, 0, 0.06),
+    -3px -3px 6px rgba(255, 255, 255, 0.6);
+}
+[data-template="classic"] .t-btn-primary:hover {
+  opacity: 1;
+  box-shadow:
+    4px 4px 8px rgba(0, 0, 0, 0.08),
+    -4px -4px 8px rgba(255, 255, 255, 0.7);
+}
+
+[data-template="classic"] .t-btn-secondary {
+  padding: 0.75rem 2rem;
+  font-size: 0.875rem;
+  font-weight: 500;
+  border-radius: 8px;
+  background: transparent;
+}
+
+/* Playful buttons */
+[data-template="playful"] .t-btn-primary {
+  padding: 0.875rem 2.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.1);
+}
+[data-template="playful"] .t-btn-primary:hover {
+  opacity: 1;
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.14);
+}
+
+[data-template="playful"] .t-btn-secondary {
+  padding: 0.875rem 2.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  background: transparent;
+}
+[data-template="playful"] .t-btn-secondary:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+/* ==================== Divider ==================== */
+.t-divider {
+  height: 1px;
+  width: 100%;
+}
+
+/* ==================== Badge (Playful) ==================== */
+.t-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.375rem 1rem;
+  font-size: 0.75rem;
+  font-weight: 600;
+  border-radius: 9999px;
+  gap: 0.375rem;
+}
+
+/* ==================== Blob (Playful background) ==================== */
+.t-blob {
+  position: absolute;
+  border-radius: 50%;
+  opacity: 0.08;
+  filter: blur(60px);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ==================== Product Card ==================== */
+.t-product-card {
+  display: block;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+[data-template="minimal"] .t-product-card:hover {
+  opacity: 0.8;
+}
+
+[data-template="editorial"] .t-product-card:hover {
+  opacity: 0.85;
+}
+
+[data-template="bold"] .t-product-card {
+  border: 2px solid;
+  padding: 0;
+  overflow: hidden;
+}
+[data-template="bold"] .t-product-card:hover {
+  transform: translateY(-3px);
+}
+
+[data-template="classic"] .t-product-card {
+  border-radius: 10px;
+  overflow: hidden;
+}
+[data-template="classic"] .t-product-card:hover {
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+[data-template="playful"] .t-product-card {
+  border-radius: 20px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+}
+[data-template="playful"] .t-product-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.1);
+}
+
+/* --- Product Image --- */
+.t-product-image {
+  aspect-ratio: 1;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* --- Category Label (Bold) --- */
+.t-category-label {
+  display: inline-block;
+  padding: 0.125rem 0.5rem;
+  font-size: 0.625rem;
+  font-weight: 700;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  border: 1px solid;
+}
+
+/* ==================== Blog Grid (Editorial) ==================== */
+.t-blog-grid {
+  display: grid;
+  gap: 2rem;
+}
+@media (min-width: 768px) {
+  .t-blog-grid {
+    grid-template-columns: 1.4fr 1fr;
+    gap: 3rem;
+  }
+}
+
+/* ==================== Nav Styles ==================== */
+
+/* Bold nav: dark, uppercase, wide letter-spacing */
+[data-template="bold"] nav {
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+/* Playful nav: rounded feel */
+[data-template="playful"] nav a {
+  border-radius: 9999px;
+}
+
+/* ==================== Form Inputs per Template ==================== */
+[data-template="bold"] input,
+[data-template="bold"] textarea {
+  border-radius: 0 !important;
+  border-width: 2px !important;
+}
+
+[data-template="playful"] input,
+[data-template="playful"] textarea {
+  border-radius: 12px !important;
+}
+
+[data-template="classic"] input,
+[data-template="classic"] textarea {
+  border-radius: 8px !important;
+  box-shadow:
+    inset 2px 2px 4px rgba(0, 0, 0, 0.03),
+    inset -2px -2px 4px rgba(255, 255, 255, 0.5);
+}
+
+/* ==================== Footer per Template ==================== */
+[data-template="bold"] footer {
+  border-top-width: 2px !important;
+}
+
+[data-template="playful"] footer {
+  border-top: none !important;
+}
+
+/* ==================== Scroll Animations (Intersection Observer friendly) ==================== */
+.t-animate {
+  opacity: 0;
+}
+
+.t-animate.t-visible {
+  animation: template-fade-up 0.6s ease-out forwards;
+}
+
+.t-animate-delay-1.t-visible {
+  animation-delay: 0.1s;
+}
+
+.t-animate-delay-2.t-visible {
+  animation-delay: 0.2s;
+}
+
+.t-animate-delay-3.t-visible {
+  animation-delay: 0.3s;
+}
+
+/* ==================== Links & Interactions ==================== */
+
+/* Editorial: underline-grow on hover */
+[data-template="editorial"] a.t-link-underline {
+  position: relative;
+}
+[data-template="editorial"] a.t-link-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+[data-template="editorial"] a.t-link-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* Bold: color inversion on hover */
+[data-template="bold"] .t-hover-invert:hover {
+  filter: invert(1);
+  transition: filter 0.2s ease;
+}
