@@ -134,7 +134,8 @@ export function AICommandPalette({ brandId, brand, onApply }: AICommandPalettePr
   const [selectedAction, setSelectedAction] = useState<AIAction | null>(null);
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [loading, setLoading] = useState(false);
-  const [results, setResults] = useState<Record<string, unknown> | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const [results, setResults] = useState<Record<string, any> | null>(null);
   const [searchQuery, setSearchQuery] = useState('');
 
   // Pre-fill brand data when action selected
@@ -419,9 +420,11 @@ function ResultsView({
   onRegenerate,
   loading,
 }: {
-  results: Record<string, unknown>;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  results: Record<string, any>;
   actionId: string;
-  onApply: (type: string, value: unknown) => void;
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  onApply: (type: string, value: any) => void;
   onRegenerate: () => void;
   loading: boolean;
 }) {
@@ -479,7 +482,6 @@ function ResultsView({
       )}
 
       {/* Color Palettes */}
-      {/* @ts-expect-error — results values are safely cast below */}
       {actionId === 'color-palette' ? (
         <div className="space-y-4">
           {((results.palettes as Array<{ name: string; colors: Record<string, string>; reasoning: string }>) || []).map((palette, i) => (

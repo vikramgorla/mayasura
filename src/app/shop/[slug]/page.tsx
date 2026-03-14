@@ -2,7 +2,16 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from './layout';
+
+function getProductBadge(product: { name: string; price?: number | null; created_at?: string }, index: number): { label: string; type: 'new' | 'sale' | 'best' } | null {
+  // Simple heuristic: first 2 products = "Best Seller", next 2 = "New", products with low price = "Sale"
+  if (index < 2) return { label: 'Best Seller', type: 'best' };
+  if (index < 4) return { label: 'New', type: 'new' };
+  if (product.price && product.price < 20) return { label: 'Sale', type: 'sale' };
+  return null;
+}
 
 export default function ShopPage() {
   const shop = useShop();
@@ -31,6 +40,26 @@ export default function ShopPage() {
   const filtered = filter === 'all' ? products : products.filter((p) => p.category === filter);
 
   const containerWidth = templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl';
+
+  // Badge style per type
+  const badgeStyle = (type: 'new' | 'sale' | 'best'): React.CSSProperties => {
+    const colors = {
+      new: { bg: '#3B82F6', text: '#FFFFFF' },
+      sale: { bg: '#EF4444', text: '#FFFFFF' },
+      best: { bg: accentColor, text: '#FFFFFF' },
+    };
+    const c = colors[type];
+    return {
+      backgroundColor: c.bg,
+      color: c.text,
+      borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : '6px',
+      fontSize: '0.625rem',
+      fontWeight: 700,
+      letterSpacing: '0.05em',
+      textTransform: 'uppercase' as const,
+      padding: '2px 8px',
+    };
+  };
 
   // Filter button style per template
   const filterBtnStyle = (active: boolean): React.CSSProperties => {
@@ -182,99 +211,153 @@ export default function ShopPage() {
               </p>
             </div>
           ) : (
-            <div className={`grid grid-cols-1 sm:grid-cols-2 ${templateId === 'bold' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} xl:grid-cols-4 gap-6`}>
-              {filtered.map((product) => (
-                <div
-                  key={product.id}
-                  className="group"
-                  style={
-                    templateId === 'bold'
-                      ? { border: `2px solid ${textColor}10` }
-                      : templateId === 'playful'
-                      ? { backgroundColor: '#FFFFFF', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }
-                      : templateId === 'classic'
-                      ? { borderRadius: '10px', overflow: 'hidden', boxShadow: '6px 6px 12px rgba(0,0,0,0.04), -6px -6px 12px rgba(255,255,255,0.7)' }
-                      : {}
-                  }
-                >
-                  <Link href={`/shop/${slug}/product/${product.id}`}>
-                    <div
-                      className="aspect-square overflow-hidden flex items-center justify-center"
-                      style={{
-                        backgroundColor: isDark ? '#111111' : `${textColor}04`,
-                        borderRadius: templateId === 'playful' ? '0' : templateId === 'classic' ? '0' : '0',
+            <motion.div
+              className={`grid grid-cols-1 sm:grid-cols-2 ${templateId === 'bold' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} xl:grid-cols-4 gap-6`}
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: { transition: { staggerChildren: 0.06 } },
+              }}
+            >
+              <AnimatePresence>
+                {filtered.map((product, index) => {
+                  const badge = getProductBadge(product, index);
+                  return (
+                    <motion.div
+                      key={product.id}
+                      className="group relative"
+                      variants={{
+                        hidden: { opacity: 0, y: 20 },
+                        visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: 'easeOut' } },
                       }}
+                      layout
+                      style={
+                        templateId === 'bold'
+                          ? { border: `2px solid ${textColor}10` }
+                          : templateId === 'playful'
+                          ? { backgroundColor: '#FFFFFF', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }
+                          : templateId === 'classic'
+                          ? { borderRadius: '10px', overflow: 'hidden', boxShadow: '6px 6px 12px rgba(0,0,0,0.04), -6px -6px 12px rgba(255,255,255,0.7)' }
+                          : {}
+                      }
                     >
-                      {product.image_url ? (
-                        <img
-                          src={product.image_url}
-                          alt={product.name}
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                        />
-                      ) : (
-                        <div className="w-full h-full flex items-center justify-center">
-                          <svg className="w-10 h-10" style={{ color: `${textColor}10` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
-                            <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-                          </svg>
-                        </div>
-                      )}
-                    </div>
-                    <div className={templateId === 'playful' || templateId === 'classic' ? 'p-4' : templateId === 'bold' ? 'p-4' : 'mt-4'}>
-                      {product.category && (
-                        <span
-                          className="text-[10px] font-medium uppercase tracking-widest mb-1 block"
+                      <Link href={`/shop/${slug}/product/${product.id}`}>
+                        <div
+                          className="aspect-square overflow-hidden flex items-center justify-center relative"
                           style={{
-                            color: templateId === 'bold' ? accentColor : `${textColor}30`,
-                            fontWeight: templateId === 'bold' ? 700 : 500,
+                            backgroundColor: isDark ? '#111111' : `${textColor}04`,
                           }}
                         >
-                          {product.category}
-                        </span>
-                      )}
-                      <h3
-                        className="text-sm font-medium mb-1 group-hover:opacity-60 transition-opacity"
-                        style={{
-                          fontFamily: brand.font_heading,
-                          textTransform: templateId === 'bold' ? 'uppercase' : undefined,
-                          letterSpacing: templateId === 'bold' ? '0.02em' : undefined,
-                        }}
-                      >
-                        {product.name}
-                      </h3>
-                      {product.description && (
-                        <p className="text-xs line-clamp-1 mb-2" style={{ color: `${textColor}40` }}>
-                          {product.description}
-                        </p>
-                      )}
-                    </div>
-                  </Link>
-                  <div className={`flex items-center justify-between ${templateId === 'playful' || templateId === 'classic' || templateId === 'bold' ? 'px-4 pb-4' : 'mt-2'}`}>
-                    {product.price != null && product.price > 0 ? (
-                      <span className="text-sm font-medium">
-                        {product.currency || 'USD'} {product.price.toFixed(2)}
-                      </span>
-                    ) : (
-                      <span className="text-xs" style={{ color: `${textColor}35` }}>Free</span>
-                    )}
-                    <button
-                      onClick={() =>
-                        addToCart({
-                          productId: product.id,
-                          name: product.name,
-                          price: product.price || 0,
-                          currency: product.currency || 'USD',
-                          image_url: product.image_url || undefined,
-                        })
-                      }
-                      className="text-xs px-4 py-2 transition-all hover:opacity-80"
-                      style={addBtnStyle}
-                    >
-                      {templateId === 'bold' ? 'ADD' : templateId === 'playful' ? 'Add to Cart 🛒' : 'Add to Cart'}
-                    </button>
-                  </div>
-                </div>
-              ))}
-            </div>
+                          {/* Product badge */}
+                          {badge && (
+                            <div className="absolute top-3 left-3 z-10">
+                              <span style={badgeStyle(badge.type)}>{badge.label}</span>
+                            </div>
+                          )}
+
+                          {product.image_url ? (
+                            <img
+                              src={product.image_url}
+                              alt={product.name}
+                              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center">
+                              <svg className="w-10 h-10" style={{ color: `${textColor}10` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                                <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                              </svg>
+                            </div>
+                          )}
+
+                          {/* Hover overlay with quick-add button */}
+                          <div
+                            className="absolute inset-0 flex items-end justify-center pb-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                            style={{ background: `linear-gradient(to top, ${isDark ? '#000000' : '#000000'}60 0%, transparent 50%)` }}
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                addToCart({
+                                  productId: product.id,
+                                  name: product.name,
+                                  price: product.price || 0,
+                                  currency: product.currency || 'USD',
+                                  image_url: product.image_url || undefined,
+                                });
+                              }}
+                              className="px-6 py-2.5 text-sm font-medium transition-all hover:scale-105 active:scale-95"
+                              style={{
+                                backgroundColor: '#FFFFFF',
+                                color: '#000000',
+                                borderRadius: templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : '2px',
+                                fontWeight: 600,
+                                boxShadow: '0 4px 16px rgba(0,0,0,0.15)',
+                              }}
+                            >
+                              {templateId === 'bold' ? 'QUICK ADD' : templateId === 'playful' ? 'Quick Add 🛒' : 'Quick Add'}
+                            </button>
+                          </div>
+                        </div>
+                        <div className={templateId === 'playful' || templateId === 'classic' ? 'p-4' : templateId === 'bold' ? 'p-4' : 'mt-4'}>
+                          {product.category && (
+                            <span
+                              className="text-[10px] font-medium uppercase tracking-widest mb-1 block"
+                              style={{
+                                color: templateId === 'bold' ? accentColor : `${textColor}30`,
+                                fontWeight: templateId === 'bold' ? 700 : 500,
+                              }}
+                            >
+                              {product.category}
+                            </span>
+                          )}
+                          <h3
+                            className="text-sm font-medium mb-1 group-hover:opacity-60 transition-opacity"
+                            style={{
+                              fontFamily: brand.font_heading,
+                              textTransform: templateId === 'bold' ? 'uppercase' : undefined,
+                              letterSpacing: templateId === 'bold' ? '0.02em' : undefined,
+                            }}
+                          >
+                            {product.name}
+                          </h3>
+                          {product.description && (
+                            <p className="text-xs line-clamp-1 mb-2" style={{ color: `${textColor}40` }}>
+                              {product.description}
+                            </p>
+                          )}
+                        </div>
+                      </Link>
+                      <div className={`flex items-center justify-between ${templateId === 'playful' || templateId === 'classic' || templateId === 'bold' ? 'px-4 pb-4' : 'mt-2'}`}>
+                        {product.price != null && product.price > 0 ? (
+                          <span className="text-sm font-medium">
+                            {product.currency || 'USD'} {product.price.toFixed(2)}
+                          </span>
+                        ) : (
+                          <span className="text-xs" style={{ color: `${textColor}35` }}>Free</span>
+                        )}
+                        <button
+                          onClick={() =>
+                            addToCart({
+                              productId: product.id,
+                              name: product.name,
+                              price: product.price || 0,
+                              currency: product.currency || 'USD',
+                              image_url: product.image_url || undefined,
+                            })
+                          }
+                          className="text-xs px-4 py-2 transition-all hover:opacity-80 active:scale-95"
+                          style={addBtnStyle}
+                        >
+                          {templateId === 'bold' ? 'ADD' : templateId === 'playful' ? 'Add to Cart 🛒' : 'Add to Cart'}
+                        </button>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </AnimatePresence>
+            </motion.div>
           )}
         </div>
       </section>
