@@ -5,7 +5,7 @@ const BASE = process.env.BASE_URL || 'https://mayasura-web-production.up.railway
 test.describe('Landing Page', () => {
   test('loads and shows hero text', async ({ page }) => {
     await page.goto(BASE);
-    await expect(page.locator('h1')).toContainText(['palace', 'brand', 'Build'], { ignoreCase: true });
+    await expect(page.locator('h1').first()).toContainText('digital palace', { ignoreCase: true });
   });
 
   test('has Create Brand CTA', async ({ page }) => {
@@ -72,7 +72,7 @@ test.describe('Wizard Flow', () => {
   test('navigates to /create', async ({ page }) => {
     await page.goto(`${BASE}/create`);
     await expect(page).toHaveURL(/create/);
-    await expect(page.locator('text=Brand Basics')).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Brand Basics' })).toBeVisible();
   });
 
   test('step 1 shows brand name input', async ({ page }) => {
