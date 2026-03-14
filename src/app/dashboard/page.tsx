@@ -154,6 +154,14 @@ export default function DashboardListPage() {
                         </div>
                         <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors flex-shrink-0" />
                       </div>
+                      {brand.status === 'launched' && brand.slug && (
+                        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 flex gap-3" onClick={(e) => e.stopPropagation()}>
+                          <a href={`/site/${brand.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:text-blue-700">🌐 Site</a>
+                          <a href={`/shop/${brand.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs text-amber-600 hover:text-amber-700">🛒 Shop</a>
+                          <a href={`/blog/${brand.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-600 hover:text-purple-700">📝 Blog</a>
+                          <a href={`/chat/${brand.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs text-emerald-600 hover:text-emerald-700">💬 Chat</a>
+                        </div>
+                      )}
                     </div>
                   </Link>
                 </motion.div>
