@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Brand } from '@/lib/types';
 import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
 import { buildGoogleFontsUrl } from '@/lib/font-loader';
@@ -244,9 +245,13 @@ export default function ChatPage() {
             </div>
           )}
 
+          <AnimatePresence initial={false}>
           {messages.map((msg, i) => (
-            <div
+            <motion.div
               key={i}
+              initial={{ opacity: 0, y: 12, scale: 0.96 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              transition={{ duration: 0.25, ease: 'easeOut' }}
               className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
             >
               <div
@@ -263,8 +268,9 @@ export default function ChatPage() {
               >
                 {msg.content}
               </div>
-            </div>
+            </motion.div>
           ))}
+          </AnimatePresence>
 
           {sending && (
             <div className="flex justify-start">
@@ -330,9 +336,15 @@ export default function ChatPage() {
             {templateId === 'playful' ? '🚀' : 'Send'}
           </button>
         </form>
-        <p className="text-center text-xs mt-3 max-w-3xl mx-auto" style={{ color: `${textColor}20` }}>
-          Powered by {brand.name} AI · Built with Mayasura
-        </p>
+        <div className="text-center mt-3 max-w-3xl mx-auto flex items-center justify-center gap-4">
+          <p className="text-xs" style={{ color: `${textColor}20` }}>
+            Powered by <Link href="/" className="hover:opacity-60 transition-opacity" style={{ color: `${textColor}30` }}>Mayasura</Link>
+          </p>
+          <span className="text-xs" style={{ color: `${textColor}10` }}>·</span>
+          <p className="text-xs" style={{ color: `${textColor}15` }}>
+            💬 Text · 📎 Files coming soon
+          </p>
+        </div>
       </div>
     </div>
   );

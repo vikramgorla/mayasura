@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import Link from 'next/link';
 import { usePathname, useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -14,11 +14,13 @@ import { ErrorBoundary } from '@/components/error-boundary';
 import { Brand } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
-import { CommandPalette } from '@/components/command-palette';
-import { AICommandPalette } from '@/components/ai-command-palette';
 import { NotificationBell } from '@/components/notification-bell';
 import { useToast } from '@/components/ui/toast';
 import { UserNav } from '@/components/user-nav';
+
+// Lazy-load heavy components
+const CommandPalette = lazy(() => import('@/components/command-palette').then(m => ({ default: m.CommandPalette })));
+const AICommandPalette = lazy(() => import('@/components/ai-command-palette').then(m => ({ default: m.AICommandPalette })));
 
 const navItems = [
   { href: '', icon: LayoutDashboard, label: 'Overview' },
@@ -91,7 +93,10 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#09090B] flex">
       <a href="#dashboard-content" className="skip-to-content">Skip to content</a>
-      <CommandPalette brandId={brandId} />
+      <Suspense fallback={null}>
+        <CommandPalette brandId={brandId} />
+      </Suspense>
+      <Suspense fallback={null}>
       <AICommandPalette
         brandId={brandId}
         brand={brand ? {
@@ -130,6 +135,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
           }
         }}
       />
+      </Suspense>
 
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-64 bg-white dark:bg-zinc-900/95 border-r border-zinc-200 dark:border-zinc-800 flex-col fixed h-full z-20 sidebar-gradient" aria-label="Dashboard sidebar">
