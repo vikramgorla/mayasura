@@ -197,16 +197,46 @@ export const TONE_OPTIONS = [
   'Technical & Expert',
 ] as const;
 
-export const FONT_OPTIONS = [
-  'Inter',
-  'Plus Jakarta Sans',
-  'DM Sans',
-  'Outfit',
-  'Space Grotesk',
-  'Manrope',
-  'Sora',
-  'Geist',
-] as const;
+export interface FontOption {
+  name: string;
+  category: 'sans-serif' | 'serif' | 'display';
+  googleFamily?: string; // override for Google Fonts URL if different from name
+}
+
+export const FONT_OPTIONS_GROUPED: FontOption[] = [
+  // Sans-serif
+  { name: 'Inter', category: 'sans-serif' },
+  { name: 'Plus Jakarta Sans', category: 'sans-serif' },
+  { name: 'DM Sans', category: 'sans-serif' },
+  { name: 'Outfit', category: 'sans-serif' },
+  { name: 'Space Grotesk', category: 'sans-serif' },
+  { name: 'Manrope', category: 'sans-serif' },
+  { name: 'Sora', category: 'sans-serif' },
+  { name: 'Poppins', category: 'sans-serif' },
+  { name: 'Nunito', category: 'sans-serif' },
+  { name: 'Lato', category: 'sans-serif' },
+  { name: 'Raleway', category: 'sans-serif' },
+  { name: 'Work Sans', category: 'sans-serif' },
+  { name: 'Geist', category: 'sans-serif' },
+  // Serif
+  { name: 'Playfair Display', category: 'serif' },
+  { name: 'Source Serif 4', category: 'serif' },
+  { name: 'Lora', category: 'serif' },
+  { name: 'Merriweather', category: 'serif' },
+  { name: 'Crimson Pro', category: 'serif' },
+  { name: 'EB Garamond', category: 'serif' },
+  { name: 'Libre Baskerville', category: 'serif' },
+  // Display
+  { name: 'Archivo Black', category: 'display' },
+  { name: 'Bebas Neue', category: 'display' },
+  { name: 'Oswald', category: 'display' },
+];
+
+// Flat list for backward compatibility
+export const FONT_OPTIONS = FONT_OPTIONS_GROUPED.map(f => f.name);
+
+// All font names as a type
+export type FontName = (typeof FONT_OPTIONS)[number];
 
 export const INDUSTRY_CATEGORIES = [
   { id: 'restaurant', name: 'Restaurant/Food & Beverage', emoji: '🍕' },
