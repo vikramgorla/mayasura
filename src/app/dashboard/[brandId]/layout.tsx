@@ -7,7 +7,8 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Globe, MessageSquare, Package, FileText,
   BarChart3, ArrowLeft, HeadphonesIcon, Sparkles, Menu, X,
-  Download, Moon, Sun, Settings, ShoppingBag, Newspaper, Paintbrush
+  Download, Moon, Sun, Settings, ShoppingBag, Newspaper, Paintbrush,
+  Keyboard
 } from 'lucide-react';
 import { PageLoader } from '@/components/ui/loading';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -17,6 +18,7 @@ import { useTheme } from '@/components/theme-provider';
 import { NotificationBell } from '@/components/notification-bell';
 import { useToast } from '@/components/ui/toast';
 import { UserNav } from '@/components/user-nav';
+import { KeyboardShortcutsModal, useKeyboardShortcutsModal } from '@/components/keyboard-shortcuts-modal';
 
 // Lazy-load heavy components
 const CommandPalette = lazy(() => import('@/components/command-palette').then(m => ({ default: m.CommandPalette })));

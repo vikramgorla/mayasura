@@ -143,15 +143,26 @@ function CreatePageContent() {
         body: JSON.stringify({ type: 'landing' }),
       }).catch(() => {});
 
-      // Launch confetti
+      // Launch confetti celebration
       try {
         const confetti = (await import('canvas-confetti')).default;
+        // First burst — center
         confetti({
-          particleCount: 150,
-          spread: 100,
+          particleCount: 120,
+          spread: 80,
           origin: { y: 0.6 },
-          colors: ['#4F46E5', '#7C3AED', '#A855F7', '#22C55E', '#F59E0B'],
+          colors: ['#4F46E5', '#7C3AED', '#A855F7', '#22C55E', '#F59E0B', '#EC4899'],
+          gravity: 0.8,
         });
+        // Side bursts
+        setTimeout(() => {
+          confetti({ particleCount: 60, angle: 60, spread: 55, origin: { x: 0 }, colors: ['#7C3AED', '#A855F7', '#6366F1'] });
+          confetti({ particleCount: 60, angle: 120, spread: 55, origin: { x: 1 }, colors: ['#22C55E', '#10B981', '#34D399'] });
+        }, 200);
+        // Final scatter
+        setTimeout(() => {
+          confetti({ particleCount: 40, spread: 120, origin: { y: 0.3 }, scalar: 0.8, gravity: 1.2, colors: ['#F59E0B', '#FCD34D', '#FDE68A'] });
+        }, 500);
       } catch {} // Silent fail if confetti doesn't load
 
       toast.success('🎉 Brand launched!', `${data.name} is live`);

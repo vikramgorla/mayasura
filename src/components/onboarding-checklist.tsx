@@ -4,21 +4,11 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Package, Paintbrush, FileText, MessageSquare, Globe,
-  CheckCircle2, Circle, X, ChevronDown, ChevronUp,
-  ArrowRight, Trophy, Sparkles
+  Package, Paintbrush, FileText, MessageSquare, Eye,
+  Check, ArrowRight, X, Sparkles,
 } from 'lucide-react';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
-
-interface ChecklistItem {
-  id: string;
-  icon: React.ElementType;
-  label: string;
-  desc: string;
-  link: string;
-  done: boolean;
-  color: string;
-}
 
 interface OnboardingChecklistProps {
   brandId: string;
@@ -26,49 +16,62 @@ interface OnboardingChecklistProps {
   contentCount: number;
   blogPostCount: number;
   hasChatbot: boolean;
-  brandSlug?: string;
+  brandSlug?: string | null;
   hasDesignCustomization: boolean;
 }
 
-function CircularRing({
-  value,
-  size = 72,
-  strokeWidth = 5,
-}: {
-  value: number;
-  size?: number;
-  strokeWidth?: number;
-}) {
+interface ChecklistItem {
+  id: string;
+  label: string;
+  description: string;
+  href: string;
+  icon: React.ComponentType<{ className?: string }>;
+  color: string;
+  isComplete: boolean;
+  external?: boolean;
+}
+
+function ProgressRing({ percent, size = 56, strokeWidth = 4 }: { percent: number; size?: number; strokeWidth?: number }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
-  const offset = circumference - (value / 100) * circumference;
-  const color = value >= 100 ? '#10b981' : value >= 60 ? '#6366f1' : value >= 30 ? '#3b82f6' : '#a78bfa';
+  const offset = circumference - (percent / 100) * circumference;
 
   return (
-    <svg width={size} height={size} className="transform -rotate-90 shrink-0">
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke="currentColor"
-        className="text-zinc-100 dark:text-zinc-800"
-        strokeWidth={strokeWidth}
-      />
-      <motion.circle
-        cx={size / 2}
-        cy={size / 2}
-        r={radius}
-        fill="none"
-        stroke={color}
-        strokeWidth={strokeWidth}
-        strokeLinecap="round"
-        strokeDasharray={circumference}
-        initial={{ strokeDashoffset: circumference }}
-        animate={{ strokeDashoffset: offset }}
-        transition={{ duration: 1.2, ease: 'easeOut', delay: 0.3 }}
-      />
-    </svg>
+    <div className="relative" style={{ width: size, height: size }}>
+      <svg width={size} height={size} className="transform -rotate-90">
+        <circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="currentColor"
+          className="text-zinc-100 dark:text-zinc-800"
+          strokeWidth={strokeWidth}
+        />
+        <motion.circle
+          cx={size / 2}
+          cy={size / 2}
+          r={radius}
+          fill="none"
+          stroke="url(#progress-gradient)"
+          strokeWidth={strokeWidth}
+          strokeLinecap="round"
+          strokeDasharray={circumference}
+          initial={{ strokeDashoffset: circumference }}
+          animate={{ strokeDashoffset: offset }}
+          transition={{ duration: 1, ease: 'easeOut' }}
+        />
+        <defs>
+          <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="#7C3AED" />
+            <stop offset="100%" stopColor="#6366F1" />
+          </linearGradient>
+        </defs>
+      </svg>
+      <div className="absolute inset-0 flex items-center justify-center">
+        <span className="text-xs font-bold text-zinc-900 dark:text-white">{Math.round(percent)}%</span>
+      </div>
+    </div>
   );
 }
 
@@ -81,241 +84,222 @@ export function OnboardingChecklist({
   brandSlug,
   hasDesignCustomization,
 }: OnboardingChecklistProps) {
-  const storageKey = `mayasura-onboarding-${brandId}`;
   const [dismissed, setDismissed] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
-  const [mounted, setMounted] = useState(false);
+  const [manualChecks, setManualChecks] = useState<Record<string, boolean>>({});
 
+  // Load dismissed / manual checks from localStorage
   useEffect(() => {
-    setMounted(true);
-    if (typeof window !== 'undefined') {
-      const saved = localStorage.getItem(storageKey);
-      if (saved) {
-        try {
-          const parsed = JSON.parse(saved);
-          setDismissed(parsed.dismissed ?? false);
-          setCollapsed(parsed.collapsed ?? false);
-        } catch {
-          // ignore
-        }
+    try {
+      const stored = localStorage.getItem(`onboarding-${brandId}`);
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        if (parsed.dismissed) setDismissed(true);
+        if (parsed.manualChecks) setManualChecks(parsed.manualChecks);
       }
+    } catch {
+      // ignore
     }
-  }, [storageKey]);
+  }, [brandId]);
+
+  // Persist to localStorage
+  const persist = (updates: { dismissed?: boolean; manualChecks?: Record<string, boolean> }) => {
+    try {
+      const stored = localStorage.getItem(`onboarding-${brandId}`);
+      const current = stored ? JSON.parse(stored) : {};
+      const next = { ...current, ...updates };
+      localStorage.setItem(`onboarding-${brandId}`, JSON.stringify(next));
+    } catch {
+      // ignore
+    }
+  };
 
   const items: ChecklistItem[] = [
     {
       id: 'product',
-      icon: Package,
       label: 'Add your first product',
-      desc: 'Start selling with a product catalog',
-      link: `/dashboard/${brandId}/products`,
-      done: productCount > 0,
-      color: 'text-amber-600 bg-amber-50 dark:bg-amber-900/30',
+      description: 'Start building your product catalog',
+      href: `/dashboard/${brandId}/products`,
+      icon: Package,
+      color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600',
+      isComplete: productCount > 0 || !!manualChecks['product'],
     },
     {
       id: 'design',
-      icon: Paintbrush,
       label: 'Customize your design',
-      desc: 'Pick a template, colors, and fonts',
-      link: `/dashboard/${brandId}/design`,
-      done: hasDesignCustomization,
-      color: 'text-pink-600 bg-pink-50 dark:bg-pink-900/30',
+      description: 'Make it yours with colors, fonts & templates',
+      href: `/dashboard/${brandId}/design`,
+      icon: Paintbrush,
+      color: 'bg-pink-50 dark:bg-pink-900/30 text-pink-600',
+      isComplete: hasDesignCustomization || !!manualChecks['design'],
     },
     {
       id: 'blog',
-      icon: FileText,
       label: 'Write a blog post',
-      desc: 'Drive traffic with AI-generated content',
-      link: `/dashboard/${brandId}/blog`,
-      done: blogPostCount > 0,
-      color: 'text-purple-600 bg-purple-50 dark:bg-purple-900/30',
+      description: 'Share your story and boost SEO',
+      href: `/dashboard/${brandId}/blog`,
+      icon: FileText,
+      color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600',
+      isComplete: blogPostCount > 0 || !!manualChecks['blog'],
     },
     {
       id: 'chatbot',
+      label: 'Configure chatbot',
+      description: 'AI assistant trained on your brand voice',
+      href: `/dashboard/${brandId}/chatbot`,
       icon: MessageSquare,
-      label: 'Set up your chatbot',
-      desc: 'Train your AI on your brand voice',
-      link: `/dashboard/${brandId}/chatbot`,
-      done: hasChatbot,
-      color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30',
+      color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600',
+      isComplete: hasChatbot || !!manualChecks['chatbot'],
     },
     {
       id: 'preview',
-      icon: Globe,
       label: 'Preview your site',
-      desc: 'See your brand live in the browser',
-      link: brandSlug ? `/site/${brandSlug}` : `/dashboard/${brandId}/website`,
-      done: contentCount > 0 || blogPostCount > 0,
-      color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30',
+      description: 'See how visitors experience your brand',
+      href: brandSlug ? `/site/${brandSlug}` : `/dashboard/${brandId}/website`,
+      icon: Eye,
+      color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600',
+      isComplete: !!manualChecks['preview'],
+      external: !!brandSlug,
     },
   ];
 
-  const doneCount = items.filter(i => i.done).length;
+  const completedCount = items.filter(i => i.isComplete).length;
   const totalCount = items.length;
-  const percent = Math.round((doneCount / totalCount) * 100);
-  const allDone = doneCount === totalCount;
-
-  const persist = (updates: { dismissed?: boolean; collapsed?: boolean }) => {
-    if (typeof window !== 'undefined') {
-      const current = JSON.parse(localStorage.getItem(storageKey) || '{}');
-      localStorage.setItem(storageKey, JSON.stringify({ ...current, ...updates }));
-    }
-  };
+  const percent = Math.round((completedCount / totalCount) * 100);
+  const allComplete = completedCount === totalCount;
 
   const handleDismiss = () => {
     setDismissed(true);
     persist({ dismissed: true });
   };
 
-  const handleCollapse = () => {
-    setCollapsed(prev => {
-      persist({ collapsed: !prev });
-      return !prev;
-    });
-  };
-
-  if (!mounted || dismissed) return null;
+  if (dismissed) return null;
 
   return (
     <AnimatePresence>
       <motion.div
-        initial={{ opacity: 0, y: -10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.4, ease: [0.25, 0.46, 0.45, 0.94] }}
-        className="mb-6"
+        initial={{ opacity: 0, y: -10, height: 0 }}
+        animate={{ opacity: 1, y: 0, height: 'auto' }}
+        exit={{ opacity: 0, y: -10, height: 0 }}
+        transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+        className="mb-8"
       >
-        <div className={`rounded-2xl border overflow-hidden transition-all duration-300 ${
-          allDone
-            ? 'border-emerald-200 dark:border-emerald-800 bg-gradient-to-br from-emerald-50 to-teal-50 dark:from-emerald-950/30 dark:to-teal-950/30'
-            : 'border-violet-200 dark:border-violet-800/50 bg-gradient-to-br from-violet-50/80 to-indigo-50/50 dark:from-violet-950/20 dark:to-indigo-950/20'
-        }`}>
-          {/* Header */}
-          <div className="px-5 py-4 flex items-center gap-4">
-            {/* Progress ring */}
-            <div className="relative shrink-0">
-              <CircularRing value={percent} />
-              <div className="absolute inset-0 flex items-center justify-center">
-                {allDone ? (
-                  <Trophy className="h-5 w-5 text-emerald-500" />
-                ) : (
-                  <span className="text-xs font-bold text-[var(--text-primary)]">{percent}%</span>
-                )}
-              </div>
-            </div>
-
-            {/* Title */}
-            <div className="flex-1 min-w-0">
-              {allDone ? (
-                <>
-                  <p className="font-semibold text-sm text-emerald-700 dark:text-emerald-400">
-                    🎉 You&apos;re all set!
-                  </p>
-                  <p className="text-xs text-emerald-600/70 dark:text-emerald-500/70 mt-0.5">
-                    Your brand is ready to grow. Keep going!
-                  </p>
-                </>
-              ) : (
-                <>
-                  <p className="font-semibold text-sm text-[var(--text-primary)]">
-                    Get started — {doneCount}/{totalCount} complete
-                  </p>
-                  <p className="text-xs text-[var(--text-tertiary)] mt-0.5">
-                    {totalCount - doneCount} step{totalCount - doneCount !== 1 ? 's' : ''} left to launch your digital palace
-                  </p>
-                </>
-              )}
-            </div>
-
-            {/* Actions */}
-            <div className="flex items-center gap-1 shrink-0">
-              <button
-                onClick={handleCollapse}
-                className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                aria-label={collapsed ? 'Expand' : 'Collapse'}
-              >
-                {collapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-              </button>
-              {allDone && (
-                <button
-                  onClick={handleDismiss}
-                  className="p-1.5 rounded-lg text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] hover:bg-black/5 dark:hover:bg-white/5 transition-colors"
-                  aria-label="Dismiss"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          </div>
-
-          {/* Progress bar */}
-          <div className="h-1 bg-black/5 dark:bg-white/5">
-            <motion.div
-              className={`h-full rounded-full transition-colors duration-500 ${allDone ? 'bg-emerald-500' : 'bg-violet-500'}`}
-              initial={{ width: 0 }}
-              animate={{ width: `${percent}%` }}
-              transition={{ duration: 1, ease: 'easeOut', delay: 0.2 }}
-            />
-          </div>
-
-          {/* Checklist items */}
-          <AnimatePresence>
-            {!collapsed && (
-              <motion.div
-                initial={{ height: 0, opacity: 0 }}
-                animate={{ height: 'auto', opacity: 1 }}
-                exit={{ height: 0, opacity: 0 }}
-                transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-                className="overflow-hidden"
-              >
-                <div className="px-5 py-3 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2">
-                  {items.map((item, i) => (
-                    <motion.div
-                      key={item.id}
-                      initial={{ opacity: 0, y: 8 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: i * 0.05 }}
-                    >
-                      {item.done ? (
-                        <div className="flex items-start gap-2.5 p-3 rounded-xl bg-white/50 dark:bg-white/5 opacity-70">
-                          <CheckCircle2 className="h-4 w-4 text-emerald-500 mt-0.5 shrink-0" />
-                          <div className="min-w-0">
-                            <p className="text-xs font-medium text-[var(--text-secondary)] line-through">{item.label}</p>
-                          </div>
-                        </div>
-                      ) : (
-                        <Link href={item.link} target={item.id === 'preview' && brandSlug ? '_blank' : undefined} rel={item.id === 'preview' && brandSlug ? 'noopener noreferrer' : undefined}>
-                          <div className="flex items-start gap-2.5 p-3 rounded-xl bg-white/60 dark:bg-white/5 hover:bg-white/90 dark:hover:bg-white/10 transition-colors cursor-pointer group border border-transparent hover:border-violet-200 dark:hover:border-violet-800/50">
-                            <div className={`h-6 w-6 rounded-md flex items-center justify-center shrink-0 ${item.color}`}>
-                              <item.icon className="h-3.5 w-3.5" />
-                            </div>
-                            <div className="flex-1 min-w-0">
-                              <p className="text-xs font-medium text-[var(--text-primary)] group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors leading-tight">{item.label}</p>
-                              <p className="text-[10px] text-[var(--text-tertiary)] mt-0.5 hidden sm:block leading-tight">{item.desc}</p>
-                            </div>
-                            <ArrowRight className="h-3 w-3 text-[var(--text-tertiary)] group-hover:text-violet-500 transition-colors shrink-0 mt-0.5 opacity-0 group-hover:opacity-100" />
-                          </div>
-                        </Link>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-
-                {allDone && (
-                  <div className="px-5 pb-4 flex items-center gap-3">
-                    <Sparkles className="h-4 w-4 text-emerald-500" />
-                    <p className="text-xs text-emerald-600 dark:text-emerald-400">
-                      Amazing work! Your brand ecosystem is fully set up.
-                    </p>
-                    <button onClick={handleDismiss} className="ml-auto text-xs text-[var(--text-tertiary)] hover:text-[var(--text-secondary)] transition-colors">
-                      Dismiss
-                    </button>
+        <Card className="overflow-hidden border-violet-200/50 dark:border-violet-800/30 bg-gradient-to-br from-white via-violet-50/20 to-white dark:from-zinc-900 dark:via-violet-950/10 dark:to-zinc-900">
+          <CardContent className="p-5 sm:p-6">
+            {/* Header */}
+            <div className="flex items-start justify-between mb-5">
+              <div className="flex items-center gap-4">
+                <ProgressRing percent={percent} />
+                <div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <Sparkles className="h-4 w-4 text-violet-500" />
+                    <h3 className="font-semibold text-sm text-zinc-900 dark:text-white">
+                      {allComplete ? '🎉 All set! Your brand is ready' : 'Set up your brand'}
+                    </h3>
                   </div>
-                )}
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400">
+                    {allComplete
+                      ? 'You\'ve completed all the steps. Your digital palace is ready.'
+                      : `${completedCount} of ${totalCount} steps complete — let's build your palace`
+                    }
+                  </p>
+                </div>
+              </div>
+              <button
+                onClick={handleDismiss}
+                className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                aria-label="Dismiss onboarding checklist"
+              >
+                <X className="h-4 w-4" />
+              </button>
+            </div>
+
+            {/* Checklist items */}
+            <div className="space-y-1.5">
+              {items.map((item, i) => {
+                const ItemWrapper = item.external
+                  ? ({ children, className }: { children: React.ReactNode; className: string }) => (
+                      <a href={item.href} target="_blank" rel="noopener noreferrer" className={className}>{children}</a>
+                    )
+                  : ({ children, className }: { children: React.ReactNode; className: string }) => (
+                      <Link href={item.href} className={className}>{children}</Link>
+                    );
+
+                return (
+                  <motion.div
+                    key={item.id}
+                    initial={{ opacity: 0, x: -8 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05, duration: 0.3 }}
+                  >
+                    <ItemWrapper
+                      className={`flex items-center gap-3.5 p-3 rounded-xl transition-all duration-200 group ${
+                        item.isComplete
+                          ? 'bg-emerald-50/50 dark:bg-emerald-950/10'
+                          : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer'
+                      }`}
+                    >
+                      {/* Check circle */}
+                      <div className={`h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                        item.isComplete
+                          ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30'
+                          : 'border-2 border-zinc-200 dark:border-zinc-700 group-hover:border-violet-400 dark:group-hover:border-violet-500'
+                      }`}>
+                        {item.isComplete && (
+                          <motion.div
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            transition={{ type: 'spring', stiffness: 500, damping: 20 }}
+                          >
+                            <Check className="h-3.5 w-3.5" />
+                          </motion.div>
+                        )}
+                      </div>
+
+                      {/* Icon */}
+                      <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                        <item.icon className="h-4 w-4" />
+                      </div>
+
+                      {/* Text */}
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-medium ${
+                          item.isComplete
+                            ? 'text-zinc-400 dark:text-zinc-500 line-through'
+                            : 'text-zinc-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400'
+                        } transition-colors`}>
+                          {item.label}
+                        </p>
+                        <p className="text-xs text-zinc-400 dark:text-zinc-500 hidden sm:block">
+                          {item.description}
+                        </p>
+                      </div>
+
+                      {/* Arrow */}
+                      {!item.isComplete && (
+                        <ArrowRight className="h-4 w-4 text-zinc-300 group-hover:text-violet-500 transition-colors flex-shrink-0" />
+                      )}
+                    </ItemWrapper>
+                  </motion.div>
+                );
+              })}
+            </div>
+
+            {/* All complete CTA */}
+            {allComplete && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: 0.3 }}
+                className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex items-center justify-between"
+              >
+                <p className="text-xs text-zinc-500">Your brand ecosystem is live and ready.</p>
+                <Button size="sm" variant="outline" onClick={handleDismiss} className="text-xs">
+                  Dismiss
+                </Button>
               </motion.div>
             )}
-          </AnimatePresence>
-        </div>
+          </CardContent>
+        </Card>
       </motion.div>
     </AnimatePresence>
   );

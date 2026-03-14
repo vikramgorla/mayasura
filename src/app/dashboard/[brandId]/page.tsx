@@ -313,7 +313,7 @@ export default function BrandDashboardPage() {
         contentCount={data.contentCount}
         blogPostCount={data.blogPostCount}
         hasChatbot={data.contentCount > 0}
-        brandSlug={data.brand.slug}
+        brandSlug={data.brand.slug ?? undefined}
         hasDesignCustomization={
           data.brand.website_template !== 'minimal' ||
           data.brand.primary_color !== '#6366F1'
