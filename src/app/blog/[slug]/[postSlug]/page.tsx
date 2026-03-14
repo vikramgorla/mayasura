@@ -464,7 +464,6 @@ export default function BlogPostPage() {
                     href={`#${item.id}`}
                     className="block text-xs py-1 transition-all hover:opacity-80"
                     style={{
-                      paddingLeft: `${(item.level - 1) * 12}px`,
                       color: activeSection === item.id ? accentColor : `${textColor}40`,
                       fontWeight: activeSection === item.id ? 600 : 400,
                       borderLeft: activeSection === item.id ? `2px solid ${accentColor}` : `1px solid ${textColor}08`,

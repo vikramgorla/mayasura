@@ -312,6 +312,7 @@ export default function ProductsPage() {
             icon={ShoppingBag}
             title="No products yet"
             description="Add your first product to start selling"
+            illustration="products"
             action={{
               label: 'Add Product',
               onClick: () => { resetForm(); setShowForm(true); },

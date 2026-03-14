@@ -392,6 +392,7 @@ export default function BlogManagementPage() {
             icon={Newspaper}
             title="No blog posts yet"
             description="Write your first post to engage your audience"
+            illustration="blog"
             action={{
               label: 'Create First Post',
               onClick: () => setCreating(true),
