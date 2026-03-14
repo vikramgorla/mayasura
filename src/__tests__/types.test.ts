@@ -16,8 +16,8 @@ describe('Type constants', () => {
     expect(TONE_OPTIONS).toHaveLength(8);
   });
 
-  it('has 8 font options', () => {
-    expect(FONT_OPTIONS).toHaveLength(8);
+  it('has 34 font options', () => {
+    expect(FONT_OPTIONS).toHaveLength(34);
   });
 
   it('has 10 industry categories', () => {

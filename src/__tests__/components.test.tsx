@@ -17,7 +17,7 @@ describe('Button component', () => {
   it('renders with brand variant', () => {
     const { container } = render(<Button variant="brand">Action</Button>);
     const button = container.querySelector('button');
-    expect(button?.className).toContain('bg-blue-600');
+    expect(button?.className).toContain('bg-violet-700');
   });
 
   it('renders disabled state', () => {
@@ -91,6 +91,6 @@ describe('Avatar component', () => {
 describe('Progress component', () => {
   it('renders with value', () => {
     const { container } = render(<Progress value={50} />);
-    expect(container.querySelector('.bg-blue-600')).toBeInTheDocument();
+    expect(container.querySelector('.bg-indigo-600')).toBeInTheDocument();
   });
 });
