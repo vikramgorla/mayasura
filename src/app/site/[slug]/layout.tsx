@@ -7,6 +7,7 @@ import { Brand } from '@/lib/types';
 import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
 import { buildGoogleFontsUrl } from '@/lib/font-loader';
 import { type PageLayout, getDefaultLayout } from '@/lib/page-layout';
+import { useScrollAnimation } from '@/lib/use-scroll-animation';
 import {
   resolveDesignSettings,
   designSettingsToCSSVars,
@@ -493,6 +494,9 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
     }
   }, [data]);
 
+  // Initialize scroll animations for consumer site
+  useScrollAnimation();
+
   useEffect(() => {
     if (!data) return;
     fetch(`/api/public/brand/${slug}/track`, {
@@ -535,6 +539,7 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
       <div
         className="min-h-screen flex flex-col"
         data-template={data.websiteTemplate?.id || 'minimal'}
+        data-animation={data.settings?.animation_style || 'moderate'}
         style={{
           backgroundColor: data.brand.secondary_color || '#fafafa',
           color: data.brand.primary_color || '#0f172a',

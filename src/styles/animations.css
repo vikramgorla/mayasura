@@ -1,0 +1,346 @@
+/* =====================================================================
+   ANIMATIONS SYSTEM — Mayasura Rich Animation Library
+   Brands can choose: subtle / moderate / dynamic / none
+   Applied via [data-animation] attribute on root element.
+   ===================================================================== */
+
+/* ==================== Base Keyframes ==================== */
+
+/* Scroll Reveal */
+@keyframes anim-fade-up {
+  from { opacity: 0; transform: translateY(30px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes anim-fade-in {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes anim-slide-left {
+  from { opacity: 0; transform: translateX(-40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes anim-slide-right {
+  from { opacity: 0; transform: translateX(40px); }
+  to { opacity: 1; transform: translateX(0); }
+}
+
+@keyframes anim-zoom-in {
+  from { opacity: 0; transform: scale(0.92); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes anim-blur-in {
+  from { opacity: 0; filter: blur(8px); }
+  to { opacity: 1; filter: blur(0); }
+}
+
+/* Loading */
+@keyframes anim-shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes anim-dot-pulse {
+  0%, 80%, 100% { transform: scale(0.6); opacity: 0.4; }
+  40% { transform: scale(1); opacity: 1; }
+}
+
+@keyframes anim-progress {
+  0% { width: 0%; }
+  100% { width: 100%; }
+}
+
+@keyframes anim-spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+/* Micro-interactions */
+@keyframes anim-bounce-subtle {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes anim-shake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  75% { transform: translateX(4px); }
+}
+
+@keyframes anim-toast-in {
+  from { opacity: 0; transform: translateY(16px) scale(0.95); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
+}
+
+@keyframes anim-toast-out {
+  from { opacity: 1; transform: translateY(0) scale(1); }
+  to { opacity: 0; transform: translateY(16px) scale(0.95); }
+}
+
+@keyframes anim-counter-up {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+/* Glow effect */
+@keyframes anim-glow-pulse {
+  0%, 100% { box-shadow: 0 0 5px var(--anim-glow-color, rgba(99, 102, 241, 0.2)); }
+  50% { box-shadow: 0 0 20px var(--anim-glow-color, rgba(99, 102, 241, 0.4)); }
+}
+
+/* ==================== Scroll Reveal Classes ==================== */
+/* Elements start hidden, become visible when .anim-visible is added */
+
+.anim-on-scroll {
+  opacity: 0;
+  transition: opacity 0.6s ease, transform 0.6s ease;
+}
+
+.anim-fade-up {
+  transform: translateY(30px);
+}
+
+.anim-fade-in {
+  /* Just opacity */
+}
+
+.anim-slide-left {
+  transform: translateX(-40px);
+}
+
+.anim-slide-right {
+  transform: translateX(40px);
+}
+
+.anim-zoom-in {
+  transform: scale(0.92);
+}
+
+/* When visible */
+.anim-on-scroll.anim-visible {
+  opacity: 1;
+  transform: translateY(0) translateX(0) scale(1);
+}
+
+/* Stagger delays */
+.anim-delay-1 { transition-delay: 0.1s; }
+.anim-delay-2 { transition-delay: 0.2s; }
+.anim-delay-3 { transition-delay: 0.3s; }
+.anim-delay-4 { transition-delay: 0.4s; }
+.anim-delay-5 { transition-delay: 0.5s; }
+
+/* ==================== Hover Effects ==================== */
+
+/* Card lift */
+.anim-hover-lift {
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+}
+.anim-hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+/* Glow on hover */
+.anim-hover-glow {
+  transition: box-shadow 0.3s ease;
+}
+.anim-hover-glow:hover {
+  box-shadow: 0 0 24px var(--anim-glow-color, rgba(99, 102, 241, 0.15));
+}
+
+/* Border color transition */
+.anim-hover-border {
+  transition: border-color 0.3s ease;
+}
+.anim-hover-border:hover {
+  border-color: var(--anim-accent, currentColor);
+}
+
+/* Image zoom on hover (apply to container with overflow:hidden) */
+.anim-hover-zoom img,
+.anim-hover-zoom .anim-zoom-target {
+  transition: transform 0.5s ease;
+}
+.anim-hover-zoom:hover img,
+.anim-hover-zoom:hover .anim-zoom-target {
+  transform: scale(1.05);
+}
+
+/* Underline grow */
+.anim-hover-underline {
+  position: relative;
+}
+.anim-hover-underline::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 100%;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.3s ease;
+}
+.anim-hover-underline:hover::after {
+  transform: scaleX(1);
+}
+
+/* ==================== Button Micro-interactions ==================== */
+
+.anim-btn-press {
+  transition: transform 0.1s ease;
+}
+.anim-btn-press:active {
+  transform: scale(0.96);
+}
+
+/* ==================== Input Focus ==================== */
+
+.anim-input-focus {
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+.anim-input-focus:focus {
+  box-shadow: 0 0 0 3px var(--anim-glow-color, rgba(99, 102, 241, 0.12));
+}
+
+/* ==================== Loading States ==================== */
+
+.anim-shimmer {
+  background: linear-gradient(90deg, transparent 25%, rgba(255, 255, 255, 0.08) 50%, transparent 75%);
+  background-size: 200% 100%;
+  animation: anim-shimmer 1.5s ease-in-out infinite;
+}
+
+.anim-dot-pulse {
+  display: inline-flex;
+  gap: 4px;
+}
+.anim-dot-pulse > span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: currentColor;
+  animation: anim-dot-pulse 1.4s ease-in-out infinite;
+}
+.anim-dot-pulse > span:nth-child(1) { animation-delay: 0s; }
+.anim-dot-pulse > span:nth-child(2) { animation-delay: 0.2s; }
+.anim-dot-pulse > span:nth-child(3) { animation-delay: 0.4s; }
+
+.anim-spin {
+  animation: anim-spin 1s linear infinite;
+}
+
+/* ==================== Toast ==================== */
+
+.anim-toast-enter {
+  animation: anim-toast-in 0.3s ease-out forwards;
+}
+
+.anim-toast-exit {
+  animation: anim-toast-out 0.2s ease-in forwards;
+}
+
+/* ==================== Animation Intensity Levels ==================== */
+
+/* NONE — disable all animations */
+[data-animation="none"] .anim-on-scroll,
+[data-animation="none"] .t-animate {
+  opacity: 1 !important;
+  transform: none !important;
+  transition: none !important;
+  animation: none !important;
+}
+
+[data-animation="none"] .anim-hover-lift:hover,
+[data-animation="none"] .anim-hover-zoom:hover img {
+  transform: none !important;
+}
+
+/* SUBTLE — reduced distances, faster timings */
+[data-animation="subtle"] .anim-on-scroll {
+  transition-duration: 0.3s;
+}
+
+[data-animation="subtle"] .anim-fade-up {
+  transform: translateY(12px);
+}
+
+[data-animation="subtle"] .anim-slide-left {
+  transform: translateX(-16px);
+}
+
+[data-animation="subtle"] .anim-slide-right {
+  transform: translateX(16px);
+}
+
+[data-animation="subtle"] .anim-hover-lift:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+/* MODERATE (default) — standard distances */
+/* Uses base values above */
+
+/* DYNAMIC — enhanced, more dramatic */
+[data-animation="dynamic"] .anim-on-scroll {
+  transition-duration: 0.8s;
+}
+
+[data-animation="dynamic"] .anim-fade-up {
+  transform: translateY(48px);
+}
+
+[data-animation="dynamic"] .anim-slide-left {
+  transform: translateX(-60px);
+}
+
+[data-animation="dynamic"] .anim-slide-right {
+  transform: translateX(60px);
+}
+
+[data-animation="dynamic"] .anim-hover-lift:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 20px 48px rgba(0, 0, 0, 0.12);
+}
+
+[data-animation="dynamic"] .anim-hover-zoom:hover img,
+[data-animation="dynamic"] .anim-hover-zoom:hover .anim-zoom-target {
+  transform: scale(1.1);
+}
+
+/* ==================== Parallax (JS-driven via transform) ==================== */
+
+.anim-parallax {
+  will-change: transform;
+  transition: transform 0.1s linear;
+}
+
+/* ==================== Page Transitions (for consumer sites) ==================== */
+
+.anim-page-enter {
+  animation: anim-fade-up 0.4s ease-out forwards;
+}
+
+.anim-page-exit {
+  animation: anim-fade-in 0.2s ease-in reverse forwards;
+}
+
+/* ==================== Reduced Motion Override ==================== */
+@media (prefers-reduced-motion: reduce) {
+  .anim-on-scroll,
+  .anim-hover-lift,
+  .anim-hover-glow,
+  .anim-hover-zoom img,
+  .anim-hover-underline::after,
+  .anim-btn-press,
+  .anim-parallax {
+    animation: none !important;
+    transition: none !important;
+    transform: none !important;
+    opacity: 1 !important;
+  }
+}
