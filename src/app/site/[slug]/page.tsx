@@ -2,12 +2,14 @@
 
 import Link from 'next/link';
 import { useBrandSite, BrandPlaceholder } from './layout';
+import { LayoutSections } from '@/components/site/section-renderer';
+import { getDefaultLayout } from '@/lib/page-layout';
 
 export default function BrandHomePage() {
   const data = useBrandSite();
   if (!data) return null;
 
-  const { brand, products, blogPosts, websiteTemplate: template } = data;
+  const { brand, products, blogPosts, websiteTemplate: template, pageLayout } = data;
   const slug = brand.slug || brand.id;
   const channels = JSON.parse(brand.channels || '[]') as string[];
   const templateId = template?.id || 'minimal';
@@ -620,6 +622,8 @@ export default function BrandHomePage() {
     );
   };
 
+  const layout = pageLayout || getDefaultLayout(brand.name);
+
   return (
     <>
       {renderHero()}
@@ -629,6 +633,15 @@ export default function BrandHomePage() {
       {renderProducts()}
       <Divider />
       {renderBlog()}
+      <Divider />
+      {/* Render extra layout sections (testimonials, stats, newsletter, FAQ) */}
+      <LayoutSections
+        layout={layout}
+        brand={brand}
+        template={template}
+        products={products}
+        blogPosts={blogPosts}
+      />
       <Divider />
       {renderCTA()}
     </>

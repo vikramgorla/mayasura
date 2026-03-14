@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { Brand } from '@/lib/types';
 import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
 import { buildGoogleFontsUrl } from '@/lib/font-loader';
+import { type PageLayout, getDefaultLayout } from '@/lib/page-layout';
 
 interface BrandSiteData {
   brand: Brand;
@@ -28,6 +29,7 @@ interface BrandSiteData {
   }>;
   settings?: Record<string, string>;
   websiteTemplate?: WebsiteTemplate;
+  pageLayout?: PageLayout;
 }
 
 const BrandSiteContext = createContext<BrandSiteData | null>(null);
@@ -440,7 +442,14 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
         // Resolve website template from settings
         const templateId = d.settings?.website_template || 'minimal';
         const websiteTemplate = getWebsiteTemplate(templateId);
-        setData({ ...d, websiteTemplate });
+        // Parse page layout from settings
+        let pageLayout: PageLayout | undefined;
+        if (d.settings?.page_layout) {
+          try {
+            pageLayout = JSON.parse(d.settings.page_layout);
+          } catch { /* ignore */ }
+        }
+        setData({ ...d, websiteTemplate, pageLayout });
       })
       .catch(() => setError(true));
   }, [slug]);
