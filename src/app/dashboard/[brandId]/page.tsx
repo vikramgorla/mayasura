@@ -17,6 +17,7 @@ import { Button } from '@/components/ui/button';
 import { Sparkline } from '@/components/ui/sparkline';
 import { Brand } from '@/lib/types';
 import { useToast } from '@/components/ui/toast';
+import { OnboardingChecklist } from '@/components/onboarding-checklist';
 
 interface DashboardData {
   brand: Brand;
@@ -304,6 +305,20 @@ export default function BrandDashboardPage() {
         </div>
         <p className="text-zinc-500 dark:text-zinc-400">{data.brand.tagline || 'Your brand command center'}</p>
       </motion.div>
+
+      {/* Onboarding Checklist */}
+      <OnboardingChecklist
+        brandId={brandId}
+        productCount={data.productCount}
+        contentCount={data.contentCount}
+        blogPostCount={data.blogPostCount}
+        hasChatbot={data.contentCount > 0}
+        brandSlug={data.brand.slug}
+        hasDesignCustomization={
+          data.brand.website_template !== 'minimal' ||
+          data.brand.primary_color !== '#6366F1'
+        }
+      />
 
       {/* Quick Stats Cards */}
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
