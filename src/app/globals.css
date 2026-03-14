@@ -349,3 +349,59 @@ html, body {
     width: 100% !important;
   }
 }
+
+/* ==================== Performance Utilities ==================== */
+
+/* Content visibility for large off-screen sections */
+.cv-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px;
+}
+
+/* Prevent layout shift on images */
+img {
+  height: auto;
+  max-width: 100%;
+}
+
+/* GPU-accelerated compositing for animated elements */
+.gpu-layer {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+/* ==================== Design System CSS Custom Properties (extended) ==================== */
+/* These complement the :root tokens above with component-level properties */
+:root {
+  /* Card tokens */
+  --card-bg: var(--bg-surface);
+  --card-border: var(--border-primary);
+  --card-radius: var(--radius-xl);
+  --card-shadow: var(--shadow-sm);
+  --card-shadow-hover: var(--shadow-md);
+
+  /* Button tokens */
+  --btn-height-sm: 32px;
+  --btn-height-md: 40px;
+  --btn-height-lg: 48px;
+  --btn-height-xl: 56px;
+  --btn-radius: var(--radius-md);
+
+  /* Input tokens */
+  --input-height: 40px;
+  --input-border: var(--border-primary);
+  --input-bg: var(--bg-surface);
+  --input-focus-ring: var(--accent);
+
+  /* Nav tokens */
+  --nav-height: 56px;
+  --nav-bg: color-mix(in srgb, var(--bg-primary) 85%, transparent);
+  --sidebar-width: 256px;
+
+  /* Transition presets */
+  --transition-fast: 100ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-base: 150ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
+}

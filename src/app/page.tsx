@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, Suspense, lazy } from 'react';
 import Link from "next/link";
 import { motion, AnimatePresence, useInView } from "framer-motion";
 import {
@@ -12,7 +12,16 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
-import { FloatingCTA, SocialProof, LiveDemo, ComparisonTable, ScrollCTAModal } from "@/components/landing";
+// Eagerly load lightweight CTA components
+import { FloatingCTA, ScrollCTAModal } from "@/components/landing";
+// Lazy-load heavy below-fold sections
+const SocialProof = lazy(() => import("@/components/landing/social-proof").then(m => ({ default: m.SocialProof })));
+const LiveDemo = lazy(() => import("@/components/landing/live-demo").then(m => ({ default: m.LiveDemo })));
+const ComparisonTable = lazy(() => import("@/components/landing/comparison-table").then(m => ({ default: m.ComparisonTable })));
+
+function SectionSkeleton({ height = 300 }: { height?: number }) {
+  return <div className="w-full animate-pulse bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl" style={{ height }} />;
+}
 
 // ─── Animated Counter ────────────────────────────────────────────
 function AnimatedCounter({ end, suffix = '', duration = 2000 }: { end: number; suffix?: string; duration?: number }) {
@@ -395,7 +404,9 @@ export default function Home() {
       </section>
 
       {/* ═══════════ SOCIAL PROOF NUMBERS ═══════════ */}
-      <SocialProof />
+      <Suspense fallback={<SectionSkeleton height={260} />}>
+        <SocialProof />
+      </Suspense>
 
       {/* ═══════════ FEATURE GRID (3×2) ═══════════ */}
       <section className="py-20 sm:py-28 px-4 sm:px-6">
@@ -439,7 +450,9 @@ export default function Home() {
       </section>
 
       {/* ═══════════ LIVE DEMO — Interactive Brand Morphing ═══════════ */}
-      <LiveDemo />
+      <Suspense fallback={<div className="py-20 bg-[var(--bg-secondary)]"><SectionSkeleton height={400} /></div>}>
+        <LiveDemo />
+      </Suspense>
 
       {/* ═══════════ TEMPLATE SHOWCASE ═══════════ */}
       <section className="py-20 sm:py-28 px-4 sm:px-6">
@@ -560,7 +573,9 @@ export default function Home() {
       </section>
 
       {/* ═══════════ COMPARISON TABLE ═══════════ */}
-      <ComparisonTable />
+      <Suspense fallback={<SectionSkeleton height={400} />}>
+        <ComparisonTable />
+      </Suspense>
 
       {/* ═══════════ PRICING ═══════════ */}
       <section id="pricing" className="py-20 sm:py-28 px-4 sm:px-6">
