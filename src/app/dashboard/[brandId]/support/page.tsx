@@ -70,6 +70,7 @@ export default function SupportPage() {
   const [selectedTicketData, setSelectedTicketData] = useState<Ticket | null>(null);
   const [newMessage, setNewMessage] = useState('');
   const [sending, setSending] = useState(false);
+  const [creating, setCreating] = useState(false);
   const [filter, setFilter] = useState('all');
   const [form, setForm] = useState({
     customer_name: '',
@@ -81,25 +82,32 @@ export default function SupportPage() {
   });
 
   const loadTickets = async () => {
-    const url = filter !== 'all'
-      ? `/api/brands/${brandId}/tickets?status=${filter}`
-      : `/api/brands/${brandId}/tickets`;
-    const res = await fetch(url);
-    const data = await res.json();
-    setTickets(data.tickets || []);
-    setStats(data.stats || { total: 0, open: 0, resolved: 0, satisfaction: null });
+    try {
+      const url = filter !== 'all'
+        ? `/api/brands/${brandId}/tickets?status=${filter}`
+        : `/api/brands/${brandId}/tickets`;
+      const res = await fetch(url);
+      if (!res.ok) throw new Error('Failed to load tickets');
+      const data = await res.json();
+      setTickets(data.tickets || []);
+      setStats(data.stats || { total: 0, open: 0, resolved: 0, satisfaction: null });
+    } catch {
+      toast.error('Failed to load tickets');
+    }
   };
 
   useEffect(() => { loadTickets(); }, [brandId, filter]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const createNewTicket = async () => {
-    if (!form.customer_name || !form.customer_email || !form.subject) return;
+    if (!form.customer_name || !form.customer_email || !form.subject || creating) return;
+    setCreating(true);
     try {
-      await fetch(`/api/brands/${brandId}/tickets`, {
+      const res = await fetch(`/api/brands/${brandId}/tickets`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(form),
       });
+      if (!res.ok) throw new Error('Failed to create ticket');
       toast.success('Ticket created', `Ticket for ${form.customer_name}`);
       setShowForm(false);
       setForm({ customer_name: '', customer_email: '', subject: '', message: '', priority: 'medium', category: '' });
@@ -107,6 +115,7 @@ export default function SupportPage() {
     } catch {
       toast.error('Failed to create ticket');
     }
+    setCreating(false);
   };
 
   const openTicket = async (ticketId: string) => {
@@ -229,7 +238,9 @@ export default function SupportPage() {
                 </div>
                 <div className="flex justify-end gap-2">
                   <Button variant="outline" onClick={() => setShowForm(false)}>Cancel</Button>
-                  <Button variant="brand" onClick={createNewTicket} disabled={!form.customer_name || !form.subject}>Create Ticket</Button>
+                  <Button variant="brand" onClick={createNewTicket} disabled={!form.customer_name || !form.subject || creating}>
+                    {creating ? 'Creating...' : 'Create Ticket'}
+                  </Button>
                 </div>
               </CardContent>
             </Card>

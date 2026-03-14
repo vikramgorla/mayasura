@@ -70,6 +70,7 @@ function CreatePageContent() {
   const prevStep = () => setStep(s => Math.max(s - 1, 1));
 
   const handleLaunch = async () => {
+    if (isLaunching) return;
     setIsLaunching(true);
     try {
       // Step 1: Create the brand

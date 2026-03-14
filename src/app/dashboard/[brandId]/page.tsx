@@ -169,14 +169,21 @@ export default function BrandDashboardPage() {
   const toast = useToast();
 
   useEffect(() => {
+    const safeFetch = (url: string, fallback: unknown = null) =>
+      fetch(url).then(r => { if (!r.ok) throw new Error(); return r.json(); }).catch(() => fallback);
+
     Promise.all([
-      fetch(`/api/brands/${brandId}`).then(r => r.json()),
-      fetch(`/api/brands/${brandId}/products`).then(r => r.json()),
-      fetch(`/api/brands/${brandId}/content`).then(r => r.json()),
-      fetch(`/api/brands/${brandId}/tickets`).then(r => r.json()).catch(() => ({ stats: { total: 0, open: 0, resolved: 0, satisfaction: null } })),
-      fetch(`/api/brands/${brandId}/analytics`).then(r => r.json()).catch(() => null),
-      fetch(`/api/brands/${brandId}/blog`).then(r => r.json()).catch(() => ({ posts: [] })),
+      safeFetch(`/api/brands/${brandId}`, { brand: null }),
+      safeFetch(`/api/brands/${brandId}/products`, { products: [] }),
+      safeFetch(`/api/brands/${brandId}/content`, { content: [] }),
+      safeFetch(`/api/brands/${brandId}/tickets`, { stats: { total: 0, open: 0, resolved: 0, satisfaction: null } }),
+      safeFetch(`/api/brands/${brandId}/analytics`),
+      safeFetch(`/api/brands/${brandId}/blog`, { posts: [] }),
     ]).then(([brandData, productData, contentData, ticketData, analyticsData, blogData]) => {
+      if (!brandData?.brand) {
+        toast.error('Failed to load dashboard data');
+        return;
+      }
       // Build recent activity from various sources
       const activities: Array<{ id: string; type: string; description: string; created_at: string; metadata: string }> = [];
 

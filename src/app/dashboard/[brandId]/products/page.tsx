@@ -41,7 +41,13 @@ export default function ProductsPage() {
   const toast = useToast();
 
   const loadProducts = () => {
-    fetch(`/api/brands/${brandId}/products`).then(r => r.json()).then(d => setProducts(d.products || []));
+    fetch(`/api/brands/${brandId}/products`)
+      .then(r => {
+        if (!r.ok) throw new Error('Failed to load products');
+        return r.json();
+      })
+      .then(d => setProducts(d.products || []))
+      .catch(() => toast.error('Failed to load products'));
   };
 
   useEffect(() => { loadProducts(); }, [brandId]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -108,9 +114,14 @@ export default function ProductsPage() {
 
   const deleteProduct = async (productId: string) => {
     if (!confirm('Delete this product?')) return;
-    await fetch(`/api/brands/${brandId}/products?productId=${productId}`, { method: 'DELETE' });
-    toast.success('Product deleted');
-    loadProducts();
+    try {
+      const res = await fetch(`/api/brands/${brandId}/products?productId=${productId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      toast.success('Product deleted');
+      loadProducts();
+    } catch {
+      toast.error('Failed to delete product');
+    }
   };
 
   const generateDescription = async () => {
@@ -227,6 +238,7 @@ export default function ProductsPage() {
                     <img
                       src={form.image_url}
                       alt="Product preview"
+                      loading="lazy"
                       className="h-20 w-20 object-cover rounded-lg border border-zinc-200 dark:border-zinc-700"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />
@@ -316,6 +328,7 @@ export default function ProductsPage() {
                     <img
                       src={product.image_url}
                       alt={product.name}
+                      loading="lazy"
                       className="h-16 w-16 object-cover rounded-lg border border-zinc-200 dark:border-zinc-700 flex-shrink-0"
                       onError={(e) => { (e.target as HTMLImageElement).style.display = 'none'; }}
                     />

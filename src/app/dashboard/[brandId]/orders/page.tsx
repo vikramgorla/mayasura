@@ -29,19 +29,26 @@ export default function OrdersPage() {
   const toast = useToast();
 
   const loadData = () => {
-    fetch(`/api/brands/${brandId}`).then(r => r.json()).then(d => setBrand(d.brand));
-    fetch(`/api/brands/${brandId}/orders`).then(r => r.json()).then(d => setOrders(d.orders || []));
+    fetch(`/api/brands/${brandId}`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(d => setBrand(d.brand))
+      .catch(() => toast.error('Failed to load brand'));
+    fetch(`/api/brands/${brandId}/orders`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(d => setOrders(d.orders || []))
+      .catch(() => toast.error('Failed to load orders'));
   };
 
   useEffect(() => { loadData(); }, [brandId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const updateStatus = async (orderId: string, status: string) => {
     try {
-      await fetch(`/api/brands/${brandId}/orders`, {
+      const res = await fetch(`/api/brands/${brandId}/orders`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ orderId, status }),
       });
+      if (!res.ok) throw new Error();
       toast.success(`Order ${status}`);
       loadData();
       if (selectedOrder?.id === orderId) {

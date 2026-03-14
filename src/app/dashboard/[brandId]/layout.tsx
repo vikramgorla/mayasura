@@ -10,6 +10,7 @@ import {
   Download, Moon, Sun, Settings, ShoppingBag, Newspaper, Paintbrush
 } from 'lucide-react';
 import { PageLoader } from '@/components/ui/loading';
+import { ErrorBoundary } from '@/components/error-boundary';
 import { Brand } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
@@ -46,10 +47,16 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
 
   useEffect(() => {
     fetch(`/api/brands/${brandId}`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error('Failed to load brand');
+        return r.json();
+      })
       .then(data => { setBrand(data.brand); setLoading(false); })
-      .catch(() => setLoading(false));
-  }, [brandId]);
+      .catch(() => {
+        toast.error('Failed to load brand');
+        setLoading(false);
+      });
+  }, [brandId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     setMobileMenuOpen(false);
@@ -286,14 +293,16 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
 
       {/* Main Content */}
       <main id="dashboard-content" className="flex-1 lg:ml-64 pt-14 lg:pt-0" role="main">
-        <motion.div
-          key={pathname}
-          initial={{ opacity: 0, y: 8 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.2 }}
-        >
-          {children}
-        </motion.div>
+        <ErrorBoundary>
+          <motion.div
+            key={pathname}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.2 }}
+          >
+            {children}
+          </motion.div>
+        </ErrorBoundary>
       </main>
     </div>
   );

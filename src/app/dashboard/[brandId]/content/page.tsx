@@ -40,7 +40,10 @@ export default function ContentPage() {
     const url = filter
       ? `/api/brands/${brandId}/content?type=${filter}`
       : `/api/brands/${brandId}/content`;
-    fetch(url).then(r => r.json()).then(d => setContent(d.content || []));
+    fetch(url)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(d => setContent(d.content || []))
+      .catch(() => toast.error('Failed to load content'));
   };
 
   useEffect(() => { loadContent(); }, [brandId, filter]); // eslint-disable-line react-hooks/exhaustive-deps
@@ -64,9 +67,14 @@ export default function ContentPage() {
 
   const deleteContentItem = async (contentId: string) => {
     if (!confirm('Delete this content?')) return;
-    await fetch(`/api/brands/${brandId}/content?contentId=${contentId}`, { method: 'DELETE' });
-    toast.success('Content deleted');
-    loadContent();
+    try {
+      const res = await fetch(`/api/brands/${brandId}/content?contentId=${contentId}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      toast.success('Content deleted');
+      loadContent();
+    } catch {
+      toast.error('Failed to delete content');
+    }
   };
 
   const duplicateContent = async (item: ContentItem) => {

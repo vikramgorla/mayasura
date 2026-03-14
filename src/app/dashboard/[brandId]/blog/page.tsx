@@ -47,8 +47,14 @@ export default function BlogManagementPage() {
   const toast = useToast();
 
   const loadData = () => {
-    fetch(`/api/brands/${brandId}`).then(r => r.json()).then(d => setBrand(d.brand));
-    fetch(`/api/brands/${brandId}/blog`).then(r => r.json()).then(d => setPosts(d.posts || []));
+    fetch(`/api/brands/${brandId}`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(d => setBrand(d.brand))
+      .catch(() => toast.error('Failed to load brand'));
+    fetch(`/api/brands/${brandId}/blog`)
+      .then(r => { if (!r.ok) throw new Error(); return r.json(); })
+      .then(d => setPosts(d.posts || []))
+      .catch(() => toast.error('Failed to load blog posts'));
   };
 
   useEffect(() => { loadData(); }, [brandId]); // eslint-disable-line react-hooks/exhaustive-deps

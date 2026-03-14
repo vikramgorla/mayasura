@@ -96,7 +96,7 @@ export default function ProductDetailPage() {
           }}
         >
           {product.image_url ? (
-            <img src={product.image_url} alt={product.name} className="w-full h-full object-cover" />
+            <img src={product.image_url} alt={product.name} loading="lazy" className="w-full h-full object-cover" />
           ) : (
             <div className="flex items-center justify-center">
               <svg className="w-16 h-16" style={{ color: `${textColor}08` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={0.5}>

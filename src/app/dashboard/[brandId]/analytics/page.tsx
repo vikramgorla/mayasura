@@ -154,9 +154,15 @@ export default function AnalyticsPage() {
 
   useEffect(() => {
     fetch(`/api/brands/${brandId}/analytics?days=${days}`)
-      .then(r => r.json())
+      .then(r => {
+        if (!r.ok) throw new Error();
+        return r.json();
+      })
       .then(d => setData(d))
-      .catch(() => {});
+      .catch(() => {
+        // Analytics may not have data yet - this is normal
+        setData(null);
+      });
   }, [brandId, days]);
 
   const stats = [
