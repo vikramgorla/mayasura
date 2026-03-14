@@ -240,17 +240,20 @@ export default function Home() {
           <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight mb-3 text-[var(--text-primary)]">
             Ready to build your palace?
           </h2>
-          <p className="text-[var(--text-secondary)] mb-6">
-            Start creating your brand ecosystem in minutes. No credit card required.
+          <p className="text-[var(--text-secondary)] mb-8">
+            Go from idea to a complete digital presence in under 5 minutes. No credit card, no code.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/create" className="w-full sm:w-auto">
               <Button size="xl" variant="brand" className="w-full sm:w-auto">
-                Create Your Brand
+                Create Your Brand — Free
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
+          <p className="text-xs text-[var(--text-tertiary)] mt-4">
+            Open source · MIT License · Self-hostable
+          </p>
         </div>
       </section>
 
