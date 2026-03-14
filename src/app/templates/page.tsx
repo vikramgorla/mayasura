@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import { ArrowLeft, ArrowRight, Sparkles, Package, Palette, MessageSquare } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
+import { UserNav } from '@/components/user-nav';
 import { STARTER_TEMPLATES, StarterTemplate } from '@/lib/templates';
 
 export default function TemplatesPage() {
@@ -15,20 +16,23 @@ export default function TemplatesPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       {/* Nav */}
-      <nav className="bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+      <nav className="bg-white dark:bg-[#09090B] border-b border-zinc-200 dark:border-zinc-800">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-zinc-900 dark:bg-white flex items-center justify-center">
-              <span className="text-white dark:text-zinc-900 text-sm font-bold">M</span>
+            <div className="h-7 w-7 rounded-md bg-violet-700 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">M</span>
             </div>
-            <span className="font-semibold text-lg tracking-tight">Mayasura</span>
+            <span className="font-display font-semibold text-base tracking-tight">Mayasura</span>
           </Link>
-          <Link href="/create">
-            <Button variant="brand" size="sm">
-              Start from Scratch
-              <ArrowRight className="h-3.5 w-3.5" />
-            </Button>
-          </Link>
+          <div className="flex items-center gap-3">
+            <Link href="/create">
+              <Button variant="brand" size="sm">
+                Start from Scratch
+                <ArrowRight className="h-3.5 w-3.5" />
+              </Button>
+            </Link>
+            <UserNav />
+          </div>
         </div>
       </nav>
 
@@ -175,7 +179,7 @@ function TemplateCard({
       onClick={onSelect}
       className={`w-full text-left bg-white dark:bg-zinc-800 rounded-xl border-2 overflow-hidden transition-all hover:shadow-lg cursor-pointer ${
         isSelected
-          ? 'border-indigo-500 dark:border-indigo-400 shadow-lg shadow-violet-500/10'
+          ? 'border-violet-500 dark:border-violet-400 shadow-lg shadow-violet-500/10'
           : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
       }`}
     >

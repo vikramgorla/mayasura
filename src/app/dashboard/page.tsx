@@ -2,81 +2,54 @@
 
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
+// import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Plus, ArrowRight, LogOut, Moon, Sun } from 'lucide-react';
+import { Plus, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { Skeleton, SkeletonCard } from '@/components/ui/skeleton';
+import { SkeletonCard } from '@/components/ui/skeleton';
 import { Brand } from '@/lib/types';
-import { useTheme } from '@/components/theme-provider';
-import { useToast } from '@/components/ui/toast';
+import { UserNav } from '@/components/user-nav';
 
 export default function DashboardListPage() {
   const [brands, setBrands] = useState<Brand[]>([]);
   const [loading, setLoading] = useState(true);
-  const [user, setUser] = useState<{ name: string; email: string } | null>(null);
-  const { resolved, setTheme } = useTheme();
-  const toast = useToast();
-  const router = useRouter();
 
   useEffect(() => {
-    Promise.all([
-      fetch('/api/brands').then(r => r.json()),
-      fetch('/api/auth/me').then(r => r.json()),
-    ]).then(([brandData, userData]) => {
-      setBrands(brandData.brands || []);
-      setUser(userData.user || null);
-      setLoading(false);
-    }).catch(() => setLoading(false));
+    fetch('/api/brands')
+      .then(r => r.json())
+      .then(data => {
+        setBrands(data.brands || []);
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
   }, []);
 
-  const logout = async () => {
-    await fetch('/api/auth/logout', { method: 'POST' });
-    toast.info('Signed out');
-    router.push('/');
-  };
-
   return (
-    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
-      <nav className="bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
-        <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
+    <div className="min-h-screen bg-[var(--bg-primary)]">
+      <nav className="bg-[var(--bg-surface)] border-b border-[var(--border-primary)]">
+        <div className="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-zinc-900 dark:bg-white flex items-center justify-center">
-              <span className="text-white dark:text-zinc-900 text-sm font-bold">M</span>
+            <div className="h-7 w-7 rounded-md bg-violet-700 flex items-center justify-center">
+              <span className="text-white text-xs font-bold">M</span>
             </div>
-            <span className="font-semibold text-lg tracking-tight hidden sm:inline">Mayasura</span>
+            <span className="font-display font-semibold text-base tracking-tight hidden sm:inline">Mayasura</span>
           </Link>
-          <div className="flex items-center gap-2 sm:gap-3">
-            <button
-              onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')}
-              className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
-            >
-              {resolved === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-            </button>
-            {user && (
-              <button
-                onClick={logout}
-                className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors text-zinc-500"
-                title="Sign out"
-              >
-                <LogOut className="h-4 w-4" />
-              </button>
-            )}
+          <div className="flex items-center gap-3">
             <Link href="/create">
               <Button size="sm" variant="brand">
                 <Plus className="h-3.5 w-3.5" />
                 <span className="hidden sm:inline">New Brand</span>
               </Button>
             </Link>
+            <UserNav />
           </div>
         </div>
       </nav>
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">Your Brands</h1>
-          {user && <p className="text-sm text-zinc-400 hidden sm:block">Welcome, {user.name}</p>}
+          <h1 className="font-display text-2xl sm:text-3xl font-bold text-[var(--text-primary)]">Your Brands</h1>
         </div>
         <p className="text-zinc-500 dark:text-zinc-400 mb-8">Manage your brand ecosystems</p>
 
