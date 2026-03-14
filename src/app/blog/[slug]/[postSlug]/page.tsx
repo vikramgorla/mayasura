@@ -14,7 +14,6 @@ function readingTime(content: string | null): string {
 }
 
 function renderContent(content: string): string {
-  // Simple markdown-like rendering
   return content
     .split('\n\n')
     .map((para) => {
@@ -34,7 +33,6 @@ function renderContent(content: string): string {
       if (para.startsWith('> ')) {
         return `<blockquote class="border-l-4 pl-4 italic opacity-70 my-6" style="border-color: currentColor">${para.slice(2)}</blockquote>`;
       }
-      // Bold and italic
       let processed = para
         .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
         .replace(/\*(.+?)\*/g, '<em>$1</em>')
@@ -65,7 +63,22 @@ export default function BlogPostPage() {
   }, [slug, postSlug]);
 
   if (!data) return null;
-  const { brand } = data;
+  const { brand, websiteTemplate: template } = data;
+  const templateId = template?.id || 'minimal';
+  const tp = template?.preview;
+
+  const isDark = templateId === 'bold';
+  const textColor = isDark ? '#FFFFFF' : brand.primary_color;
+  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const accentColor = brand.accent_color || textColor;
+
+  const headingStyle: React.CSSProperties = {
+    fontFamily: brand.font_heading,
+    fontWeight: tp?.typography.headingWeight || '600',
+    letterSpacing: tp?.typography.headingTracking || '-0.02em',
+    textTransform: (tp?.typography.headingCase || 'normal') as React.CSSProperties['textTransform'],
+    color: textColor,
+  };
 
   const copyLink = () => {
     navigator.clipboard.writeText(window.location.href);
@@ -75,12 +88,11 @@ export default function BlogPostPage() {
 
   if (loading) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-16">
+      <div className="max-w-3xl mx-auto px-5 sm:px-8 py-16">
         <div className="animate-pulse space-y-4">
-          <div className="h-4 w-20 rounded bg-zinc-200" />
-          <div className="h-8 w-2/3 rounded bg-zinc-200" />
-          <div className="h-4 w-full rounded bg-zinc-200" />
-          <div className="h-4 w-5/6 rounded bg-zinc-200" />
+          <div className="h-4 w-20 rounded" style={{ backgroundColor: `${textColor}08` }} />
+          <div className="h-8 w-2/3 rounded" style={{ backgroundColor: `${textColor}08` }} />
+          <div className="h-4 w-full rounded" style={{ backgroundColor: `${textColor}05` }} />
         </div>
       </div>
     );
@@ -88,13 +100,9 @@ export default function BlogPostPage() {
 
   if (!post) {
     return (
-      <div className="max-w-3xl mx-auto px-4 py-20 text-center">
-        <h1 className="text-2xl font-bold mb-4">Post not found</h1>
-        <Link
-          href={`/blog/${slug}`}
-          className="hover:opacity-80"
-          style={{ color: brand.accent_color }}
-        >
+      <div className="max-w-3xl mx-auto px-5 sm:px-8 py-20 text-center">
+        <h1 className="text-2xl font-semibold mb-4" style={headingStyle}>Post not found</h1>
+        <Link href={`/blog/${slug}`} className="text-sm font-medium transition-opacity hover:opacity-60" style={{ color: accentColor }}>
           ← Back to blog
         </Link>
       </div>
@@ -105,16 +113,24 @@ export default function BlogPostPage() {
     try { return JSON.parse(post.tags || '[]'); } catch { return []; }
   })();
 
+  const containerWidth = templateId === 'bold' ? 'max-w-4xl' : 'max-w-3xl';
+
   return (
-    <article className="max-w-3xl mx-auto px-4 sm:px-6 py-12 sm:py-16">
-      {/* Breadcrumb */}
+    <article className={`${containerWidth} mx-auto px-5 sm:px-8 py-12 sm:py-16`}>
+      {/* Back link */}
       <div className="mb-8">
         <Link
           href={`/blog/${slug}`}
-          className="text-sm hover:opacity-80 transition-opacity"
-          style={{ color: brand.accent_color }}
+          className="text-sm transition-opacity hover:opacity-60"
+          style={{
+            color: accentColor,
+            fontWeight: templateId === 'bold' ? 700 : 400,
+            letterSpacing: templateId === 'bold' ? '0.1em' : undefined,
+            textTransform: templateId === 'bold' ? 'uppercase' as const : undefined,
+            fontSize: templateId === 'bold' ? '0.6875rem' : undefined,
+          }}
         >
-          ← Back to blog
+          {templateId === 'bold' ? '← ALL POSTS' : '← Back to blog'}
         </Link>
       </div>
 
@@ -123,42 +139,52 @@ export default function BlogPostPage() {
         <div className="flex items-center gap-3 mb-4">
           {post.category && (
             <span
-              className="px-3 py-1 rounded-full text-xs font-semibold"
+              className="text-xs font-medium uppercase tracking-wider"
               style={{
-                backgroundColor: `${brand.accent_color}15`,
-                color: brand.accent_color,
+                color: accentColor,
+                fontWeight: templateId === 'bold' ? 700 : 500,
+                letterSpacing: templateId === 'bold' ? '0.12em' : '0.06em',
               }}
             >
               {post.category}
             </span>
           )}
-          <span className="text-sm opacity-40">{readingTime(post.content)}</span>
+          <span className="text-xs" style={{ color: `${textColor}35` }}>{readingTime(post.content)}</span>
         </div>
 
         <h1
-          className="text-3xl sm:text-4xl lg:text-5xl font-bold leading-tight mb-6"
-          style={{ fontFamily: brand.font_heading }}
+          className="leading-tight mb-6"
+          style={{
+            ...headingStyle,
+            fontSize: templateId === 'bold' ? 'clamp(1.75rem, 4vw, 3rem)' : templateId === 'minimal' ? 'clamp(1.5rem, 3.5vw, 2.5rem)' : 'clamp(1.75rem, 4vw, 2.75rem)',
+            fontWeight: templateId === 'minimal' ? 400 : headingStyle.fontWeight,
+          }}
         >
           {post.title}
         </h1>
 
         {post.excerpt && (
-          <p className="text-lg opacity-60 leading-relaxed">{post.excerpt}</p>
+          <p className="text-base leading-relaxed" style={{ color: `${textColor}55`, fontFamily: templateId === 'editorial' ? brand.font_heading : undefined }}>
+            {post.excerpt}
+          </p>
         )}
 
-        <div className="flex items-center gap-4 mt-6 pt-6 border-t" style={{ borderColor: `${brand.primary_color}10` }}>
+        <div
+          className="flex items-center gap-4 mt-6 pt-6 border-t"
+          style={{
+            borderColor: `${textColor}08`,
+            borderTopWidth: templateId === 'bold' ? '2px' : '1px',
+          }}
+        >
           {post.published_at && (
-            <time className="text-sm opacity-50">
-              {new Date(post.published_at).toLocaleDateString('en-US', {
-                month: 'long',
-                day: 'numeric',
-                year: 'numeric',
-              })}
+            <time className="text-sm" style={{ color: `${textColor}40` }}>
+              {new Date(post.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
             </time>
           )}
           <button
             onClick={copyLink}
-            className="text-sm opacity-50 hover:opacity-80 transition-opacity"
+            className="text-sm transition-opacity hover:opacity-60"
+            style={{ color: `${textColor}40` }}
           >
             {copied ? '✓ Copied!' : '🔗 Share'}
           </button>
@@ -169,18 +195,27 @@ export default function BlogPostPage() {
       <div
         className="prose max-w-none text-base"
         dangerouslySetInnerHTML={{ __html: renderContent(post.content || '') }}
-        style={{ fontFamily: brand.font_body }}
+        style={{
+          fontFamily: brand.font_body,
+          color: `${textColor}dd`,
+          lineHeight: 1.75,
+        }}
       />
 
       {/* Tags */}
       {tags.length > 0 && (
-        <div className="mt-12 pt-8 border-t" style={{ borderColor: `${brand.primary_color}10` }}>
+        <div className="mt-12 pt-8 border-t" style={{ borderColor: `${textColor}08` }}>
           <div className="flex flex-wrap gap-2">
             {tags.map((tag: string) => (
               <span
                 key={tag}
-                className="px-3 py-1 rounded-full text-xs font-medium"
-                style={{ backgroundColor: `${brand.primary_color}08` }}
+                className="px-3 py-1 text-xs font-medium"
+                style={{
+                  backgroundColor: `${textColor}06`,
+                  color: `${textColor}60`,
+                  borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : '4px',
+                  border: templateId === 'bold' ? `1px solid ${textColor}15` : undefined,
+                }}
               >
                 #{tag}
               </span>
@@ -189,14 +224,25 @@ export default function BlogPostPage() {
         </div>
       )}
 
-      {/* Navigation */}
-      <div className="mt-16 pt-8 border-t text-center" style={{ borderColor: `${brand.primary_color}10` }}>
+      {/* Bottom navigation */}
+      <div
+        className="mt-16 pt-8 border-t text-center"
+        style={{
+          borderColor: `${textColor}08`,
+          borderTopWidth: templateId === 'bold' ? '2px' : '1px',
+        }}
+      >
         <Link
           href={`/blog/${slug}`}
-          className="text-sm font-semibold hover:opacity-80"
-          style={{ color: brand.accent_color }}
+          className="text-sm font-medium transition-opacity hover:opacity-60"
+          style={{
+            color: accentColor,
+            fontWeight: templateId === 'bold' ? 700 : 500,
+            letterSpacing: templateId === 'bold' ? '0.1em' : undefined,
+            textTransform: templateId === 'bold' ? 'uppercase' as const : undefined,
+          }}
         >
-          ← All Posts
+          {templateId === 'bold' ? '← ALL POSTS' : '← All Posts'}
         </Link>
       </div>
     </article>

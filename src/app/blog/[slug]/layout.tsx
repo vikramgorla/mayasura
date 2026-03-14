@@ -4,9 +4,13 @@ import { useEffect, useState, createContext, useContext } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Brand } from '@/lib/types';
+import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
+import { buildGoogleFontsUrl } from '@/lib/font-loader';
 
 interface BlogSiteData {
   brand: Brand;
+  websiteTemplate?: WebsiteTemplate;
+  settings?: Record<string, string>;
 }
 
 const BlogSiteContext = createContext<BlogSiteData | null>(null);
@@ -26,16 +30,37 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
         if (!r.ok) throw new Error('Not found');
         return r.json();
       })
-      .then((d) => setData({ brand: d.brand }))
+      .then((d) => {
+        const templateId = d.settings?.website_template || 'minimal';
+        const websiteTemplate = getWebsiteTemplate(templateId);
+        setData({ brand: d.brand, websiteTemplate, settings: d.settings });
+      })
       .catch(() => setError(true));
   }, [slug]);
 
+  // Load Google Fonts
+  useEffect(() => {
+    if (!data) return;
+    const fonts = [data.brand.font_heading, data.brand.font_body].filter(Boolean) as string[];
+    if (fonts.length === 0) return;
+    const url = buildGoogleFontsUrl(fonts);
+    const existing = document.querySelector(`link[href="${url}"]`);
+    if (!existing) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = url;
+      document.head.appendChild(link);
+    }
+  }, [data]);
+
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-900 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-white text-zinc-900">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Blog not found</h1>
-          <Link href="/" className="text-blue-400 hover:underline">← Back to Mayasura</Link>
+          <h1 className="text-2xl font-semibold mb-3">Blog not found</h1>
+          <Link href="/" className="text-sm font-medium underline underline-offset-4 hover:opacity-70">
+            ← Back to Mayasura
+          </Link>
         </div>
       </div>
     );
@@ -43,79 +68,107 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-        <div className="animate-pulse h-8 w-32 rounded bg-zinc-200" />
+      <div className="min-h-screen flex items-center justify-center bg-white">
+        <div className="animate-pulse flex flex-col items-center gap-3">
+          <div className="h-8 w-8 rounded bg-zinc-100" />
+          <div className="h-3 w-24 rounded bg-zinc-100" />
+        </div>
       </div>
     );
   }
 
-  const { brand } = data;
+  const { brand, websiteTemplate: template } = data;
+  const templateId = template?.id || 'minimal';
+  const isDark = templateId === 'bold';
+  const textColor = isDark ? '#FFFFFF' : brand.primary_color;
+  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const accentColor = brand.accent_color || textColor;
+
+  // Nav link style per template
+  const linkClass = (() => {
+    if (templateId === 'bold') return 'text-[11px] font-bold uppercase tracking-[0.12em]';
+    if (templateId === 'editorial') return 'text-[13px] font-medium';
+    if (templateId === 'playful') return 'text-[13px] font-semibold';
+    return 'text-[13px] font-medium';
+  })();
 
   return (
     <BlogSiteContext.Provider value={data}>
       <div
-        className="min-h-screen"
+        className="min-h-screen flex flex-col"
+        data-template={templateId}
         style={{
-          backgroundColor: brand.secondary_color || '#f8fafc',
-          color: brand.primary_color || '#0f172a',
+          backgroundColor: bgColor,
+          color: textColor,
           fontFamily: brand.font_body || 'Inter',
         }}
       >
         {/* Blog nav */}
         <nav
-          className="sticky top-0 z-50 backdrop-blur-xl border-b"
+          className="sticky top-0 z-50 border-b transition-all duration-300"
           style={{
-            backgroundColor: `${brand.primary_color}f0`,
-            borderColor: `${brand.accent_color}30`,
+            backgroundColor: `${bgColor}f0`,
+            borderColor: `${textColor}08`,
+            backdropFilter: 'blur(16px) saturate(180%)',
           }}
         >
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex items-center justify-between h-14">
+          <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-4xl'} mx-auto px-5 sm:px-8`}>
+            <div className={`flex items-center justify-between ${templateId === 'bold' ? 'h-14' : 'h-16'}`}>
               <Link
                 href={`/site/${slug}`}
-                className="text-lg font-bold"
-                style={{ color: brand.secondary_color, fontFamily: brand.font_heading }}
+                className="transition-opacity hover:opacity-70"
+                style={{
+                  color: textColor,
+                  fontFamily: brand.font_heading,
+                  fontWeight: templateId === 'bold' ? 700 : templateId === 'editorial' ? 700 : 500,
+                  fontSize: templateId === 'bold' ? '0.8125rem' : '1.125rem',
+                  letterSpacing: templateId === 'bold' ? '0.1em' : '-0.01em',
+                  textTransform: templateId === 'bold' ? 'uppercase' as const : undefined,
+                }}
               >
                 {brand.name}
               </Link>
               <div className="flex items-center gap-6">
                 <Link
                   href={`/blog/${slug}`}
-                  className="text-sm font-medium"
-                  style={{ color: `${brand.secondary_color}cc` }}
+                  className={`${linkClass} transition-colors`}
+                  style={{ color: textColor }}
                 >
-                  Blog
+                  {templateId === 'editorial' ? 'Journal' : templateId === 'bold' ? 'BLOG' : 'Blog'}
                 </Link>
                 <Link
                   href={`/site/${slug}`}
-                  className="text-sm font-medium"
-                  style={{ color: `${brand.secondary_color}80` }}
+                  className={`${linkClass} transition-colors`}
+                  style={{ color: `${textColor}55` }}
                 >
-                  Website
+                  {templateId === 'bold' ? 'WEBSITE' : 'Website'}
                 </Link>
                 <Link
                   href={`/shop/${slug}`}
-                  className="text-sm font-medium"
-                  style={{ color: `${brand.secondary_color}80` }}
+                  className={`${linkClass} transition-colors hidden sm:inline`}
+                  style={{ color: `${textColor}55` }}
                 >
-                  Shop
+                  {templateId === 'bold' ? 'SHOP' : 'Shop'}
                 </Link>
               </div>
             </div>
           </div>
         </nav>
 
-        <main>{children}</main>
+        <main className="flex-1">{children}</main>
 
-        {/* Simple footer */}
+        {/* Footer */}
         <footer
           className="border-t py-8"
-          style={{ borderColor: `${brand.primary_color}10` }}
+          style={{
+            borderColor: `${textColor}06`,
+            borderTopWidth: templateId === 'bold' ? '2px' : '1px',
+          }}
         >
-          <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <p className="text-sm opacity-40">
+          <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-4xl'} mx-auto px-5 sm:px-8 text-center`}>
+            <p className="text-xs" style={{ color: `${textColor}30` }}>
               © {new Date().getFullYear()} {brand.name} · Powered by{' '}
-              <Link href="/" className="hover:opacity-80" style={{ color: brand.accent_color }}>
+              <Link href="/" className="hover:opacity-80 transition-opacity" style={{ color: accentColor }}>
                 Mayasura
               </Link>
             </p>
