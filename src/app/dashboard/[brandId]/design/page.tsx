@@ -269,9 +269,9 @@ export default function DesignStudioPage() {
       </div>
 
       {/* Main Content: Controls + Preview */}
-      <div className="flex flex-1 overflow-hidden">
+      <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
         {/* Left Panel: Controls */}
-        <div className="w-80 lg:w-96 border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col shrink-0 overflow-hidden">
+        <div className="w-full lg:w-80 xl:w-96 border-b lg:border-b-0 lg:border-r border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 flex flex-col shrink-0 overflow-hidden max-h-[50vh] lg:max-h-none">
           {/* Section tabs */}
           <div className="flex border-b border-zinc-200 dark:border-zinc-800 px-2 py-1.5 gap-0.5 overflow-x-auto shrink-0">
             {PANEL_SECTIONS.map(section => (

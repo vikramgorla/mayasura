@@ -1,19 +1,19 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { useParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
   Globe, MessageSquare, Package, FileText, BarChart3,
   ArrowRight, ShoppingBag, Sparkles, Plus, CheckCircle,
-  Circle, HeadphonesIcon, TrendingUp, Clock, Download
+  Circle, HeadphonesIcon, TrendingUp, Clock, Eye,
+  Users, DollarSign, Paintbrush, Newspaper, Zap,
+  ArrowUpRight, ArrowDownRight, Settings
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Progress } from '@/components/ui/progress';
-import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { Sparkline } from '@/components/ui/sparkline';
 import { Brand } from '@/lib/types';
 import { useToast } from '@/components/ui/toast';
@@ -22,10 +22,23 @@ interface DashboardData {
   brand: Brand;
   productCount: number;
   contentCount: number;
+  blogPostCount: number;
   ticketStats: { total: number; open: number; resolved: number; satisfaction: number | null };
+  analytics: {
+    pageViews: { total: number; prevTotal: number; byDay: Array<{ day: string; count: number }> };
+    uniqueVisitors: number;
+    prevUniqueVisitors: number;
+    revenue: number;
+    currentRevenue: number;
+    prevRevenue: number;
+    conversionRate: number;
+    prevConversionRate: number;
+    orderCount: number;
+  } | null;
+  recentActivity: Array<{ id: string; type: string; description: string; created_at: string; metadata: string }>;
 }
 
-function AnimatedCounter({ value, duration = 1000 }: { value: number; duration?: number }) {
+function AnimatedCounter({ value, duration = 1000, prefix = '', suffix = '' }: { value: number; duration?: number; prefix?: string; suffix?: string }) {
   const [count, setCount] = useState(0);
   const ref = useRef<HTMLSpanElement>(null);
 
@@ -44,27 +57,113 @@ function AnimatedCounter({ value, duration = 1000 }: { value: number; duration?:
     return () => clearInterval(timer);
   }, [value, duration]);
 
-  return <span ref={ref} className="animate-count-up">{count}</span>;
+  return <span ref={ref}>{prefix}{count.toLocaleString()}{suffix}</span>;
 }
 
-function calculateHealthScore(data: DashboardData): number {
+function CircularProgress({ value, size = 120, strokeWidth = 8, color = '#6366F1' }: { value: number; size?: number; strokeWidth?: number; color?: string }) {
+  const radius = (size - strokeWidth) / 2;
+  const circumference = radius * 2 * Math.PI;
+  const offset = circumference - (value / 100) * circumference;
+
+  return (
+    <svg width={size} height={size} className="transform -rotate-90">
+      <circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke="currentColor"
+        className="text-zinc-100 dark:text-zinc-800"
+        strokeWidth={strokeWidth}
+      />
+      <motion.circle
+        cx={size / 2}
+        cy={size / 2}
+        r={radius}
+        fill="none"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeDasharray={circumference}
+        initial={{ strokeDashoffset: circumference }}
+        animate={{ strokeDashoffset: offset }}
+        transition={{ duration: 1.2, ease: 'easeOut' }}
+      />
+    </svg>
+  );
+}
+
+function TrendIndicator({ current, previous }: { current: number; previous: number }) {
+  if (previous === 0 && current === 0) return null;
+  const pct = previous > 0 ? Math.round(((current - previous) / previous) * 100) : current > 0 ? 100 : 0;
+  const isUp = pct >= 0;
+  return (
+    <span className={`inline-flex items-center gap-0.5 text-[10px] font-semibold ${isUp ? 'text-emerald-600' : 'text-red-500'}`}>
+      {isUp ? <ArrowUpRight className="h-3 w-3" /> : <ArrowDownRight className="h-3 w-3" />}
+      {Math.abs(pct)}%
+    </span>
+  );
+}
+
+function calculateHealthScore(data: DashboardData): { score: number; recommendations: string[] } {
+  const recommendations: string[] = [];
   let score = 0;
   const checks = [
-    data.brand.name,
-    data.brand.tagline,
-    data.brand.description,
-    data.brand.brand_voice,
-    data.productCount > 0,
-    data.contentCount > 0,
-    JSON.parse(data.brand.channels || '[]').length > 0,
-    data.brand.status === 'launched',
+    { check: !!data.brand.name, label: 'Set brand name', weight: 10 },
+    { check: !!data.brand.tagline, label: 'Add a tagline', weight: 10 },
+    { check: !!data.brand.description, label: 'Add a brand description', weight: 10 },
+    { check: !!data.brand.brand_voice, label: 'Define your brand voice', weight: 10 },
+    { check: data.productCount > 0, label: 'Add at least one product', weight: 15 },
+    { check: data.contentCount > 0, label: 'Generate website content', weight: 10 },
+    { check: data.blogPostCount > 0, label: 'Publish a blog post', weight: 10 },
+    { check: JSON.parse(data.brand.channels || '[]').length >= 2, label: 'Enable 2+ channels', weight: 10 },
+    { check: data.brand.website_template !== 'minimal', label: 'Customize your design template', weight: 5 },
+    { check: data.brand.status === 'launched', label: 'Launch your brand', weight: 10 },
   ];
-  score = Math.round((checks.filter(Boolean).length / checks.length) * 100);
-  return score;
+
+  for (const c of checks) {
+    if (c.check) {
+      score += c.weight;
+    } else {
+      recommendations.push(c.label);
+    }
+  }
+
+  return { score, recommendations: recommendations.slice(0, 3) };
+}
+
+const activityIcons: Record<string, { emoji: string; color: string }> = {
+  'brand_created': { emoji: '🚀', color: 'bg-violet-100 dark:bg-violet-900/30' },
+  'brand_launched': { emoji: '🏛️', color: 'bg-emerald-100 dark:bg-emerald-900/30' },
+  'product_added': { emoji: '📦', color: 'bg-amber-100 dark:bg-amber-900/30' },
+  'product_deleted': { emoji: '🗑️', color: 'bg-red-100 dark:bg-red-900/30' },
+  'content_generated': { emoji: '✍️', color: 'bg-purple-100 dark:bg-purple-900/30' },
+  'blog_published': { emoji: '📝', color: 'bg-blue-100 dark:bg-blue-900/30' },
+  'order_placed': { emoji: '🛒', color: 'bg-green-100 dark:bg-green-900/30' },
+  'contact_received': { emoji: '📧', color: 'bg-cyan-100 dark:bg-cyan-900/30' },
+  'ticket_created': { emoji: '🎫', color: 'bg-rose-100 dark:bg-rose-900/30' },
+  'settings_updated': { emoji: '⚙️', color: 'bg-zinc-100 dark:bg-zinc-800' },
+  'design_updated': { emoji: '🎨', color: 'bg-pink-100 dark:bg-pink-900/30' },
+  'import': { emoji: '📥', color: 'bg-indigo-100 dark:bg-indigo-900/30' },
+};
+
+function timeAgo(dateStr: string): string {
+  const now = Date.now();
+  const date = new Date(dateStr).getTime();
+  const diff = now - date;
+  const mins = Math.floor(diff / 60000);
+  if (mins < 1) return 'Just now';
+  if (mins < 60) return `${mins}m ago`;
+  const hours = Math.floor(mins / 60);
+  if (hours < 24) return `${hours}h ago`;
+  const days = Math.floor(hours / 24);
+  if (days < 7) return `${days}d ago`;
+  return new Date(dateStr).toLocaleDateString();
 }
 
 export default function BrandDashboardPage() {
   const params = useParams();
+  const router = useRouter();
   const brandId = params.brandId as string;
   const [data, setData] = useState<DashboardData | null>(null);
   const toast = useToast();
@@ -75,12 +174,66 @@ export default function BrandDashboardPage() {
       fetch(`/api/brands/${brandId}/products`).then(r => r.json()),
       fetch(`/api/brands/${brandId}/content`).then(r => r.json()),
       fetch(`/api/brands/${brandId}/tickets`).then(r => r.json()).catch(() => ({ stats: { total: 0, open: 0, resolved: 0, satisfaction: null } })),
-    ]).then(([brandData, productData, contentData, ticketData]) => {
+      fetch(`/api/brands/${brandId}/analytics`).then(r => r.json()).catch(() => null),
+      fetch(`/api/brands/${brandId}/blog`).then(r => r.json()).catch(() => ({ posts: [] })),
+    ]).then(([brandData, productData, contentData, ticketData, analyticsData, blogData]) => {
+      // Build recent activity from various sources
+      const activities: Array<{ id: string; type: string; description: string; created_at: string; metadata: string }> = [];
+
+      // Brand creation
+      if (brandData.brand) {
+        activities.push({
+          id: 'brand-created',
+          type: 'brand_created',
+          description: `Brand "${brandData.brand.name}" created`,
+          created_at: brandData.brand.created_at,
+          metadata: '{}',
+        });
+      }
+
+      if (brandData.brand?.status === 'launched') {
+        activities.push({
+          id: 'brand-launched',
+          type: 'brand_launched',
+          description: 'Brand launched and live',
+          created_at: brandData.brand.updated_at,
+          metadata: '{}',
+        });
+      }
+
+      const products = productData.products || [];
+      products.slice(0, 3).forEach((p: { id: string; name: string; created_at?: string }) => {
+        activities.push({
+          id: `product-${p.id}`,
+          type: 'product_added',
+          description: `Product "${p.name}" added`,
+          created_at: p.created_at || brandData.brand.created_at,
+          metadata: '{}',
+        });
+      });
+
+      const posts = blogData.posts || [];
+      posts.filter((p: { status: string }) => p.status === 'published').slice(0, 3).forEach((p: { id: string; title: string; published_at?: string; created_at: string }) => {
+        activities.push({
+          id: `blog-${p.id}`,
+          type: 'blog_published',
+          description: `Blog post "${p.title}" published`,
+          created_at: p.published_at || p.created_at,
+          metadata: '{}',
+        });
+      });
+
+      // Sort by date and take latest 10
+      activities.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+
       setData({
         brand: brandData.brand,
-        productCount: productData.products?.length || 0,
+        productCount: products.length,
         contentCount: contentData.content?.length || 0,
+        blogPostCount: posts.length,
         ticketStats: ticketData.stats || { total: 0, open: 0, resolved: 0, satisfaction: null },
+        analytics: analyticsData,
+        recentActivity: activities.slice(0, 10),
       });
     });
   }, [brandId]);
@@ -88,46 +241,48 @@ export default function BrandDashboardPage() {
   if (!data) return null;
 
   const channels = JSON.parse(data.brand.channels || '[]');
-  const healthScore = calculateHealthScore(data);
+  const { score: healthScore, recommendations } = calculateHealthScore(data);
+  const healthColor = healthScore >= 80 ? '#10b981' : healthScore >= 60 ? '#3b82f6' : healthScore >= 40 ? '#f59e0b' : '#ef4444';
 
-  const stats = [
-    { label: 'Channels', value: channels.length, icon: Globe, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/30', sparkColor: '#2563EB', sparkData: [1, 2, 2, 3, channels.length] },
-    { label: 'Products', value: data.productCount, icon: Package, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/30', sparkColor: '#D97706', sparkData: [0, 1, 2, 3, data.productCount] },
-    { label: 'Content', value: data.contentCount, icon: FileText, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/30', sparkColor: '#7C3AED', sparkData: [0, 1, 1, 2, data.contentCount] },
-    { label: 'Tickets', value: data.ticketStats.total, icon: HeadphonesIcon, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/30', sparkColor: '#059669', sparkData: [0, 1, 2, 1, data.ticketStats.total] },
-  ];
+  const pageViews = data.analytics?.pageViews?.total || 0;
+  const prevPageViews = data.analytics?.pageViews?.prevTotal || 0;
+  const uniqueVisitors = data.analytics?.uniqueVisitors || 0;
+  const prevUniqueVisitors = data.analytics?.prevUniqueVisitors || 0;
+  const revenue = data.analytics?.currentRevenue || 0;
+  const prevRevenue = data.analytics?.prevRevenue || 0;
+  const conversionRate = data.analytics?.conversionRate || 0;
+  const prevConversionRate = data.analytics?.prevConversionRate || 0;
+  const sparkData = data.analytics?.pageViews?.byDay?.map((d: { count: number }) => d.count) || [0, 0, 0, 0, 0];
 
-  const quickLinks = [
-    { href: `/dashboard/${brandId}/website`, icon: Globe, label: 'Website', desc: 'View generated website', color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' },
-    { href: `/dashboard/${brandId}/chatbot`, icon: MessageSquare, label: 'Chatbot', desc: 'Test your AI chatbot', color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600' },
-    { href: `/dashboard/${brandId}/products`, icon: Package, label: 'Products', desc: `${data.productCount} products`, color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600' },
-    { href: `/dashboard/${brandId}/content`, icon: FileText, label: 'Content', desc: `${data.contentCount} pieces`, color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600' },
-    { href: `/dashboard/${brandId}/support`, icon: HeadphonesIcon, label: 'Support', desc: `${data.ticketStats.open} open tickets`, color: 'bg-rose-50 dark:bg-rose-900/30 text-rose-600' },
-    { href: `/dashboard/${brandId}/strategy`, icon: Sparkles, label: 'AI Strategy', desc: 'Brand insights', color: 'bg-violet-50 dark:bg-violet-900/30 text-violet-600' },
+  const statsCards = [
+    { label: 'Page Views', value: pageViews, prev: prevPageViews, icon: Eye, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/30', sparkColor: '#2563EB', prefix: '' },
+    { label: 'Unique Visitors', value: uniqueVisitors, prev: prevUniqueVisitors, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/30', sparkColor: '#059669', prefix: '' },
+    { label: 'Conversion Rate', value: conversionRate, prev: prevConversionRate, icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/30', sparkColor: '#D97706', prefix: '', suffix: '%' },
+    { label: 'Revenue', value: revenue, prev: prevRevenue, icon: DollarSign, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/30', sparkColor: '#7C3AED', prefix: '$' },
   ];
 
   const onboardingItems = [
-    { done: !!data.brand.name, label: 'Set your brand name', link: '' },
-    { done: !!data.brand.tagline, label: 'Add a tagline', link: '' },
+    { done: !!data.brand.name, label: 'Create your brand', link: '' },
+    { done: !!data.brand.tagline, label: 'Add a tagline', link: `/dashboard/${brandId}/settings` },
     { done: data.productCount > 0, label: 'Add your first product', link: `/dashboard/${brandId}/products` },
     { done: data.contentCount > 0, label: 'Generate website content', link: `/dashboard/${brandId}/content` },
-    { done: !!data.brand.brand_voice, label: 'Define your brand voice', link: '' },
-    { done: data.brand.status === 'launched', label: 'Launch your brand', link: '' },
+    { done: data.blogPostCount > 0, label: 'Publish a blog post', link: `/dashboard/${brandId}/blog` },
+    { done: data.brand.status === 'launched', label: 'Launch your brand', link: `/dashboard/${brandId}/settings` },
   ];
 
   const completedItems = onboardingItems.filter(i => i.done).length;
+  const showOnboarding = completedItems < onboardingItems.length;
+
+  const quickActions = [
+    { icon: Plus, label: 'Add Product', href: `/dashboard/${brandId}/products`, color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600' },
+    { icon: Newspaper, label: 'Write Blog Post', href: `/dashboard/${brandId}/blog`, color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600' },
+    { icon: BarChart3, label: 'Check Analytics', href: `/dashboard/${brandId}/analytics`, color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' },
+    { icon: Paintbrush, label: 'Design Studio', href: `/dashboard/${brandId}/design`, color: 'bg-pink-50 dark:bg-pink-900/30 text-pink-600' },
+    { icon: Globe, label: 'View Website', href: data.brand.slug ? `/site/${data.brand.slug}` : '#', color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600', external: true },
+  ];
 
   return (
-    <div className="p-4 sm:p-8">
-      {/* Breadcrumbs */}
-      <Breadcrumbs
-        items={[
-          { label: 'Dashboard', href: '/dashboard' },
-          { label: data.brand.name },
-        ]}
-        className="mb-4"
-      />
-
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto">
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -140,12 +295,12 @@ export default function BrandDashboardPage() {
             {data.brand.status}
           </Badge>
         </div>
-        <p className="text-zinc-500 dark:text-zinc-400">{data.brand.tagline || 'No tagline'}</p>
+        <p className="text-zinc-500 dark:text-zinc-400">{data.brand.tagline || 'Your brand command center'}</p>
       </motion.div>
 
-      {/* Stats Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
-        {stats.map((stat, i) => (
+      {/* Quick Stats Cards */}
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {statsCards.map((stat, i) => (
           <motion.div
             key={stat.label}
             initial={{ opacity: 0, y: 20 }}
@@ -158,10 +313,13 @@ export default function BrandDashboardPage() {
                   <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${stat.bg}`}>
                     <stat.icon className={`h-5 w-5 ${stat.color}`} />
                   </div>
-                  <Sparkline data={stat.sparkData} color={stat.sparkColor} width={60} height={24} />
+                  <div className="flex flex-col items-end gap-1">
+                    <Sparkline data={sparkData.length > 1 ? sparkData : [0, 1, 2, 1, stat.value]} color={stat.sparkColor} width={60} height={24} />
+                    <TrendIndicator current={stat.value} previous={stat.prev} />
+                  </div>
                 </div>
                 <p className="text-2xl font-bold text-zinc-900 dark:text-white">
-                  <AnimatedCounter value={stat.value} />
+                  <AnimatedCounter value={Math.round(stat.value)} prefix={stat.prefix} suffix={(stat as { suffix?: string }).suffix || ''} />
                 </p>
                 <p className="text-xs text-zinc-400 mt-1">{stat.label}</p>
               </CardContent>
@@ -185,106 +343,231 @@ export default function BrandDashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="text-center mb-4">
-                <div className="text-4xl font-bold text-blue-600 mb-1">
-                  <AnimatedCounter value={healthScore} />%
+              <div className="flex items-center gap-6">
+                <div className="relative">
+                  <CircularProgress value={healthScore} size={100} strokeWidth={8} color={healthColor} />
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <div className="text-center">
+                      <span className="text-2xl font-bold text-zinc-900 dark:text-white">
+                        <AnimatedCounter value={healthScore} />
+                      </span>
+                      <span className="text-sm text-zinc-400">%</span>
+                    </div>
+                  </div>
                 </div>
-                <p className="text-xs text-zinc-400">
-                  {healthScore >= 80 ? 'Excellent' : healthScore >= 60 ? 'Good' : healthScore >= 40 ? 'Getting there' : 'Needs attention'}
-                </p>
+                <div className="flex-1">
+                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                    {healthScore >= 80 ? '🎉 Excellent!' : healthScore >= 60 ? '👍 Good progress' : healthScore >= 40 ? '💪 Getting there' : '🚀 Let\'s get started'}
+                  </p>
+                  {recommendations.length > 0 && (
+                    <div className="space-y-1.5">
+                      {recommendations.map((rec, i) => (
+                        <div key={i} className="flex items-center gap-2 text-xs text-zinc-500">
+                          <Zap className="h-3 w-3 text-amber-500 flex-shrink-0" />
+                          {rec}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
-              <Progress value={healthScore} color={
-                healthScore >= 80 ? 'bg-emerald-500' :
-                healthScore >= 60 ? 'bg-blue-500' :
-                healthScore >= 40 ? 'bg-amber-500' : 'bg-red-500'
-              } />
             </CardContent>
           </Card>
         </motion.div>
 
-        {/* Onboarding Checklist */}
+        {/* Getting Started / Quick Actions */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           className="lg:col-span-2"
         >
-          <Card className="h-full">
-            <CardHeader>
-              <div className="flex items-center justify-between">
+          {showOnboarding ? (
+            <Card className="h-full">
+              <CardHeader>
+                <div className="flex items-center justify-between">
+                  <CardTitle className="text-sm flex items-center gap-2">
+                    <CheckCircle className="h-4 w-4 text-emerald-600" />
+                    Getting Started
+                  </CardTitle>
+                  <span className="text-xs text-zinc-400">{completedItems}/{onboardingItems.length} complete</span>
+                </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  {onboardingItems.map((item, i) => (
+                    <motion.div
+                      key={item.label}
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: 0.3 + i * 0.03 }}
+                    >
+                      {item.link && !item.done ? (
+                        <Link href={item.link} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors group">
+                          <Circle className="h-4 w-4 text-zinc-300 flex-shrink-0 group-hover:text-violet-400 transition-colors" />
+                          <span className="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                            {item.label}
+                          </span>
+                          <ArrowRight className="h-3 w-3 text-zinc-300 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
+                        </Link>
+                      ) : (
+                        <div className="flex items-center gap-3 p-2.5 rounded-lg">
+                          <motion.div
+                            initial={item.done ? { scale: 0 } : undefined}
+                            animate={item.done ? { scale: 1 } : undefined}
+                            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
+                          >
+                            {item.done ? (
+                              <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
+                            ) : (
+                              <Circle className="h-4 w-4 text-zinc-300 flex-shrink-0" />
+                            )}
+                          </motion.div>
+                          <span className={`text-sm ${item.done ? 'text-zinc-400 line-through' : 'text-zinc-700 dark:text-zinc-300'}`}>
+                            {item.label}
+                          </span>
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          ) : (
+            <Card className="h-full">
+              <CardHeader>
                 <CardTitle className="text-sm flex items-center gap-2">
-                  <CheckCircle className="h-4 w-4 text-emerald-600" />
-                  Getting Started
+                  <Zap className="h-4 w-4 text-amber-500" />
+                  Quick Actions
                 </CardTitle>
-                <span className="text-xs text-zinc-400">{completedItems}/{onboardingItems.length} complete</span>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                {onboardingItems.map((item) => (
-                  <div key={item.label} className="flex items-center gap-3 p-2 rounded-lg">
-                    {item.done ? (
-                      <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-                    ) : (
-                      <Circle className="h-4 w-4 text-zinc-300 flex-shrink-0" />
-                    )}
-                    <span className={`text-sm ${item.done ? 'text-zinc-400 line-through' : 'text-zinc-700 dark:text-zinc-300'}`}>
-                      {item.label}
-                    </span>
-                  </div>
-                ))}
-              </div>
+              </CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+                  {quickActions.map((action, i) => (
+                    <motion.div
+                      key={action.label}
+                      initial={{ opacity: 0, scale: 0.9 }}
+                      animate={{ opacity: 1, scale: 1 }}
+                      transition={{ delay: 0.3 + i * 0.03 }}
+                    >
+                      {action.external ? (
+                        <a href={action.href} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors group">
+                          <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform`}>
+                            <action.icon className="h-5 w-5" />
+                          </div>
+                          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 text-center">{action.label}</span>
+                        </a>
+                      ) : (
+                        <Link href={action.href} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors group">
+                          <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform`}>
+                            <action.icon className="h-5 w-5" />
+                          </div>
+                          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 text-center">{action.label}</span>
+                        </Link>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          )}
+        </motion.div>
+      </div>
+
+      {/* Quick Access + Recent Activity */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        {/* Quick Access */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">Quick Access</h2>
+          <div className="space-y-2">
+            {[
+              { href: `/dashboard/${brandId}/website`, icon: Globe, label: 'Website', desc: 'View & manage pages', color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' },
+              { href: `/dashboard/${brandId}/products`, icon: Package, label: 'Products', desc: `${data.productCount} products`, color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600' },
+              { href: `/dashboard/${brandId}/blog`, icon: Newspaper, label: 'Blog', desc: `${data.blogPostCount} posts`, color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600' },
+              { href: `/dashboard/${brandId}/support`, icon: HeadphonesIcon, label: 'Support', desc: `${data.ticketStats.open} open tickets`, color: 'bg-rose-50 dark:bg-rose-900/30 text-rose-600' },
+              { href: `/dashboard/${brandId}/chatbot`, icon: MessageSquare, label: 'Chatbot', desc: 'Test AI assistant', color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600' },
+              { href: `/dashboard/${brandId}/strategy`, icon: Sparkles, label: 'AI Strategy', desc: 'Brand insights', color: 'bg-violet-50 dark:bg-violet-900/30 text-violet-600' },
+            ].map((link, i) => (
+              <motion.div
+                key={link.href}
+                initial={{ opacity: 0, x: -10 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.35 + i * 0.03 }}
+              >
+                <Link href={link.href}>
+                  <Card className="hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer group">
+                    <CardContent className="p-4 flex items-center gap-4">
+                      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${link.color}`}>
+                        <link.icon className="h-5 w-5" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-medium text-sm text-zinc-900 dark:text-white">{link.label}</p>
+                        <p className="text-xs text-zinc-400">{link.desc}</p>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
+                    </CardContent>
+                  </Card>
+                </Link>
+              </motion.div>
+            ))}
+          </div>
+        </motion.div>
+
+        {/* Recent Activity Timeline */}
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+          <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white flex items-center gap-2">
+            <Clock className="h-4 w-4 text-zinc-400" />
+            Recent Activity
+          </h2>
+          <Card>
+            <CardContent className="p-4">
+              {data.recentActivity.length === 0 ? (
+                <div className="py-8 text-center text-sm text-zinc-400">
+                  No activity yet. Start building your brand!
+                </div>
+              ) : (
+                <div className="space-y-1">
+                  {data.recentActivity.map((activity, i) => {
+                    const iconInfo = activityIcons[activity.type] || { emoji: '📋', color: 'bg-zinc-100 dark:bg-zinc-800' };
+                    return (
+                      <motion.div
+                        key={activity.id}
+                        initial={{ opacity: 0, x: 10 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ delay: 0.4 + i * 0.03 }}
+                        className="flex items-start gap-3 py-2.5 border-b border-zinc-50 dark:border-zinc-800/50 last:border-0"
+                      >
+                        <div className={`h-8 w-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${iconInfo.color}`}>
+                          {iconInfo.emoji}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm text-zinc-700 dark:text-zinc-300 truncate">{activity.description}</p>
+                          <p className="text-[10px] text-zinc-300 dark:text-zinc-600 mt-0.5">
+                            {timeAgo(activity.created_at)}
+                          </p>
+                        </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              )}
             </CardContent>
           </Card>
         </motion.div>
       </div>
 
-      {/* Quick Links */}
-      <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">Quick Access</h2>
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        {quickLinks.map((link, i) => (
-          <motion.div
-            key={link.href}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.3 + i * 0.03 }}
-          >
-            <Link href={link.href}>
-              <Card className="hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer group">
-                <CardContent className="p-5 flex items-center gap-4">
-                  <div className={`h-11 w-11 rounded-xl flex items-center justify-center ${link.color}`}>
-                    <link.icon className="h-5 w-5" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-zinc-900 dark:text-white">{link.label}</p>
-                    <p className="text-xs text-zinc-400">{link.desc}</p>
-                  </div>
-                  <ArrowRight className="h-4 w-4 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
-                </CardContent>
-              </Card>
-            </Link>
-          </motion.div>
-        ))}
-      </div>
-
       {/* Live Ecosystem Links */}
       {data.brand.status === 'launched' && data.brand.slug && (
-        <>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}>
           <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">🏛️ Live Ecosystem</h2>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
               { href: `/site/${data.brand.slug}`, icon: Globe, label: 'Website', desc: 'Live brand website', color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30' },
               { href: `/shop/${data.brand.slug}`, icon: ShoppingBag, label: 'Shop', desc: 'E-commerce store', color: 'text-amber-600 bg-amber-50 dark:bg-amber-900/30' },
               { href: `/blog/${data.brand.slug}`, icon: FileText, label: 'Blog', desc: 'Live blog', color: 'text-purple-600 bg-purple-50 dark:bg-purple-900/30' },
               { href: `/chat/${data.brand.slug}`, icon: MessageSquare, label: 'Chatbot', desc: 'AI assistant', color: 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/30' },
             ].map((link) => (
-              <a
-                key={link.href}
-                href={link.href}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="block"
-              >
+              <a key={link.href} href={link.href} target="_blank" rel="noopener noreferrer" className="block">
                 <Card className="hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer group h-full">
                   <CardContent className="p-4">
                     <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-3 ${link.color}`}>
@@ -297,59 +580,32 @@ export default function BrandDashboardPage() {
               </a>
             ))}
           </div>
-        </>
+        </motion.div>
       )}
 
-      {/* Recent Activity */}
-      <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white flex items-center gap-2">
-        <Clock className="h-4 w-4 text-zinc-400" />
-        Recent Activity
-      </h2>
-      <Card className="mb-8">
-        <CardContent className="p-5">
-          <div className="space-y-4">
-            {[
-              { icon: '🚀', text: 'Brand created', time: data.brand.created_at ? new Date(data.brand.created_at).toLocaleDateString() : 'Recently', color: 'bg-violet-100 dark:bg-violet-900/30' },
-              ...(data.brand.status === 'launched' ? [{ icon: '🏛️', text: 'Brand launched and live', time: 'Active', color: 'bg-emerald-100 dark:bg-emerald-900/30' }] : []),
-              ...(data.productCount > 0 ? [{ icon: '📦', text: `${data.productCount} product${data.productCount > 1 ? 's' : ''} added`, time: 'Up to date', color: 'bg-amber-100 dark:bg-amber-900/30' }] : []),
-              ...(data.contentCount > 0 ? [{ icon: '✍️', text: `${data.contentCount} content piece${data.contentCount > 1 ? 's' : ''} created`, time: 'Up to date', color: 'bg-purple-100 dark:bg-purple-900/30' }] : []),
-              ...(data.ticketStats.open > 0 ? [{ icon: '🎫', text: `${data.ticketStats.open} open ticket${data.ticketStats.open > 1 ? 's' : ''} need attention`, time: 'Action needed', color: 'bg-rose-100 dark:bg-rose-900/30' }] : []),
-            ].slice(0, 5).map((activity, i) => (
-              <div key={i} className="flex items-center gap-3">
-                <div className={`h-8 w-8 rounded-lg flex items-center justify-center text-sm ${activity.color}`}>
-                  {activity.icon}
-                </div>
-                <div className="flex-1 min-w-0">
-                  <p className="text-sm text-zinc-700 dark:text-zinc-300">{activity.text}</p>
-                </div>
-                <span className="text-xs text-zinc-400 flex-shrink-0">{activity.time}</span>
-              </div>
-            ))}
-          </div>
-        </CardContent>
-      </Card>
-
       {/* Active Channels */}
-      <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">Active Channels</h2>
-      <Card>
-        <CardContent className="p-6">
-          <div className="flex flex-wrap gap-2">
-            {channels.length === 0 ? (
-              <p className="text-sm text-zinc-400">No channels enabled</p>
-            ) : (
-              channels.map((channel: string) => (
-                <Badge key={channel} variant="default" className="capitalize">
-                  {channel === 'ecommerce' ? (
-                    <><ShoppingBag className="h-3 w-3 mr-1" /> E-Commerce</>
-                  ) : (
-                    channel.replace(/-/g, ' ')
-                  )}
-                </Badge>
-              ))
-            )}
-          </div>
-        </CardContent>
-      </Card>
+      <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.55 }}>
+        <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">Active Channels</h2>
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex flex-wrap gap-2">
+              {channels.length === 0 ? (
+                <p className="text-sm text-zinc-400">No channels enabled — <Link href={`/dashboard/${brandId}/settings`} className="text-violet-500 hover:underline">enable channels</Link></p>
+              ) : (
+                channels.map((channel: string) => (
+                  <Badge key={channel} variant="default" className="capitalize">
+                    {channel === 'ecommerce' ? (
+                      <><ShoppingBag className="h-3 w-3 mr-1" /> E-Commerce</>
+                    ) : (
+                      channel.replace(/-/g, ' ')
+                    )}
+                  </Badge>
+                ))
+              )}
+            </div>
+          </CardContent>
+        </Card>
+      </motion.div>
     </div>
   );
 }

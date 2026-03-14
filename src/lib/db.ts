@@ -482,6 +482,7 @@ export function deleteBrandCascade(brandId: string): Record<string, number> {
   const txn = db.transaction(() => {
     // 1. Leaf tables with brand_id FK
     counts.page_views = db.prepare('DELETE FROM page_views WHERE brand_id = ?').run(brandId).changes;
+    counts.notifications = db.prepare('DELETE FROM notifications WHERE brand_id = ?').run(brandId).changes;
     counts.activities = db.prepare('DELETE FROM activities WHERE brand_id = ?').run(brandId).changes;
     counts.newsletter_subscribers = db.prepare('DELETE FROM newsletter_subscribers WHERE brand_id = ?').run(brandId).changes;
     counts.contact_submissions = db.prepare('DELETE FROM contact_submissions WHERE brand_id = ?').run(brandId).changes;
@@ -1137,4 +1138,131 @@ export function getConsumerUser(id: string) {
 export function getOrdersByConsumer(brandId: string, email: string) {
   const db = getDb();
   return db.prepare('SELECT * FROM orders WHERE brand_id = ? AND customer_email = ? ORDER BY created_at DESC').all(brandId, email);
+}
+
+// ==================== Notification operations ====================
+
+export function createNotification(notification: {
+  id: string;
+  brand_id: string;
+  type: string;
+  title: string;
+  message?: string;
+  metadata?: string;
+}) {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO notifications (id, brand_id, type, title, message, metadata)
+    VALUES (@id, @brand_id, @type, @title, @message, @metadata)
+  `).run({
+    ...notification,
+    message: notification.message || null,
+    metadata: notification.metadata || '{}',
+  });
+}
+
+export function getNotifications(brandId: string, limit = 20, unreadOnly = false) {
+  const db = getDb();
+  if (unreadOnly) {
+    return db.prepare('SELECT * FROM notifications WHERE brand_id = ? AND is_read = 0 ORDER BY created_at DESC LIMIT ?').all(brandId, limit);
+  }
+  return db.prepare('SELECT * FROM notifications WHERE brand_id = ? ORDER BY created_at DESC LIMIT ?').all(brandId, limit);
+}
+
+export function getUnreadNotificationCount(brandId: string): number {
+  const db = getDb();
+  const row = db.prepare('SELECT COUNT(*) as count FROM notifications WHERE brand_id = ? AND is_read = 0').get(brandId) as { count: number };
+  return row.count;
+}
+
+export function markNotificationRead(id: string) {
+  const db = getDb();
+  db.prepare('UPDATE notifications SET is_read = 1 WHERE id = ?').run(id);
+}
+
+export function markAllNotificationsRead(brandId: string) {
+  const db = getDb();
+  db.prepare('UPDATE notifications SET is_read = 1 WHERE brand_id = ? AND is_read = 0').run(brandId);
+}
+
+// ==================== Enhanced Analytics ====================
+
+export function getPageViewStatsEnhanced(brandId: string, days = 30) {
+  const db = getDb();
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const prevSince = new Date(Date.now() - days * 2 * 24 * 60 * 60 * 1000).toISOString();
+
+  const total = db.prepare('SELECT COUNT(*) as count FROM page_views WHERE brand_id = ? AND created_at > ?').get(brandId, since) as { count: number };
+  const prevTotal = db.prepare('SELECT COUNT(*) as count FROM page_views WHERE brand_id = ? AND created_at > ? AND created_at <= ?').get(brandId, prevSince, since) as { count: number };
+
+  const byPage = db.prepare('SELECT page, COUNT(*) as count FROM page_views WHERE brand_id = ? AND created_at > ? GROUP BY page ORDER BY count DESC LIMIT 10').all(brandId, since);
+  const byDay = db.prepare("SELECT DATE(created_at) as day, COUNT(*) as count FROM page_views WHERE brand_id = ? AND created_at > ? GROUP BY DATE(created_at) ORDER BY day ASC").all(brandId, since);
+
+  // Unique visitors (approximate by user_agent)
+  const uniqueVisitors = db.prepare('SELECT COUNT(DISTINCT user_agent) as count FROM page_views WHERE brand_id = ? AND created_at > ? AND user_agent IS NOT NULL').get(brandId, since) as { count: number };
+  const prevUniqueVisitors = db.prepare('SELECT COUNT(DISTINCT user_agent) as count FROM page_views WHERE brand_id = ? AND created_at > ? AND created_at <= ? AND user_agent IS NOT NULL').get(brandId, prevSince, since) as { count: number };
+
+  // Device breakdown from user_agent
+  const allViews = db.prepare('SELECT user_agent FROM page_views WHERE brand_id = ? AND created_at > ? AND user_agent IS NOT NULL').all(brandId, since) as Array<{ user_agent: string }>;
+  let mobile = 0, tablet = 0, desktop = 0;
+  for (const v of allViews) {
+    const ua = v.user_agent.toLowerCase();
+    if (ua.includes('mobile') || ua.includes('iphone') || ua.includes('android')) {
+      if (ua.includes('tablet') || ua.includes('ipad')) tablet++;
+      else mobile++;
+    } else if (ua.includes('tablet') || ua.includes('ipad')) {
+      tablet++;
+    } else {
+      desktop++;
+    }
+  }
+
+  // Referrer breakdown
+  const byReferrer = db.prepare("SELECT referrer, COUNT(*) as count FROM page_views WHERE brand_id = ? AND created_at > ? AND referrer IS NOT NULL AND referrer != '' GROUP BY referrer ORDER BY count DESC LIMIT 10").all(brandId, since);
+
+  return {
+    total: total.count,
+    prevTotal: prevTotal.count,
+    uniqueVisitors: uniqueVisitors.count,
+    prevUniqueVisitors: prevUniqueVisitors.count,
+    byPage,
+    byDay,
+    devices: { mobile, tablet, desktop },
+    byReferrer,
+  };
+}
+
+// ==================== Full Brand Export ====================
+
+export function getFullBrandExport(brandId: string) {
+  const db = getDb();
+  const brand = getBrand(brandId);
+  const products = getProductsByBrand(brandId);
+  const content = getContentByBrand(brandId);
+  const blogPosts = getBlogPosts(brandId);
+  const orders = getOrdersByBrand(brandId);
+  const contacts = getContactSubmissions(brandId);
+  const subscribers = getNewsletterSubscribers(brandId);
+  const settings = getBrandSettings(brandId);
+  const pages = getBrandPages(brandId);
+  const faqs = getChatbotFaqs(brandId);
+  const activities = getActivities(brandId, 100);
+  const tickets = getTicketsByBrand(brandId);
+
+  return {
+    brand,
+    products,
+    content,
+    blogPosts,
+    orders,
+    contacts,
+    subscribers,
+    settings,
+    pages,
+    faqs,
+    activities,
+    tickets,
+    exportedAt: new Date().toISOString(),
+    version: '3.3',
+  };
 }

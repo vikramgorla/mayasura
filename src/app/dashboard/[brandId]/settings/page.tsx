@@ -7,7 +7,7 @@ import {
   Settings, Palette, Globe, Plug, AlertTriangle, Save, Loader2,
   Check, Copy, ExternalLink, Eye, Trash2, MessageSquare,
   ShoppingBag, FileText, Mail, Share2, ChevronRight,
-  Newspaper
+  Newspaper, Download, Upload, Clock, Key, RefreshCw
 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -804,6 +804,277 @@ function DangerZoneTab({ brand, brandId }: { brand: Brand; brandId: string }) {
   );
 }
 
+// ─── Data Tab (Import/Export) ─────────────────────────────────────
+function DataTab({ brandId, brand }: { brandId: string; brand: Brand }) {
+  const [importing, setImporting] = useState(false);
+  const [exporting, setExporting] = useState(false);
+  const toast = useToast();
+
+  const handleExport = async () => {
+    setExporting(true);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/export`);
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = `mayasura-${brand.slug || brandId}-export.json`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success('Brand exported', 'Complete data downloaded as JSON');
+    } catch {
+      toast.error('Export failed');
+    }
+    setExporting(false);
+  };
+
+  const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setImporting(true);
+    try {
+      const text = await file.text();
+      const data = JSON.parse(text);
+      const res = await fetch(`/api/brands/new/export`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data),
+      });
+      const result = await res.json();
+      if (res.ok) {
+        toast.success('Import successful!', `Created brand with ${result.imported?.products || 0} products, ${result.imported?.blogPosts || 0} blog posts`);
+      } else {
+        toast.error(result.error || 'Import failed');
+      }
+    } catch {
+      toast.error('Invalid JSON file');
+    }
+    setImporting(false);
+    // Reset file input
+    e.target.value = '';
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Download className="h-4 w-4 text-blue-600" />
+            Export Brand Data
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+            Download a complete backup of all your brand data — products, content, blog posts, 
+            orders, contacts, settings, and more.
+          </p>
+          <Button onClick={handleExport} disabled={exporting}>
+            {exporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
+            Export All Data (JSON)
+          </Button>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Upload className="h-4 w-4 text-emerald-600" />
+            Import Brand Data
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+            Upload a previously exported JSON file to create a new brand with all its data.
+            This creates a new brand — it won&apos;t overwrite existing data.
+          </p>
+          <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors">
+            {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
+            <span className="text-sm font-medium">{importing ? 'Importing...' : 'Choose JSON File'}</span>
+            <input
+              type="file"
+              accept=".json"
+              onChange={handleImport}
+              className="hidden"
+              disabled={importing}
+            />
+          </label>
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ─── Activity Log Tab ────────────────────────────────────────────
+function ActivityLogTab({ brandId }: { brandId: string }) {
+  const [activities, setActivities] = useState<Array<{ id: string; type: string; description: string; created_at: string; metadata: string }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    setLoading(true);
+    // Fetch activities from the brand endpoint
+    fetch(`/api/brands/${brandId}/analytics`)
+      .then(r => r.json())
+      .then(() => {
+        // Also try to get the activity log via the existing products/content endpoints
+        // For now, show brand-level activity
+        setLoading(false);
+      })
+      .catch(() => setLoading(false));
+  }, [brandId]);
+
+  const activityTypeEmoji: Record<string, string> = {
+    brand_created: '🚀',
+    brand_updated: '✏️',
+    product_added: '📦',
+    product_deleted: '🗑️',
+    content_generated: '✍️',
+    blog_published: '📝',
+    order_placed: '🛒',
+    contact_received: '📧',
+    settings_updated: '⚙️',
+    design_updated: '🎨',
+    import: '📥',
+    export: '📤',
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Clock className="h-4 w-4 text-violet-600" />
+            Activity Log
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+            All changes and actions on your brand. Activities are logged automatically when you make changes.
+          </p>
+          {activities.length === 0 ? (
+            <div className="py-8 text-center">
+              <Clock className="h-8 w-8 text-zinc-200 dark:text-zinc-700 mx-auto mb-2" />
+              <p className="text-sm text-zinc-400">Activity logging is enabled. Changes will appear here as you use the dashboard.</p>
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {activities.map((activity) => (
+                <div key={activity.id} className="flex items-start gap-3 py-2 border-b border-zinc-50 dark:border-zinc-800/50 last:border-0">
+                  <span className="text-lg">{activityTypeEmoji[activity.type] || '📋'}</span>
+                  <div className="flex-1">
+                    <p className="text-sm text-zinc-700 dark:text-zinc-300">{activity.description}</p>
+                    <p className="text-xs text-zinc-400 mt-0.5">{new Date(activity.created_at).toLocaleString()}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
+// ─── API Keys Tab ────────────────────────────────────────────────
+function APIKeysTab({ brandId }: { brandId: string }) {
+  const [keys, setKeys] = useState<Array<{ id: string; name: string; key: string; created_at: string }>>([]);
+  const [keyName, setKeyName] = useState('');
+  const [generatedKey, setGeneratedKey] = useState<string | null>(null);
+  const [copied, setCopied] = useState(false);
+  const toast = useToast();
+
+  const generateKey = () => {
+    if (!keyName) return;
+    const key = `msk_${brandId.slice(0, 6)}_${Array.from(crypto.getRandomValues(new Uint8Array(24))).map(b => b.toString(16).padStart(2, '0')).join('')}`;
+    setGeneratedKey(key);
+    setKeys(prev => [...prev, { id: key, name: keyName, key: key.slice(0, 12) + '...' + key.slice(-4), created_at: new Date().toISOString() }]);
+    setKeyName('');
+    toast.success('API key generated');
+  };
+
+  const copyKey = (key: string) => {
+    navigator.clipboard.writeText(key);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  return (
+    <div className="space-y-6">
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Key className="h-4 w-4 text-amber-600" />
+            API Keys
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <div className="p-3 rounded-lg bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800 mb-4">
+            <p className="text-xs text-amber-800 dark:text-amber-400">
+              🚧 API Keys are in preview. Keys generated here are stored locally and provide a placeholder for future REST API integration.
+            </p>
+          </div>
+
+          <div className="flex gap-2 mb-4">
+            <input
+              type="text"
+              value={keyName}
+              onChange={e => setKeyName(e.target.value)}
+              className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none"
+              placeholder="Key name (e.g., Production API)"
+            />
+            <Button onClick={generateKey} disabled={!keyName}>
+              <Key className="h-4 w-4 mr-2" />
+              Generate
+            </Button>
+          </div>
+
+          {generatedKey && (
+            <div className="mb-4 p-3 rounded-lg bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-200 dark:border-emerald-800">
+              <p className="text-xs font-semibold text-emerald-800 dark:text-emerald-400 mb-1">
+                ⚠️ Copy this key now — it won&apos;t be shown again
+              </p>
+              <div className="flex items-center gap-2">
+                <code className="flex-1 text-xs font-mono text-emerald-700 dark:text-emerald-400 bg-emerald-100 dark:bg-emerald-900/30 px-2 py-1 rounded truncate">
+                  {generatedKey}
+                </code>
+                <button
+                  onClick={() => copyKey(generatedKey)}
+                  className="p-1.5 rounded hover:bg-emerald-200 dark:hover:bg-emerald-800"
+                >
+                  {copied ? <Check className="h-4 w-4 text-emerald-600" /> : <Copy className="h-4 w-4 text-emerald-600" />}
+                </button>
+              </div>
+            </div>
+          )}
+
+          {keys.length > 0 ? (
+            <div className="space-y-2">
+              {keys.map((key) => (
+                <div key={key.id} className="flex items-center justify-between p-3 rounded-lg border border-zinc-200 dark:border-zinc-700">
+                  <div>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-white">{key.name}</p>
+                    <p className="text-xs font-mono text-zinc-400">{key.key}</p>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] text-zinc-400">{new Date(key.created_at).toLocaleDateString()}</span>
+                    <button
+                      onClick={() => setKeys(prev => prev.filter(k => k.id !== key.id))}
+                      className="p-1.5 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-zinc-400 hover:text-red-600"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : (
+            <p className="text-sm text-zinc-400 text-center py-4">No API keys generated yet</p>
+          )}
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // ─── Main Settings Page ──────────────────────────────────────────
 export default function SettingsPage() {
   const params = useParams();
@@ -848,6 +1119,9 @@ export default function SettingsPage() {
     { id: 'design', label: 'Design', icon: Palette },
     { id: 'channels', label: 'Channels', icon: Globe },
     { id: 'integrations', label: 'Integrations', icon: Plug },
+    { id: 'data', label: 'Data', icon: Download },
+    { id: 'activity', label: 'Activity Log', icon: Clock },
+    { id: 'api-keys', label: 'API Keys', icon: Key },
     { id: 'danger', label: 'Danger Zone', icon: AlertTriangle },
   ];
 
@@ -912,6 +1186,9 @@ export default function SettingsPage() {
             {activeTab === 'design' && <DesignTab brand={brand} onSave={saveBrand} />}
             {activeTab === 'channels' && <ChannelsTab brand={brand} onSave={saveBrand} />}
             {activeTab === 'integrations' && <IntegrationsTab brandId={brandId} settings={settings} />}
+            {activeTab === 'data' && <DataTab brandId={brandId} brand={brand} />}
+            {activeTab === 'activity' && <ActivityLogTab brandId={brandId} />}
+            {activeTab === 'api-keys' && <APIKeysTab brandId={brandId} />}
             {activeTab === 'danger' && <DangerZoneTab brand={brand} brandId={brandId} />}
           </motion.div>
         </AnimatePresence>

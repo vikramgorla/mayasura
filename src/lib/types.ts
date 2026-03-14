@@ -169,6 +169,17 @@ export interface ConsumerUser {
   created_at: string;
 }
 
+export interface Notification {
+  id: string;
+  brand_id: string;
+  type: string;
+  title: string;
+  message: string | null;
+  is_read: number;
+  metadata: string;
+  created_at: string;
+}
+
 // API Response envelope
 export interface ApiResponse<T = unknown> {
   success: boolean;

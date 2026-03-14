@@ -14,6 +14,8 @@ import { Brand } from '@/lib/types';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
 import { CommandPalette } from '@/components/command-palette';
+import { AICommandPalette } from '@/components/ai-command-palette';
+import { NotificationBell } from '@/components/notification-bell';
 import { useToast } from '@/components/ui/toast';
 import { UserNav } from '@/components/user-nav';
 
@@ -83,6 +85,44 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
     <div className="min-h-screen bg-zinc-50 dark:bg-[#09090B] flex">
       <a href="#dashboard-content" className="skip-to-content">Skip to content</a>
       <CommandPalette brandId={brandId} />
+      <AICommandPalette
+        brandId={brandId}
+        brand={brand ? {
+          name: brand.name,
+          industry: brand.industry,
+          brand_voice: brand.brand_voice,
+          primary_color: brand.primary_color,
+          secondary_color: brand.secondary_color,
+          accent_color: brand.accent_color,
+        } : undefined}
+        onApply={async (type, data) => {
+          // Apply AI-generated content to the brand
+          const updates: Record<string, unknown> = {};
+          if (type === 'brand-name' && data.name) updates.name = data.name;
+          if (type === 'tagline' && data.tagline) updates.tagline = data.tagline;
+          if (type === 'colors') {
+            if (data.primary) updates.primary_color = data.primary;
+            if (data.secondary) updates.secondary_color = data.secondary;
+            if (data.accent) updates.accent_color = data.accent;
+          }
+          if (Object.keys(updates).length > 0) {
+            try {
+              const res = await fetch(`/api/brands/${brandId}`, {
+                method: 'PUT',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(updates),
+              });
+              if (res.ok) {
+                const data = await res.json();
+                setBrand(data.brand);
+                toast.success('Applied!', 'AI-generated content saved');
+              }
+            } catch {
+              toast.error('Failed to apply');
+            }
+          }
+        }}
+      />
 
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-64 bg-white dark:bg-zinc-900/95 border-r border-zinc-200 dark:border-zinc-800 flex-col fixed h-full z-20 sidebar-gradient" aria-label="Dashboard sidebar">
@@ -155,8 +195,9 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
             <kbd className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-600 text-[10px]">⌘K</kbd>
             <span className="ml-1.5">Command Palette</span>
           </div>
-          <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800">
+          <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
             <UserNav />
+            <NotificationBell brandId={brandId} />
           </div>
         </div>
       </aside>
@@ -178,9 +219,12 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
               <span className="font-semibold text-sm truncate max-w-[150px]">{brand.name}</span>
             </div>
           </div>
-          <button onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')} className="p-1.5" aria-label={resolved === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
-            {resolved === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
-          </button>
+          <div className="flex items-center gap-1">
+            <NotificationBell brandId={brandId} />
+            <button onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')} className="p-1.5" aria-label={resolved === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
+              {resolved === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
+            </button>
+          </div>
         </div>
       </div>
 
