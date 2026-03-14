@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, updateBrand, deleteBrand } from '@/lib/db';
+import { getBrand, updateBrand, deleteBrandCascade, isSlugAvailable } from '@/lib/db';
 import { requireBrandOwner, sanitizeObject } from '@/lib/api-auth';
 
 export async function GET(
@@ -33,6 +33,21 @@ export async function PUT(
       body.channels = JSON.stringify(body.channels);
     }
 
+    // Validate slug if being changed
+    if (body.slug) {
+      const slug = body.slug.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-|-$/g, '');
+      if (slug.length < 2) {
+        return NextResponse.json({ error: 'Slug must be at least 2 characters' }, { status: 400 });
+      }
+      if (slug.length > 64) {
+        return NextResponse.json({ error: 'Slug must be under 64 characters' }, { status: 400 });
+      }
+      if (!isSlugAvailable(slug, id)) {
+        return NextResponse.json({ error: 'Slug is already taken' }, { status: 409 });
+      }
+      body.slug = slug;
+    }
+
     // Sanitize string inputs
     const sanitized = sanitizeObject(body);
     updateBrand(id, sanitized);
@@ -53,8 +68,8 @@ export async function DELETE(
     const { error } = await requireBrandOwner(id);
     if (error) return error;
 
-    deleteBrand(id);
-    return NextResponse.json({ success: true });
+    const counts = deleteBrandCascade(id);
+    return NextResponse.json({ success: true, deleted: counts });
   } catch (error) {
     console.error('Error deleting brand:', error);
     return NextResponse.json({ error: 'Failed to delete brand' }, { status: 500 });

@@ -308,6 +308,18 @@ function runMigrations(db: Database.Database) {
     console.log('[DB] Adding stock_count column to products');
     db.exec("ALTER TABLE products ADD COLUMN stock_count INTEGER DEFAULT -1");
   }
+
+  // V3.3: Add website_template column to brands
+  if (!hasColumn(db, 'brands', 'website_template')) {
+    console.log('[DB] Adding website_template column to brands');
+    db.exec("ALTER TABLE brands ADD COLUMN website_template TEXT DEFAULT 'minimal'");
+  }
+
+  // V3.3: Add custom_css column to brands
+  if (!hasColumn(db, 'brands', 'custom_css')) {
+    console.log('[DB] Adding custom_css column to brands');
+    db.exec("ALTER TABLE brands ADD COLUMN custom_css TEXT");
+  }
   
   console.log('[DB] Migrations complete');
 }
@@ -420,6 +432,7 @@ const ALLOWED_BRAND_FIELDS = new Set([
   'name', 'tagline', 'description', 'industry', 'logo_url',
   'primary_color', 'secondary_color', 'accent_color',
   'font_heading', 'font_body', 'brand_voice', 'channels', 'status', 'slug',
+  'website_template', 'custom_css',
 ]);
 
 export function updateBrand(id: string, updates: Record<string, unknown>) {
@@ -441,6 +454,78 @@ export function updateBrand(id: string, updates: Record<string, unknown>) {
 export function deleteBrand(id: string) {
   const db = getDb();
   return db.prepare('DELETE FROM brands WHERE id = ?').run(id);
+}
+
+/**
+ * Delete a brand and ALL related data in a single transaction.
+ * Returns counts of deleted rows per table for confirmation UI.
+ */
+export function deleteBrandCascade(brandId: string): Record<string, number> {
+  const db = getDb();
+  db.pragma('foreign_keys = ON');
+
+  const counts: Record<string, number> = {};
+
+  const txn = db.transaction(() => {
+    // 1. Leaf tables with brand_id FK
+    counts.page_views = db.prepare('DELETE FROM page_views WHERE brand_id = ?').run(brandId).changes;
+    counts.activities = db.prepare('DELETE FROM activities WHERE brand_id = ?').run(brandId).changes;
+    counts.newsletter_subscribers = db.prepare('DELETE FROM newsletter_subscribers WHERE brand_id = ?').run(brandId).changes;
+    counts.contact_submissions = db.prepare('DELETE FROM contact_submissions WHERE brand_id = ?').run(brandId).changes;
+    counts.brand_settings = db.prepare('DELETE FROM brand_settings WHERE brand_id = ?').run(brandId).changes;
+    counts.chatbot_faqs = db.prepare('DELETE FROM chatbot_faqs WHERE brand_id = ?').run(brandId).changes;
+    counts.chat_messages = db.prepare('DELETE FROM chat_messages WHERE brand_id = ?').run(brandId).changes;
+
+    // 2. Ticket messages via tickets (nested FK)
+    const tickets = db.prepare('SELECT id FROM tickets WHERE brand_id = ?').all(brandId) as Array<{ id: string }>;
+    let ticketMessageCount = 0;
+    for (const t of tickets) {
+      ticketMessageCount += db.prepare('DELETE FROM ticket_messages WHERE ticket_id = ?').run(t.id).changes;
+    }
+    counts.ticket_messages = ticketMessageCount;
+    counts.tickets = db.prepare('DELETE FROM tickets WHERE brand_id = ?').run(brandId).changes;
+
+    // 3. Order items via orders (nested FK)
+    const orders = db.prepare('SELECT id FROM orders WHERE brand_id = ?').all(brandId) as Array<{ id: string }>;
+    let orderItemCount = 0;
+    for (const o of orders) {
+      orderItemCount += db.prepare('DELETE FROM order_items WHERE order_id = ?').run(o.id).changes;
+    }
+    counts.order_items = orderItemCount;
+    counts.orders = db.prepare('DELETE FROM orders WHERE brand_id = ?').run(brandId).changes;
+
+    // 4. Remaining tables with brand_id FK
+    counts.blog_posts = db.prepare('DELETE FROM blog_posts WHERE brand_id = ?').run(brandId).changes;
+    counts.content = db.prepare('DELETE FROM content WHERE brand_id = ?').run(brandId).changes;
+    counts.products = db.prepare('DELETE FROM products WHERE brand_id = ?').run(brandId).changes;
+    counts.brand_pages = db.prepare('DELETE FROM brand_pages WHERE brand_id = ?').run(brandId).changes;
+    counts.consumer_users = db.prepare('DELETE FROM consumer_users WHERE brand_id = ?').run(brandId).changes;
+
+    // 5. Finally, delete the brand itself
+    counts.brands = db.prepare('DELETE FROM brands WHERE id = ?').run(brandId).changes;
+  });
+
+  txn();
+  return counts;
+}
+
+/**
+ * Get counts of all related items for a brand (used in deletion confirmation UI).
+ */
+export function getBrandRelatedCounts(brandId: string): Record<string, number> {
+  const db = getDb();
+  const tables = [
+    'products', 'content', 'chat_messages', 'tickets', 'activities',
+    'orders', 'contact_submissions', 'newsletter_subscribers',
+    'brand_settings', 'brand_pages', 'blog_posts', 'chatbot_faqs',
+    'consumer_users', 'page_views',
+  ];
+  const counts: Record<string, number> = {};
+  for (const table of tables) {
+    const row = db.prepare(`SELECT COUNT(*) as count FROM ${table} WHERE brand_id = ?`).get(brandId) as { count: number };
+    counts[table] = row.count;
+  }
+  return counts;
 }
 
 // ==================== Product operations ====================
@@ -698,6 +783,20 @@ export function getActivities(brandId: string, limit = 20) {
 export function getBrandBySlug(slug: string) {
   const db = getDb();
   return db.prepare('SELECT * FROM brands WHERE slug = ?').get(slug);
+}
+
+/**
+ * Check if a slug is available (not used by another brand).
+ * Returns true if available, false if taken.
+ */
+export function isSlugAvailable(slug: string, excludeBrandId?: string): boolean {
+  const db = getDb();
+  if (excludeBrandId) {
+    const row = db.prepare('SELECT id FROM brands WHERE slug = ? AND id != ?').get(slug, excludeBrandId);
+    return !row;
+  }
+  const row = db.prepare('SELECT id FROM brands WHERE slug = ?').get(slug);
+  return !row;
 }
 
 // ==================== Brand Settings operations ====================

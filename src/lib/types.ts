@@ -56,6 +56,8 @@ export interface Brand {
   channels: string;
   status: string;
   user_id: string | null;
+  website_template: string | null;
+  custom_css: string | null;
   created_at: string;
   updated_at: string;
 }

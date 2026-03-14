@@ -29,13 +29,19 @@ export async function PUT(
     if (error) return error;
 
     const body = await request.json();
-    const { key, value } = body;
 
-    if (!key) {
-      return NextResponse.json({ error: 'key is required' }, { status: 400 });
+    // Support single key-value pair
+    if (body.key) {
+      setBrandSetting(id, sanitizeInput(body.key), body.value ? sanitizeInput(body.value) : '');
     }
 
-    setBrandSetting(id, sanitizeInput(key), value ? sanitizeInput(value) : '');
+    // Support bulk settings update: { settings: { key1: val1, key2: val2 } }
+    if (body.settings && typeof body.settings === 'object') {
+      for (const [key, value] of Object.entries(body.settings)) {
+        setBrandSetting(id, sanitizeInput(key), value ? sanitizeInput(String(value)) : '');
+      }
+    }
+
     const settings = getBrandSettings(id);
     return NextResponse.json({ settings });
   } catch (error) {
