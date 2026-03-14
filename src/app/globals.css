@@ -235,3 +235,23 @@ h4, h5, h6 {
 .sidebar-gradient {
   background: linear-gradient(180deg, var(--bg-surface) 0%, var(--bg-primary) 100%);
 }
+
+/* ==================== Performance: will-change hints ==================== */
+.will-change-transform {
+  will-change: transform;
+}
+
+.will-change-opacity {
+  will-change: opacity;
+}
+
+/* Animate-in utility for loading states */
+.animate-in {
+  animation: fadeIn 0.3s ease-out forwards;
+}
+
+/* Content visibility for off-screen sections */
+.content-auto {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 500px;
+}
