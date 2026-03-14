@@ -67,14 +67,14 @@ export default function StepBasics({ data, updateData, onNext }: Props) {
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">Brand Basics</h2>
-        <p className="text-slate-500">Let&apos;s start with the foundation. What&apos;s your brand about?</p>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-slate-900 dark:text-white">Brand Basics</h2>
+        <p className="text-slate-500 dark:text-slate-400">Let&apos;s start with the foundation. What&apos;s your brand about?</p>
       </div>
 
       <div className="space-y-6">
         {/* Industry */}
         <div>
-          <label className="block text-sm font-medium mb-2">Industry / Category</label>
+          <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Industry / Category</label>
           <Input
             value={data.industry}
             onChange={(e) => updateData({ industry: e.target.value })}
@@ -85,13 +85,13 @@ export default function StepBasics({ data, updateData, onNext }: Props) {
         {/* Brand Name */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium">Brand Name</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Brand Name</label>
             <Button
               variant="ghost"
               size="sm"
               onClick={suggestNames}
               disabled={!data.industry || loadingNames}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
             >
               {loadingNames ? <Spinner className="h-4" /> : <><Sparkles className="h-3.5 w-3.5" /> AI Suggest</>}
             </Button>
@@ -107,7 +107,7 @@ export default function StepBasics({ data, updateData, onNext }: Props) {
                 <button
                   key={name}
                   onClick={() => { updateData({ name }); setSuggestedNames([]); }}
-                  className="px-3 py-1.5 rounded-full bg-blue-50 text-blue-700 text-sm hover:bg-blue-100 transition-colors cursor-pointer"
+                  className="px-3 py-1.5 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 text-sm hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors cursor-pointer border border-indigo-200/50 dark:border-indigo-800/50"
                 >
                   {name}
                 </button>
@@ -119,13 +119,13 @@ export default function StepBasics({ data, updateData, onNext }: Props) {
         {/* Tagline */}
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-sm font-medium">Tagline</label>
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Tagline</label>
             <Button
               variant="ghost"
               size="sm"
               onClick={suggestTaglines}
               disabled={!data.name || !data.industry || loadingTaglines}
-              className="text-blue-600 hover:text-blue-700"
+              className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300"
             >
               {loadingTaglines ? <Spinner className="h-4" /> : <><Sparkles className="h-3.5 w-3.5" /> AI Suggest</>}
             </Button>
@@ -141,7 +141,7 @@ export default function StepBasics({ data, updateData, onNext }: Props) {
                 <button
                   key={tagline}
                   onClick={() => { updateData({ tagline }); setSuggestedTaglines([]); }}
-                  className="block w-full text-left px-4 py-2.5 rounded-lg bg-blue-50 text-blue-700 text-sm hover:bg-blue-100 transition-colors cursor-pointer"
+                  className="block w-full text-left px-4 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-700 dark:text-indigo-300 text-sm hover:bg-indigo-100 dark:hover:bg-indigo-900/50 transition-colors cursor-pointer border border-indigo-200/50 dark:border-indigo-800/50"
                 >
                   &ldquo;{tagline}&rdquo;
                 </button>
@@ -152,7 +152,7 @@ export default function StepBasics({ data, updateData, onNext }: Props) {
 
         {/* Description */}
         <div>
-          <label className="block text-sm font-medium mb-2">Description</label>
+          <label className="block text-sm font-medium mb-2 text-slate-700 dark:text-slate-300">Description</label>
           <Textarea
             value={data.description}
             onChange={(e) => updateData({ description: e.target.value })}
