@@ -3,6 +3,11 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useBrandSite } from '../layout';
+import {
+  getPrimaryButtonStyle,
+  getSecondaryButtonStyle,
+  BORDER_RADIUS_MAP,
+} from '@/lib/design-settings';
 
 export default function ContactPage() {
   const data = useBrandSite();
@@ -13,7 +18,7 @@ export default function ContactPage() {
 
   if (!data) return null;
 
-  const { brand, websiteTemplate: template } = data;
+  const { brand, websiteTemplate: template, designSettings } = data;
   const slug = brand.slug || brand.id;
   const templateId = template?.id || 'minimal';
   const tp = template?.preview;
@@ -22,6 +27,10 @@ export default function ContactPage() {
   const bgColor = isDark ? '#000000' : brand.secondary_color;
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const accentColor = brand.accent_color || textColor;
+
+  const ds = designSettings;
+  const primaryBtnStyle = getPrimaryButtonStyle(ds, accentColor);
+  const dsRadius = BORDER_RADIUS_MAP[ds.borderRadius];
 
   const headingStyle: React.CSSProperties = {
     fontFamily: brand.font_heading,

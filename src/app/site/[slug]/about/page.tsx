@@ -2,12 +2,17 @@
 
 import Link from 'next/link';
 import { useBrandSite, BrandPlaceholder } from '../layout';
+import {
+  getPrimaryButtonStyle,
+  getSecondaryButtonStyle,
+  BORDER_RADIUS_MAP,
+} from '@/lib/design-settings';
 
 export default function AboutPage() {
   const data = useBrandSite();
   if (!data) return null;
 
-  const { brand, websiteTemplate: template } = data;
+  const { brand, websiteTemplate: template, designSettings } = data;
   const slug = brand.slug || brand.id;
   const templateId = template?.id || 'minimal';
   const tp = template?.preview;
@@ -16,6 +21,11 @@ export default function AboutPage() {
   const bgColor = isDark ? '#000000' : brand.secondary_color;
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const accentColor = brand.accent_color || textColor;
+
+  const ds = designSettings;
+  const primaryBtnStyle = getPrimaryButtonStyle(ds, accentColor);
+  const secondaryBtnStyle = getSecondaryButtonStyle(ds, textColor);
+  const dsRadius = BORDER_RADIUS_MAP[ds.borderRadius];
 
   const headingStyle: React.CSSProperties = {
     fontFamily: brand.font_heading,
@@ -136,7 +146,7 @@ export default function AboutPage() {
               style={{
                 aspectRatio: templateId === 'editorial' ? '4/5' : '4/3',
                 backgroundColor: isDark ? '#111111' : `${textColor}04`,
-                borderRadius: templateId === 'playful' ? '24px' : templateId === 'classic' ? '12px' : templateId === 'bold' ? '0' : '0',
+                borderRadius: templateId === 'playful' ? '24px' : templateId === 'classic' ? '12px' : templateId === 'bold' ? '0' : dsRadius,
                 border: templateId === 'bold' ? `2px solid ${textColor}10` : undefined,
               }}
             >
@@ -257,6 +267,7 @@ export default function AboutPage() {
               href={`/site/${slug}/contact`}
               className="t-btn-primary"
               style={{
+                ...primaryBtnStyle,
                 backgroundColor: isDark ? accentColor : textColor,
                 color: isDark ? '#FFFFFF' : bgColor,
               }}
@@ -265,11 +276,11 @@ export default function AboutPage() {
             </Link>
             <Link
               href={`/shop/${slug}`}
-              className="t-btn-secondary border"
+              className="t-btn-secondary"
               style={{
+                ...secondaryBtnStyle,
                 borderColor: `${textColor}${isDark ? '25' : '15'}`,
                 color: textColor,
-                borderWidth: templateId === 'bold' ? '2px' : '1px',
               }}
             >
               {templateId === 'playful' ? 'Browse Shop 🛍️' : templateId === 'bold' ? 'BROWSE SHOP' : 'Browse Shop'}

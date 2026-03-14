@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useBrandSite } from '../layout';
+import { BORDER_RADIUS_MAP } from '@/lib/design-settings';
 
 export default function ProductsPage() {
   const data = useBrandSite();
@@ -10,7 +11,7 @@ export default function ProductsPage() {
 
   if (!data) return null;
 
-  const { brand, products, websiteTemplate: template } = data;
+  const { brand, products, websiteTemplate: template, designSettings } = data;
   const slug = brand.slug || brand.id;
   const templateId = template?.id || 'minimal';
   const tp = template?.preview;
@@ -19,6 +20,8 @@ export default function ProductsPage() {
   const bgColor = isDark ? '#000000' : brand.secondary_color;
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const accentColor = brand.accent_color || textColor;
+
+  const dsRadius = BORDER_RADIUS_MAP[designSettings.borderRadius];
 
   const headingStyle: React.CSSProperties = {
     fontFamily: brand.font_heading,
@@ -152,7 +155,7 @@ export default function ProductsPage() {
                     className="t-product-image mb-4 overflow-hidden"
                     style={{
                       backgroundColor: isDark ? '#111111' : `${textColor}04`,
-                      borderRadius: templateId === 'playful' ? '16px' : templateId === 'classic' ? '8px' : '0',
+                      borderRadius: templateId === 'playful' ? '16px' : templateId === 'classic' ? '8px' : dsRadius,
                     }}
                   >
                     {product.image_url ? (
