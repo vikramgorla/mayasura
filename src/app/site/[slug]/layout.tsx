@@ -8,6 +8,8 @@ import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-template
 import { buildGoogleFontsUrl } from '@/lib/font-loader';
 import { type PageLayout, getDefaultLayout } from '@/lib/page-layout';
 import { useScrollAnimation } from '@/lib/use-scroll-animation';
+import { ScrollToTop } from '@/components/site/scroll-to-top';
+import { CookieConsent } from '@/components/site/cookie-consent';
 import {
   resolveDesignSettings,
   designSettingsToCSSVars,
@@ -561,6 +563,12 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
         <BrandNav brand={data.brand} template={data.websiteTemplate} designSettings={data.designSettings} />
         <main id="main-content" className="flex-1" role="main">{children}</main>
         <BrandFooter brand={data.brand} template={data.websiteTemplate} designSettings={data.designSettings} />
+        <ScrollToTop accentColor={data.brand.accent_color || '#6366F1'} />
+        <CookieConsent
+          accentColor={data.brand.accent_color || '#6366F1'}
+          bgColor={data.brand.secondary_color || '#FFFFFF'}
+          textColor={data.brand.primary_color || '#000000'}
+        />
       </div>
     </BrandSiteContext.Provider>
   );
