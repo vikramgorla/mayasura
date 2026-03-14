@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Globe, MessageSquare, Package, FileText,
   BarChart3, ArrowLeft, HeadphonesIcon, Sparkles, Menu, X,
-  Download, Moon, Sun, Settings, ShoppingBag, Newspaper
+  Download, Moon, Sun, Settings, ShoppingBag, Newspaper, Paintbrush
 } from 'lucide-react';
 import { PageLoader } from '@/components/ui/loading';
 import { Brand } from '@/lib/types';
@@ -20,6 +20,7 @@ import { UserNav } from '@/components/user-nav';
 const navItems = [
   { href: '', icon: LayoutDashboard, label: 'Overview' },
   { href: '/website', icon: Globe, label: 'Website' },
+  { href: '/design', icon: Paintbrush, label: 'Design Studio' },
   { href: '/blog', icon: Newspaper, label: 'Blog' },
   { href: '/orders', icon: ShoppingBag, label: 'Orders' },
   { href: '/chatbot', icon: MessageSquare, label: 'Chatbot' },

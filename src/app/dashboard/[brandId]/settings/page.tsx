@@ -13,7 +13,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
-import { Brand, INDUSTRY_CATEGORIES, FONT_OPTIONS, TONE_OPTIONS } from '@/lib/types';
+import { Brand, INDUSTRY_CATEGORIES, TONE_OPTIONS } from '@/lib/types';
 import { WEBSITE_TEMPLATES } from '@/lib/website-templates';
 
 // ─── General Tab ─────────────────────────────────────────────────
@@ -211,216 +211,73 @@ function GeneralTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<
 }
 
 // ─── Design Tab ──────────────────────────────────────────────────
-function DesignTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<string, unknown>) => Promise<boolean> }) {
-  const [form, setForm] = useState({
-    website_template: brand.website_template || 'minimal',
-    primary_color: brand.primary_color || '#0f172a',
-    secondary_color: brand.secondary_color || '#f8fafc',
-    accent_color: brand.accent_color || '#3b82f6',
-    font_heading: brand.font_heading || 'Inter',
-    font_body: brand.font_body || 'Inter',
-    custom_css: brand.custom_css || '',
-  });
-  const [saving, setSaving] = useState(false);
-
-  const handleSave = async () => {
-    setSaving(true);
-    await onSave(form);
-    setSaving(false);
-  };
-
-  const selectedTemplate = WEBSITE_TEMPLATES.find(t => t.id === form.website_template);
+function DesignTab({ brand }: { brand: Brand; onSave: (updates: Record<string, unknown>) => Promise<boolean> }) {
+  const params = useParams();
+  const brandId = params.brandId as string;
+  const selectedTemplate = WEBSITE_TEMPLATES.find(t => t.id === (brand.website_template || 'minimal'));
 
   return (
     <div className="space-y-6">
-      {/* Template Selection */}
+      {/* Design Studio CTA */}
       <Card>
-        <CardHeader>
-          <CardTitle className="text-sm">Website Template</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {WEBSITE_TEMPLATES.map(template => (
-              <button
-                key={template.id}
-                onClick={() => setForm(f => ({ ...f, website_template: template.id }))}
-                className={`relative p-4 rounded-xl border-2 text-left transition-all ${
-                  form.website_template === template.id
-                    ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/10'
-                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
-                }`}
+        <CardContent className="p-6">
+          <div className="flex items-start gap-4">
+            <div className="h-12 w-12 rounded-xl bg-violet-100 dark:bg-violet-900/30 flex items-center justify-center flex-shrink-0">
+              <Palette className="h-6 w-6 text-violet-600 dark:text-violet-400" />
+            </div>
+            <div className="flex-1">
+              <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">Design Studio</h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+                Open the full Design Studio for a premium editing experience with live preview, 
+                10 color palettes, 23+ fonts, button styles, and more.
+              </p>
+              <a
+                href={`/dashboard/${brandId}/design`}
+                className="inline-flex items-center gap-2 px-4 py-2 rounded-lg bg-violet-600 text-white text-sm font-medium hover:bg-violet-700 transition-colors"
               >
-                {form.website_template === template.id && (
-                  <div className="absolute top-2 right-2">
-                    <Check className="h-4 w-4 text-violet-600" />
-                  </div>
-                )}
-                {/* Mini template preview */}
-                <div
-                  className="h-20 rounded-lg mb-3 flex flex-col items-center justify-center gap-1 overflow-hidden"
-                  style={{
-                    backgroundColor: template.colors.light.background,
-                    border: `1px solid ${template.colors.light.border}`,
-                  }}
-                >
-                  <div
-                    className="w-3/4 h-2 rounded"
-                    style={{ backgroundColor: template.colors.light.text }}
-                  />
-                  <div
-                    className="w-1/2 h-1.5 rounded"
-                    style={{ backgroundColor: template.colors.light.muted }}
-                  />
-                  <div
-                    className="w-16 h-4 rounded mt-1"
-                    style={{
-                      backgroundColor: template.colors.light.accent,
-                      borderRadius: template.preview.borderRadius,
-                    }}
-                  />
-                </div>
-                <p className="font-medium text-sm text-zinc-900 dark:text-white">{template.name}</p>
-                <p className="text-xs text-zinc-400 mt-0.5">{template.description}</p>
-              </button>
-            ))}
-          </div>
-          {selectedTemplate && (
-            <p className="text-xs text-zinc-400 mt-3">
-              Best for: {selectedTemplate.bestFor.join(', ')}
-            </p>
-          )}
-        </CardContent>
-      </Card>
-
-      {/* Colors */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm">Colors</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-            {([
-              { key: 'primary_color', label: 'Primary' },
-              { key: 'secondary_color', label: 'Secondary' },
-              { key: 'accent_color', label: 'Accent' },
-            ] as const).map(({ key, label }) => (
-              <div key={key}>
-                <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">{label}</label>
-                <div className="flex items-center gap-2">
-                  <div className="relative">
-                    <input
-                      type="color"
-                      value={form[key]}
-                      onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                      className="h-10 w-10 rounded-lg cursor-pointer border border-zinc-200 dark:border-zinc-700"
-                    />
-                  </div>
-                  <input
-                    type="text"
-                    value={form[key]}
-                    onChange={e => setForm(f => ({ ...f, [key]: e.target.value }))}
-                    className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-mono outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-                  />
-                </div>
-              </div>
-            ))}
-          </div>
-          {/* Color preview */}
-          <div className="mt-4 p-4 rounded-xl border border-zinc-200 dark:border-zinc-700">
-            <p className="text-xs text-zinc-400 mb-2">Preview</p>
-            <div className="flex items-center gap-3">
-              <div className="h-12 w-12 rounded-lg" style={{ backgroundColor: form.primary_color }} />
-              <div className="h-12 w-12 rounded-lg border border-zinc-200 dark:border-zinc-600" style={{ backgroundColor: form.secondary_color }} />
-              <div className="h-12 w-12 rounded-lg" style={{ backgroundColor: form.accent_color }} />
-              <div className="ml-4 flex-1">
-                <div className="h-3 w-24 rounded" style={{ backgroundColor: form.primary_color }} />
-                <div className="h-2 w-16 rounded mt-1.5" style={{ backgroundColor: form.accent_color, opacity: 0.6 }} />
-                <div
-                  className="inline-block px-3 py-1 rounded text-white text-xs mt-2"
-                  style={{ backgroundColor: form.accent_color }}
-                >
-                  Button
-                </div>
-              </div>
+                <Palette className="h-4 w-4" />
+                Open Design Studio
+                <ExternalLink className="h-3.5 w-3.5" />
+              </a>
             </div>
           </div>
         </CardContent>
       </Card>
 
-      {/* Fonts */}
+      {/* Quick summary of current design */}
       <Card>
         <CardHeader>
-          <CardTitle className="text-sm">Typography</CardTitle>
+          <CardTitle className="text-sm">Current Design</CardTitle>
         </CardHeader>
-        <CardContent>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <div>
-              <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Heading Font</label>
-              <select
-                value={form.font_heading}
-                onChange={e => setForm(f => ({ ...f, font_heading: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-              >
-                {FONT_OPTIONS.map(font => (
-                  <option key={font} value={font}>{font}</option>
-                ))}
-                {/* Add template-specific fonts */}
-                {selectedTemplate && !FONT_OPTIONS.includes(selectedTemplate.fonts.heading as typeof FONT_OPTIONS[number]) && (
-                  <option value={selectedTemplate.fonts.heading}>{selectedTemplate.fonts.heading} (template)</option>
-                )}
-              </select>
-            </div>
-            <div>
-              <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Body Font</label>
-              <select
-                value={form.font_body}
-                onChange={e => setForm(f => ({ ...f, font_body: e.target.value }))}
-                className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-              >
-                {FONT_OPTIONS.map(font => (
-                  <option key={font} value={font}>{font}</option>
-                ))}
-                {selectedTemplate && !FONT_OPTIONS.includes(selectedTemplate.fonts.body as typeof FONT_OPTIONS[number]) && (
-                  <option value={selectedTemplate.fonts.body}>{selectedTemplate.fonts.body} (template)</option>
-                )}
-              </select>
+        <CardContent className="space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-zinc-400 w-20">Template</span>
+            <span className="text-sm font-medium text-zinc-900 dark:text-white">
+              {selectedTemplate?.name || 'Minimal'}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-zinc-400 w-20">Colors</span>
+            <div className="flex gap-1.5">
+              <div className="h-6 w-6 rounded border border-zinc-200 dark:border-zinc-700" style={{ backgroundColor: brand.primary_color }} />
+              <div className="h-6 w-6 rounded border border-zinc-200 dark:border-zinc-700" style={{ backgroundColor: brand.secondary_color }} />
+              <div className="h-6 w-6 rounded border border-zinc-200 dark:border-zinc-700" style={{ backgroundColor: brand.accent_color }} />
             </div>
           </div>
-          <div className="mt-3 p-4 rounded-xl border border-zinc-200 dark:border-zinc-700">
-            <p className="text-xs text-zinc-400 mb-2">Typography Preview</p>
-            <h3 className="text-xl font-bold text-zinc-900 dark:text-white" style={{ fontFamily: form.font_heading }}>
-              {form.font_heading} Heading
-            </h3>
-            <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1" style={{ fontFamily: form.font_body }}>
-              Body text using {form.font_body}. The quick brown fox jumps over the lazy dog.
-            </p>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-zinc-400 w-20">Heading</span>
+            <span className="text-sm text-zinc-900 dark:text-white" style={{ fontFamily: brand.font_heading }}>
+              {brand.font_heading}
+            </span>
+          </div>
+          <div className="flex items-center gap-3">
+            <span className="text-xs text-zinc-400 w-20">Body</span>
+            <span className="text-sm text-zinc-900 dark:text-white" style={{ fontFamily: brand.font_body }}>
+              {brand.font_body}
+            </span>
           </div>
         </CardContent>
       </Card>
-
-      {/* Custom CSS */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-sm">Custom CSS</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <p className="text-xs text-zinc-400 mb-2">Inject custom CSS into your public-facing pages</p>
-          <textarea
-            value={form.custom_css}
-            onChange={e => setForm(f => ({ ...f, custom_css: e.target.value }))}
-            rows={6}
-            className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-900 text-green-400 text-xs font-mono outline-none resize-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
-            placeholder={`/* Your custom CSS here */\n.hero-section {\n  padding: 4rem 0;\n}`}
-          />
-        </CardContent>
-      </Card>
-
-      <div className="flex justify-end">
-        <Button onClick={handleSave} disabled={saving}>
-          {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
-          Save Design
-        </Button>
-      </div>
     </div>
   );
 }
