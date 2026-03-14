@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Brand } from '@/lib/types';
 import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
+import { buildGoogleFontsUrl } from '@/lib/font-loader';
 
 interface BrandSiteData {
   brand: Brand;
@@ -301,6 +302,21 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
       })
       .catch(() => setError(true));
   }, [slug]);
+
+  // Load Google Fonts for the brand's heading + body fonts
+  useEffect(() => {
+    if (!data) return;
+    const fonts = [data.brand.font_heading, data.brand.font_body].filter(Boolean) as string[];
+    if (fonts.length === 0) return;
+    const url = buildGoogleFontsUrl(fonts);
+    const existing = document.querySelector(`link[href="${url}"]`);
+    if (!existing) {
+      const link = document.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = url;
+      document.head.appendChild(link);
+    }
+  }, [data]);
 
   useEffect(() => {
     if (!data) return;
