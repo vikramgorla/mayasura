@@ -33,17 +33,17 @@ const icons: Record<ToastType, typeof CheckCircle> = {
 };
 
 const styles: Record<ToastType, string> = {
-  success: 'bg-emerald-50 border-emerald-200 text-emerald-900',
-  error: 'bg-red-50 border-red-200 text-red-900',
-  info: 'bg-blue-50 border-blue-200 text-blue-900',
-  warning: 'bg-amber-50 border-amber-200 text-amber-900',
+  success: 'bg-white/90 dark:bg-slate-900/90 border-emerald-200 dark:border-emerald-800/50 text-emerald-900 dark:text-emerald-100',
+  error: 'bg-white/90 dark:bg-slate-900/90 border-red-200 dark:border-red-800/50 text-red-900 dark:text-red-100',
+  info: 'bg-white/90 dark:bg-slate-900/90 border-indigo-200 dark:border-indigo-800/50 text-indigo-900 dark:text-indigo-100',
+  warning: 'bg-white/90 dark:bg-slate-900/90 border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-100',
 };
 
 const iconStyles: Record<ToastType, string> = {
-  success: 'text-emerald-600',
-  error: 'text-red-600',
-  info: 'text-blue-600',
-  warning: 'text-amber-600',
+  success: 'text-emerald-500',
+  error: 'text-red-500',
+  info: 'text-indigo-500',
+  warning: 'text-amber-500',
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -81,10 +81,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 layout
                 initial={{ opacity: 0, y: 20, scale: 0.95 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                exit={{ opacity: 0, x: 20, scale: 0.95 }}
                 transition={{ duration: 0.2, ease: 'easeOut' }}
                 className={cn(
-                  'pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-lg backdrop-blur-sm',
+                  'pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-xl backdrop-blur-md',
                   styles[t.type]
                 )}
               >
@@ -92,12 +92,12 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold">{t.title}</p>
                   {t.description && (
-                    <p className="text-xs mt-0.5 opacity-80">{t.description}</p>
+                    <p className="text-xs mt-0.5 opacity-70">{t.description}</p>
                   )}
                 </div>
                 <button
                   onClick={() => removeToast(t.id)}
-                  className="flex-shrink-0 rounded-md p-1 opacity-60 hover:opacity-100 transition-opacity"
+                  className="flex-shrink-0 rounded-md p-1 opacity-40 hover:opacity-100 transition-opacity"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>
