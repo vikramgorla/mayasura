@@ -251,8 +251,13 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
   );
 }
 
-function BrandFooter({ brand }: { brand: Brand }) {
+function BrandFooter({ brand, template }: { brand: Brand; template?: WebsiteTemplate }) {
   const slug = brand.slug || brand.id;
+  const templateId = template?.id || 'minimal';
+  const isDark = templateId === 'bold';
+  const textColor = isDark ? '#FFFFFF' : brand.primary_color;
+  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const accentColor = brand.accent_color || textColor;
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
 
@@ -272,33 +277,44 @@ function BrandFooter({ brand }: { brand: Brand }) {
     }
   };
 
+  const inputBorderRadius = templateId === 'playful' ? '12px' : templateId === 'classic' ? '8px' : '0';
+  const btnBorderRadius = templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : '0';
+
   return (
     <footer
       className="border-t"
       style={{
-        backgroundColor: brand.secondary_color,
-        borderColor: `${brand.primary_color}08`,
-        color: `${brand.primary_color}66`,
+        backgroundColor: bgColor,
+        borderColor: `${textColor}06`,
+        borderTopWidth: templateId === 'bold' ? '2px' : '1px',
+        color: `${textColor}55`,
       }}
     >
-      <div className="max-w-6xl mx-auto px-5 sm:px-8 py-16">
+      <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8 py-16`}>
         <div className="grid grid-cols-1 md:grid-cols-12 gap-12">
           {/* Brand info */}
           <div className="md:col-span-5">
             <h3
-              className="text-lg font-semibold mb-3"
-              style={{ color: brand.primary_color, fontFamily: brand.font_heading }}
+              className="text-lg mb-3"
+              style={{
+                color: textColor,
+                fontFamily: brand.font_heading,
+                fontWeight: templateId === 'bold' ? 700 : templateId === 'minimal' ? 400 : 600,
+                textTransform: templateId === 'bold' ? 'uppercase' : undefined,
+                letterSpacing: templateId === 'bold' ? '0.06em' : undefined,
+                fontSize: templateId === 'bold' ? '0.875rem' : undefined,
+              }}
             >
               {brand.name}
             </h3>
-            <p className="text-sm leading-relaxed max-w-sm mb-6">
+            <p className="text-sm leading-relaxed max-w-sm mb-6" style={{ color: `${textColor}45` }}>
               {brand.description || brand.tagline || ''}
             </p>
 
             {/* Newsletter */}
             {subscribed ? (
-              <p className="text-sm font-medium" style={{ color: brand.accent_color }}>
-                ✓ Subscribed. Thank you.
+              <p className="text-sm font-medium" style={{ color: accentColor }}>
+                {templateId === 'playful' ? '✨ Subscribed! Thank you.' : '✓ Subscribed. Thank you.'}
               </p>
             ) : (
               <form onSubmit={handleNewsletter} className="flex gap-2 max-w-sm">
@@ -309,18 +325,28 @@ function BrandFooter({ brand }: { brand: Brand }) {
                   onChange={(e) => setEmail(e.target.value)}
                   className="flex-1 px-4 py-2.5 text-sm border outline-none transition-colors"
                   style={{
-                    borderColor: `${brand.primary_color}15`,
-                    color: brand.primary_color,
+                    borderColor: `${textColor}12`,
+                    color: textColor,
                     backgroundColor: 'transparent',
+                    borderRadius: inputBorderRadius,
+                    borderWidth: templateId === 'bold' ? '2px' : '1px',
                   }}
                   required
                 />
                 <button
                   type="submit"
                   className="px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-80"
-                  style={{ backgroundColor: brand.primary_color, color: brand.secondary_color }}
+                  style={{
+                    backgroundColor: isDark ? accentColor : textColor,
+                    color: isDark ? '#FFFFFF' : bgColor,
+                    borderRadius: btnBorderRadius,
+                    fontWeight: templateId === 'bold' ? 700 : 500,
+                    letterSpacing: templateId === 'bold' ? '0.06em' : undefined,
+                    textTransform: templateId === 'bold' ? 'uppercase' : undefined,
+                    fontSize: templateId === 'bold' ? '0.6875rem' : undefined,
+                  }}
                 >
-                  Subscribe
+                  {templateId === 'bold' ? 'SUBSCRIBE' : 'Subscribe'}
                 </button>
               </form>
             )}
@@ -328,7 +354,14 @@ function BrandFooter({ brand }: { brand: Brand }) {
 
           {/* Links */}
           <div className="md:col-span-3 md:col-start-7">
-            <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: brand.primary_color }}>
+            <h4
+              className="text-xs font-semibold uppercase tracking-wider mb-4"
+              style={{
+                color: textColor,
+                fontWeight: templateId === 'bold' ? 700 : 600,
+                letterSpacing: templateId === 'bold' ? '0.12em' : '0.06em',
+              }}
+            >
               Pages
             </h4>
             <ul className="space-y-2.5">
@@ -340,7 +373,7 @@ function BrandFooter({ brand }: { brand: Brand }) {
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm hover:opacity-80 transition-opacity">
-                    {link.label}
+                    {templateId === 'bold' ? link.label.toUpperCase() : link.label}
                   </Link>
                 </li>
               ))}
@@ -348,18 +381,25 @@ function BrandFooter({ brand }: { brand: Brand }) {
           </div>
 
           <div className="md:col-span-3">
-            <h4 className="text-xs font-semibold uppercase tracking-wider mb-4" style={{ color: brand.primary_color }}>
+            <h4
+              className="text-xs font-semibold uppercase tracking-wider mb-4"
+              style={{
+                color: textColor,
+                fontWeight: templateId === 'bold' ? 700 : 600,
+                letterSpacing: templateId === 'bold' ? '0.12em' : '0.06em',
+              }}
+            >
               More
             </h4>
             <ul className="space-y-2.5">
               {[
                 { href: `/shop/${slug}`, label: 'Shop' },
-                { href: `/blog/${slug}`, label: 'Blog' },
+                { href: `/blog/${slug}`, label: templateId === 'editorial' ? 'Journal' : 'Blog' },
                 { href: `/chat/${slug}`, label: 'Chat with us' },
               ].map((link) => (
                 <li key={link.href}>
                   <Link href={link.href} className="text-sm hover:opacity-80 transition-opacity">
-                    {link.label}
+                    {templateId === 'bold' ? link.label.toUpperCase() : link.label}
                   </Link>
                 </li>
               ))}
@@ -369,12 +409,12 @@ function BrandFooter({ brand }: { brand: Brand }) {
 
         <div
           className="mt-12 pt-8 border-t flex flex-col sm:flex-row items-center justify-between gap-4 text-xs"
-          style={{ borderColor: `${brand.primary_color}08` }}
+          style={{ borderColor: `${textColor}06` }}
         >
-          <span>© {new Date().getFullYear()} {brand.name}</span>
-          <span>
+          <span style={{ color: `${textColor}35` }}>© {new Date().getFullYear()} {brand.name}</span>
+          <span style={{ color: `${textColor}30` }}>
             Powered by{' '}
-            <Link href="/" className="hover:opacity-80 transition-opacity" style={{ color: brand.primary_color }}>
+            <Link href="/" className="hover:opacity-80 transition-opacity" style={{ color: accentColor }}>
               Mayasura
             </Link>
           </span>
@@ -470,7 +510,7 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
       >
         <BrandNav brand={data.brand} template={data.websiteTemplate} />
         <main className="flex-1">{children}</main>
-        <BrandFooter brand={data.brand} />
+        <BrandFooter brand={data.brand} template={data.websiteTemplate} />
       </div>
     </BrandSiteContext.Provider>
   );
