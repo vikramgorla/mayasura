@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, createTicket, getTicketsByBrand, getTicket, updateTicket, addTicketMessage, getTicketMessages, getTicketStats } from '@/lib/db';
+import { createTicket, getTicketsByBrand, getTicket, updateTicket, addTicketMessage, getTicketMessages, getTicketStats } from '@/lib/db';
+import { requireBrandOwner, sanitizeInput } from '@/lib/api-auth';
 import { nanoid } from 'nanoid';
 
 export async function GET(
@@ -8,10 +9,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const { searchParams } = new URL(request.url);
     const status = searchParams.get('status') || undefined;
@@ -38,10 +37,8 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const body = await request.json();
 
@@ -52,10 +49,9 @@ export async function POST(
         id: msgId,
         ticket_id: body.ticketId,
         role: body.role || 'agent',
-        content: body.message,
+        content: sanitizeInput(body.message),
       });
-      
-      // Optionally update status
+
       if (body.status) {
         updateTicket(body.ticketId, { status: body.status });
       }
@@ -72,20 +68,19 @@ export async function POST(
     createTicket({
       id: ticketId,
       brand_id: id,
-      customer_name: body.customer_name,
-      customer_email: body.customer_email,
-      subject: body.subject,
-      category: body.category,
+      customer_name: sanitizeInput(body.customer_name),
+      customer_email: sanitizeInput(body.customer_email),
+      subject: sanitizeInput(body.subject),
+      category: body.category ? sanitizeInput(body.category) : undefined,
       priority: body.priority || 'medium',
     });
 
-    // Add initial message if provided
     if (body.message) {
       addTicketMessage({
         id: nanoid(12),
         ticket_id: ticketId,
         role: 'customer',
-        content: body.message,
+        content: sanitizeInput(body.message),
       });
     }
 
@@ -103,9 +98,12 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await params;
+    const { id } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const body = await request.json();
-    
+
     if (!body.ticketId) {
       return NextResponse.json({ error: 'Ticket ID required' }, { status: 400 });
     }
@@ -113,7 +111,7 @@ export async function PUT(
     const updates: Record<string, unknown> = {};
     if (body.status) updates.status = body.status;
     if (body.priority) updates.priority = body.priority;
-    if (body.category) updates.category = body.category;
+    if (body.category) updates.category = sanitizeInput(body.category);
     if (body.satisfaction_rating !== undefined) updates.satisfaction_rating = body.satisfaction_rating;
 
     updateTicket(body.ticketId, updates);

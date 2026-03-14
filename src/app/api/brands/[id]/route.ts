@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getBrand, updateBrand, deleteBrand } from '@/lib/db';
+import { requireBrandOwner, sanitizeObject } from '@/lib/api-auth';
 
 export async function GET(
   _request: NextRequest,
@@ -7,10 +8,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error, brand } = await requireBrandOwner(id);
+    if (error) return error;
     return NextResponse.json({ brand });
   } catch (error) {
     console.error('Error fetching brand:', error);
@@ -24,19 +23,19 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const body = await request.json();
-    
+
     // If channels is an array, stringify it
     if (Array.isArray(body.channels)) {
       body.channels = JSON.stringify(body.channels);
     }
 
-    updateBrand(id, body);
+    // Sanitize string inputs
+    const sanitized = sanitizeObject(body);
+    updateBrand(id, sanitized);
     const updated = getBrand(id);
     return NextResponse.json({ brand: updated });
   } catch (error) {
@@ -51,10 +50,8 @@ export async function DELETE(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     deleteBrand(id);
     return NextResponse.json({ success: true });

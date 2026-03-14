@@ -29,6 +29,7 @@ function initializeDatabase(db: Database.Database) {
       name TEXT NOT NULL,
       password_hash TEXT NOT NULL,
       avatar_url TEXT,
+      token_version INTEGER DEFAULT 0,
       created_at TEXT DEFAULT (datetime('now'))
     );
 
@@ -296,6 +297,12 @@ function runMigrations(db: Database.Database) {
     }
   }
 
+  // V3.2: Add token_version column to users for JWT revocation
+  if (!hasColumn(db, 'users', 'token_version')) {
+    console.log('[DB] Adding token_version column to users');
+    db.exec("ALTER TABLE users ADD COLUMN token_version INTEGER DEFAULT 0");
+  }
+
   // V3: Add stock_count column to products
   if (!hasColumn(db, 'products', 'stock_count')) {
     console.log('[DB] Adding stock_count column to products');
@@ -324,6 +331,19 @@ export function getUserByEmail(email: string) {
 export function getUserById(id: string) {
   const db = getDb();
   return db.prepare('SELECT * FROM users WHERE id = ?').get(id);
+}
+
+export function getTokenVersion(userId: string): number {
+  const db = getDb();
+  const row = db.prepare('SELECT token_version FROM users WHERE id = ?').get(userId) as { token_version: number } | undefined;
+  return row?.token_version ?? 0;
+}
+
+export function incrementTokenVersion(userId: string): number {
+  const db = getDb();
+  db.prepare('UPDATE users SET token_version = token_version + 1 WHERE id = ?').run(userId);
+  const row = db.prepare('SELECT token_version FROM users WHERE id = ?').get(userId) as { token_version: number } | undefined;
+  return row?.token_version ?? 0;
 }
 
 // ==================== Brand operations ====================
@@ -395,15 +415,27 @@ export function getAllBrands(userId?: string) {
   return db.prepare('SELECT * FROM brands ORDER BY created_at DESC').all();
 }
 
+// Whitelist of allowed columns for brand updates (H3: SQL injection prevention)
+const ALLOWED_BRAND_FIELDS = new Set([
+  'name', 'tagline', 'description', 'industry', 'logo_url',
+  'primary_color', 'secondary_color', 'accent_color',
+  'font_heading', 'font_body', 'brand_voice', 'channels', 'status', 'slug',
+]);
+
 export function updateBrand(id: string, updates: Record<string, unknown>) {
   const db = getDb();
-  const fields = Object.keys(updates)
-    .filter(k => updates[k] !== undefined)
+  const safeUpdates: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    if (ALLOWED_BRAND_FIELDS.has(key) && value !== undefined) {
+      safeUpdates[key] = value;
+    }
+  }
+  const fields = Object.keys(safeUpdates)
     .map(k => `${k} = @${k}`)
     .join(', ');
   if (!fields) return;
   const stmt = db.prepare(`UPDATE brands SET ${fields}, updated_at = datetime('now') WHERE id = @id`);
-  return stmt.run({ ...updates, id });
+  return stmt.run({ ...safeUpdates, id });
 }
 
 export function deleteBrand(id: string) {
@@ -445,15 +477,25 @@ export function getProductsByBrand(brandId: string) {
   return db.prepare('SELECT * FROM products WHERE brand_id = ? ORDER BY sort_order ASC, created_at DESC').all(brandId);
 }
 
+const ALLOWED_PRODUCT_FIELDS = new Set([
+  'name', 'description', 'price', 'currency', 'image_url',
+  'category', 'sort_order', 'status', 'stock_count',
+]);
+
 export function updateProduct(id: string, updates: Record<string, unknown>) {
   const db = getDb();
-  const fields = Object.keys(updates)
-    .filter(k => updates[k] !== undefined)
+  const safeUpdates: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    if (ALLOWED_PRODUCT_FIELDS.has(key) && value !== undefined) {
+      safeUpdates[key] = value;
+    }
+  }
+  const fields = Object.keys(safeUpdates)
     .map(k => `${k} = @${k}`)
     .join(', ');
   if (!fields) return;
   const stmt = db.prepare(`UPDATE products SET ${fields} WHERE id = @id`);
-  return stmt.run({ ...updates, id });
+  return stmt.run({ ...safeUpdates, id });
 }
 
 export function deleteProduct(id: string) {
@@ -572,15 +614,24 @@ export function getTicket(id: string) {
   return db.prepare('SELECT * FROM tickets WHERE id = ?').get(id);
 }
 
+const ALLOWED_TICKET_FIELDS = new Set([
+  'status', 'priority', 'category', 'satisfaction_rating',
+]);
+
 export function updateTicket(id: string, updates: Record<string, unknown>) {
   const db = getDb();
-  const fields = Object.keys(updates)
-    .filter(k => updates[k] !== undefined)
+  const safeUpdates: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    if (ALLOWED_TICKET_FIELDS.has(key) && value !== undefined) {
+      safeUpdates[key] = value;
+    }
+  }
+  const fields = Object.keys(safeUpdates)
     .map(k => `${k} = @${k}`)
     .join(', ');
   if (!fields) return;
   const stmt = db.prepare(`UPDATE tickets SET ${fields}, updated_at = datetime('now') WHERE id = @id`);
-  return stmt.run({ ...updates, id });
+  return stmt.run({ ...safeUpdates, id });
 }
 
 export function addTicketMessage(msg: {
@@ -765,14 +816,23 @@ export function createBlogPost(post: {
   });
 }
 
+const ALLOWED_BLOG_POST_FIELDS = new Set([
+  'title', 'slug', 'content', 'excerpt', 'category', 'tags', 'status', 'published_at',
+]);
+
 export function updateBlogPost(id: string, updates: Record<string, unknown>) {
   const db = getDb();
-  const fields = Object.keys(updates)
-    .filter(k => updates[k] !== undefined)
+  const safeUpdates: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    if (ALLOWED_BLOG_POST_FIELDS.has(key) && value !== undefined) {
+      safeUpdates[key] = value;
+    }
+  }
+  const fields = Object.keys(safeUpdates)
     .map(k => `${k} = @${k}`)
     .join(', ');
   if (!fields) return;
-  db.prepare(`UPDATE blog_posts SET ${fields} WHERE id = @id`).run({ ...updates, id });
+  db.prepare(`UPDATE blog_posts SET ${fields} WHERE id = @id`).run({ ...safeUpdates, id });
 }
 
 export function deleteBlogPost(id: string) {
@@ -817,14 +877,21 @@ export function getOrder(id: string) {
   return db.prepare('SELECT * FROM orders WHERE id = ?').get(id);
 }
 
+const ALLOWED_ORDER_FIELDS = new Set(['status', 'shipping_address']);
+
 export function updateOrder(id: string, updates: Record<string, unknown>) {
   const db = getDb();
-  const fields = Object.keys(updates)
-    .filter(k => updates[k] !== undefined)
+  const safeUpdates: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    if (ALLOWED_ORDER_FIELDS.has(key) && value !== undefined) {
+      safeUpdates[key] = value;
+    }
+  }
+  const fields = Object.keys(safeUpdates)
     .map(k => `${k} = @${k}`)
     .join(', ');
   if (!fields) return;
-  db.prepare(`UPDATE orders SET ${fields} WHERE id = @id`).run({ ...updates, id });
+  db.prepare(`UPDATE orders SET ${fields} WHERE id = @id`).run({ ...safeUpdates, id });
 }
 
 // ==================== Contact form operations ====================
@@ -884,14 +951,21 @@ export function createChatbotFaq(faq: { id: string; brand_id: string; question: 
   `).run({ ...faq, sort_order: faq.sort_order ?? 0 });
 }
 
+const ALLOWED_FAQ_FIELDS = new Set(['question', 'answer', 'sort_order']);
+
 export function updateChatbotFaq(id: string, updates: Record<string, unknown>) {
   const db = getDb();
-  const fields = Object.keys(updates)
-    .filter(k => updates[k] !== undefined)
+  const safeUpdates: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    if (ALLOWED_FAQ_FIELDS.has(key) && value !== undefined) {
+      safeUpdates[key] = value;
+    }
+  }
+  const fields = Object.keys(safeUpdates)
     .map(k => `${k} = @${k}`)
     .join(', ');
   if (!fields) return;
-  db.prepare(`UPDATE chatbot_faqs SET ${fields} WHERE id = @id`).run({ ...updates, id });
+  db.prepare(`UPDATE chatbot_faqs SET ${fields} WHERE id = @id`).run({ ...safeUpdates, id });
 }
 
 export function deleteChatbotFaq(id: string) {

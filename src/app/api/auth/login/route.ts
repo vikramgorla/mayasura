@@ -7,6 +7,7 @@ interface UserRow {
   email: string;
   name: string;
   password_hash: string;
+  token_version: number;
 }
 
 export async function POST(request: NextRequest) {
@@ -27,7 +28,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Invalid email or password' }, { status: 401 });
     }
 
-    const token = await createToken({ userId: user.id, email: user.email, name: user.name });
+    const token = await createToken({
+      userId: user.id,
+      email: user.email,
+      name: user.name,
+      tokenVersion: user.token_version ?? 0,
+    });
     await setSessionCookie(token);
 
     return NextResponse.json({

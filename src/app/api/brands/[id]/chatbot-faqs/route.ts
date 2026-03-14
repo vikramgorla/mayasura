@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, getChatbotFaqs, createChatbotFaq, updateChatbotFaq, deleteChatbotFaq } from '@/lib/db';
+import { getChatbotFaqs, createChatbotFaq, updateChatbotFaq, deleteChatbotFaq } from '@/lib/db';
+import { requireBrandOwner, sanitizeInput, sanitizeObject } from '@/lib/api-auth';
 import { nanoid } from 'nanoid';
 
 export async function GET(
@@ -8,10 +9,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const faqs = getChatbotFaqs(id);
     return NextResponse.json({ faqs });
@@ -27,10 +26,8 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const body = await request.json();
     if (!body.question || !body.answer) {
@@ -41,8 +38,8 @@ export async function POST(
     createChatbotFaq({
       id: faqId,
       brand_id: id,
-      question: body.question,
-      answer: body.answer,
+      question: sanitizeInput(body.question),
+      answer: sanitizeInput(body.answer),
       sort_order: body.sort_order,
     });
 
@@ -58,6 +55,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const body = await request.json();
     const { faqId, ...updates } = body;
 
@@ -65,7 +66,7 @@ export async function PUT(
       return NextResponse.json({ error: 'faqId is required' }, { status: 400 });
     }
 
-    updateChatbotFaq(faqId, updates);
+    updateChatbotFaq(faqId, sanitizeObject(updates));
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error updating FAQ:', error);
@@ -78,6 +79,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const body = await request.json();
     const { faqId } = body;
 

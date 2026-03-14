@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, getBrandSettings, setBrandSetting } from '@/lib/db';
+import { getBrandSettings, setBrandSetting } from '@/lib/db';
+import { requireBrandOwner, sanitizeInput } from '@/lib/api-auth';
 
 export async function GET(
   _request: NextRequest,
@@ -7,10 +8,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const settings = getBrandSettings(id);
     return NextResponse.json({ settings });
@@ -26,10 +25,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const body = await request.json();
     const { key, value } = body;
@@ -38,7 +35,7 @@ export async function PUT(
       return NextResponse.json({ error: 'key is required' }, { status: 400 });
     }
 
-    setBrandSetting(id, key, value || '');
+    setBrandSetting(id, sanitizeInput(key), value ? sanitizeInput(value) : '');
     const settings = getBrandSettings(id);
     return NextResponse.json({ settings });
   } catch (error) {

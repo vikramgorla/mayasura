@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, getProductsByBrand, getContentByBrand } from '@/lib/db';
+import { getProductsByBrand, getContentByBrand } from '@/lib/db';
+import { requireBrandOwner } from '@/lib/api-auth';
 
 export async function GET(
   _request: NextRequest,
@@ -7,10 +8,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error, brand } = await requireBrandOwner(id);
+    if (error) return error;
 
     const products = getProductsByBrand(id);
     const content = getContentByBrand(id);

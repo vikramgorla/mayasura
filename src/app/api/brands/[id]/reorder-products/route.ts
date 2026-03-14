@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, reorderProducts } from '@/lib/db';
+import { reorderProducts } from '@/lib/db';
+import { requireBrandOwner } from '@/lib/api-auth';
 
 export async function PUT(
   request: NextRequest,
@@ -7,10 +8,8 @@ export async function PUT(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const { items } = await request.json();
     if (!Array.isArray(items)) {

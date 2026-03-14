@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, createContent, getContentByBrand, deleteContent } from '@/lib/db';
+import { createContent, getContentByBrand, deleteContent } from '@/lib/db';
+import { requireBrandOwner, sanitizeInput } from '@/lib/api-auth';
 import { nanoid } from 'nanoid';
 
 export async function GET(
@@ -8,10 +9,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const { searchParams } = new URL(request.url);
     const type = searchParams.get('type') || undefined;
     const content = getContentByBrand(id, type);
@@ -28,10 +28,8 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const body = await request.json();
     if (!body.type) {
@@ -42,8 +40,8 @@ export async function POST(
     createContent({
       id: contentId,
       brand_id: id,
-      type: body.type,
-      title: body.title,
+      type: sanitizeInput(body.type),
+      title: body.title ? sanitizeInput(body.title) : undefined,
       body: body.body,
       metadata: body.metadata ? JSON.stringify(body.metadata) : undefined,
     });
@@ -60,7 +58,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await params;
+    const { id } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const { searchParams } = new URL(request.url);
     const contentId = searchParams.get('contentId');
     if (!contentId) {

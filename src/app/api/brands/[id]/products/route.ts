@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, createProduct, getProductsByBrand, updateProduct, deleteProduct } from '@/lib/db';
+import { createProduct, getProductsByBrand, updateProduct, deleteProduct } from '@/lib/db';
+import { requireBrandOwner, sanitizeInput, sanitizeObject } from '@/lib/api-auth';
 import { nanoid } from 'nanoid';
 
 export async function GET(
@@ -8,10 +9,9 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const products = getProductsByBrand(id);
     return NextResponse.json({ products });
   } catch (error) {
@@ -26,10 +26,8 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id);
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
 
     const body = await request.json();
     if (!body.name) {
@@ -40,12 +38,12 @@ export async function POST(
     createProduct({
       id: productId,
       brand_id: id,
-      name: body.name,
-      description: body.description,
+      name: sanitizeInput(body.name),
+      description: body.description ? sanitizeInput(body.description) : undefined,
       price: body.price,
       currency: body.currency,
       image_url: body.image_url,
-      category: body.category,
+      category: body.category ? sanitizeInput(body.category) : undefined,
     });
 
     return NextResponse.json({ product: { id: productId, ...body, brand_id: id } }, { status: 201 });
@@ -60,12 +58,16 @@ export async function PUT(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await params;
+    const { id } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const body = await request.json();
     if (!body.productId) {
       return NextResponse.json({ error: 'Product ID required' }, { status: 400 });
     }
-    updateProduct(body.productId, body);
+    const { productId, ...updates } = body;
+    updateProduct(productId, sanitizeObject(updates));
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error updating product:', error);
@@ -78,7 +80,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    await params;
+    const { id } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('productId');
     if (!productId) {

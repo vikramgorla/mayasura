@@ -1,9 +1,13 @@
 import { SignJWT, jwtVerify } from 'jose';
 import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
+import { getTokenVersion } from './db';
 
 function getSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET || 'mayasura-default-secret-change-in-production';
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is required. Set it in your deployment environment.');
+  }
   return new Uint8Array(Buffer.from(secret, 'utf-8'));
 }
 
@@ -19,8 +23,18 @@ export async function verifyPassword(password: string, hash: string): Promise<bo
   return bcrypt.compare(password, hash);
 }
 
-export async function createToken(payload: { userId: string; email: string; name: string }): Promise<string> {
-  return new SignJWT(payload)
+export async function createToken(payload: {
+  userId: string;
+  email: string;
+  name: string;
+  tokenVersion?: number;
+}): Promise<string> {
+  return new SignJWT({
+    userId: payload.userId,
+    email: payload.email,
+    name: payload.name,
+    tv: payload.tokenVersion ?? 0,
+  })
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
@@ -30,7 +44,15 @@ export async function createToken(payload: { userId: string; email: string; name
 export async function verifyToken(token: string): Promise<{ userId: string; email: string; name: string } | null> {
   try {
     const { payload } = await jwtVerify(token, JWT_SECRET);
-    return payload as unknown as { userId: string; email: string; name: string };
+    const data = payload as unknown as { userId: string; email: string; name: string; tv?: number };
+
+    // Check token version — reject revoked tokens (C4 fix)
+    const currentVersion = getTokenVersion(data.userId);
+    if (data.tv !== undefined && data.tv < currentVersion) {
+      return null; // Token has been revoked
+    }
+
+    return { userId: data.userId, email: data.email, name: data.name };
   } catch {
     return null;
   }

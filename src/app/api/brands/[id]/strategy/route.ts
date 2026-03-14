@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, getProductsByBrand, getContentByBrand } from '@/lib/db';
+import { getProductsByBrand, getContentByBrand } from '@/lib/db';
+import { requireBrandOwner } from '@/lib/api-auth';
 import Anthropic from '@anthropic-ai/sdk';
 
 const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
@@ -28,10 +29,9 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id) as BrandRow | undefined;
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error, brand: rawBrand } = await requireBrandOwner(id);
+    if (error) return error;
+    const brand = rawBrand as unknown as BrandRow;
 
     const body = await request.json();
     const { type } = body;

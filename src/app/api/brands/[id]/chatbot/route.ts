@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, getProductsByBrand, addChatMessage, getChatHistory } from '@/lib/db';
+import { getProductsByBrand, addChatMessage, getChatHistory } from '@/lib/db';
 import { chatWithBrand } from '@/lib/ai';
+import { requireBrandOwner, sanitizeInput } from '@/lib/api-auth';
 import { nanoid } from 'nanoid';
-
-interface BrandRow {
-  id: string;
-  name: string;
-  brand_voice: string | null;
-  [key: string]: unknown;
-}
 
 interface ProductRow {
   name: string;
@@ -29,10 +23,8 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id) as BrandRow | undefined;
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error, brand } = await requireBrandOwner(id);
+    if (error) return error;
 
     const body = await request.json();
     const { message, sessionId } = body;
@@ -41,6 +33,7 @@ export async function POST(
       return NextResponse.json({ error: 'Message is required' }, { status: 400 });
     }
 
+    const sanitizedMessage = sanitizeInput(message);
     const chatSessionId = sessionId || nanoid(12);
     const products = getProductsByBrand(id) as ProductRow[];
     const history = getChatHistory(id, chatSessionId) as ChatRow[];
@@ -50,14 +43,15 @@ export async function POST(
       id: nanoid(12),
       brand_id: id,
       role: 'user',
-      content: message,
+      content: sanitizedMessage,
       session_id: chatSessionId,
     });
 
     // Get AI response
+    const brandData = brand as unknown as { name: string; brand_voice: string | null };
     const response = await chatWithBrand({
-      brandName: brand.name,
-      brandVoice: brand.brand_voice || undefined,
+      brandName: brandData.name,
+      brandVoice: brandData.brand_voice || undefined,
       products: products.map(p => ({
         name: p.name,
         description: p.description || undefined,
@@ -67,7 +61,7 @@ export async function POST(
         role: h.role as 'user' | 'assistant',
         content: h.content,
       })),
-      message,
+      message: sanitizedMessage,
     });
 
     // Save assistant response

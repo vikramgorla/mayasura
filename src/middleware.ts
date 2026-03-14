@@ -4,7 +4,10 @@ import { jwtVerify } from 'jose';
 const COOKIE_NAME = 'mayasura-session';
 
 function getSecret(): Uint8Array {
-  const secret = process.env.JWT_SECRET || 'mayasura-default-secret-change-in-production';
+  const secret = process.env.JWT_SECRET;
+  if (!secret) {
+    throw new Error('JWT_SECRET environment variable is required');
+  }
   return new Uint8Array(Buffer.from(secret, 'utf-8'));
 }
 

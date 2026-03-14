@@ -1,12 +1,16 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getBlogPostById, updateBlogPost, deleteBlogPost } from '@/lib/db';
+import { requireBrandOwner, sanitizeObject } from '@/lib/api-auth';
 
 export async function GET(
   _request: NextRequest,
   { params }: { params: Promise<{ id: string; postId: string }> }
 ) {
   try {
-    const { postId } = await params;
+    const { id, postId } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const post = getBlogPostById(postId);
     if (!post) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
@@ -23,7 +27,10 @@ export async function PUT(
   { params }: { params: Promise<{ id: string; postId: string }> }
 ) {
   try {
-    const { postId } = await params;
+    const { id, postId } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const post = getBlogPostById(postId);
     if (!post) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });
@@ -41,7 +48,8 @@ export async function PUT(
       body.tags = JSON.stringify(body.tags);
     }
 
-    updateBlogPost(postId, body);
+    const sanitized = sanitizeObject(body);
+    updateBlogPost(postId, sanitized);
     const updated = getBlogPostById(postId);
     return NextResponse.json({ post: updated });
   } catch (error) {
@@ -55,7 +63,10 @@ export async function DELETE(
   { params }: { params: Promise<{ id: string; postId: string }> }
 ) {
   try {
-    const { postId } = await params;
+    const { id, postId } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
     const post = getBlogPostById(postId);
     if (!post) {
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });

@@ -1,14 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, getProductsByBrand, createContent } from '@/lib/db';
+import { getProductsByBrand, createContent } from '@/lib/db';
 import { generateContent } from '@/lib/ai';
+import { requireBrandOwner } from '@/lib/api-auth';
 import { nanoid } from 'nanoid';
-
-interface BrandRow {
-  id: string;
-  name: string;
-  brand_voice: string | null;
-  [key: string]: unknown;
-}
 
 interface ProductRow {
   name: string;
@@ -22,10 +16,8 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
-    const brand = getBrand(id) as BrandRow | undefined;
-    if (!brand) {
-      return NextResponse.json({ error: 'Brand not found' }, { status: 404 });
-    }
+    const { error, brand } = await requireBrandOwner(id);
+    if (error) return error;
 
     const body = await request.json();
     const { type, topic } = body;
@@ -34,11 +26,12 @@ export async function POST(
       return NextResponse.json({ error: 'Valid content type required (blog, social, email, about, landing)' }, { status: 400 });
     }
 
+    const brandData = brand as unknown as { name: string; brand_voice: string | null };
     const products = getProductsByBrand(id) as ProductRow[];
-    
+
     const result = await generateContent({
-      brandName: brand.name,
-      brandVoice: brand.brand_voice || undefined,
+      brandName: brandData.name,
+      brandVoice: brandData.brand_voice || undefined,
       type,
       topic,
       products: products.map(p => ({ name: p.name, description: p.description || undefined })),
