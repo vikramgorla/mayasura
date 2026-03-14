@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
+import { FloatingCTA, SocialProof, LiveDemo, ComparisonTable, ScrollCTAModal } from "@/components/landing";
 
 // ─── Animated Counter ────────────────────────────────────────────
 function AnimatedCounter({ end, suffix = '', duration = 2000 }: { end: number; suffix?: string; duration?: number }) {
@@ -85,6 +86,10 @@ const faqs = [
   { q: "Do I need technical knowledge?", a: "Not at all. The guided wizard walks you through everything step by step. If you can fill out a form, you can build a complete brand ecosystem." },
   { q: "Can I export my data?", a: "Yes. You own all your data. Export everything as JSON at any time. Since it's open source, you can also self-host and have complete control over your data." },
   { q: "What channels are supported?", a: "Website, AI Chatbot, E-Commerce, Blog, Newsletter, Contact Forms, Analytics Dashboard, and CRM. More channels including social media and push notifications are coming soon." },
+  { q: "How is this different from Shopify or Squarespace?", a: "Mayasura is AI-native — it generates your entire brand, content, and chatbot automatically. It's also open-source and free. Other platforms charge $16-39+/month, require hours of manual setup, and don't include AI content generation or chatbots." },
+  { q: "Can I migrate from another platform?", a: "Yes. Import your products, content, and blog posts from other platforms. We support CSV imports and are building integrations with Shopify, WooCommerce, and more." },
+  { q: "How does the AI chatbot work?", a: "The chatbot is trained on your brand voice, products, and content. It answers customer questions, recommends products, and provides support — all sounding like your brand, not a generic bot." },
+  { q: "Is there an API?", a: "Yes — our Pro plan includes full API access for custom integrations. You can manage products, content, analytics, and more programmatically. The API follows RESTful conventions with comprehensive documentation." },
 ];
 
 const templatePreviews = [
@@ -115,16 +120,20 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
       initial={{ opacity: 0, y: 10 }}
       whileInView={{ opacity: 1, y: 0 }}
       viewport={{ once: true }}
-      transition={{ delay: index * 0.05 }}
-      className="border-b border-zinc-200 dark:border-zinc-800"
+      transition={{ delay: index * 0.04, duration: 0.4 }}
+      className="border-b border-zinc-200 dark:border-zinc-800 group/faq"
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between py-5 text-left group min-h-[44px]"
       >
         <span className="font-medium text-[15px] text-[var(--text-primary)] group-hover:text-violet-600 transition-colors pr-4">{q}</span>
-        <motion.div animate={{ rotate: isOpen ? 180 : 0 }} transition={{ duration: 0.2 }}>
-          <ChevronDown className="h-4 w-4 text-[var(--text-tertiary)] flex-shrink-0" />
+        <motion.div
+          animate={{ rotate: isOpen ? 180 : 0 }}
+          transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+          className={`flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center transition-colors ${isOpen ? 'bg-violet-100 dark:bg-violet-900/30' : 'bg-zinc-100 dark:bg-zinc-800'}`}
+        >
+          <ChevronDown className={`h-3.5 w-3.5 transition-colors ${isOpen ? 'text-violet-600 dark:text-violet-400' : 'text-[var(--text-tertiary)]'}`} />
         </motion.div>
       </button>
       <AnimatePresence>
@@ -133,10 +142,10 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
-            transition={{ duration: 0.25, ease: 'easeInOut' }}
+            transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
             className="overflow-hidden"
           >
-            <p className="text-sm text-[var(--text-secondary)] pb-5 leading-relaxed">{a}</p>
+            <p className="text-sm text-[var(--text-secondary)] pb-5 leading-relaxed pl-0.5">{a}</p>
           </motion.div>
         )}
       </AnimatePresence>
@@ -236,6 +245,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
+      <FloatingCTA />
+      <ScrollCTAModal />
       {/* Nav */}
       <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)]/80 backdrop-blur-xl border-b border-[var(--border-primary)]">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
@@ -383,6 +394,9 @@ export default function Home() {
         </div>
       </section>
 
+      {/* ═══════════ SOCIAL PROOF NUMBERS ═══════════ */}
+      <SocialProof />
+
       {/* ═══════════ FEATURE GRID (3×2) ═══════════ */}
       <section className="py-20 sm:py-28 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
@@ -424,8 +438,11 @@ export default function Home() {
         </div>
       </section>
 
-      {/* ═══════════ INTERACTIVE TEMPLATE SHOWCASE ═══════════ */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6 bg-[var(--bg-secondary)]">
+      {/* ═══════════ LIVE DEMO — Interactive Brand Morphing ═══════════ */}
+      <LiveDemo />
+
+      {/* ═══════════ TEMPLATE SHOWCASE ═══════════ */}
+      <section className="py-20 sm:py-28 px-4 sm:px-6">
         <div className="max-w-6xl mx-auto">
           <motion.div
             initial="hidden"
@@ -541,6 +558,9 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════ COMPARISON TABLE ═══════════ */}
+      <ComparisonTable />
 
       {/* ═══════════ PRICING ═══════════ */}
       <section id="pricing" className="py-20 sm:py-28 px-4 sm:px-6">
@@ -752,7 +772,7 @@ export default function Home() {
 
       {/* ═══════════ FAQ ═══════════ */}
       <section id="faq" className="py-20 sm:py-28 px-4 sm:px-6">
-        <div className="max-w-3xl mx-auto">
+        <div className="max-w-5xl mx-auto">
           <motion.div
             initial="hidden"
             whileInView="visible"
@@ -764,13 +784,20 @@ export default function Home() {
               Frequently asked questions
             </h2>
             <p className="text-[var(--text-secondary)] max-w-md mx-auto">
-              Everything you need to know about Mayasura.
+              Everything you need to know about building your digital palace.
             </p>
           </motion.div>
-          <div className="border-t border-zinc-200 dark:border-zinc-800">
-            {faqs.map((faq, i) => (
-              <FaqItem key={faq.q} q={faq.q} a={faq.a} index={i} />
-            ))}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12">
+            <div className="border-t border-zinc-200 dark:border-zinc-800">
+              {faqs.filter((_, i) => i % 2 === 0).map((faq, i) => (
+                <FaqItem key={faq.q} q={faq.q} a={faq.a} index={i} />
+              ))}
+            </div>
+            <div className="border-t border-zinc-200 dark:border-zinc-800">
+              {faqs.filter((_, i) => i % 2 === 1).map((faq, i) => (
+                <FaqItem key={faq.q} q={faq.q} a={faq.a} index={i} />
+              ))}
+            </div>
           </div>
         </div>
       </section>

@@ -212,8 +212,6 @@ function NewsletterSection({ section, brand, template }: { section: PageSection 
                       color: textColor,
                       backgroundColor: isDark ? '#FFFFFF08' : '#FFFFFF',
                       borderRadius: templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : tp?.borderRadius || '0',
-                      // @ts-expect-error -- ring-color custom property
-                      '--tw-ring-color': `${accentColor}30`,
                     }}
                     required
                   />

@@ -13,18 +13,20 @@ import {
 } from '@/lib/design-settings';
 
 // ─── Template-specific animation variants ────────────────────────
-const heroAnimations = {
+import type { Variants } from 'framer-motion';
+
+const heroAnimations: Record<string, { container: Variants; item: Variants }> = {
   minimal: {
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } } },
-    item: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.8, ease: 'easeOut' } } },
+    item: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.8 } } },
   },
   bold: {
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.05 } } },
-    item: { hidden: { opacity: 0, y: 60 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.33, 1, 0.68, 1] } } },
+    item: { hidden: { opacity: 0, y: 60 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.33, 1, 0.68, 1] as const } } },
   },
   editorial: {
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } } },
-    item: { hidden: { opacity: 0, x: -20 }, show: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } } },
+    item: { hidden: { opacity: 0, x: -20 }, show: { opacity: 1, x: 0, transition: { duration: 0.6 } } },
   },
   playful: {
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } } },
@@ -32,27 +34,22 @@ const heroAnimations = {
   },
   classic: {
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.15 } } },
-    item: { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: 'easeOut' } } },
+    item: { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.7 } } },
   },
 };
 
-const scrollReveal = {
-  hidden: { opacity: 0, y: 30 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
-};
-
-const scrollStagger = {
+const scrollStagger: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
 };
 
-const scrollItem = {
+const scrollItem: Variants = {
   hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
 };
 
 function getHeroAnim(templateId: string) {
-  if (templateId in heroAnimations) return heroAnimations[templateId as keyof typeof heroAnimations];
+  if (templateId in heroAnimations) return heroAnimations[templateId];
   return heroAnimations.minimal;
 }
 
