@@ -32,8 +32,8 @@ export default function StepChannels({ data, updateData, onNext, onBack }: Props
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">Choose Your Channels</h2>
-        <p className="text-slate-500">Select which digital channels to activate for your brand.</p>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-slate-900 dark:text-white">Choose Your Channels</h2>
+        <p className="text-slate-500 dark:text-slate-400">Select which digital channels to activate for your brand.</p>
       </div>
 
       <div className="space-y-3">
@@ -47,25 +47,25 @@ export default function StepChannels({ data, updateData, onNext, onBack }: Props
               onClick={() => toggleChannel(channel.id)}
               className={`w-full flex items-center gap-4 p-5 rounded-xl border-2 transition-all cursor-pointer ${
                 isSelected
-                  ? 'border-slate-900 bg-slate-50 shadow-sm'
-                  : 'border-slate-200 bg-white hover:border-slate-300'
+                  ? 'border-indigo-500 dark:border-indigo-400 bg-indigo-50 dark:bg-indigo-950/30 shadow-sm shadow-indigo-500/10'
+                  : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 hover:border-slate-300 dark:hover:border-slate-600'
               }`}
             >
               <div className={`h-11 w-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                isSelected ? 'bg-slate-900 text-white' : 'bg-slate-100 text-slate-500'
+                isSelected ? 'bg-indigo-600 dark:bg-indigo-500 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400'
               }`}>
                 <Icon className="h-5 w-5" />
               </div>
               <div className="text-left flex-1">
-                <p className={`font-medium ${isSelected ? 'text-slate-900' : 'text-slate-700'}`}>
+                <p className={`font-medium ${isSelected ? 'text-slate-900 dark:text-white' : 'text-slate-700 dark:text-slate-300'}`}>
                   {channel.name}
                 </p>
-                <p className="text-sm text-slate-500">{channel.description}</p>
+                <p className="text-sm text-slate-500 dark:text-slate-400">{channel.description}</p>
               </div>
               <div className={`h-6 w-6 rounded-full border-2 flex items-center justify-center flex-shrink-0 transition-all ${
                 isSelected
-                  ? 'bg-slate-900 border-slate-900 text-white'
-                  : 'border-slate-300'
+                  ? 'bg-indigo-600 dark:bg-indigo-500 border-indigo-600 dark:border-indigo-500 text-white'
+                  : 'border-slate-300 dark:border-slate-600'
               }`}>
                 {isSelected && <Check className="h-3.5 w-3.5" />}
               </div>
@@ -75,7 +75,7 @@ export default function StepChannels({ data, updateData, onNext, onBack }: Props
       </div>
 
       <div className="mt-4 text-center">
-        <p className="text-sm text-slate-400">
+        <p className="text-sm text-slate-400 dark:text-slate-500">
           {data.channels.length} channel{data.channels.length !== 1 ? 's' : ''} selected
         </p>
       </div>

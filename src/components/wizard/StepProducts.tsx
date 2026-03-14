@@ -65,14 +65,14 @@ export default function StepProducts({ data, updateData, onNext, onBack }: Props
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
-        <h2 className="text-2xl font-bold mb-2">Products & Services</h2>
-        <p className="text-slate-500">Add what your brand offers. AI can help write compelling descriptions.</p>
+        <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-slate-900 dark:text-white">Products & Services</h2>
+        <p className="text-slate-500 dark:text-slate-400">Add what your brand offers. AI can help write compelling descriptions.</p>
       </div>
 
       <div className="space-y-6">
         {data.products.length === 0 && (
-          <div className="border-2 border-dashed border-slate-200 rounded-xl p-8 text-center">
-            <p className="text-slate-500 mb-4">No products yet. Add your first product or service.</p>
+          <div className="border-2 border-dashed border-slate-200 dark:border-slate-700 rounded-xl p-8 text-center">
+            <p className="text-slate-500 dark:text-slate-400 mb-4">No products yet. Add your first product or service.</p>
             <Button onClick={addProduct} variant="outline" size="sm">
               <Plus className="h-4 w-4" />
               Add Product
@@ -81,17 +81,17 @@ export default function StepProducts({ data, updateData, onNext, onBack }: Props
         )}
 
         {data.products.map((product, i) => (
-          <div key={i} className="bg-white border border-slate-200 rounded-xl p-6 animate-scale-in">
+          <div key={i} className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-6 animate-scale-in">
             <div className="flex items-center justify-between mb-4">
-              <span className="text-sm font-medium text-slate-500">Product {i + 1}</span>
-              <Button variant="ghost" size="sm" onClick={() => removeProduct(i)} className="text-red-500 hover:text-red-700 hover:bg-red-50">
+              <span className="text-sm font-medium text-slate-500 dark:text-slate-400">Product {i + 1}</span>
+              <Button variant="ghost" size="sm" onClick={() => removeProduct(i)} className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30">
                 <Trash2 className="h-4 w-4" />
               </Button>
             </div>
 
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-xs text-slate-500 mb-1">Name</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Name</label>
                 <Input
                   value={product.name}
                   onChange={(e) => updateProduct(i, { name: e.target.value })}
@@ -100,7 +100,7 @@ export default function StepProducts({ data, updateData, onNext, onBack }: Props
               </div>
               <div className="flex gap-2">
                 <div className="flex-1">
-                  <label className="block text-xs text-slate-500 mb-1">Price</label>
+                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Price</label>
                   <Input
                     type="number"
                     value={product.price || ''}
@@ -109,7 +109,7 @@ export default function StepProducts({ data, updateData, onNext, onBack }: Props
                   />
                 </div>
                 <div className="w-20">
-                  <label className="block text-xs text-slate-500 mb-1">Currency</label>
+                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Currency</label>
                   <Input
                     value={product.currency || 'USD'}
                     onChange={(e) => updateProduct(i, { currency: e.target.value })}
@@ -120,7 +120,7 @@ export default function StepProducts({ data, updateData, onNext, onBack }: Props
             </div>
 
             <div className="mb-4">
-              <label className="block text-xs text-slate-500 mb-1">Category</label>
+              <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Category</label>
               <Input
                 value={product.category || ''}
                 onChange={(e) => updateProduct(i, { category: e.target.value })}
@@ -130,13 +130,13 @@ export default function StepProducts({ data, updateData, onNext, onBack }: Props
 
             <div>
               <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs text-slate-500">Description</label>
+                <label className="block text-xs text-slate-500 dark:text-slate-400">Description</label>
                 <Button
                   variant="ghost"
                   size="sm"
                   onClick={() => generateDescription(i)}
                   disabled={!product.name || loading === i}
-                  className="text-blue-600 hover:text-blue-700 text-xs"
+                  className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 text-xs"
                 >
                   {loading === i ? <Spinner className="h-3" /> : <><Sparkles className="h-3 w-3" /> Generate</>}
                 </Button>
