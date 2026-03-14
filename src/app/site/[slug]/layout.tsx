@@ -7,6 +7,15 @@ import { Brand } from '@/lib/types';
 import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
 import { buildGoogleFontsUrl } from '@/lib/font-loader';
 import { type PageLayout, getDefaultLayout } from '@/lib/page-layout';
+import {
+  resolveDesignSettings,
+  designSettingsToCSSVars,
+  getPrimaryButtonStyle,
+  getSecondaryButtonStyle,
+  SPACING_MAP,
+  BORDER_RADIUS_MAP,
+  type ResolvedDesignSettings,
+} from '@/lib/design-settings';
 
 interface BrandSiteData {
   brand: Brand;
@@ -30,6 +39,7 @@ interface BrandSiteData {
   settings?: Record<string, string>;
   websiteTemplate?: WebsiteTemplate;
   pageLayout?: PageLayout;
+  designSettings: ResolvedDesignSettings;
 }
 
 const BrandSiteContext = createContext<BrandSiteData | null>(null);
@@ -87,14 +97,14 @@ export function useBrandSite() {
   return useContext(BrandSiteContext);
 }
 
-function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplate }) {
+function BrandNav({ brand, template, designSettings }: { brand: Brand; template?: WebsiteTemplate; designSettings: ResolvedDesignSettings }) {
   const slug = brand.slug || brand.id;
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
-  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
 
   useEffect(() => {
@@ -160,6 +170,13 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
     if (templateId === 'bold') return { fontWeight: 700, fontSize: '0.875rem', letterSpacing: '0.1em', textTransform: 'uppercase' as const };
     if (templateId === 'classic') return { fontWeight: 600, fontSize: '1.125rem', letterSpacing: '0' };
     if (templateId === 'playful') return { fontWeight: 700, fontSize: '1.125rem', letterSpacing: '-0.01em' };
+    if (templateId === 'startup') return { fontWeight: 600, fontSize: '1.125rem', letterSpacing: '-0.02em' };
+    if (templateId === 'portfolio') return { fontWeight: 400, fontSize: '1rem', letterSpacing: '-0.01em' };
+    if (templateId === 'magazine') return { fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.02em' };
+    if (templateId === 'boutique') return { fontWeight: 500, fontSize: '0.875rem', letterSpacing: '0.12em', textTransform: 'uppercase' as const };
+    if (templateId === 'tech') return { fontWeight: 700, fontSize: '0.9375rem', letterSpacing: '-0.02em', fontFamily: 'JetBrains Mono, monospace' };
+    if (templateId === 'wellness') return { fontWeight: 300, fontSize: '1.125rem', letterSpacing: '0.02em' };
+    if (templateId === 'restaurant') return { fontWeight: 700, fontSize: '1.25rem', letterSpacing: '-0.01em' };
     return {};
   })();
 
@@ -215,6 +232,8 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
             onClick={() => setMenuOpen(!menuOpen)}
             className="md:hidden p-2 -mr-2"
             style={{ color: textColor }}
+            aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+            aria-expanded={menuOpen}
           >
             <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={templateId === 'bold' ? 2 : 1.5}>
               {menuOpen ? (
@@ -253,12 +272,12 @@ function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplat
   );
 }
 
-function BrandFooter({ brand, template }: { brand: Brand; template?: WebsiteTemplate }) {
+function BrandFooter({ brand, template, designSettings }: { brand: Brand; template?: WebsiteTemplate; designSettings: ResolvedDesignSettings }) {
   const slug = brand.slug || brand.id;
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
-  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);
@@ -279,8 +298,9 @@ function BrandFooter({ brand, template }: { brand: Brand; template?: WebsiteTemp
     }
   };
 
-  const inputBorderRadius = templateId === 'playful' ? '12px' : templateId === 'classic' ? '8px' : '0';
-  const btnBorderRadius = templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : '0';
+  const dsRadius = BORDER_RADIUS_MAP[designSettings.borderRadius];
+  const inputBorderRadius = templateId === 'playful' ? '12px' : templateId === 'classic' ? '8px' : dsRadius;
+  const btnBorderRadius = templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : dsRadius;
 
   return (
     <footer
@@ -319,8 +339,10 @@ function BrandFooter({ brand, template }: { brand: Brand; template?: WebsiteTemp
                 {templateId === 'playful' ? '✨ Subscribed! Thank you.' : '✓ Subscribed. Thank you.'}
               </p>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex gap-2 max-w-sm">
+              <form onSubmit={handleNewsletter} className="flex gap-2 max-w-sm" aria-label="Newsletter signup">
+                <label htmlFor="footer-newsletter-email" className="sr-only">Email address</label>
                 <input
+                  id="footer-newsletter-email"
                   type="email"
                   placeholder="Email address"
                   value={email}
@@ -449,7 +471,8 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
             pageLayout = JSON.parse(d.settings.page_layout);
           } catch { /* ignore */ }
         }
-        setData({ ...d, websiteTemplate, pageLayout });
+        const ds = resolveDesignSettings(d.settings, d.brand.primary_color || '#0f172a');
+        setData({ ...d, websiteTemplate, pageLayout, designSettings: ds });
       })
       .catch(() => setError(true));
   }, [slug]);
@@ -516,11 +539,23 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
           backgroundColor: data.brand.secondary_color || '#fafafa',
           color: data.brand.primary_color || '#0f172a',
           fontFamily: data.brand.font_body || 'Inter',
+          ...designSettingsToCSSVars(
+            data.designSettings,
+            data.brand.primary_color || '#0f172a',
+            data.brand.secondary_color || '#fafafa',
+            data.brand.accent_color || '#3b82f6',
+          ) as React.CSSProperties,
         }}
       >
-        <BrandNav brand={data.brand} template={data.websiteTemplate} />
-        <main className="flex-1">{children}</main>
-        <BrandFooter brand={data.brand} template={data.websiteTemplate} />
+        <a
+          href="#main-content"
+          className="sr-only focus:not-sr-only focus:absolute focus:z-[100] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-white focus:text-black focus:rounded focus:shadow-lg focus:text-sm focus:font-medium"
+        >
+          Skip to content
+        </a>
+        <BrandNav brand={data.brand} template={data.websiteTemplate} designSettings={data.designSettings} />
+        <main id="main-content" className="flex-1" role="main">{children}</main>
+        <BrandFooter brand={data.brand} template={data.websiteTemplate} designSettings={data.designSettings} />
       </div>
     </BrandSiteContext.Provider>
   );
