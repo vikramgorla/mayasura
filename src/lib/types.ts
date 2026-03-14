@@ -41,6 +41,7 @@ export interface BrandData {
 export interface Brand {
   id: string;
   name: string;
+  slug: string | null;
   tagline: string | null;
   description: string | null;
   industry: string | null;
@@ -95,6 +96,73 @@ export interface ActivityItem {
   type: string;
   description: string;
   metadata: string;
+  created_at: string;
+}
+
+// V3 types
+export interface Order {
+  id: string;
+  brand_id: string;
+  customer_email: string;
+  customer_name: string;
+  shipping_address: string | null;
+  items: string;
+  total: number;
+  currency: string;
+  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
+  stripe_session_id: string | null;
+  created_at: string;
+}
+
+export interface BlogPost {
+  id: string;
+  brand_id: string;
+  title: string;
+  slug: string;
+  content: string | null;
+  excerpt: string | null;
+  category: string | null;
+  tags: string;
+  status: 'draft' | 'published';
+  published_at: string | null;
+  created_at: string;
+}
+
+export interface BrandPage {
+  id: string;
+  brand_id: string;
+  slug: string;
+  title: string;
+  content: string | null;
+  is_published: number;
+  sort_order: number;
+  created_at: string;
+}
+
+export interface ContactSubmission {
+  id: string;
+  brand_id: string;
+  name: string;
+  email: string;
+  message: string;
+  status: string;
+  created_at: string;
+}
+
+export interface ChatbotFaq {
+  id: string;
+  brand_id: string;
+  question: string;
+  answer: string;
+  sort_order: number;
+}
+
+export interface ConsumerUser {
+  id: string;
+  brand_id: string;
+  email: string;
+  name: string;
+  password_hash: string;
   created_at: string;
 }
 

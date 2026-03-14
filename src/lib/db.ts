@@ -120,6 +120,115 @@ function initializeDatabase(db: Database.Database) {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
+    -- V3: Orders
+    CREATE TABLE IF NOT EXISTS orders (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      customer_email TEXT NOT NULL,
+      customer_name TEXT NOT NULL,
+      shipping_address TEXT,
+      items TEXT DEFAULT '[]',
+      total REAL NOT NULL DEFAULT 0,
+      currency TEXT DEFAULT 'USD',
+      status TEXT DEFAULT 'pending',
+      stripe_session_id TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- V3: Order items
+    CREATE TABLE IF NOT EXISTS order_items (
+      id TEXT PRIMARY KEY,
+      order_id TEXT NOT NULL REFERENCES orders(id) ON DELETE CASCADE,
+      product_id TEXT,
+      product_name TEXT NOT NULL,
+      quantity INTEGER NOT NULL DEFAULT 1,
+      price REAL NOT NULL DEFAULT 0
+    );
+
+    -- V3: Contact form submissions
+    CREATE TABLE IF NOT EXISTS contact_submissions (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      name TEXT NOT NULL,
+      email TEXT NOT NULL,
+      message TEXT NOT NULL,
+      status TEXT DEFAULT 'new',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- V3: Newsletter subscribers
+    CREATE TABLE IF NOT EXISTS newsletter_subscribers (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      email TEXT NOT NULL,
+      subscribed_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- V3: Brand settings (key-value store for integrations)
+    CREATE TABLE IF NOT EXISTS brand_settings (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      key TEXT NOT NULL,
+      value TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- V3: Brand pages (CMS)
+    CREATE TABLE IF NOT EXISTS brand_pages (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      slug TEXT NOT NULL,
+      title TEXT NOT NULL,
+      content TEXT,
+      is_published INTEGER DEFAULT 1,
+      sort_order INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- V3: Blog posts
+    CREATE TABLE IF NOT EXISTS blog_posts (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      title TEXT NOT NULL,
+      slug TEXT NOT NULL,
+      content TEXT,
+      excerpt TEXT,
+      category TEXT,
+      tags TEXT DEFAULT '[]',
+      status TEXT DEFAULT 'draft',
+      published_at TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- V3: Chatbot FAQs
+    CREATE TABLE IF NOT EXISTS chatbot_faqs (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      question TEXT NOT NULL,
+      answer TEXT NOT NULL,
+      sort_order INTEGER DEFAULT 0
+    );
+
+    -- V3: Consumer users (separate from admin users)
+    CREATE TABLE IF NOT EXISTS consumer_users (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      email TEXT NOT NULL,
+      name TEXT NOT NULL,
+      password_hash TEXT NOT NULL,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
+    -- V3: Page views (simple analytics)
+    CREATE TABLE IF NOT EXISTS page_views (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      page TEXT NOT NULL,
+      referrer TEXT,
+      user_agent TEXT,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
     -- Indexes
     CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand_id);
     CREATE INDEX IF NOT EXISTS idx_content_brand ON content(brand_id);
@@ -128,6 +237,20 @@ function initializeDatabase(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_ticket_messages_ticket ON ticket_messages(ticket_id);
     CREATE INDEX IF NOT EXISTS idx_activities_brand ON activities(brand_id);
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+    CREATE INDEX IF NOT EXISTS idx_orders_brand ON orders(brand_id);
+    CREATE INDEX IF NOT EXISTS idx_order_items_order ON order_items(order_id);
+    CREATE INDEX IF NOT EXISTS idx_contact_submissions_brand ON contact_submissions(brand_id);
+    CREATE INDEX IF NOT EXISTS idx_newsletter_brand ON newsletter_subscribers(brand_id);
+    CREATE INDEX IF NOT EXISTS idx_brand_settings_brand_key ON brand_settings(brand_id, key);
+    CREATE INDEX IF NOT EXISTS idx_brand_pages_brand ON brand_pages(brand_id);
+    CREATE INDEX IF NOT EXISTS idx_blog_posts_brand ON blog_posts(brand_id);
+    CREATE INDEX IF NOT EXISTS idx_blog_posts_slug ON blog_posts(brand_id, slug);
+    CREATE INDEX IF NOT EXISTS idx_chatbot_faqs_brand ON chatbot_faqs(brand_id);
+    CREATE INDEX IF NOT EXISTS idx_consumer_users_brand ON consumer_users(brand_id);
+    CREATE INDEX IF NOT EXISTS idx_consumer_users_email ON consumer_users(brand_id, email);
+    CREATE INDEX IF NOT EXISTS idx_page_views_brand ON page_views(brand_id);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_newsletter_unique ON newsletter_subscribers(brand_id, email);
+    CREATE UNIQUE INDEX IF NOT EXISTS idx_brand_settings_unique ON brand_settings(brand_id, key);
   `);
 
   // Run migrations for existing databases
@@ -158,6 +281,25 @@ function runMigrations(db: Database.Database) {
   if (!hasColumn(db, 'products', 'sort_order')) {
     console.log('[DB] Adding sort_order column to products');
     db.exec("ALTER TABLE products ADD COLUMN sort_order INTEGER DEFAULT 0");
+  }
+
+  // V3: Add slug column to brands
+  if (!hasColumn(db, 'brands', 'slug')) {
+    console.log('[DB] Adding slug column to brands');
+    db.exec("ALTER TABLE brands ADD COLUMN slug TEXT");
+    // Generate slugs for existing brands
+    const brands = db.prepare('SELECT id, name FROM brands WHERE slug IS NULL').all() as Array<{ id: string; name: string }>;
+    const updateSlug = db.prepare('UPDATE brands SET slug = ? WHERE id = ?');
+    for (const brand of brands) {
+      const slug = brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+      updateSlug.run(slug || brand.id, brand.id);
+    }
+  }
+
+  // V3: Add stock_count column to products
+  if (!hasColumn(db, 'products', 'stock_count')) {
+    console.log('[DB] Adding stock_count column to products');
+    db.exec("ALTER TABLE products ADD COLUMN stock_count INTEGER DEFAULT -1");
   }
   
   console.log('[DB] Migrations complete');
@@ -202,6 +344,7 @@ export function createBrand(brand: {
   channels?: string;
   status?: string;
   user_id?: string;
+  slug?: string;
 }) {
   const db = getDb();
   
@@ -228,6 +371,9 @@ export function createBrand(brand: {
   // Only include columns that exist in the table
   if (colNames.has('industry')) data.industry = brand.industry || null;
   if (colNames.has('user_id')) data.user_id = brand.user_id || null;
+  if (colNames.has('slug')) {
+    data.slug = brand.slug || brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
+  }
   
   const fields = Object.keys(data);
   const placeholders = fields.map(f => `@${f}`);
@@ -494,4 +640,315 @@ export function addActivity(activity: {
 export function getActivities(brandId: string, limit = 20) {
   const db = getDb();
   return db.prepare('SELECT * FROM activities WHERE brand_id = ? ORDER BY created_at DESC LIMIT ?').all(brandId, limit);
+}
+
+// ==================== Brand slug operations ====================
+
+export function getBrandBySlug(slug: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM brands WHERE slug = ?').get(slug);
+}
+
+// ==================== Brand Settings operations ====================
+
+export function getBrandSetting(brandId: string, key: string): string | null {
+  const db = getDb();
+  const row = db.prepare('SELECT value FROM brand_settings WHERE brand_id = ? AND key = ?').get(brandId, key) as { value: string } | undefined;
+  return row?.value ?? null;
+}
+
+export function getBrandSettings(brandId: string): Record<string, string> {
+  const db = getDb();
+  const rows = db.prepare('SELECT key, value FROM brand_settings WHERE brand_id = ?').all(brandId) as Array<{ key: string; value: string }>;
+  const settings: Record<string, string> = {};
+  for (const row of rows) {
+    settings[row.key] = row.value;
+  }
+  return settings;
+}
+
+export function setBrandSetting(brandId: string, key: string, value: string) {
+  const db = getDb();
+  const id = `${brandId}_${key}`;
+  db.prepare(`
+    INSERT INTO brand_settings (id, brand_id, key, value)
+    VALUES (?, ?, ?, ?)
+    ON CONFLICT(brand_id, key) DO UPDATE SET value = excluded.value
+  `).run(id, brandId, key, value);
+}
+
+// ==================== Brand Pages operations ====================
+
+export function getBrandPages(brandId: string, publishedOnly = false) {
+  const db = getDb();
+  if (publishedOnly) {
+    return db.prepare('SELECT * FROM brand_pages WHERE brand_id = ? AND is_published = 1 ORDER BY sort_order ASC').all(brandId);
+  }
+  return db.prepare('SELECT * FROM brand_pages WHERE brand_id = ? ORDER BY sort_order ASC').all(brandId);
+}
+
+export function getBrandPage(brandId: string, slug: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM brand_pages WHERE brand_id = ? AND slug = ?').get(brandId, slug);
+}
+
+export function upsertBrandPage(page: {
+  id: string;
+  brand_id: string;
+  slug: string;
+  title: string;
+  content?: string;
+  is_published?: number;
+  sort_order?: number;
+}) {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO brand_pages (id, brand_id, slug, title, content, is_published, sort_order)
+    VALUES (@id, @brand_id, @slug, @title, @content, @is_published, @sort_order)
+    ON CONFLICT(id) DO UPDATE SET
+      title = excluded.title,
+      content = excluded.content,
+      is_published = excluded.is_published,
+      sort_order = excluded.sort_order
+  `).run({
+    ...page,
+    content: page.content || null,
+    is_published: page.is_published ?? 1,
+    sort_order: page.sort_order ?? 0,
+  });
+}
+
+// ==================== Blog Post operations ====================
+
+export function getBlogPosts(brandId: string, publishedOnly = false) {
+  const db = getDb();
+  if (publishedOnly) {
+    return db.prepare("SELECT * FROM blog_posts WHERE brand_id = ? AND status = 'published' ORDER BY published_at DESC").all(brandId);
+  }
+  return db.prepare('SELECT * FROM blog_posts WHERE brand_id = ? ORDER BY created_at DESC').all(brandId);
+}
+
+export function getBlogPost(brandId: string, slug: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM blog_posts WHERE brand_id = ? AND slug = ?').get(brandId, slug);
+}
+
+export function getBlogPostById(id: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM blog_posts WHERE id = ?').get(id);
+}
+
+export function createBlogPost(post: {
+  id: string;
+  brand_id: string;
+  title: string;
+  slug: string;
+  content?: string;
+  excerpt?: string;
+  category?: string;
+  tags?: string;
+  status?: string;
+  published_at?: string;
+}) {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO blog_posts (id, brand_id, title, slug, content, excerpt, category, tags, status, published_at)
+    VALUES (@id, @brand_id, @title, @slug, @content, @excerpt, @category, @tags, @status, @published_at)
+  `).run({
+    ...post,
+    content: post.content || null,
+    excerpt: post.excerpt || null,
+    category: post.category || null,
+    tags: post.tags || '[]',
+    status: post.status || 'draft',
+    published_at: post.published_at || null,
+  });
+}
+
+export function updateBlogPost(id: string, updates: Record<string, unknown>) {
+  const db = getDb();
+  const fields = Object.keys(updates)
+    .filter(k => updates[k] !== undefined)
+    .map(k => `${k} = @${k}`)
+    .join(', ');
+  if (!fields) return;
+  db.prepare(`UPDATE blog_posts SET ${fields} WHERE id = @id`).run({ ...updates, id });
+}
+
+export function deleteBlogPost(id: string) {
+  const db = getDb();
+  return db.prepare('DELETE FROM blog_posts WHERE id = ?').run(id);
+}
+
+// ==================== Order operations ====================
+
+export function createOrder(order: {
+  id: string;
+  brand_id: string;
+  customer_email: string;
+  customer_name: string;
+  shipping_address?: string;
+  items: string;
+  total: number;
+  currency?: string;
+  status?: string;
+  stripe_session_id?: string;
+}) {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO orders (id, brand_id, customer_email, customer_name, shipping_address, items, total, currency, status, stripe_session_id)
+    VALUES (@id, @brand_id, @customer_email, @customer_name, @shipping_address, @items, @total, @currency, @status, @stripe_session_id)
+  `).run({
+    ...order,
+    shipping_address: order.shipping_address || null,
+    currency: order.currency || 'USD',
+    status: order.status || 'pending',
+    stripe_session_id: order.stripe_session_id || null,
+  });
+}
+
+export function getOrdersByBrand(brandId: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM orders WHERE brand_id = ? ORDER BY created_at DESC').all(brandId);
+}
+
+export function getOrder(id: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM orders WHERE id = ?').get(id);
+}
+
+export function updateOrder(id: string, updates: Record<string, unknown>) {
+  const db = getDb();
+  const fields = Object.keys(updates)
+    .filter(k => updates[k] !== undefined)
+    .map(k => `${k} = @${k}`)
+    .join(', ');
+  if (!fields) return;
+  db.prepare(`UPDATE orders SET ${fields} WHERE id = @id`).run({ ...updates, id });
+}
+
+// ==================== Contact form operations ====================
+
+export function createContactSubmission(sub: {
+  id: string;
+  brand_id: string;
+  name: string;
+  email: string;
+  message: string;
+}) {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO contact_submissions (id, brand_id, name, email, message)
+    VALUES (@id, @brand_id, @name, @email, @message)
+  `).run(sub);
+}
+
+export function getContactSubmissions(brandId: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM contact_submissions WHERE brand_id = ? ORDER BY created_at DESC').all(brandId);
+}
+
+export function updateContactSubmission(id: string, status: string) {
+  const db = getDb();
+  db.prepare('UPDATE contact_submissions SET status = ? WHERE id = ?').run(status, id);
+}
+
+// ==================== Newsletter operations ====================
+
+export function addNewsletterSubscriber(brandId: string, email: string) {
+  const db = getDb();
+  const id = `${brandId}_${email}`;
+  db.prepare(`
+    INSERT OR IGNORE INTO newsletter_subscribers (id, brand_id, email)
+    VALUES (?, ?, ?)
+  `).run(id, brandId, email);
+}
+
+export function getNewsletterSubscribers(brandId: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM newsletter_subscribers WHERE brand_id = ? ORDER BY subscribed_at DESC').all(brandId);
+}
+
+// ==================== Chatbot FAQ operations ====================
+
+export function getChatbotFaqs(brandId: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM chatbot_faqs WHERE brand_id = ? ORDER BY sort_order ASC').all(brandId);
+}
+
+export function createChatbotFaq(faq: { id: string; brand_id: string; question: string; answer: string; sort_order?: number }) {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO chatbot_faqs (id, brand_id, question, answer, sort_order)
+    VALUES (@id, @brand_id, @question, @answer, @sort_order)
+  `).run({ ...faq, sort_order: faq.sort_order ?? 0 });
+}
+
+export function updateChatbotFaq(id: string, updates: Record<string, unknown>) {
+  const db = getDb();
+  const fields = Object.keys(updates)
+    .filter(k => updates[k] !== undefined)
+    .map(k => `${k} = @${k}`)
+    .join(', ');
+  if (!fields) return;
+  db.prepare(`UPDATE chatbot_faqs SET ${fields} WHERE id = @id`).run({ ...updates, id });
+}
+
+export function deleteChatbotFaq(id: string) {
+  const db = getDb();
+  return db.prepare('DELETE FROM chatbot_faqs WHERE id = ?').run(id);
+}
+
+// ==================== Page Views operations ====================
+
+export function trackPageView(view: { id: string; brand_id: string; page: string; referrer?: string; user_agent?: string }) {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO page_views (id, brand_id, page, referrer, user_agent)
+    VALUES (@id, @brand_id, @page, @referrer, @user_agent)
+  `).run({
+    ...view,
+    referrer: view.referrer || null,
+    user_agent: view.user_agent || null,
+  });
+}
+
+export function getPageViewStats(brandId: string, days = 30) {
+  const db = getDb();
+  const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+  const total = db.prepare('SELECT COUNT(*) as count FROM page_views WHERE brand_id = ? AND created_at > ?').get(brandId, since) as { count: number };
+  const byPage = db.prepare('SELECT page, COUNT(*) as count FROM page_views WHERE brand_id = ? AND created_at > ? GROUP BY page ORDER BY count DESC LIMIT 10').all(brandId, since);
+  const byDay = db.prepare("SELECT DATE(created_at) as day, COUNT(*) as count FROM page_views WHERE brand_id = ? AND created_at > ? GROUP BY DATE(created_at) ORDER BY day ASC").all(brandId, since);
+  return { total: total.count, byPage, byDay };
+}
+
+// ==================== Consumer User operations ====================
+
+export function createConsumerUser(user: {
+  id: string;
+  brand_id: string;
+  email: string;
+  name: string;
+  password_hash: string;
+}) {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO consumer_users (id, brand_id, email, name, password_hash)
+    VALUES (@id, @brand_id, @email, @name, @password_hash)
+  `).run(user);
+}
+
+export function getConsumerUserByEmail(brandId: string, email: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM consumer_users WHERE brand_id = ? AND email = ?').get(brandId, email);
+}
+
+export function getConsumerUser(id: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM consumer_users WHERE id = ?').get(id);
+}
+
+export function getOrdersByConsumer(brandId: string, email: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM orders WHERE brand_id = ? AND customer_email = ? ORDER BY created_at DESC').all(brandId, email);
 }
