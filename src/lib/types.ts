@@ -199,12 +199,12 @@ export const TONE_OPTIONS = [
 
 export interface FontOption {
   name: string;
-  category: 'sans-serif' | 'serif' | 'display';
+  category: 'sans-serif' | 'serif' | 'display' | 'monospace';
   googleFamily?: string; // override for Google Fonts URL if different from name
 }
 
 export const FONT_OPTIONS_GROUPED: FontOption[] = [
-  // Sans-serif
+  // Sans-serif (modern)
   { name: 'Inter', category: 'sans-serif' },
   { name: 'Plus Jakarta Sans', category: 'sans-serif' },
   { name: 'DM Sans', category: 'sans-serif' },
@@ -217,8 +217,10 @@ export const FONT_OPTIONS_GROUPED: FontOption[] = [
   { name: 'Lato', category: 'sans-serif' },
   { name: 'Raleway', category: 'sans-serif' },
   { name: 'Work Sans', category: 'sans-serif' },
-  { name: 'Geist', category: 'sans-serif' },
-  // Serif
+  { name: 'Rubik', category: 'sans-serif' },
+  { name: 'Figtree', category: 'sans-serif' },
+  { name: 'Albert Sans', category: 'sans-serif' },
+  // Serif (classic)
   { name: 'Playfair Display', category: 'serif' },
   { name: 'Source Serif 4', category: 'serif' },
   { name: 'Lora', category: 'serif' },
@@ -226,10 +228,20 @@ export const FONT_OPTIONS_GROUPED: FontOption[] = [
   { name: 'Crimson Pro', category: 'serif' },
   { name: 'EB Garamond', category: 'serif' },
   { name: 'Libre Baskerville', category: 'serif' },
-  // Display
+  { name: 'Cormorant Garamond', category: 'serif' },
+  { name: 'Spectral', category: 'serif' },
+  { name: 'Noto Serif', category: 'serif' },
+  // Display (bold/decorative)
   { name: 'Archivo Black', category: 'display' },
   { name: 'Bebas Neue', category: 'display' },
   { name: 'Oswald', category: 'display' },
+  { name: 'Anton', category: 'display' },
+  { name: 'Montserrat', category: 'display' },
+  { name: 'Righteous', category: 'display' },
+  // Monospace (tech/dev)
+  { name: 'JetBrains Mono', category: 'monospace' },
+  { name: 'Fira Code', category: 'monospace' },
+  { name: 'Source Code Pro', category: 'monospace' },
 ];
 
 // Flat list for backward compatibility

@@ -14,18 +14,18 @@ interface FontPickerProps {
 }
 
 const CATEGORY_LABELS: Record<string, string> = {
-  'sans-serif': 'Sans-Serif',
-  'serif': 'Serif',
-  'display': 'Display',
+  'sans-serif': 'Sans-Serif (Modern)',
+  'serif': 'Serif (Classic)',
+  'display': 'Display (Bold)',
+  'monospace': 'Monospace (Tech)',
 };
 
 // Build Google Fonts URL for all design fonts
 function getAllFontsUrl(): string {
   const fonts = FONT_OPTIONS_GROUPED
-    .filter(f => f.name !== 'Geist') // Geist isn't on Google Fonts
     .map(f => {
       const family = (f.googleFamily || f.name).replace(/\s+/g, '+');
-      return `family=${family}:wght@400;700`;
+      return `family=${family}:wght@400;600;700`;
     })
     .join('&');
   return `https://fonts.googleapis.com/css2?${fonts}&display=swap`;
@@ -65,7 +65,7 @@ export function FontPicker({ value, onChange, label, className }: FontPickerProp
     return () => document.removeEventListener('mousedown', handleClick);
   }, []);
 
-  const categories = ['sans-serif', 'serif', 'display'] as const;
+  const categories = ['sans-serif', 'serif', 'display', 'monospace'] as const;
 
   return (
     <div ref={ref} className={cn('relative', className)}>

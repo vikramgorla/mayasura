@@ -85,6 +85,42 @@ export const COLOR_PALETTES: ColorPalette[] = [
     description: 'Cool blues + white + steel',
     colors: { primary: '#1E3A5F', secondary: '#F8FAFC', accent: '#3B82F6', text: '#1E3A5F', muted: '#94A3B8', surface: '#FFFFFF', border: '#CBD5E1' },
   },
+  {
+    id: 'coral-reef',
+    name: 'Coral Reef',
+    description: 'Warm coral + turquoise + sand',
+    colors: { primary: '#B83B5E', secondary: '#FFF5F0', accent: '#0E9AA7', text: '#3D1C2F', muted: '#9A8C8C', surface: '#FFFFFF', border: '#F0D9CF' },
+  },
+  {
+    id: 'studio',
+    name: 'Studio',
+    description: 'Charcoal + warm white + sienna',
+    colors: { primary: '#2D2D2D', secondary: '#FAF8F5', accent: '#C75B2A', text: '#1A1A1A', muted: '#8C8C8C', surface: '#FFFFFF', border: '#E8E4DF' },
+  },
+  {
+    id: 'minimal-ink',
+    name: 'Minimal Ink',
+    description: 'Near-black + white + blue accent',
+    colors: { primary: '#111111', secondary: '#FFFFFF', accent: '#2563EB', text: '#111111', muted: '#6B7280', surface: '#FAFAFA', border: '#E5E7EB' },
+  },
+  {
+    id: 'candy',
+    name: 'Candy',
+    description: 'Bright pink + cyan + warm yellow',
+    colors: { primary: '#E91E8C', secondary: '#FFF8FC', accent: '#06B6D4', text: '#1F1235', muted: '#9B8BA0', surface: '#FFFFFF', border: '#F5D0E8' },
+  },
+  {
+    id: 'vintage',
+    name: 'Vintage',
+    description: 'Sepia + parchment + olive green',
+    colors: { primary: '#5C3D2E', secondary: '#F5F0E1', accent: '#6B7F3B', text: '#3C2A1E', muted: '#8B7D6B', surface: '#FFFDF7', border: '#DDD5C4' },
+  },
+  {
+    id: 'tech-dark',
+    name: 'Tech Dark',
+    description: 'Dark gray + black + electric blue',
+    colors: { primary: '#0A0A0F', secondary: '#0F0F17', accent: '#3B82F6', text: '#E2E8F0', muted: '#64748B', surface: '#1A1A2E', border: '#1E293B' },
+  },
 ];
 
 // ─── Color Swatch Input ──────────────────────────────────────────
@@ -152,19 +188,78 @@ function ColorInput({
   );
 }
 
+// ─── Mini Website Thumbnail for Palette ──────────────────────────
+function PaletteMiniSite({ colors }: { colors: ColorSystem }) {
+  const isDark = isColorDark(colors.secondary);
+  const textColor = isDark ? '#FFFFFF' : colors.text;
+  const navBg = isDark ? colors.primary : colors.text;
+  const navText = isDark ? '#FFFFFF' : colors.secondary;
+
+  return (
+    <div className="rounded overflow-hidden" style={{ backgroundColor: colors.secondary }}>
+      {/* Tiny nav */}
+      <div
+        className="flex items-center justify-between px-1.5 py-1"
+        style={{ backgroundColor: navBg }}
+      >
+        <div className="h-1 w-4 rounded-sm" style={{ backgroundColor: navText, opacity: 0.9 }} />
+        <div className="flex gap-0.5 items-center">
+          <div className="h-0.5 w-2 rounded-sm" style={{ backgroundColor: navText, opacity: 0.4 }} />
+          <div className="h-0.5 w-2 rounded-sm" style={{ backgroundColor: navText, opacity: 0.4 }} />
+          <div
+            className="h-2 w-3 rounded-sm"
+            style={{ backgroundColor: colors.accent, opacity: 0.9 }}
+          />
+        </div>
+      </div>
+      {/* Tiny hero */}
+      <div className="px-1.5 py-2 text-center">
+        <div className="h-1 w-8 mx-auto rounded-sm mb-0.5" style={{ backgroundColor: textColor, opacity: 0.8 }} />
+        <div className="h-0.5 w-6 mx-auto rounded-sm mb-1" style={{ backgroundColor: colors.muted, opacity: 0.5 }} />
+        <div className="h-2 w-5 mx-auto rounded-sm" style={{ backgroundColor: colors.accent }} />
+      </div>
+      {/* Tiny cards */}
+      <div className="px-1 pb-1 grid grid-cols-3 gap-0.5">
+        {[1, 2, 3].map(i => (
+          <div
+            key={i}
+            className="p-0.5 rounded-sm"
+            style={{ backgroundColor: colors.surface, border: `0.5px solid ${colors.border}` }}
+          >
+            <div className="h-2 rounded-sm mb-0.5" style={{ backgroundColor: `${colors.muted}15` }} />
+            <div className="h-0.5 w-3/4 rounded-sm" style={{ backgroundColor: textColor, opacity: 0.15 }} />
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// Helper: check if a color is dark
+function isColorDark(hex: string): boolean {
+  const c = hex.replace('#', '');
+  if (c.length < 6) return false;
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  const luminance = (0.299 * r + 0.587 * g + 0.114 * b) / 255;
+  return luminance < 0.5;
+}
+
 // ─── Color Palette Presets ───────────────────────────────────────
 export function ColorPalettePresets({
   activeId,
   onSelect,
+  compact,
 }: {
   activeId?: string;
   onSelect: (palette: ColorPalette) => void;
+  compact?: boolean;
 }) {
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-5 gap-2">
+    <div className={cn('grid gap-2', compact ? 'grid-cols-2 sm:grid-cols-4' : 'grid-cols-2 sm:grid-cols-4 lg:grid-cols-4')}>
       {COLOR_PALETTES.map(palette => {
         const isActive = activeId === palette.id;
-        const colors = palette.colors;
         return (
           <motion.button
             key={palette.id}
@@ -172,25 +267,23 @@ export function ColorPalettePresets({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             className={cn(
-              'relative p-2.5 rounded-xl border-2 text-left transition-all',
+              'relative p-2 rounded-xl border-2 text-left transition-all',
               isActive
                 ? 'border-violet-500 bg-violet-50 dark:bg-violet-900/10 shadow-sm'
                 : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
             )}
           >
             {isActive && (
-              <div className="absolute top-1.5 right-1.5">
+              <div className="absolute top-1.5 right-1.5 z-10">
                 <Check className="h-3.5 w-3.5 text-violet-600" />
               </div>
             )}
-            {/* Color swatch strip */}
-            <div className="flex h-5 rounded-md overflow-hidden mb-2">
-              {[colors.primary, colors.secondary, colors.accent, colors.text, colors.muted, colors.surface, colors.border].map((c, i) => (
-                <div key={i} className="flex-1" style={{ backgroundColor: c }} />
-              ))}
+            {/* Mini website thumbnail */}
+            <div className="mb-1.5">
+              <PaletteMiniSite colors={palette.colors} />
             </div>
-            <p className="text-xs font-medium text-zinc-800 dark:text-zinc-200 truncate">{palette.name}</p>
-            <p className="text-[10px] text-zinc-400 dark:text-zinc-500 truncate">{palette.description}</p>
+            <p className="text-[11px] font-medium text-zinc-800 dark:text-zinc-200 truncate">{palette.name}</p>
+            <p className="text-[9px] text-zinc-400 dark:text-zinc-500 truncate">{palette.description}</p>
           </motion.button>
         );
       })}
