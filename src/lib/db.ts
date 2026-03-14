@@ -143,11 +143,11 @@ function runMigrations(db: Database.Database) {
     try { db.exec("ALTER TABLE brands ADD COLUMN industry TEXT"); } catch { /* already exists */ }
   }
   
-  // Add user_id column if missing
+  // Add user_id column if missing (no REFERENCES in ALTER TABLE for SQLite compatibility)
   try {
     db.prepare("SELECT user_id FROM brands LIMIT 1").get();
   } catch {
-    try { db.exec("ALTER TABLE brands ADD COLUMN user_id TEXT REFERENCES users(id) ON DELETE SET NULL"); } catch { /* already exists */ }
+    try { db.exec("ALTER TABLE brands ADD COLUMN user_id TEXT"); } catch { /* already exists */ }
   }
 
   // Add sort_order column to products if missing
