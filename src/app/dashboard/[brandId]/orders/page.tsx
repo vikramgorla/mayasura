@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { ShoppingBag, Package, Truck, CheckCircle, Clock, DollarSign } from 'lucide-react';
+import { ShoppingBag, Package, Truck, CheckCircle, Clock, DollarSign, Share2 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
 import { Order, Brand } from '@/lib/types';
@@ -125,13 +126,15 @@ export default function OrdersPage() {
         </div>
 
         {orders.length === 0 ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <ShoppingBag className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
-              <p className="text-zinc-500">No orders yet</p>
-              <p className="text-sm text-zinc-400 mt-1">Orders will appear here when customers checkout</p>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={ShoppingBag}
+            title="No orders yet"
+            description="Share your store to start receiving orders"
+            action={brand?.slug ? {
+              label: 'View Store',
+              href: `/shop/${brand.slug}`,
+            } : undefined}
+          />
         ) : (
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
             {/* Order list */}

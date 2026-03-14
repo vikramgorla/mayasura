@@ -479,6 +479,7 @@ function ResultsView({
       )}
 
       {/* Color Palettes */}
+      {/* @ts-expect-error — results values are safely cast below */}
       {actionId === 'color-palette' ? (
         <div className="space-y-4">
           {((results.palettes as Array<{ name: string; colors: Record<string, string>; reasoning: string }>) || []).map((palette, i) => (

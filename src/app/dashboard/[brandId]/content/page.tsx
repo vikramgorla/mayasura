@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { FileText, Sparkles, Trash2, BookOpen, Share2, Mail, Copy, Eye, X, Globe, MessageCircle } from 'lucide-react';
+import { FileText, Sparkles, Trash2, BookOpen, Share2, Mail, Copy, Eye, X, Globe, MessageCircle, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/loading';
@@ -177,11 +178,11 @@ export default function ContentPage() {
 
       {/* Content List */}
       {content.length === 0 ? (
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-12 text-center">
-          <FileText className="h-12 w-12 text-zinc-300 dark:text-zinc-600 mx-auto mb-4" />
-          <h3 className="font-semibold mb-1 text-zinc-900 dark:text-white">No content yet</h3>
-          <p className="text-sm text-zinc-400 dark:text-zinc-500">Generate some content using the buttons above</p>
-        </div>
+        <EmptyState
+          icon={Wand2}
+          title="No content yet"
+          description="Generate content with AI — use the buttons above to create blog posts, social media copy, emails, and more"
+        />
       ) : (
         <div className="space-y-4">
           {content.map((item) => {

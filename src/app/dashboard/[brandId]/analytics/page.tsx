@@ -3,8 +3,9 @@
 import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { BarChart3, Eye, ShoppingBag, FileText, Mail, MessageSquare, DollarSign, Users, Monitor, Smartphone, Tablet, Globe, ArrowUpRight, ArrowDownRight, TrendingUp, Filter } from 'lucide-react';
+import { BarChart3, Eye, ShoppingBag, FileText, Mail, MessageSquare, DollarSign, Users, Monitor, Smartphone, Tablet, Globe, ArrowUpRight, ArrowDownRight, TrendingUp, Filter, Rocket } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Sparkline } from '@/components/ui/sparkline';
 
 interface AnalyticsData {
@@ -221,6 +222,20 @@ export default function AnalyticsPage() {
             </motion.div>
           ))}
         </div>
+
+        {/* Encouraging empty state when no analytics data at all */}
+        {(!data || ((data.pageViews?.total || 0) === 0 && (data.orderCount || 0) === 0 && (data.uniqueVisitors || 0) === 0)) && (
+          <EmptyState
+            icon={Rocket}
+            title="Your analytics are warming up"
+            description="Once your brand site gets traffic, you'll see page views, visitor stats, and revenue data here. Share your site to get started!"
+            action={{
+              label: 'View Dashboard',
+              href: `/dashboard/${brandId}`,
+            }}
+            className="mb-8"
+          />
+        )}
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
           {/* Views over time - Line chart */}

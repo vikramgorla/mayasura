@@ -6,9 +6,10 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
   HeadphonesIcon, Plus, X, Send, AlertCircle,
   Clock, CheckCircle, XCircle, ChevronRight, BarChart3,
-  Star
+  Star, MessageCircle
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Badge } from '@/components/ui/badge';
@@ -248,11 +249,15 @@ export default function SupportPage() {
           </div>
 
           {tickets.length === 0 ? (
-            <div className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl p-12 text-center">
-              <HeadphonesIcon className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
-              <h3 className="font-semibold mb-1">No tickets yet</h3>
-              <p className="text-sm text-zinc-400">Create a support ticket to get started</p>
-            </div>
+            <EmptyState
+              icon={MessageCircle}
+              title="No support tickets yet"
+              description="Your chatbot handles customer questions automatically. Tickets will appear here when issues need human attention."
+              action={{
+                label: 'Create Ticket',
+                onClick: () => setShowForm(true),
+              }}
+            />
           ) : (
             <div className="space-y-2">
               {tickets.map(ticket => {

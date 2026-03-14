@@ -2,8 +2,9 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Package, Plus, Sparkles, Trash2, X, Edit, Image, Tag, Box, Search, Save } from 'lucide-react';
+import { Package, Plus, Sparkles, Trash2, X, Edit, Image, Tag, Box, Search, Save, ShoppingBag } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
 import { Textarea } from '@/components/ui/textarea';
 import { Card, CardContent } from '@/components/ui/card';
@@ -288,20 +289,23 @@ export default function ProductsPage() {
 
       {/* Products List */}
       {filteredProducts.length === 0 ? (
-        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl p-12 text-center">
-          <Package className="h-12 w-12 text-zinc-300 dark:text-zinc-600 mx-auto mb-4" />
-          <h3 className="font-semibold mb-1 text-zinc-900 dark:text-white">
-            {searchQuery ? 'No products found' : 'No products yet'}
-          </h3>
-          <p className="text-sm text-zinc-400 dark:text-zinc-500 mb-4">
-            {searchQuery ? 'Try a different search' : 'Add your first product or service'}
-          </p>
-          {!searchQuery && (
-            <Button variant="outline" size="sm" onClick={() => { resetForm(); setShowForm(true); }}>
-              <Plus className="h-3.5 w-3.5" /> Add Product
-            </Button>
-          )}
-        </div>
+        searchQuery ? (
+          <EmptyState
+            icon={Search}
+            title="No products found"
+            description="Try a different search term"
+          />
+        ) : (
+          <EmptyState
+            icon={ShoppingBag}
+            title="No products yet"
+            description="Add your first product to start selling"
+            action={{
+              label: 'Add Product',
+              onClick: () => { resetForm(); setShowForm(true); },
+            }}
+          />
+        )
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {filteredProducts.map((product) => (

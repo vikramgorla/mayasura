@@ -3,8 +3,9 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Plus, FileText, Edit, Trash2, Eye, EyeOff, Sparkles, X, Image, Tag, Calendar, Code } from 'lucide-react';
+import { Plus, FileText, Edit, Trash2, Eye, EyeOff, Sparkles, X, Image, Tag, Calendar, Code, Newspaper } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { EmptyState } from '@/components/ui/empty-state';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
@@ -381,15 +382,15 @@ export default function BlogManagementPage() {
 
         {/* Posts list */}
         {posts.length === 0 && !creating ? (
-          <Card>
-            <CardContent className="p-12 text-center">
-              <FileText className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
-              <p className="text-zinc-500 mb-4">No blog posts yet</p>
-              <Button onClick={() => setCreating(true)}>
-                <Plus className="h-4 w-4 mr-1" /> Create First Post
-              </Button>
-            </CardContent>
-          </Card>
+          <EmptyState
+            icon={Newspaper}
+            title="No blog posts yet"
+            description="Write your first post to engage your audience"
+            action={{
+              label: 'Create First Post',
+              onClick: () => setCreating(true),
+            }}
+          />
         ) : (
           <div className="space-y-3">
             {posts.map((post) => {
