@@ -4,12 +4,18 @@ import Link from 'next/link';
 import { useBrandSite, BrandPlaceholder } from './layout';
 import { LayoutSections } from '@/components/site/section-renderer';
 import { getDefaultLayout } from '@/lib/page-layout';
+import {
+  getPrimaryButtonStyle,
+  getSecondaryButtonStyle,
+  SPACING_MAP,
+  BORDER_RADIUS_MAP,
+} from '@/lib/design-settings';
 
 export default function BrandHomePage() {
   const data = useBrandSite();
   if (!data) return null;
 
-  const { brand, products, blogPosts, websiteTemplate: template, pageLayout } = data;
+  const { brand, products, blogPosts, websiteTemplate: template, pageLayout, designSettings } = data;
   const slug = brand.slug || brand.id;
   const channels = JSON.parse(brand.channels || '[]') as string[];
   const templateId = template?.id || 'minimal';
@@ -19,6 +25,13 @@ export default function BrandHomePage() {
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
+
+  // Design settings — applied from Design Studio
+  const ds = designSettings;
+  const primaryBtnStyle = getPrimaryButtonStyle(ds, accentColor);
+  const secondaryBtnStyle = getSecondaryButtonStyle(ds, textColor);
+  const dsRadius = BORDER_RADIUS_MAP[ds.borderRadius];
+  const dsSp = SPACING_MAP[ds.spacingDensity];
 
   const headingStyle: React.CSSProperties = {
     fontFamily: brand.font_heading,
@@ -49,11 +62,11 @@ export default function BrandHomePage() {
               </p>
               <div className="flex flex-wrap gap-4 mt-12">
                 {channels.includes('ecommerce') && (
-                  <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: textColor, color: bgColor }}>
+                  <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: textColor, color: bgColor }}>
                     Shop Now
                   </Link>
                 )}
-                <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}12`, color: textColor }}>
+                <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
                   Learn More
                 </Link>
               </div>
@@ -83,11 +96,11 @@ export default function BrandHomePage() {
                 </p>
                 <div className="flex flex-wrap gap-4 mt-10">
                   {channels.includes('ecommerce') && (
-                    <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: textColor, color: bgColor }}>
+                    <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: textColor, color: bgColor }}>
                       Shop Now
                     </Link>
                   )}
-                  <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}12`, color: textColor }}>
+                  <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
                     Our Story
                   </Link>
                 </div>
@@ -122,11 +135,11 @@ export default function BrandHomePage() {
             <div className="h-0.5 w-16 mt-4 mb-10" style={{ backgroundColor: accentColor }} />
             <div className="flex flex-wrap gap-4">
               {channels.includes('ecommerce') && (
-                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
                   SHOP NOW
                 </Link>
               )}
-              <Link href={`/site/${slug}/about`} className="t-btn-secondary border-2" style={{ borderColor: '#FFFFFF20', color: '#FFFFFF' }}>
+              <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={{ ...secondaryBtnStyle, borderColor: '#FFFFFF20', color: '#FFFFFF' }}>
                 LEARN MORE
               </Link>
             </div>
