@@ -3,15 +3,17 @@ import { cookies } from 'next/headers';
 import bcrypt from 'bcryptjs';
 import { getTokenVersion } from './db';
 
+let _cachedSecret: Uint8Array | null = null;
+
 function getSecret(): Uint8Array {
+  if (_cachedSecret) return _cachedSecret;
   const secret = process.env.JWT_SECRET;
   if (!secret) {
     throw new Error('JWT_SECRET environment variable is required. Set it in your deployment environment.');
   }
-  return new Uint8Array(Buffer.from(secret, 'utf-8'));
+  _cachedSecret = new Uint8Array(Buffer.from(secret, 'utf-8'));
+  return _cachedSecret;
 }
-
-const JWT_SECRET = getSecret();
 
 const COOKIE_NAME = 'mayasura-session';
 
@@ -38,12 +40,12 @@ export async function createToken(payload: {
     .setProtectedHeader({ alg: 'HS256' })
     .setIssuedAt()
     .setExpirationTime('7d')
-    .sign(JWT_SECRET);
+    .sign(getSecret());
 }
 
 export async function verifyToken(token: string): Promise<{ userId: string; email: string; name: string } | null> {
   try {
-    const { payload } = await jwtVerify(token, JWT_SECRET);
+    const { payload } = await jwtVerify(token, getSecret());
     const data = payload as unknown as { userId: string; email: string; name: string; tv?: number };
 
     // Check token version — reject revoked tokens (C4 fix)
