@@ -402,7 +402,7 @@ export default function DesignStudioPage() {
                         value={customCSS}
                         onChange={e => { setCustomCSS(e.target.value); markChanged(); }}
                         rows={6}
-                        className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-900 text-green-400 text-xs font-mono outline-none resize-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                        className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-900 text-zinc-800 dark:text-green-400 text-xs font-mono outline-none resize-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
                         placeholder={`/* Your custom CSS */\n.hero-section {\n  padding: 4rem 0;\n}`}
                       />
                     </div>

@@ -35,7 +35,7 @@ export function Tabs({
 
 export function TabsList({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('inline-flex items-center gap-1 rounded-xl bg-zinc-100 p-1', className)}>
+    <div className={cn('inline-flex items-center gap-1 rounded-xl bg-zinc-100 dark:bg-zinc-800 p-1', className)} role="tablist">
       {children}
     </div>
   );
@@ -55,17 +55,19 @@ export function TabsTrigger({
 
   return (
     <button
+      role="tab"
+      aria-selected={isActive}
       onClick={() => ctx.onChange(value)}
       className={cn(
         'relative px-4 py-2 text-sm font-medium rounded-lg transition-colors',
-        isActive ? 'text-zinc-900' : 'text-zinc-500 hover:text-zinc-700',
+        isActive ? 'text-zinc-900 dark:text-white' : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300',
         className
       )}
     >
       {isActive && (
         <motion.div
           layoutId="active-tab"
-          className="absolute inset-0 bg-white rounded-lg shadow-sm"
+          className="absolute inset-0 bg-white dark:bg-zinc-700 rounded-lg shadow-sm"
           transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
         />
       )}

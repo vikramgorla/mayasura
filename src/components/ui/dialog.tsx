@@ -53,7 +53,7 @@ export function Dialog({ open, onClose, children, className, size = 'md' }: Dial
             exit={{ opacity: 0, scale: 0.95, y: 10 }}
             transition={{ duration: 0.2, ease: 'easeOut' }}
             className={cn(
-              'relative w-full bg-white rounded-2xl shadow-2xl overflow-hidden',
+              'relative w-full bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl overflow-hidden',
               sizes[size],
               className
             )}
@@ -68,11 +68,11 @@ export function Dialog({ open, onClose, children, className, size = 'md' }: Dial
 
 export function DialogHeader({ children, onClose, className }: { children: ReactNode; onClose?: () => void; className?: string }) {
   return (
-    <div className={cn('flex items-center justify-between p-6 border-b border-zinc-100', className)}>
-      <div className="font-semibold text-lg">{children}</div>
+    <div className={cn('flex items-center justify-between p-6 border-b border-zinc-100 dark:border-zinc-800', className)}>
+      <div className="font-semibold text-lg text-zinc-900 dark:text-white">{children}</div>
       {onClose && (
-        <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-zinc-100 transition-colors">
-          <X className="h-4 w-4 text-zinc-500" />
+        <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors" aria-label="Close dialog">
+          <X className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
         </button>
       )}
     </div>
@@ -85,7 +85,7 @@ export function DialogBody({ children, className }: { children: ReactNode; class
 
 export function DialogFooter({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('flex items-center justify-end gap-3 p-6 border-t border-zinc-100 bg-zinc-50', className)}>
+    <div className={cn('flex items-center justify-end gap-3 p-6 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50', className)}>
       {children}
     </div>
   );
