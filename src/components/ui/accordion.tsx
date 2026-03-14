@@ -16,15 +16,15 @@ export function AccordionItem({ title, children, defaultOpen = false, className 
   const [open, setOpen] = useState(defaultOpen);
 
   return (
-    <div className={cn('border-b border-slate-100 last:border-0', className)}>
+    <div className={cn('border-b border-zinc-100 last:border-0', className)}>
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center justify-between w-full py-4 text-left text-sm font-medium hover:text-slate-700 transition-colors"
+        className="flex items-center justify-between w-full py-4 text-left text-sm font-medium hover:text-zinc-700 transition-colors"
       >
         {title}
         <ChevronDown
           className={cn(
-            'h-4 w-4 text-slate-400 transition-transform duration-200',
+            'h-4 w-4 text-zinc-400 transition-transform duration-200',
             open && 'rotate-180'
           )}
         />
@@ -38,7 +38,7 @@ export function AccordionItem({ title, children, defaultOpen = false, className 
             transition={{ duration: 0.2, ease: 'easeInOut' }}
             className="overflow-hidden"
           >
-            <div className="pb-4 text-sm text-slate-500">{children}</div>
+            <div className="pb-4 text-sm text-zinc-500">{children}</div>
           </motion.div>
         )}
       </AnimatePresence>

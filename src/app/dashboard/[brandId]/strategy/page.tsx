@@ -53,11 +53,11 @@ export default function StrategyPage() {
   return (
     <div className="p-4 sm:p-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+        <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
           <Sparkles className="h-6 w-6 text-blue-600" />
           AI Strategy Advisor
         </h1>
-        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Get AI-powered insights and recommendations for your brand</p>
+        <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Get AI-powered insights and recommendations for your brand</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -67,8 +67,8 @@ export default function StrategyPage() {
               <div className={`h-11 w-11 rounded-xl flex items-center justify-center mb-3 ${option.color}`}>
                 <option.icon className="h-5 w-5" />
               </div>
-              <h3 className="font-semibold text-sm mb-1 text-slate-900 dark:text-white">{option.label}</h3>
-              <p className="text-xs text-slate-400 mb-4">{option.desc}</p>
+              <h3 className="font-semibold text-sm mb-1 text-zinc-900 dark:text-white">{option.label}</h3>
+              <p className="text-xs text-zinc-400 mb-4">{option.desc}</p>
               <Button
                 variant="outline"
                 size="sm"
@@ -112,7 +112,7 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
     return (
       <Card>
         <CardContent className="p-6">
-          <pre className="text-sm text-slate-600 whitespace-pre-wrap">{String(result)}</pre>
+          <pre className="text-sm text-zinc-600 whitespace-pre-wrap">{String(result)}</pre>
         </CardContent>
       </Card>
     );
@@ -135,8 +135,8 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
             {renderList('Opportunities', result.opportunities as string[], 'blue')}
             {result.positioning ? (
               <div>
-                <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Positioning</h4>
-                <p className="text-sm text-slate-700 dark:text-slate-300">{String(result.positioning)}</p>
+                <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">Positioning</h4>
+                <p className="text-sm text-zinc-700 dark:text-zinc-300">{String(result.positioning)}</p>
               </div>
             ) : null}
             {renderList('Recommendations', result.recommendations as string[], 'amber')}
@@ -159,7 +159,7 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
           <div className="space-y-4">
             {result.primaryKeywords ? (
               <div>
-                <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Primary Keywords</h4>
+                <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">Primary Keywords</h4>
                 <div className="flex flex-wrap gap-2">
                   {(result.primaryKeywords as string[]).map((kw, i) => (
                     <Badge key={i} variant="secondary">{kw}</Badge>
@@ -169,7 +169,7 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
             ) : null}
             {result.longTailKeywords ? (
               <div>
-                <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Long-Tail Keywords</h4>
+                <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">Long-Tail Keywords</h4>
                 <div className="flex flex-wrap gap-2">
                   {(result.longTailKeywords as string[]).map((kw, i) => (
                     <Badge key={i} variant="outline">{kw}</Badge>
@@ -180,8 +180,8 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
             {renderList('Content Topics', result.contentTopics as string[], 'purple')}
             {result.metaDescription ? (
               <div>
-                <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">Meta Description</h4>
-                <p className="text-sm text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-700 rounded-lg p-3">{String(result.metaDescription)}</p>
+                <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">Meta Description</h4>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-700 rounded-lg p-3">{String(result.metaDescription)}</p>
               </div>
             ) : null}
           </div>
@@ -189,13 +189,13 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
         {type === 'content-calendar' && (
           <div className="space-y-4">
             {result.strategy ? (
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-4">{String(result.strategy)}</p>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">{String(result.strategy)}</p>
             ) : null}
             {result.calendar ? (
               <div className="space-y-2">
                 {(result.calendar as Array<{ day: number; type: string; title: string; description: string }>).map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-slate-50 dark:bg-slate-700/50">
-                    <div className="h-8 w-8 rounded-lg bg-slate-200 dark:bg-slate-600 flex items-center justify-center text-xs font-semibold flex-shrink-0">
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-700/50">
+                    <div className="h-8 w-8 rounded-lg bg-zinc-200 dark:bg-zinc-600 flex items-center justify-center text-xs font-semibold flex-shrink-0">
                       D{item.day}
                     </div>
                     <div className="min-w-0">
@@ -203,7 +203,7 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
                         <span className="text-sm font-medium">{item.title}</span>
                         <Badge variant="secondary" className="text-[10px]">{item.type}</Badge>
                       </div>
-                      <p className="text-xs text-slate-400 mt-0.5">{item.description}</p>
+                      <p className="text-xs text-zinc-400 mt-0.5">{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -216,7 +216,7 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
             {result.score !== undefined ? (
               <div className="text-center py-4">
                 <div className="text-4xl font-bold text-blue-600 mb-1">{String(result.score)}%</div>
-                <p className="text-xs text-slate-400">Consistency Score</p>
+                <p className="text-xs text-zinc-400">Consistency Score</p>
               </div>
             ) : null}
             {renderList('Strengths', result.strengths as string[], 'emerald')}
@@ -233,12 +233,12 @@ function renderList(title: string, items: string[] | undefined, color: string) {
   if (!items || !Array.isArray(items) || items.length === 0) return null;
   return (
     <div>
-      <h4 className="text-xs font-semibold text-slate-500 uppercase mb-2">{title}</h4>
+      <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">{title}</h4>
       <ul className="space-y-1.5">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-2 text-sm">
             <ChevronRight className={`h-4 w-4 text-${color}-500 flex-shrink-0 mt-0.5`} />
-            <span className="text-slate-700 dark:text-slate-300">{item}</span>
+            <span className="text-zinc-700 dark:text-zinc-300">{item}</span>
           </li>
         ))}
       </ul>

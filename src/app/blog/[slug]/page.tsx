@@ -82,9 +82,9 @@ export default function BlogListingPage() {
         <div className="space-y-12">
           {[1, 2, 3].map((i) => (
             <div key={i} className="animate-pulse">
-              <div className="h-3 w-16 rounded bg-slate-100 mb-4" />
-              <div className="h-5 w-3/4 rounded bg-slate-100 mb-3" />
-              <div className="h-3 w-full rounded bg-slate-100" />
+              <div className="h-3 w-16 rounded bg-zinc-100 mb-4" />
+              <div className="h-5 w-3/4 rounded bg-zinc-100 mb-3" />
+              <div className="h-3 w-full rounded bg-zinc-100" />
             </div>
           ))}
         </div>

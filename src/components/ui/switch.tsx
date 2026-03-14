@@ -21,7 +21,7 @@ export function Switch({ checked, onCheckedChange, disabled, className, label }:
         onClick={() => !disabled && onCheckedChange(!checked)}
         className={cn(
           'relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-slate-900',
-          checked ? 'bg-slate-900' : 'bg-slate-200'
+          checked ? 'bg-zinc-900' : 'bg-zinc-200'
         )}
       >
         <motion.span
@@ -33,7 +33,7 @@ export function Switch({ checked, onCheckedChange, disabled, className, label }:
           )}
         />
       </button>
-      {label && <span className="text-sm text-slate-700">{label}</span>}
+      {label && <span className="text-sm text-zinc-700">{label}</span>}
     </label>
   );
 }

@@ -47,7 +47,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900 px-4">
+    <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-900 px-4">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -56,18 +56,18 @@ function LoginForm() {
       >
         <div className="text-center mb-8">
           <Link href="/" className="inline-flex items-center gap-2 mb-6">
-            <div className="h-10 w-10 rounded-xl bg-slate-900 dark:bg-white flex items-center justify-center">
-              <span className="text-white dark:text-slate-900 text-lg font-bold">M</span>
+            <div className="h-10 w-10 rounded-xl bg-zinc-900 dark:bg-white flex items-center justify-center">
+              <span className="text-white dark:text-zinc-900 text-lg font-bold">M</span>
             </div>
           </Link>
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Welcome back</h1>
-          <p className="text-slate-500 dark:text-slate-400">Sign in to your Mayasura account</p>
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white mb-1">Welcome back</h1>
+          <p className="text-zinc-500 dark:text-zinc-400">Sign in to your Mayasura account</p>
         </div>
 
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm">
+        <div className="bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 p-8 shadow-sm">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Email</label>
+              <label className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">Email</label>
               <Input
                 type="email"
                 value={email}
@@ -78,7 +78,7 @@ function LoginForm() {
               />
             </div>
             <div>
-              <label className="block text-sm font-medium mb-1.5 text-slate-700 dark:text-slate-300">Password</label>
+              <label className="block text-sm font-medium mb-1.5 text-zinc-700 dark:text-zinc-300">Password</label>
               <div className="relative">
                 <Input
                   type={showPassword ? 'text' : 'password'}
@@ -91,7 +91,7 @@ function LoginForm() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600"
                 >
                   {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
@@ -110,9 +110,9 @@ function LoginForm() {
           </form>
         </div>
 
-        <p className="text-center text-sm text-slate-500 mt-6">
+        <p className="text-center text-sm text-zinc-500 mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
+          <Link href="/signup" className="text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300 font-medium">
             Sign up
           </Link>
         </p>
@@ -124,8 +124,8 @@ function LoginForm() {
 export default function LoginPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-slate-900">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-indigo-600" />
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-zinc-900">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-200 border-t-indigo-600" />
       </div>
     }>
       <LoginForm />

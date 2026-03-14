@@ -8,7 +8,7 @@ export function Skeleton({ className }: SkeletonProps) {
   return (
     <div
       className={cn(
-        'animate-pulse rounded-lg bg-slate-100 dark:bg-slate-800',
+        'animate-pulse rounded-lg bg-zinc-100 dark:bg-zinc-800',
         className
       )}
     />
@@ -17,7 +17,7 @@ export function Skeleton({ className }: SkeletonProps) {
 
 export function SkeletonCard() {
   return (
-    <div className="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-6 space-y-4">
+    <div className="rounded-xl border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 p-6 space-y-4">
       <div className="flex items-center gap-3">
         <Skeleton className="h-10 w-10 rounded-full" />
         <div className="space-y-2 flex-1">
@@ -44,7 +44,7 @@ export function SkeletonTable({ rows = 5 }: { rows?: number }) {
         <Skeleton className="h-4 w-1/6" />
       </div>
       {Array.from({ length: rows }).map((_, i) => (
-        <div key={i} className="flex gap-4 px-4 py-3 border-b border-slate-100 dark:border-slate-800">
+        <div key={i} className="flex gap-4 px-4 py-3 border-b border-zinc-100 dark:border-zinc-800">
           <Skeleton className="h-5 w-1/4" />
           <Skeleton className="h-5 w-1/6" />
           <Skeleton className="h-5 w-1/5" />

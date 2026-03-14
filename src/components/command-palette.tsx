@@ -54,96 +54,96 @@ export function CommandPalette({ brandId }: CommandPaletteProps) {
               transition={{ duration: 0.15 }}
               className="relative w-full max-w-lg mx-4"
             >
-              <Command className="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 overflow-hidden">
-                <div className="flex items-center gap-2 px-4 border-b border-slate-100 dark:border-slate-800">
-                  <Search className="h-4 w-4 text-slate-400 dark:text-slate-500 flex-shrink-0" />
+              <Command className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                <div className="flex items-center gap-2 px-4 border-b border-zinc-100 dark:border-zinc-800">
+                  <Search className="h-4 w-4 text-zinc-400 dark:text-zinc-500 flex-shrink-0" />
                   <Command.Input
                     placeholder="Type a command or search..."
-                    className="w-full h-12 bg-transparent text-sm text-slate-900 dark:text-white outline-none placeholder:text-slate-400 dark:placeholder:text-slate-500"
+                    className="w-full h-12 bg-transparent text-sm text-zinc-900 dark:text-white outline-none placeholder:text-zinc-400 dark:placeholder:text-zinc-500"
                   />
-                  <kbd className="hidden sm:inline-flex items-center rounded-md border border-slate-200 dark:border-slate-700 px-1.5 text-[10px] font-medium text-slate-400 dark:text-slate-500">
+                  <kbd className="hidden sm:inline-flex items-center rounded-md border border-zinc-200 dark:border-zinc-700 px-1.5 text-[10px] font-medium text-zinc-400 dark:text-zinc-500">
                     ESC
                   </kbd>
                 </div>
                 <Command.List className="max-h-[300px] overflow-y-auto p-2">
-                  <Command.Empty className="py-8 text-center text-sm text-slate-400 dark:text-slate-500">
+                  <Command.Empty className="py-8 text-center text-sm text-zinc-400 dark:text-zinc-500">
                     No results found.
                   </Command.Empty>
 
-                  <Command.Group heading="Navigation" className="text-xs text-slate-400 dark:text-slate-500 px-2 py-1.5 font-medium">
+                  <Command.Group heading="Navigation" className="text-xs text-zinc-400 dark:text-zinc-500 px-2 py-1.5 font-medium">
                     <Command.Item
                       onSelect={() => runCommand(() => router.push('/'))}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
                     >
-                      <Home className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                      <Home className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                       Home
                     </Command.Item>
                     <Command.Item
                       onSelect={() => runCommand(() => router.push('/dashboard'))}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
                     >
-                      <LayoutDashboard className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                      <LayoutDashboard className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                       Dashboard
                     </Command.Item>
                     <Command.Item
                       onSelect={() => runCommand(() => router.push('/templates'))}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
                     >
-                      <Palette className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                      <Palette className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                       Template Gallery
                     </Command.Item>
                   </Command.Group>
 
-                  <Command.Group heading="Actions" className="text-xs text-slate-400 dark:text-slate-500 px-2 py-1.5 font-medium">
+                  <Command.Group heading="Actions" className="text-xs text-zinc-400 dark:text-zinc-500 px-2 py-1.5 font-medium">
                     <Command.Item
                       onSelect={() => runCommand(() => router.push('/create'))}
-                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                      className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
                     >
-                      <Plus className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                      <Plus className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                       Create New Brand
                     </Command.Item>
                     {brandId && (
                       <>
                         <Command.Item
                           onSelect={() => runCommand(() => router.push(`/dashboard/${brandId}/content`))}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
                         >
-                          <Sparkles className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                          <Sparkles className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                           Generate Content
                         </Command.Item>
                         <Command.Item
                           onSelect={() => runCommand(() => router.push(`/dashboard/${brandId}/products`))}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
                         >
-                          <Package className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                          <Package className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                           Manage Products
                         </Command.Item>
                         <Command.Item
                           onSelect={() => runCommand(() => router.push(`/dashboard/${brandId}/website`))}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
                         >
-                          <Globe className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                          <Globe className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                           Website Preview
                         </Command.Item>
                         <Command.Item
                           onSelect={() => runCommand(() => router.push(`/dashboard/${brandId}/chatbot`))}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
                         >
-                          <MessageSquare className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                          <MessageSquare className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                           Test Chatbot
                         </Command.Item>
                         <Command.Item
                           onSelect={() => runCommand(() => router.push(`/dashboard/${brandId}/support`))}
-                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 data-[selected=true]:bg-slate-100 dark:data-[selected=true]:bg-slate-800"
+                          className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
                         >
-                          <HeadphonesIcon className="h-4 w-4 text-slate-400 dark:text-slate-500" />
+                          <HeadphonesIcon className="h-4 w-4 text-zinc-400 dark:text-zinc-500" />
                           Customer Support
                         </Command.Item>
                       </>
                     )}
                   </Command.Group>
                 </Command.List>
-                <div className="border-t border-slate-100 dark:border-slate-800 px-4 py-2 flex items-center justify-between text-xs text-slate-400 dark:text-slate-500">
+                <div className="border-t border-zinc-100 dark:border-zinc-800 px-4 py-2 flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500">
                   <span>Navigate with ↑↓, select with ↵</span>
                   <span>⌘K to toggle</span>
                 </div>

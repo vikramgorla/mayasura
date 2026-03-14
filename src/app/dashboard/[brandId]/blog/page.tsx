@@ -122,8 +122,8 @@ export default function BlogManagementPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center justify-between mb-8">
           <div>
-            <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Blog Management</h1>
-            <p className="text-sm text-slate-400 mt-1">
+            <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Blog Management</h1>
+            <p className="text-sm text-zinc-400 mt-1">
               {posts.length} posts · {posts.filter(p => p.status === 'published').length} published
             </p>
           </div>
@@ -142,42 +142,42 @@ export default function BlogManagementPage() {
             </CardHeader>
             <CardContent className="space-y-4">
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">Title</label>
+                <label className="block text-sm font-medium mb-1 text-zinc-600 dark:text-zinc-300">Title</label>
                 <input
                   type="text"
                   value={form.title}
                   onChange={(e) => setForm(f => ({ ...f, title: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm outline-none"
+                  className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none"
                   placeholder="Post title"
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">Excerpt</label>
+                <label className="block text-sm font-medium mb-1 text-zinc-600 dark:text-zinc-300">Excerpt</label>
                 <input
                   type="text"
                   value={form.excerpt}
                   onChange={(e) => setForm(f => ({ ...f, excerpt: e.target.value }))}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm outline-none"
+                  className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none"
                   placeholder="Short summary..."
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">Category</label>
+                  <label className="block text-sm font-medium mb-1 text-zinc-600 dark:text-zinc-300">Category</label>
                   <input
                     type="text"
                     value={form.category}
                     onChange={(e) => setForm(f => ({ ...f, category: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none"
                     placeholder="e.g. News, Tutorial"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium mb-1 text-slate-600 dark:text-slate-300">Status</label>
+                  <label className="block text-sm font-medium mb-1 text-zinc-600 dark:text-zinc-300">Status</label>
                   <select
                     value={form.status}
                     onChange={(e) => setForm(f => ({ ...f, status: e.target.value }))}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none"
                   >
                     <option value="draft">Draft</option>
                     <option value="published">Published</option>
@@ -186,7 +186,7 @@ export default function BlogManagementPage() {
               </div>
               <div>
                 <div className="flex items-center justify-between mb-1">
-                  <label className="block text-sm font-medium text-slate-600 dark:text-slate-300">Content</label>
+                  <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300">Content</label>
                   <button
                     onClick={generateDraft}
                     disabled={generating}
@@ -200,7 +200,7 @@ export default function BlogManagementPage() {
                   value={form.content}
                   onChange={(e) => setForm(f => ({ ...f, content: e.target.value }))}
                   rows={12}
-                  className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm outline-none resize-none font-mono"
+                  className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none resize-none font-mono"
                   placeholder="Write your post content here... (supports basic markdown)"
                 />
               </div>
@@ -223,8 +223,8 @@ export default function BlogManagementPage() {
         {posts.length === 0 && !creating ? (
           <Card>
             <CardContent className="p-12 text-center">
-              <FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-500 mb-4">No blog posts yet</p>
+              <FileText className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
+              <p className="text-zinc-500 mb-4">No blog posts yet</p>
               <Button onClick={() => setCreating(true)}>
                 <Plus className="h-4 w-4 mr-1" /> Create First Post
               </Button>
@@ -237,14 +237,14 @@ export default function BlogManagementPage() {
                 <CardContent className="p-4 flex items-center gap-4">
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
-                      <h3 className="font-semibold text-sm text-slate-900 dark:text-white truncate">
+                      <h3 className="font-semibold text-sm text-zinc-900 dark:text-white truncate">
                         {post.title}
                       </h3>
                       <Badge variant={post.status === 'published' ? 'success' : 'secondary'}>
                         {post.status}
                       </Badge>
                     </div>
-                    <p className="text-xs text-slate-400 truncate">
+                    <p className="text-xs text-zinc-400 truncate">
                       {post.excerpt || 'No excerpt'}
                       {post.category && <> · {post.category}</>}
                       {post.published_at && <> · {new Date(post.published_at).toLocaleDateString()}</>}
@@ -253,20 +253,20 @@ export default function BlogManagementPage() {
                   <div className="flex items-center gap-1">
                     <button
                       onClick={() => togglePublish(post)}
-                      className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600"
+                      className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-600"
                       title={post.status === 'published' ? 'Unpublish' : 'Publish'}
                     >
                       {post.status === 'published' ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                     </button>
                     <button
                       onClick={() => startEdit(post)}
-                      className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-400 hover:text-slate-600"
+                      className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-600"
                     >
                       <Edit className="h-4 w-4" />
                     </button>
                     <button
                       onClick={() => handleDelete(post.id)}
-                      className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-600"
+                      className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-zinc-400 hover:text-red-600"
                     >
                       <Trash2 className="h-4 w-4" />
                     </button>

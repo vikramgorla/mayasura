@@ -13,13 +13,13 @@ export default function TemplatesPage() {
   const selectedTemplate = STARTER_TEMPLATES.find(t => t.id === selected);
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       {/* Nav */}
-      <nav className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+      <nav className="bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-slate-900 dark:bg-white flex items-center justify-center">
-              <span className="text-white dark:text-slate-900 text-sm font-bold">M</span>
+            <div className="h-8 w-8 rounded-lg bg-zinc-900 dark:bg-white flex items-center justify-center">
+              <span className="text-white dark:text-zinc-900 text-sm font-bold">M</span>
             </div>
             <span className="font-semibold text-lg tracking-tight">Mayasura</span>
           </Link>
@@ -38,14 +38,14 @@ export default function TemplatesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/50 dark:border-indigo-800/50 px-4 py-1.5 text-sm text-indigo-600 dark:text-indigo-400 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-violet-50 dark:bg-violet-950/50 border border-violet-200/50 dark:border-violet-800/50 px-4 py-1.5 text-sm text-violet-600 dark:text-violet-400 mb-6">
               <Sparkles className="h-3.5 w-3.5" />
               Category Starter Kits
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-slate-900 dark:text-white">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-zinc-900 dark:text-white">
               Start with a template
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-lg max-w-xl mx-auto">
+            <p className="text-zinc-500 dark:text-zinc-400 text-lg max-w-xl mx-auto">
               Pre-built brand ecosystems for every industry. Pick a template, customize with AI, and launch.
             </p>
           </motion.div>
@@ -73,7 +73,7 @@ export default function TemplatesPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="mt-8 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden shadow-lg"
+            className="mt-8 bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-lg"
           >
             <div className="p-6 sm:p-8" style={{ backgroundColor: selectedTemplate.primaryColor }}>
               <div className="flex items-center gap-4">
@@ -94,26 +94,26 @@ export default function TemplatesPage() {
               </div>
             </div>
             <div className="p-6 sm:p-8">
-              <p className="text-sm text-slate-600 dark:text-slate-400 mb-6">{selectedTemplate.brandDescription}</p>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-6">{selectedTemplate.brandDescription}</p>
               
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-6">
                 <div>
                   <div className="flex items-center gap-2 text-sm font-medium mb-3">
-                    <Package className="h-4 w-4 text-slate-400" />
+                    <Package className="h-4 w-4 text-zinc-400" />
                     Products Included
                   </div>
                   <div className="space-y-2">
                     {selectedTemplate.products.map((p, i) => (
                       <div key={i} className="text-sm">
                         <span className="font-medium">{p.name}</span>
-                        <span className="text-slate-400 ml-2">${p.price}</span>
+                        <span className="text-zinc-400 ml-2">${p.price}</span>
                       </div>
                     ))}
                   </div>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 text-sm font-medium mb-3">
-                    <Palette className="h-4 w-4 text-slate-400" />
+                    <Palette className="h-4 w-4 text-zinc-400" />
                     Brand Identity
                   </div>
                   <div className="flex gap-2 mb-2">
@@ -121,14 +121,14 @@ export default function TemplatesPage() {
                     <div className="h-8 w-8 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: selectedTemplate.secondaryColor }} />
                     <div className="h-8 w-8 rounded-full border-2 border-white shadow-sm" style={{ backgroundColor: selectedTemplate.accentColor }} />
                   </div>
-                  <p className="text-xs text-slate-400">{selectedTemplate.fontHeading} / {selectedTemplate.fontBody}</p>
+                  <p className="text-xs text-zinc-400">{selectedTemplate.fontHeading} / {selectedTemplate.fontBody}</p>
                 </div>
                 <div>
                   <div className="flex items-center gap-2 text-sm font-medium mb-3">
-                    <MessageSquare className="h-4 w-4 text-slate-400" />
+                    <MessageSquare className="h-4 w-4 text-zinc-400" />
                     Chatbot Persona
                   </div>
-                  <p className="text-sm text-slate-500 italic">&ldquo;{selectedTemplate.chatbotPersona}&rdquo;</p>
+                  <p className="text-sm text-zinc-500 italic">&ldquo;{selectedTemplate.chatbotPersona}&rdquo;</p>
                 </div>
               </div>
 
@@ -173,10 +173,10 @@ function TemplateCard({
   return (
     <button
       onClick={onSelect}
-      className={`w-full text-left bg-white dark:bg-slate-800 rounded-xl border-2 overflow-hidden transition-all hover:shadow-lg cursor-pointer ${
+      className={`w-full text-left bg-white dark:bg-zinc-800 rounded-xl border-2 overflow-hidden transition-all hover:shadow-lg cursor-pointer ${
         isSelected
-          ? 'border-indigo-500 dark:border-indigo-400 shadow-lg shadow-indigo-500/10'
-          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+          ? 'border-indigo-500 dark:border-indigo-400 shadow-lg shadow-violet-500/10'
+          : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600'
       }`}
     >
       <div className="h-20 p-4 flex items-end" style={{ backgroundColor: template.primaryColor }}>
@@ -195,17 +195,17 @@ function TemplateCard({
         </div>
       </div>
       <div className="p-4">
-        <p className="text-xs text-slate-400 mb-1">{template.category}</p>
-        <p className="text-sm text-slate-600 dark:text-slate-400 line-clamp-2 mb-3">
+        <p className="text-xs text-zinc-400 mb-1">{template.category}</p>
+        <p className="text-sm text-zinc-600 dark:text-zinc-400 line-clamp-2 mb-3">
           {template.description}
         </p>
         <div className="flex items-center gap-2">
           <div className="flex gap-1">
             <div className="h-4 w-4 rounded-full" style={{ backgroundColor: template.primaryColor }} />
-            <div className="h-4 w-4 rounded-full border border-slate-200" style={{ backgroundColor: template.secondaryColor }} />
+            <div className="h-4 w-4 rounded-full border border-zinc-200" style={{ backgroundColor: template.secondaryColor }} />
             <div className="h-4 w-4 rounded-full" style={{ backgroundColor: template.accentColor }} />
           </div>
-          <span className="text-xs text-slate-400">{template.products.length} products</span>
+          <span className="text-xs text-zinc-400">{template.products.length} products</span>
         </div>
       </div>
     </button>

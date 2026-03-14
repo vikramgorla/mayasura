@@ -99,11 +99,11 @@ export default function WebsitePage() {
             <Globe className="h-6 w-6" />
             Website Preview
           </h1>
-          <p className="text-slate-500 text-sm mt-1">Preview your generated website pages</p>
+          <p className="text-zinc-500 text-sm mt-1">Preview your generated website pages</p>
         </div>
         <div className="flex items-center gap-2">
           {/* Viewport Toggle */}
-          <div className="inline-flex items-center rounded-lg bg-slate-100 dark:bg-slate-700 p-1">
+          <div className="inline-flex items-center rounded-lg bg-zinc-100 dark:bg-zinc-700 p-1">
             {([
               { id: 'desktop', icon: Monitor },
               { id: 'tablet', icon: Tablet },
@@ -114,8 +114,8 @@ export default function WebsitePage() {
                 onClick={() => setViewport(v.id)}
                 className={`p-2 rounded-md transition-colors ${
                   viewport === v.id
-                    ? 'bg-white dark:bg-slate-600 shadow-sm text-slate-900 dark:text-white'
-                    : 'text-slate-400 hover:text-slate-600'
+                    ? 'bg-white dark:bg-zinc-600 shadow-sm text-zinc-900 dark:text-white'
+                    : 'text-zinc-400 hover:text-zinc-600'
                 }`}
               >
                 <v.icon className="h-4 w-4" />
@@ -134,18 +134,18 @@ export default function WebsitePage() {
         <motion.div
           animate={{ width: viewportWidths[viewport] }}
           transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-          className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden shadow-lg"
+          className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl overflow-hidden shadow-lg"
           style={{ maxWidth: '100%' }}
         >
           {/* Browser Chrome */}
-          <div className="bg-slate-100 dark:bg-slate-700 px-4 py-3 flex items-center gap-2 border-b border-slate-200 dark:border-slate-600">
+          <div className="bg-zinc-100 dark:bg-zinc-700 px-4 py-3 flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-600">
             <div className="flex gap-1.5">
               <div className="h-3 w-3 rounded-full bg-red-400" />
               <div className="h-3 w-3 rounded-full bg-amber-400" />
               <div className="h-3 w-3 rounded-full bg-green-400" />
             </div>
             <div className="flex-1 ml-2">
-              <div className="bg-white dark:bg-slate-600 rounded-md px-3 py-1 text-xs text-slate-400 max-w-xs">
+              <div className="bg-white dark:bg-zinc-600 rounded-md px-3 py-1 text-xs text-zinc-400 max-w-xs">
                 {brand.name.toLowerCase().replace(/\s+/g, '')}.com
               </div>
             </div>
@@ -154,7 +154,7 @@ export default function WebsitePage() {
           {/* Website Content */}
           <div style={{ backgroundColor: brand.secondary_color }}>
             {/* Nav */}
-            <div className="px-4 sm:px-8 py-4 flex items-center justify-between border-b border-slate-100" style={{ backgroundColor: brand.primary_color }}>
+            <div className="px-4 sm:px-8 py-4 flex items-center justify-between border-b border-zinc-100" style={{ backgroundColor: brand.primary_color }}>
               <div className="flex items-center gap-2">
                 <div className="h-8 w-8 rounded-lg flex items-center justify-center text-xs font-bold" style={{ backgroundColor: brand.accent_color, color: '#fff' }}>
                   {brand.name[0]}
@@ -188,7 +188,7 @@ export default function WebsitePage() {
                 </>
               ) : (
                 <div className="text-center py-8">
-                  <p className="text-slate-400 text-sm mb-4">No landing content generated yet</p>
+                  <p className="text-zinc-400 text-sm mb-4">No landing content generated yet</p>
                   <Button variant="brand" size="sm" onClick={() => generateContent('landing')} disabled={generating === 'landing'}>
                     {generating === 'landing' ? <Spinner className="h-4" /> : <><Sparkles className="h-3.5 w-3.5" /> Generate Landing Page</>}
                   </Button>
@@ -209,7 +209,7 @@ export default function WebsitePage() {
                   viewport === 'mobile' ? 'grid-cols-1' : viewport === 'tablet' ? 'grid-cols-2' : 'grid-cols-3'
                 }`}>
                   {products.slice(0, 6).map((product) => (
-                    <div key={product.id} className="bg-white rounded-lg p-4 border border-slate-100">
+                    <div key={product.id} className="bg-white rounded-lg p-4 border border-zinc-100">
                       <div className="h-20 rounded-md mb-3 flex items-center justify-center" style={{ backgroundColor: brand.accent_color + '15' }}>
                         <span className="text-2xl">📦</span>
                       </div>
@@ -251,7 +251,7 @@ export default function WebsitePage() {
               <h2 className="text-xl font-bold mb-6 text-center" style={{ color: brand.primary_color }}>What People Say</h2>
               <div className={`grid gap-4 max-w-2xl mx-auto ${viewport === 'mobile' ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 {['Amazing product!', 'Best experience ever'].map((text, i) => (
-                  <div key={i} className="bg-white rounded-lg p-4 border border-slate-100 text-center">
+                  <div key={i} className="bg-white rounded-lg p-4 border border-zinc-100 text-center">
                     <p className="text-sm italic mb-2" style={{ color: brand.primary_color, opacity: 0.7 }}>&ldquo;{text}&rdquo;</p>
                     <p className="text-xs font-medium" style={{ color: brand.accent_color }}>— Happy Customer</p>
                   </div>

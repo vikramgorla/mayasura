@@ -38,26 +38,26 @@ export default function DashboardListPage() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
-      <nav className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+    <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
+      <nav className="bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2">
-            <div className="h-8 w-8 rounded-lg bg-slate-900 dark:bg-white flex items-center justify-center">
-              <span className="text-white dark:text-slate-900 text-sm font-bold">M</span>
+            <div className="h-8 w-8 rounded-lg bg-zinc-900 dark:bg-white flex items-center justify-center">
+              <span className="text-white dark:text-zinc-900 text-sm font-bold">M</span>
             </div>
             <span className="font-semibold text-lg tracking-tight hidden sm:inline">Mayasura</span>
           </Link>
           <div className="flex items-center gap-2 sm:gap-3">
             <button
               onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')}
-              className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+              className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors"
             >
               {resolved === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
             </button>
             {user && (
               <button
                 onClick={logout}
-                className="p-2 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors text-slate-500"
+                className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 transition-colors text-zinc-500"
                 title="Sign out"
               >
                 <LogOut className="h-4 w-4" />
@@ -75,10 +75,10 @@ export default function DashboardListPage() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Your Brands</h1>
-          {user && <p className="text-sm text-slate-400 hidden sm:block">Welcome, {user.name}</p>}
+          <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">Your Brands</h1>
+          {user && <p className="text-sm text-zinc-400 hidden sm:block">Welcome, {user.name}</p>}
         </div>
-        <p className="text-slate-500 dark:text-slate-400 mb-8">Manage your brand ecosystems</p>
+        <p className="text-zinc-500 dark:text-zinc-400 mb-8">Manage your brand ecosystems</p>
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -88,13 +88,13 @@ export default function DashboardListPage() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl p-8 sm:p-12 text-center"
+            className="bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl p-8 sm:p-12 text-center"
           >
-            <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-4">
+            <div className="h-16 w-16 rounded-2xl bg-zinc-100 dark:bg-zinc-700 flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">🏛️</span>
             </div>
-            <h2 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">No brands yet</h2>
-            <p className="text-slate-500 dark:text-slate-400 mb-6">Create your first brand ecosystem to get started.</p>
+            <h2 className="text-xl font-semibold mb-2 text-zinc-900 dark:text-white">No brands yet</h2>
+            <p className="text-zinc-500 dark:text-zinc-400 mb-6">Create your first brand ecosystem to get started.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/create">
                 <Button variant="brand">
@@ -126,7 +126,7 @@ export default function DashboardListPage() {
                 >
                   <Link
                     href={`/dashboard/${brand.id}`}
-                    className="group bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 rounded-xl overflow-hidden hover:shadow-lg hover:border-slate-300 dark:hover:border-slate-600 transition-all block"
+                    className="group bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl overflow-hidden hover:shadow-lg hover:border-zinc-300 dark:hover:border-zinc-600 transition-all block"
                   >
                     <div className="h-24 p-4 flex items-end" style={{ backgroundColor: brand.primary_color }}>
                       <div className="flex items-center gap-2">
@@ -142,7 +142,7 @@ export default function DashboardListPage() {
                       </div>
                     </div>
                     <div className="p-4">
-                      <p className="text-sm text-slate-500 mb-3 line-clamp-2">
+                      <p className="text-sm text-zinc-500 mb-3 line-clamp-2">
                         {brand.tagline || 'No tagline'}
                       </p>
                       <div className="flex items-center justify-between">
@@ -152,10 +152,10 @@ export default function DashboardListPage() {
                           </Badge>
                           <Badge variant="outline">{channels.length} channels</Badge>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-slate-400 group-hover:text-slate-600 transition-colors flex-shrink-0" />
+                        <ArrowRight className="h-4 w-4 text-zinc-400 group-hover:text-zinc-600 transition-colors flex-shrink-0" />
                       </div>
                       {brand.status === 'launched' && brand.slug && (
-                        <div className="mt-3 pt-3 border-t border-slate-100 dark:border-slate-700 flex gap-3" onClick={(e) => e.stopPropagation()}>
+                        <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-700 flex gap-3" onClick={(e) => e.stopPropagation()}>
                           <a href={`/site/${brand.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs text-blue-600 hover:text-blue-700">🌐 Site</a>
                           <a href={`/shop/${brand.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs text-amber-600 hover:text-amber-700">🛒 Shop</a>
                           <a href={`/blog/${brand.slug}`} target="_blank" rel="noopener noreferrer" className="text-xs text-purple-600 hover:text-purple-700">📝 Blog</a>

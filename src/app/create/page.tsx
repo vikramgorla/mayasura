@@ -178,27 +178,27 @@ function CreatePageContent() {
   const progress = ((step - 1) / 5) * 100;
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F1A]">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090B]">
       {/* Header */}
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20">
+      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+          <Link href="/" className="flex items-center gap-2 text-sm text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white">
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Back to home</span>
           </Link>
-          <span className="text-sm text-slate-500 dark:text-slate-400">
+          <span className="text-sm text-zinc-500 dark:text-zinc-400">
             Step {step} of 6
           </span>
         </div>
       </div>
 
       {/* Progress Bar — sleek gradient line */}
-      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
+      <div className="bg-white/80 dark:bg-zinc-900/80 backdrop-blur-lg border-b border-zinc-200 dark:border-zinc-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
           {/* Gradient progress line */}
-          <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4">
+          <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden mb-4">
             <motion.div
-              className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-violet-500 to-purple-500"
+              className="h-full rounded-full bg-gradient-to-r from-violet-700 via-violet-500 to-purple-500"
               initial={{ width: 0 }}
               animate={{ width: `${progress}%` }}
               transition={{ duration: 0.4, ease: 'easeOut' }}
@@ -214,19 +214,19 @@ function CreatePageContent() {
                     step > s.id
                       ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-white shadow-sm shadow-emerald-500/25'
                       : step === s.id
-                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
+                      ? 'bg-gradient-to-r from-violet-700 to-violet-600 text-white shadow-md shadow-violet-500/25'
+                      : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400 dark:text-zinc-500'
                   }`}>
                     {step > s.id ? <Check className="h-3.5 w-3.5" /> : s.id}
                   </div>
                   <div className="hidden lg:block min-w-0">
-                    <p className={`text-xs font-medium truncate ${step >= s.id ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>
+                    <p className={`text-xs font-medium truncate ${step >= s.id ? 'text-zinc-900 dark:text-white' : 'text-zinc-400 dark:text-zinc-500'}`}>
                       {s.name}
                     </p>
                   </div>
                 </div>
                 {s.id < 6 && (
-                  <div className={`h-px flex-1 mx-1 sm:mx-2 transition-all duration-300 ${step > s.id ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-800'}`} />
+                  <div className={`h-px flex-1 mx-1 sm:mx-2 transition-all duration-300 ${step > s.id ? 'bg-emerald-400' : 'bg-zinc-200 dark:bg-zinc-800'}`} />
                 )}
               </div>
             ))}
@@ -252,8 +252,8 @@ function CreatePageContent() {
 export default function CreatePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0B0F1A]">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 dark:border-slate-700 border-t-indigo-600 dark:border-t-indigo-400" />
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-[#09090B]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-zinc-200 dark:border-zinc-700 border-t-indigo-600 dark:border-t-indigo-400" />
       </div>
     }>
       <CreatePageContent />

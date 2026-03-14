@@ -63,8 +63,8 @@ export default function SettingsPage() {
     <div className="p-4 sm:p-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Settings</h1>
-          <p className="text-sm text-slate-400 mt-1">Configure integrations and manage your brand</p>
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Settings</h1>
+          <p className="text-sm text-zinc-400 mt-1">Configure integrations and manage your brand</p>
         </div>
 
         {/* Live URLs */}
@@ -78,18 +78,18 @@ export default function SettingsPage() {
           <CardContent>
             <div className="space-y-3">
               {liveUrls.map((item) => (
-                <div key={item.label} className="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-800/50">
+                <div key={item.label} className="flex items-center justify-between p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
                   <div className="flex items-center gap-3">
                     <item.icon className={`h-4 w-4 ${item.color}`} />
                     <div>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white">{item.label}</p>
-                      <p className="text-xs text-slate-400 font-mono">{item.url}</p>
+                      <p className="text-sm font-medium text-zinc-900 dark:text-white">{item.label}</p>
+                      <p className="text-xs text-zinc-400 font-mono">{item.url}</p>
                     </div>
                   </div>
                   <div className="flex items-center gap-2">
                     <button
                       onClick={() => copyToClipboard(`${baseUrl}${item.url}`, item.label)}
-                      className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400"
+                      className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-400"
                     >
                       {copied === item.label ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
                     </button>
@@ -97,7 +97,7 @@ export default function SettingsPage() {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-1.5 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-400"
+                      className="p-1.5 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-400"
                     >
                       <ExternalLink className="h-4 w-4" />
                     </a>
@@ -117,16 +117,16 @@ export default function SettingsPage() {
             </CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">
               Add this script tag to any website to embed your chatbot widget:
             </p>
             <div className="relative">
-              <pre className="p-3 rounded-lg bg-slate-900 text-green-400 text-xs overflow-x-auto font-mono">
+              <pre className="p-3 rounded-lg bg-zinc-900 text-green-400 text-xs overflow-x-auto font-mono">
                 {widgetCode}
               </pre>
               <button
                 onClick={() => copyToClipboard(widgetCode, 'widget')}
-                className="absolute top-2 right-2 p-1.5 rounded bg-slate-700 hover:bg-slate-600 text-slate-300"
+                className="absolute top-2 right-2 p-1.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300"
               >
                 {copied === 'widget' ? <Check className="h-3.5 w-3.5 text-green-400" /> : <Copy className="h-3.5 w-3.5" />}
               </button>
@@ -138,7 +138,7 @@ export default function SettingsPage() {
         <Card className="mb-6">
           <CardHeader>
             <CardTitle className="text-sm flex items-center gap-2">
-              <Settings className="h-4 w-4 text-slate-500" />
+              <Settings className="h-4 w-4 text-zinc-500" />
               Integrations
             </CardTitle>
           </CardHeader>
@@ -153,7 +153,7 @@ export default function SettingsPage() {
               { key: 'smtp_pass', label: 'SMTP Password', placeholder: '••••••', sensitive: true },
             ].map((field) => (
               <div key={field.key}>
-                <label className="block text-sm font-medium mb-1.5 text-slate-600 dark:text-slate-300">
+                <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">
                   {field.label}
                 </label>
                 <div className="flex gap-2">
@@ -161,7 +161,7 @@ export default function SettingsPage() {
                     type={field.sensitive ? 'password' : 'text'}
                     value={settings[field.key] || ''}
                     onChange={(e) => setSettings(s => ({ ...s, [field.key]: e.target.value }))}
-                    className="flex-1 px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm outline-none font-mono"
+                    className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none font-mono"
                     placeholder={field.placeholder}
                   />
                   <Button
@@ -185,20 +185,20 @@ export default function SettingsPage() {
           </CardHeader>
           <CardContent className="space-y-3">
             <div className="flex justify-between text-sm">
-              <span className="text-slate-400">Brand ID</span>
-              <span className="font-mono text-slate-900 dark:text-white">{brandId}</span>
+              <span className="text-zinc-400">Brand ID</span>
+              <span className="font-mono text-zinc-900 dark:text-white">{brandId}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-400">Slug</span>
-              <span className="font-mono text-slate-900 dark:text-white">{slug}</span>
+              <span className="text-zinc-400">Slug</span>
+              <span className="font-mono text-zinc-900 dark:text-white">{slug}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-400">Status</span>
-              <span className="text-slate-900 dark:text-white capitalize">{brand.status}</span>
+              <span className="text-zinc-400">Status</span>
+              <span className="text-zinc-900 dark:text-white capitalize">{brand.status}</span>
             </div>
             <div className="flex justify-between text-sm">
-              <span className="text-slate-400">Created</span>
-              <span className="text-slate-900 dark:text-white">
+              <span className="text-zinc-400">Created</span>
+              <span className="text-zinc-900 dark:text-white">
                 {new Date(brand.created_at).toLocaleDateString()}
               </span>
             </div>

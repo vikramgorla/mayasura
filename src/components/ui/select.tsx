@@ -42,13 +42,13 @@ export function Select({ value, onValueChange, options, placeholder = 'Select...
         onClick={() => !disabled && setOpen(!open)}
         disabled={disabled}
         className={cn(
-          'flex items-center justify-between w-full h-10 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm text-slate-900 dark:text-slate-100 transition-all',
-          'hover:border-slate-300 dark:hover:border-slate-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-indigo-400',
+          'flex items-center justify-between w-full h-10 px-4 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm text-zinc-900 dark:text-zinc-100 transition-all',
+          'hover:border-zinc-300 dark:hover:border-zinc-600 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-500 dark:focus-visible:ring-indigo-400',
           disabled && 'opacity-50 cursor-not-allowed',
           open && 'ring-2 ring-indigo-500 dark:ring-indigo-400 border-transparent'
         )}
       >
-        <span className={cn(!selected && 'text-slate-400 dark:text-slate-500')}>
+        <span className={cn(!selected && 'text-zinc-400 dark:text-zinc-500')}>
           {selected ? (
             <span className="flex items-center gap-2">
               {selected.icon}
@@ -56,7 +56,7 @@ export function Select({ value, onValueChange, options, placeholder = 'Select...
             </span>
           ) : placeholder}
         </span>
-        <ChevronDown className={cn('h-4 w-4 text-slate-400 dark:text-slate-500 transition-transform', open && 'rotate-180')} />
+        <ChevronDown className={cn('h-4 w-4 text-zinc-400 dark:text-zinc-500 transition-transform', open && 'rotate-180')} />
       </button>
       <AnimatePresence>
         {open && (
@@ -65,22 +65,22 @@ export function Select({ value, onValueChange, options, placeholder = 'Select...
             animate={{ opacity: 1, y: 0, scale: 1 }}
             exit={{ opacity: 0, y: -5, scale: 0.98 }}
             transition={{ duration: 0.15 }}
-            className="absolute z-50 w-full mt-1 bg-white dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 shadow-xl dark:shadow-2xl overflow-hidden py-1"
+            className="absolute z-50 w-full mt-1 bg-white dark:bg-zinc-800 rounded-xl border border-zinc-200 dark:border-zinc-700 shadow-xl dark:shadow-2xl overflow-hidden py-1"
           >
             {options.map(option => (
               <button
                 key={option.value}
                 onClick={() => { onValueChange(option.value); setOpen(false); }}
                 className={cn(
-                  'flex items-center justify-between w-full px-4 py-2.5 text-sm text-left transition-colors hover:bg-slate-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200',
-                  option.value === value && 'bg-slate-50 dark:bg-slate-700 font-medium'
+                  'flex items-center justify-between w-full px-4 py-2.5 text-sm text-left transition-colors hover:bg-zinc-50 dark:hover:bg-zinc-700 text-zinc-700 dark:text-zinc-200',
+                  option.value === value && 'bg-zinc-50 dark:bg-zinc-700 font-medium'
                 )}
               >
                 <span className="flex items-center gap-2">
                   {option.icon}
                   {option.label}
                 </span>
-                {option.value === value && <Check className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />}
+                {option.value === value && <Check className="h-4 w-4 text-violet-600 dark:text-violet-400" />}
               </button>
             ))}
           </motion.div>

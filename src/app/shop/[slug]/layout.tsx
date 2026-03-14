@@ -115,7 +115,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-900 text-white">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Shop not found</h1>
           <Link href="/" className="text-blue-400 hover:underline">← Back to Mayasura</Link>
@@ -126,8 +126,8 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
 
   if (!brand) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-pulse h-8 w-32 rounded bg-slate-200" />
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+        <div className="animate-pulse h-8 w-32 rounded bg-zinc-200" />
       </div>
     );
   }

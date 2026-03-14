@@ -78,13 +78,13 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F1A] flex">
+    <div className="min-h-screen bg-zinc-50 dark:bg-[#09090B] flex">
       <CommandPalette brandId={brandId} />
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 bg-white dark:bg-slate-900/95 border-r border-slate-200 dark:border-slate-800 flex-col fixed h-full z-20 sidebar-gradient">
-        <div className="p-4 border-b border-slate-200 dark:border-slate-700">
-          <Link href="/dashboard" className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-600 mb-3">
+      <aside className="hidden lg:flex w-64 bg-white dark:bg-zinc-900/95 border-r border-zinc-200 dark:border-zinc-800 flex-col fixed h-full z-20 sidebar-gradient">
+        <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
+          <Link href="/dashboard" className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600 mb-3">
             <ArrowLeft className="h-3 w-3" />
             All Brands
           </Link>
@@ -97,7 +97,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
             </div>
             <div className="min-w-0">
               <h2 className="font-semibold text-sm truncate">{brand.name}</h2>
-              <p className="text-xs text-slate-400 truncate">{brand.tagline}</p>
+              <p className="text-xs text-zinc-400 truncate">{brand.tagline}</p>
             </div>
           </div>
         </div>
@@ -114,8 +114,8 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
                     className={cn(
                       'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
                       isActive
-                        ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-medium'
-                        : 'text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50 dark:hover:bg-slate-700/50'
+                        ? 'bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-white font-medium'
+                        : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-700/50'
                     )}
                   >
                     <item.icon className="h-4 w-4" />
@@ -127,36 +127,36 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
           </ul>
         </nav>
 
-        <div className="p-4 border-t border-slate-200 dark:border-slate-700 space-y-3">
+        <div className="p-4 border-t border-zinc-200 dark:border-zinc-700 space-y-3">
           <button
             onClick={exportBrand}
-            className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 w-full"
+            className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 w-full"
           >
             <Download className="h-3.5 w-3.5" />
             Export Brand Data
           </button>
           <button
             onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')}
-            className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-600 dark:hover:text-slate-300 w-full"
+            className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 w-full"
           >
             {resolved === 'dark' ? <Sun className="h-3.5 w-3.5" /> : <Moon className="h-3.5 w-3.5" />}
             {resolved === 'dark' ? 'Light Mode' : 'Dark Mode'}
           </button>
           <div className="flex gap-1.5 pt-2">
             <div className="h-4 w-4 rounded-full" style={{ backgroundColor: brand.primary_color }} />
-            <div className="h-4 w-4 rounded-full border border-slate-200 dark:border-slate-600" style={{ backgroundColor: brand.secondary_color }} />
+            <div className="h-4 w-4 rounded-full border border-zinc-200 dark:border-zinc-600" style={{ backgroundColor: brand.secondary_color }} />
             <div className="h-4 w-4 rounded-full" style={{ backgroundColor: brand.accent_color }} />
           </div>
-          <p className="text-xs text-slate-400">{brand.font_heading} / {brand.font_body}</p>
-          <div className="text-xs text-slate-400">
-            <kbd className="px-1.5 py-0.5 rounded border border-slate-200 dark:border-slate-600 text-[10px]">⌘K</kbd>
+          <p className="text-xs text-zinc-400">{brand.font_heading} / {brand.font_body}</p>
+          <div className="text-xs text-zinc-400">
+            <kbd className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-600 text-[10px]">⌘K</kbd>
             <span className="ml-1.5">Command Palette</span>
           </div>
         </div>
       </aside>
 
       {/* Mobile Header */}
-      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+      <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
         <div className="px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <button onClick={() => setMobileMenuOpen(true)} className="p-1.5">
@@ -194,15 +194,15 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
               animate={{ x: 0 }}
               exit={{ x: -280 }}
               transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-72 bg-white dark:bg-slate-800 shadow-2xl flex flex-col"
+              className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-72 bg-white dark:bg-zinc-800 shadow-2xl flex flex-col"
             >
-              <div className="p-4 border-b border-slate-200 dark:border-slate-700 flex items-center justify-between">
-                <Link href="/dashboard" className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-600">
+              <div className="p-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
+                <Link href="/dashboard" className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600">
                   <ArrowLeft className="h-3 w-3" />
                   All Brands
                 </Link>
                 <button onClick={() => setMobileMenuOpen(false)}>
-                  <X className="h-5 w-5 text-slate-400" />
+                  <X className="h-5 w-5 text-zinc-400" />
                 </button>
               </div>
               <nav className="flex-1 p-3 overflow-y-auto">
@@ -217,8 +217,8 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
                           className={cn(
                             'flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-colors',
                             isActive
-                              ? 'bg-slate-100 dark:bg-slate-700 text-slate-900 dark:text-white font-medium'
-                              : 'text-slate-500 hover:text-slate-900 dark:hover:text-white hover:bg-slate-50'
+                              ? 'bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-white font-medium'
+                              : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50'
                           )}
                         >
                           <item.icon className="h-5 w-5" />

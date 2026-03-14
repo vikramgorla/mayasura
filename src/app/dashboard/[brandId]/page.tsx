@@ -101,7 +101,7 @@ export default function BrandDashboardPage() {
     { href: `/dashboard/${brandId}/products`, icon: Package, label: 'Products', desc: `${data.productCount} products`, color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600' },
     { href: `/dashboard/${brandId}/content`, icon: FileText, label: 'Content', desc: `${data.contentCount} pieces`, color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600' },
     { href: `/dashboard/${brandId}/support`, icon: HeadphonesIcon, label: 'Support', desc: `${data.ticketStats.open} open tickets`, color: 'bg-rose-50 dark:bg-rose-900/30 text-rose-600' },
-    { href: `/dashboard/${brandId}/strategy`, icon: Sparkles, label: 'AI Strategy', desc: 'Brand insights', color: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600' },
+    { href: `/dashboard/${brandId}/strategy`, icon: Sparkles, label: 'AI Strategy', desc: 'Brand insights', color: 'bg-violet-50 dark:bg-violet-900/30 text-violet-600' },
   ];
 
   const onboardingItems = [
@@ -124,12 +124,12 @@ export default function BrandDashboardPage() {
         className="mb-8"
       >
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{data.brand.name}</h1>
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">{data.brand.name}</h1>
           <Badge variant={data.brand.status === 'launched' ? 'success' : 'secondary'}>
             {data.brand.status}
           </Badge>
         </div>
-        <p className="text-slate-500 dark:text-slate-400">{data.brand.tagline || 'No tagline'}</p>
+        <p className="text-zinc-500 dark:text-zinc-400">{data.brand.tagline || 'No tagline'}</p>
       </motion.div>
 
       {/* Stats Grid */}
@@ -146,10 +146,10 @@ export default function BrandDashboardPage() {
                 <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-3 ${stat.bg}`}>
                   <stat.icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
-                <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                   <AnimatedCounter value={stat.value} />
                 </p>
-                <p className="text-xs text-slate-400 mt-1">{stat.label}</p>
+                <p className="text-xs text-zinc-400 mt-1">{stat.label}</p>
               </CardContent>
             </Card>
           </motion.div>
@@ -175,7 +175,7 @@ export default function BrandDashboardPage() {
                 <div className="text-4xl font-bold text-blue-600 mb-1">
                   <AnimatedCounter value={healthScore} />%
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-zinc-400">
                   {healthScore >= 80 ? 'Excellent' : healthScore >= 60 ? 'Good' : healthScore >= 40 ? 'Getting there' : 'Needs attention'}
                 </p>
               </div>
@@ -202,7 +202,7 @@ export default function BrandDashboardPage() {
                   <CheckCircle className="h-4 w-4 text-emerald-600" />
                   Getting Started
                 </CardTitle>
-                <span className="text-xs text-slate-400">{completedItems}/{onboardingItems.length} complete</span>
+                <span className="text-xs text-zinc-400">{completedItems}/{onboardingItems.length} complete</span>
               </div>
             </CardHeader>
             <CardContent>
@@ -212,9 +212,9 @@ export default function BrandDashboardPage() {
                     {item.done ? (
                       <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
                     ) : (
-                      <Circle className="h-4 w-4 text-slate-300 flex-shrink-0" />
+                      <Circle className="h-4 w-4 text-zinc-300 flex-shrink-0" />
                     )}
-                    <span className={`text-sm ${item.done ? 'text-slate-400 line-through' : 'text-slate-700 dark:text-slate-300'}`}>
+                    <span className={`text-sm ${item.done ? 'text-zinc-400 line-through' : 'text-zinc-700 dark:text-zinc-300'}`}>
                       {item.label}
                     </span>
                   </div>
@@ -226,7 +226,7 @@ export default function BrandDashboardPage() {
       </div>
 
       {/* Quick Links */}
-      <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Quick Access</h2>
+      <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">Quick Access</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {quickLinks.map((link, i) => (
           <motion.div
@@ -236,16 +236,16 @@ export default function BrandDashboardPage() {
             transition={{ delay: 0.3 + i * 0.03 }}
           >
             <Link href={link.href}>
-              <Card className="hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer group">
+              <Card className="hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer group">
                 <CardContent className="p-5 flex items-center gap-4">
                   <div className={`h-11 w-11 rounded-xl flex items-center justify-center ${link.color}`}>
                     <link.icon className="h-5 w-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm text-slate-900 dark:text-white">{link.label}</p>
-                    <p className="text-xs text-slate-400">{link.desc}</p>
+                    <p className="font-medium text-sm text-zinc-900 dark:text-white">{link.label}</p>
+                    <p className="text-xs text-zinc-400">{link.desc}</p>
                   </div>
-                  <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
+                  <ArrowRight className="h-4 w-4 text-zinc-300 group-hover:text-zinc-500 transition-colors" />
                 </CardContent>
               </Card>
             </Link>
@@ -256,7 +256,7 @@ export default function BrandDashboardPage() {
       {/* Live Ecosystem Links */}
       {data.brand.status === 'launched' && data.brand.slug && (
         <>
-          <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">🏛️ Live Ecosystem</h2>
+          <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">🏛️ Live Ecosystem</h2>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
             {[
               { href: `/site/${data.brand.slug}`, icon: Globe, label: 'Website', desc: 'Live brand website', color: 'text-blue-600 bg-blue-50 dark:bg-blue-900/30' },
@@ -271,13 +271,13 @@ export default function BrandDashboardPage() {
                 rel="noopener noreferrer"
                 className="block"
               >
-                <Card className="hover:shadow-md hover:border-slate-300 dark:hover:border-slate-600 transition-all cursor-pointer group h-full">
+                <Card className="hover:shadow-md hover:border-zinc-300 dark:hover:border-zinc-600 transition-all cursor-pointer group h-full">
                   <CardContent className="p-4">
                     <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-3 ${link.color}`}>
                       <link.icon className="h-5 w-5" />
                     </div>
-                    <p className="font-medium text-sm text-slate-900 dark:text-white">{link.label}</p>
-                    <p className="text-xs text-slate-400 mt-0.5">{link.desc}</p>
+                    <p className="font-medium text-sm text-zinc-900 dark:text-white">{link.label}</p>
+                    <p className="text-xs text-zinc-400 mt-0.5">{link.desc}</p>
                   </CardContent>
                 </Card>
               </a>
@@ -287,12 +287,12 @@ export default function BrandDashboardPage() {
       )}
 
       {/* Active Channels */}
-      <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Active Channels</h2>
+      <h2 className="text-lg font-semibold mb-4 text-zinc-900 dark:text-white">Active Channels</h2>
       <Card>
         <CardContent className="p-6">
           <div className="flex flex-wrap gap-2">
             {channels.length === 0 ? (
-              <p className="text-sm text-slate-400">No channels enabled</p>
+              <p className="text-sm text-zinc-400">No channels enabled</p>
             ) : (
               channels.map((channel: string) => (
                 <Badge key={channel} variant="default" className="capitalize">

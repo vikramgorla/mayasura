@@ -33,10 +33,10 @@ const icons: Record<ToastType, typeof CheckCircle> = {
 };
 
 const styles: Record<ToastType, string> = {
-  success: 'bg-white/90 dark:bg-slate-900/90 border-emerald-200 dark:border-emerald-800/50 text-emerald-900 dark:text-emerald-100',
-  error: 'bg-white/90 dark:bg-slate-900/90 border-red-200 dark:border-red-800/50 text-red-900 dark:text-red-100',
-  info: 'bg-white/90 dark:bg-slate-900/90 border-indigo-200 dark:border-indigo-800/50 text-indigo-900 dark:text-indigo-100',
-  warning: 'bg-white/90 dark:bg-slate-900/90 border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-100',
+  success: 'bg-white/90 dark:bg-zinc-900/90 border-emerald-200 dark:border-emerald-800/50 text-emerald-900 dark:text-emerald-100',
+  error: 'bg-white/90 dark:bg-zinc-900/90 border-red-200 dark:border-red-800/50 text-red-900 dark:text-red-100',
+  info: 'bg-white/90 dark:bg-zinc-900/90 border-violet-200 dark:border-violet-800/50 text-indigo-900 dark:text-indigo-100',
+  warning: 'bg-white/90 dark:bg-zinc-900/90 border-amber-200 dark:border-amber-800/50 text-amber-900 dark:text-amber-100',
 };
 
 const iconStyles: Record<ToastType, string> = {

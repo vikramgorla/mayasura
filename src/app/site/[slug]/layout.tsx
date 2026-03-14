@@ -316,10 +316,10 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-slate-900">
+      <div className="min-h-screen flex items-center justify-center bg-white text-zinc-900">
         <div className="text-center">
           <h1 className="text-2xl font-semibold mb-3">Brand not found</h1>
-          <p className="text-slate-400 mb-6 text-sm">This brand doesn&apos;t exist or hasn&apos;t been launched yet.</p>
+          <p className="text-zinc-400 mb-6 text-sm">This brand doesn&apos;t exist or hasn&apos;t been launched yet.</p>
           <Link href="/" className="text-sm font-medium underline underline-offset-4 hover:opacity-70">
             ← Back to Mayasura
           </Link>
@@ -332,8 +332,8 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="animate-pulse flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded bg-slate-100" />
-          <div className="h-3 w-24 rounded bg-slate-100" />
+          <div className="h-8 w-8 rounded bg-zinc-100" />
+          <div className="h-3 w-24 rounded bg-zinc-100" />
         </div>
       </div>
     );

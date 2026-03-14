@@ -36,7 +36,7 @@ export function Tooltip({ content, children, side = 'top', className }: TooltipP
             exit={{ opacity: 0, scale: 0.95 }}
             transition={{ duration: 0.1 }}
             className={cn(
-              'absolute z-50 px-3 py-1.5 text-xs font-medium text-white bg-slate-900 rounded-lg whitespace-nowrap pointer-events-none',
+              'absolute z-50 px-3 py-1.5 text-xs font-medium text-white bg-zinc-900 rounded-lg whitespace-nowrap pointer-events-none',
               positions[side],
               className
             )}

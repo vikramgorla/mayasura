@@ -32,7 +32,7 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-900 text-white">
+      <div className="min-h-screen flex items-center justify-center bg-zinc-900 text-white">
         <div className="text-center">
           <h1 className="text-4xl font-bold mb-4">Blog not found</h1>
           <Link href="/" className="text-blue-400 hover:underline">← Back to Mayasura</Link>
@@ -43,8 +43,8 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-50">
-        <div className="animate-pulse h-8 w-32 rounded bg-slate-200" />
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+        <div className="animate-pulse h-8 w-32 rounded bg-zinc-200" />
       </div>
     );
   }

@@ -111,11 +111,11 @@ export default function ChatbotPage() {
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center justify-between mb-6">
           <div>
-            <h1 className="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
+            <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
               <MessageSquare className="h-6 w-6" />
               AI Chatbot
             </h1>
-            <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">
+            <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">
               Test, manage FAQs, and embed your chatbot
             </p>
           </div>
@@ -130,15 +130,15 @@ export default function ChatbotPage() {
         </div>
 
         {/* Tabs */}
-        <div className="flex gap-1 mb-6 p-1 bg-slate-100 dark:bg-slate-800 rounded-lg w-fit">
+        <div className="flex gap-1 mb-6 p-1 bg-zinc-100 dark:bg-zinc-800 rounded-lg w-fit">
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
               className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
                 activeTab === tab.id
-                  ? 'bg-white dark:bg-slate-700 text-slate-900 dark:text-white shadow-sm'
-                  : 'text-slate-500 hover:text-slate-700 dark:hover:text-slate-300'
+                  ? 'bg-white dark:bg-zinc-700 text-zinc-900 dark:text-white shadow-sm'
+                  : 'text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300'
               }`}
             >
               {tab.label}
@@ -151,7 +151,7 @@ export default function ChatbotPage() {
           <Card className="overflow-hidden">
             <div className="h-[500px] flex flex-col">
               {/* Chat header */}
-              <div className="px-5 py-3 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
+              <div className="px-5 py-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div
                     className="h-8 w-8 rounded-full flex items-center justify-center text-xs font-bold"
@@ -160,7 +160,7 @@ export default function ChatbotPage() {
                     {brand.name[0]}
                   </div>
                   <div>
-                    <p className="text-sm font-medium text-slate-900 dark:text-white">{brand.name} Support</p>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-white">{brand.name} Support</p>
                     <p className="text-xs text-emerald-500">● Online</p>
                   </div>
                 </div>
@@ -173,13 +173,13 @@ export default function ChatbotPage() {
               <div className="flex-1 overflow-y-auto p-5 space-y-4">
                 {messages.length === 0 && (
                   <div className="text-center py-8">
-                    <p className="text-sm text-slate-400">Send a message to test your chatbot</p>
+                    <p className="text-sm text-zinc-400">Send a message to test your chatbot</p>
                     <div className="flex flex-wrap justify-center gap-2 mt-4">
                       {['What do you offer?', 'Tell me about your brand'].map((q) => (
                         <button
                           key={q}
                           onClick={() => setInput(q)}
-                          className="px-3 py-1.5 rounded-full bg-slate-50 dark:bg-slate-800 text-xs hover:bg-slate-100 dark:hover:bg-slate-700"
+                          className="px-3 py-1.5 rounded-full bg-zinc-50 dark:bg-zinc-800 text-xs hover:bg-zinc-100 dark:hover:bg-zinc-700"
                         >
                           {q}
                         </button>
@@ -192,7 +192,7 @@ export default function ChatbotPage() {
                     <div className={`max-w-[75%] rounded-2xl px-4 py-3 text-sm ${
                       msg.role === 'user'
                         ? 'text-white rounded-br-md'
-                        : 'bg-slate-100 dark:bg-slate-800 text-slate-900 dark:text-slate-100 rounded-bl-md'
+                        : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 rounded-bl-md'
                     }`} style={msg.role === 'user' ? { backgroundColor: brand.accent_color } : {}}>
                       <p className="whitespace-pre-wrap leading-relaxed">{msg.content}</p>
                     </div>
@@ -200,7 +200,7 @@ export default function ChatbotPage() {
                 ))}
                 {sending && (
                   <div className="flex justify-start">
-                    <div className="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-bl-md px-4 py-3">
+                    <div className="bg-zinc-100 dark:bg-zinc-800 rounded-2xl rounded-bl-md px-4 py-3">
                       <LoadingDots />
                     </div>
                   </div>
@@ -209,7 +209,7 @@ export default function ChatbotPage() {
               </div>
 
               {/* Input */}
-              <div className="px-4 py-3 border-t border-slate-100 dark:border-slate-800">
+              <div className="px-4 py-3 border-t border-zinc-100 dark:border-zinc-800">
                 <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="flex gap-2">
                   <Input value={input} onChange={(e) => setInput(e.target.value)} placeholder="Type a message..." disabled={sending} className="flex-1" />
                   <Button type="submit" size="icon" disabled={!input.trim() || sending} variant="brand">
@@ -225,7 +225,7 @@ export default function ChatbotPage() {
         {activeTab === 'faqs' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-slate-500">{faqs.length} FAQ entries — the chatbot will use these to answer questions</p>
+              <p className="text-sm text-zinc-500">{faqs.length} FAQ entries — the chatbot will use these to answer questions</p>
               <Button onClick={() => setAddingFaq(true)} size="sm">
                 <Plus className="h-4 w-4 mr-1" /> Add FAQ
               </Button>
@@ -239,14 +239,14 @@ export default function ChatbotPage() {
                     value={newFaq.question}
                     onChange={(e) => setNewFaq(f => ({ ...f, question: e.target.value }))}
                     placeholder="Question..."
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm outline-none"
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none"
                   />
                   <textarea
                     value={newFaq.answer}
                     onChange={(e) => setNewFaq(f => ({ ...f, answer: e.target.value }))}
                     placeholder="Answer..."
                     rows={3}
-                    className="w-full px-3 py-2 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-sm outline-none resize-none"
+                    className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none resize-none"
                   />
                   <div className="flex gap-2">
                     <Button size="sm" onClick={addFaq} disabled={!newFaq.question.trim() || !newFaq.answer.trim()}>
@@ -263,9 +263,9 @@ export default function ChatbotPage() {
             {faqs.length === 0 && !addingFaq ? (
               <Card>
                 <CardContent className="p-12 text-center">
-                  <MessageSquare className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-                  <p className="text-slate-500 mb-2">No FAQs yet</p>
-                  <p className="text-sm text-slate-400 mb-4">Add question-answer pairs to help your chatbot respond better</p>
+                  <MessageSquare className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
+                  <p className="text-zinc-500 mb-2">No FAQs yet</p>
+                  <p className="text-sm text-zinc-400 mb-4">Add question-answer pairs to help your chatbot respond better</p>
                   <Button onClick={() => setAddingFaq(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add First FAQ
                   </Button>
@@ -278,16 +278,16 @@ export default function ChatbotPage() {
                     <CardContent className="p-4">
                       <div className="flex justify-between items-start gap-3">
                         <div className="flex-1">
-                          <p className="font-semibold text-sm text-slate-900 dark:text-white mb-1">
+                          <p className="font-semibold text-sm text-zinc-900 dark:text-white mb-1">
                             Q: {faq.question}
                           </p>
-                          <p className="text-sm text-slate-500 dark:text-slate-400">
+                          <p className="text-sm text-zinc-500 dark:text-zinc-400">
                             A: {faq.answer}
                           </p>
                         </div>
                         <button
                           onClick={() => deleteFaq(faq.id)}
-                          className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-slate-400 hover:text-red-600 flex-shrink-0"
+                          className="p-2 rounded-lg hover:bg-red-50 dark:hover:bg-red-900/20 text-zinc-400 hover:text-red-600 flex-shrink-0"
                         >
                           <Trash2 className="h-4 w-4" />
                         </button>
@@ -308,11 +308,11 @@ export default function ChatbotPage() {
                 <CardTitle className="text-sm">Embed Code</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-4">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
                   Add this script tag to any website to embed a floating chatbot widget that lets visitors chat with your AI assistant.
                 </p>
                 <div className="relative">
-                  <pre className="p-4 rounded-lg bg-slate-900 text-green-400 text-sm overflow-x-auto font-mono">
+                  <pre className="p-4 rounded-lg bg-zinc-900 text-green-400 text-sm overflow-x-auto font-mono">
                     {widgetCode}
                   </pre>
                   <button
@@ -322,7 +322,7 @@ export default function ChatbotPage() {
                       setTimeout(() => setCopied(false), 2000);
                       toast.success('Copied to clipboard');
                     }}
-                    className="absolute top-3 right-3 p-1.5 rounded bg-slate-700 hover:bg-slate-600 text-slate-300"
+                    className="absolute top-3 right-3 p-1.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-300"
                   >
                     {copied ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
                   </button>
@@ -335,7 +335,7 @@ export default function ChatbotPage() {
                 <CardTitle className="text-sm">Standalone Chat Page</CardTitle>
               </CardHeader>
               <CardContent>
-                <p className="text-sm text-slate-500 dark:text-slate-400 mb-3">
+                <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3">
                   You can also link directly to the full-page chatbot:
                 </p>
                 <a

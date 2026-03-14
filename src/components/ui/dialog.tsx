@@ -68,11 +68,11 @@ export function Dialog({ open, onClose, children, className, size = 'md' }: Dial
 
 export function DialogHeader({ children, onClose, className }: { children: ReactNode; onClose?: () => void; className?: string }) {
   return (
-    <div className={cn('flex items-center justify-between p-6 border-b border-slate-100', className)}>
+    <div className={cn('flex items-center justify-between p-6 border-b border-zinc-100', className)}>
       <div className="font-semibold text-lg">{children}</div>
       {onClose && (
-        <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-slate-100 transition-colors">
-          <X className="h-4 w-4 text-slate-500" />
+        <button onClick={onClose} className="rounded-lg p-1.5 hover:bg-zinc-100 transition-colors">
+          <X className="h-4 w-4 text-zinc-500" />
         </button>
       )}
     </div>
@@ -85,7 +85,7 @@ export function DialogBody({ children, className }: { children: ReactNode; class
 
 export function DialogFooter({ children, className }: { children: ReactNode; className?: string }) {
   return (
-    <div className={cn('flex items-center justify-end gap-3 p-6 border-t border-slate-100 bg-slate-50', className)}>
+    <div className={cn('flex items-center justify-end gap-3 p-6 border-t border-zinc-100 bg-zinc-50', className)}>
       {children}
     </div>
   );

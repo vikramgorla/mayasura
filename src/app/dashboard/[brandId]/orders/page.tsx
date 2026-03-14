@@ -60,8 +60,8 @@ export default function OrdersPage() {
     <div className="p-4 sm:p-8">
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="mb-8">
-          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">Orders</h1>
-          <p className="text-sm text-slate-400 mt-1">{orders.length} total orders</p>
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Orders</h1>
+          <p className="text-sm text-zinc-400 mt-1">{orders.length} total orders</p>
         </div>
 
         {/* Stats */}
@@ -73,8 +73,8 @@ export default function OrdersPage() {
                   <ShoppingBag className="h-5 w-5 text-blue-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{orders.length}</p>
-                  <p className="text-xs text-slate-400">Total Orders</p>
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">{orders.length}</p>
+                  <p className="text-xs text-zinc-400">Total Orders</p>
                 </div>
               </div>
             </CardContent>
@@ -86,8 +86,8 @@ export default function OrdersPage() {
                   <Clock className="h-5 w-5 text-yellow-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">{pendingOrders}</p>
-                  <p className="text-xs text-slate-400">Pending</p>
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">{pendingOrders}</p>
+                  <p className="text-xs text-zinc-400">Pending</p>
                 </div>
               </div>
             </CardContent>
@@ -99,10 +99,10 @@ export default function OrdersPage() {
                   <DollarSign className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                     ${totalRevenue.toFixed(0)}
                   </p>
-                  <p className="text-xs text-slate-400">Revenue</p>
+                  <p className="text-xs text-zinc-400">Revenue</p>
                 </div>
               </div>
             </CardContent>
@@ -114,10 +114,10 @@ export default function OrdersPage() {
                   <CheckCircle className="h-5 w-5 text-green-600" />
                 </div>
                 <div>
-                  <p className="text-2xl font-bold text-slate-900 dark:text-white">
+                  <p className="text-2xl font-bold text-zinc-900 dark:text-white">
                     {orders.filter(o => o.status === 'delivered').length}
                   </p>
-                  <p className="text-xs text-slate-400">Delivered</p>
+                  <p className="text-xs text-zinc-400">Delivered</p>
                 </div>
               </div>
             </CardContent>
@@ -127,9 +127,9 @@ export default function OrdersPage() {
         {orders.length === 0 ? (
           <Card>
             <CardContent className="p-12 text-center">
-              <ShoppingBag className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-              <p className="text-slate-500">No orders yet</p>
-              <p className="text-sm text-slate-400 mt-1">Orders will appear here when customers checkout</p>
+              <ShoppingBag className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
+              <p className="text-zinc-500">No orders yet</p>
+              <p className="text-sm text-zinc-400 mt-1">Orders will appear here when customers checkout</p>
             </CardContent>
           </Card>
         ) : (
@@ -146,21 +146,21 @@ export default function OrdersPage() {
                   >
                     <CardContent className="p-4">
                       <div className="flex items-center justify-between mb-2">
-                        <span className="font-mono text-xs text-slate-400">#{order.id}</span>
+                        <span className="font-mono text-xs text-zinc-400">#{order.id}</span>
                         <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${config.color}`}>
                           {config.label}
                         </span>
                       </div>
                       <div className="flex items-center justify-between">
                         <div>
-                          <p className="font-semibold text-sm text-slate-900 dark:text-white">{order.customer_name}</p>
-                          <p className="text-xs text-slate-400">{order.customer_email}</p>
+                          <p className="font-semibold text-sm text-zinc-900 dark:text-white">{order.customer_name}</p>
+                          <p className="text-xs text-zinc-400">{order.customer_email}</p>
                         </div>
                         <div className="text-right">
-                          <p className="font-bold text-sm text-slate-900 dark:text-white">
+                          <p className="font-bold text-sm text-zinc-900 dark:text-white">
                             {order.currency} {order.total.toFixed(2)}
                           </p>
-                          <p className="text-xs text-slate-400">
+                          <p className="text-xs text-zinc-400">
                             {new Date(order.created_at).toLocaleDateString()}
                           </p>
                         </div>
@@ -180,20 +180,20 @@ export default function OrdersPage() {
                   </CardHeader>
                   <CardContent className="space-y-4">
                     <div>
-                      <p className="text-xs text-slate-400 mb-1">Customer</p>
-                      <p className="text-sm font-medium text-slate-900 dark:text-white">{selectedOrder.customer_name}</p>
-                      <p className="text-xs text-slate-400">{selectedOrder.customer_email}</p>
+                      <p className="text-xs text-zinc-400 mb-1">Customer</p>
+                      <p className="text-sm font-medium text-zinc-900 dark:text-white">{selectedOrder.customer_name}</p>
+                      <p className="text-xs text-zinc-400">{selectedOrder.customer_email}</p>
                     </div>
 
                     {selectedOrder.shipping_address && (
                       <div>
-                        <p className="text-xs text-slate-400 mb-1">Shipping</p>
-                        <p className="text-sm text-slate-700 dark:text-slate-300">{selectedOrder.shipping_address}</p>
+                        <p className="text-xs text-zinc-400 mb-1">Shipping</p>
+                        <p className="text-sm text-zinc-700 dark:text-zinc-300">{selectedOrder.shipping_address}</p>
                       </div>
                     )}
 
                     <div>
-                      <p className="text-xs text-slate-400 mb-2">Items</p>
+                      <p className="text-xs text-zinc-400 mb-2">Items</p>
                       {(() => {
                         try {
                           const items = JSON.parse(selectedOrder.items);
@@ -201,7 +201,7 @@ export default function OrdersPage() {
                             <div className="space-y-2">
                               {items.map((item: { name: string; quantity: number; price: number }, i: number) => (
                                 <div key={i} className="flex justify-between text-sm">
-                                  <span className="text-slate-700 dark:text-slate-300">
+                                  <span className="text-zinc-700 dark:text-zinc-300">
                                     {item.name} ×{item.quantity}
                                   </span>
                                   <span className="font-medium">${(item.price * item.quantity).toFixed(2)}</span>
@@ -209,22 +209,22 @@ export default function OrdersPage() {
                               ))}
                             </div>
                           );
-                        } catch { return <p className="text-xs text-slate-400">Unable to parse items</p>; }
+                        } catch { return <p className="text-xs text-zinc-400">Unable to parse items</p>; }
                       })()}
                     </div>
 
-                    <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
+                    <div className="pt-3 border-t border-zinc-200 dark:border-zinc-700">
                       <div className="flex justify-between">
                         <span className="font-semibold text-sm">Total</span>
-                        <span className="font-bold text-sm text-slate-900 dark:text-white">
+                        <span className="font-bold text-sm text-zinc-900 dark:text-white">
                           {selectedOrder.currency} {selectedOrder.total.toFixed(2)}
                         </span>
                       </div>
                     </div>
 
                     {/* Status actions */}
-                    <div className="pt-3 border-t border-slate-200 dark:border-slate-700">
-                      <p className="text-xs text-slate-400 mb-2">Update Status</p>
+                    <div className="pt-3 border-t border-zinc-200 dark:border-zinc-700">
+                      <p className="text-xs text-zinc-400 mb-2">Update Status</p>
                       <div className="flex flex-wrap gap-2">
                         {statusFlow.map((s) => (
                           <button
@@ -234,7 +234,7 @@ export default function OrdersPage() {
                             className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
                               selectedOrder.status === s
                                 ? 'bg-blue-100 text-blue-800 dark:bg-blue-900/30 dark:text-blue-400'
-                                : 'bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-600'
+                                : 'bg-zinc-100 dark:bg-zinc-700 text-zinc-600 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-600'
                             }`}
                           >
                             {s.charAt(0).toUpperCase() + s.slice(1)}
@@ -247,7 +247,7 @@ export default function OrdersPage() {
               ) : (
                 <Card>
                   <CardContent className="p-8 text-center">
-                    <p className="text-sm text-slate-400">Select an order to view details</p>
+                    <p className="text-sm text-zinc-400">Select an order to view details</p>
                   </CardContent>
                 </Card>
               )}
