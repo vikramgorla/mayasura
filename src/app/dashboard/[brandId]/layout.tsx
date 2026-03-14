@@ -15,6 +15,7 @@ import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
 import { CommandPalette } from '@/components/command-palette';
 import { useToast } from '@/components/ui/toast';
+import { UserNav } from '@/components/user-nav';
 
 const navItems = [
   { href: '', icon: LayoutDashboard, label: 'Overview' },
@@ -151,6 +152,9 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
           <div className="text-xs text-zinc-400">
             <kbd className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-600 text-[10px]">⌘K</kbd>
             <span className="ml-1.5">Command Palette</span>
+          </div>
+          <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800">
+            <UserNav />
           </div>
         </div>
       </aside>
