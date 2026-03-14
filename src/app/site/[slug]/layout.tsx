@@ -445,9 +445,10 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
       .catch(() => setError(true));
   }, [slug]);
 
-  // Load Google Fonts for the brand's heading + body fonts
+  // Load Google Fonts for the brand's template fonts
   useEffect(() => {
     if (!data) return;
+    const tId = data.websiteTemplate?.id || 'minimal';
     const fonts = [data.brand.font_heading, data.brand.font_body].filter(Boolean) as string[];
     if (fonts.length === 0) return;
     const url = buildGoogleFontsUrl(fonts);
