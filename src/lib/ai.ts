@@ -137,6 +137,125 @@ Be helpful, concise, and on-brand. If asked about something you don't know, poli
   return response.content[0].type === 'text' ? response.content[0].text : '';
 }
 
+export async function generateColorPalette(params: {
+  industry: string;
+  mood?: string;
+  style?: string;
+}): Promise<{
+  name: string;
+  colors: {
+    primary: string;
+    secondary: string;
+    accent: string;
+    text: string;
+    muted: string;
+    surface: string;
+    border: string;
+  };
+  reasoning: string;
+}[]> {
+  const message = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2048,
+    messages: [
+      {
+        role: 'user',
+        content: `Generate 3 unique color palettes for a ${params.industry} brand${params.mood ? ` with a ${params.mood} mood` : ''}${params.style ? ` in ${params.style} style` : ''}.
+
+Each palette should have 7 colors: primary (text), secondary (background), accent (brand highlight), text, muted (secondary text), surface (card background), border.
+
+Return ONLY a JSON array with this structure:
+[{"name": "Palette Name", "colors": {"primary": "#hex", "secondary": "#hex", "accent": "#hex", "text": "#hex", "muted": "#hex", "surface": "#hex", "border": "#hex"}, "reasoning": "Why this palette works"}]
+
+Ensure good contrast ratios for accessibility (WCAG AA). Make each palette genuinely different.`,
+      },
+    ],
+  });
+
+  const text = message.content[0].type === 'text' ? message.content[0].text : '';
+  try {
+    const match = text.match(/\[[\s\S]*\]/);
+    return match ? JSON.parse(match[0]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export async function generateCopy(params: {
+  brandName: string;
+  industry: string;
+  brandVoice?: string;
+  type: 'hero' | 'tagline' | 'about' | 'product' | 'meta-description';
+  context?: string;
+}): Promise<{ text: string; alternatives?: string[] }> {
+  const typePrompts: Record<string, string> = {
+    hero: `Write a compelling hero section headline and subheading for ${params.brandName} (${params.industry}). Return as JSON: {"text": "headline\\n\\nsubheading", "alternatives": ["alt headline 1", "alt headline 2"]}`,
+    tagline: `Generate 5 unique taglines for ${params.brandName} in the ${params.industry} industry. Return as JSON: {"text": "best tagline", "alternatives": ["tagline 2", "tagline 3", "tagline 4", "tagline 5"]}`,
+    about: `Write an "About Us" page (3-4 paragraphs) for ${params.brandName} in the ${params.industry} industry. Return as JSON: {"text": "full about page text"}`,
+    product: `Write a compelling product description for "${params.context || 'a product'}" by ${params.brandName}. Return as JSON: {"text": "description", "alternatives": ["alt description"]}`,
+    'meta-description': `Write an SEO-optimized meta description (150-160 chars) for ${params.brandName} (${params.industry}). Return as JSON: {"text": "meta description", "alternatives": ["alt meta 1", "alt meta 2"]}`,
+  };
+
+  const message = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2048,
+    messages: [
+      {
+        role: 'user',
+        content: `${typePrompts[params.type]}${params.brandVoice ? `\nBrand voice: ${params.brandVoice}` : ''}
+        
+Return ONLY the JSON, no other text.`,
+      },
+    ],
+  });
+
+  const text = message.content[0].type === 'text' ? message.content[0].text : '';
+  try {
+    const match = text.match(/\{[\s\S]*\}/);
+    return match ? JSON.parse(match[0]) : { text: '' };
+  } catch {
+    return { text };
+  }
+}
+
+export async function analyzeSEO(params: {
+  url?: string;
+  title: string;
+  description?: string;
+  content?: string;
+  industry: string;
+}): Promise<{
+  score: number;
+  suggestions: Array<{ type: string; current: string; suggested: string; priority: 'high' | 'medium' | 'low' }>;
+}> {
+  const message = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2048,
+    messages: [
+      {
+        role: 'user',
+        content: `Analyze the SEO of this page and provide improvement suggestions:
+Title: ${params.title}
+${params.description ? `Description: ${params.description}` : ''}
+${params.content ? `Content preview: ${params.content.slice(0, 500)}` : ''}
+Industry: ${params.industry}
+
+Return as JSON: {"score": 0-100, "suggestions": [{"type": "title|description|heading|content|keyword", "current": "what exists", "suggested": "what to change to", "priority": "high|medium|low"}]}
+
+Provide 3-6 actionable suggestions. Return ONLY the JSON.`,
+      },
+    ],
+  });
+
+  const text = message.content[0].type === 'text' ? message.content[0].text : '';
+  try {
+    const match = text.match(/\{[\s\S]*\}/);
+    return match ? JSON.parse(match[0]) : { score: 0, suggestions: [] };
+  } catch {
+    return { score: 0, suggestions: [] };
+  }
+}
+
 export async function analyzeBrandVoice(description: string): Promise<{
   tone: string;
   personality: string[];

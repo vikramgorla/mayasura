@@ -6,7 +6,8 @@ import { Command } from 'cmdk';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search, Plus, LayoutDashboard, Globe, MessageSquare,
-  Package, FileText, Sparkles, Home, Palette, HeadphonesIcon
+  Package, FileText, Sparkles, Home, Palette, HeadphonesIcon,
+  Wand2, Type, PenTool, BarChart3, Paintbrush
 } from 'lucide-react';
 
 interface CommandPaletteProps {
@@ -142,6 +143,39 @@ export function CommandPalette({ brandId }: CommandPaletteProps) {
                       </>
                     )}
                   </Command.Group>
+
+                  {brandId && (
+                    <Command.Group heading="✨ AI Assist" className="text-xs text-zinc-400 dark:text-zinc-500 px-2 py-1.5 font-medium">
+                      <Command.Item
+                        onSelect={() => runCommand(() => router.push(`/dashboard/${brandId}/strategy`))}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
+                      >
+                        <Wand2 className="h-4 w-4 text-violet-500" />
+                        AI Brand Strategy
+                      </Command.Item>
+                      <Command.Item
+                        onSelect={() => runCommand(() => router.push(`/dashboard/${brandId}/design`))}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
+                      >
+                        <Paintbrush className="h-4 w-4 text-violet-500" />
+                        AI Color Palette Generator
+                      </Command.Item>
+                      <Command.Item
+                        onSelect={() => runCommand(() => router.push(`/dashboard/${brandId}/content`))}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
+                      >
+                        <PenTool className="h-4 w-4 text-violet-500" />
+                        AI Copy Writer
+                      </Command.Item>
+                      <Command.Item
+                        onSelect={() => runCommand(() => router.push(`/dashboard/${brandId}/analytics`))}
+                        className="flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm cursor-pointer text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 data-[selected=true]:bg-zinc-100 dark:data-[selected=true]:bg-zinc-800"
+                      >
+                        <BarChart3 className="h-4 w-4 text-violet-500" />
+                        AI SEO Analyzer
+                      </Command.Item>
+                    </Command.Group>
+                  )}
                 </Command.List>
                 <div className="border-t border-zinc-100 dark:border-zinc-800 px-4 py-2 flex items-center justify-between text-xs text-zinc-400 dark:text-zinc-500">
                   <span>Navigate with ↑↓, select with ↵</span>

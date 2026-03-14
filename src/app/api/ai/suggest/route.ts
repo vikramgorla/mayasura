@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { suggestBrandNames, suggestTaglines, generateProductDescription, analyzeBrandVoice } from '@/lib/ai';
+import { suggestBrandNames, suggestTaglines, generateProductDescription, analyzeBrandVoice, generateColorPalette, generateCopy } from '@/lib/ai';
 import { WEBSITE_TEMPLATES, suggestTemplateForIndustry } from '@/lib/website-templates';
 
 export async function POST(request: NextRequest) {
