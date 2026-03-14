@@ -885,6 +885,7 @@ export default function BrandHomePage() {
         template={template}
         products={products}
         blogPosts={blogPosts}
+        designSettings={designSettings}
       />
       <Divider />
       {renderCTA()}

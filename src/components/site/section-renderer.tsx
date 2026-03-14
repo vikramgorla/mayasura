@@ -23,10 +23,17 @@ import type {
   StatsConfig,
   FaqConfig,
 } from '@/lib/page-layout';
+import {
+  getPrimaryButtonStyle,
+  BORDER_RADIUS_MAP,
+  SPACING_MAP,
+  type ResolvedDesignSettings,
+} from '@/lib/design-settings';
 
 interface SectionProps {
   brand: Brand;
   template?: WebsiteTemplate;
+  designSettings?: ResolvedDesignSettings;
   products?: Array<{ id: string; name: string; description: string; price: number; currency: string; image_url: string | null; category: string | null }>;
   blogPosts?: Array<{ id: string; title: string; slug: string; excerpt: string | null; category: string | null; published_at: string }>;
 }
@@ -371,6 +378,7 @@ export function LayoutSections({
   template,
   products,
   blogPosts,
+  designSettings,
 }: {
   layout: PageLayout;
 } & SectionProps) {
