@@ -402,13 +402,15 @@ export function TemplateDetailPreview({
         </p>
         <div className="inline-flex items-center rounded-lg bg-zinc-100 dark:bg-zinc-700 p-0.5">
           {([
-            { id: 'desktop' as Viewport, icon: Monitor },
-            { id: 'tablet' as Viewport, icon: Tablet },
-            { id: 'mobile' as Viewport, icon: Smartphone },
+            { id: 'desktop' as Viewport, icon: Monitor, label: 'Desktop preview' },
+            { id: 'tablet' as Viewport, icon: Tablet, label: 'Tablet preview' },
+            { id: 'mobile' as Viewport, icon: Smartphone, label: 'Mobile preview' },
           ]).map(v => (
             <button
               key={v.id}
               onClick={() => setViewport(v.id)}
+              aria-label={v.label}
+              aria-pressed={viewport === v.id}
               className={cn(
                 'p-1.5 rounded-md transition-colors',
                 viewport === v.id

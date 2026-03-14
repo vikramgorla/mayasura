@@ -71,7 +71,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={contextValue}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none">
+      <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none" role="status" aria-live="polite" aria-label="Notifications">
         <AnimatePresence mode="popLayout">
           {toasts.map((t) => {
             const Icon = icons[t.type];
@@ -98,6 +98,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
                 <button
                   onClick={() => removeToast(t.id)}
                   className="flex-shrink-0 rounded-md p-1 opacity-40 hover:opacity-100 transition-opacity"
+                  aria-label="Dismiss notification"
                 >
                   <X className="h-3.5 w-3.5" />
                 </button>

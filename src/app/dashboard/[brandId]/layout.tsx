@@ -81,10 +81,11 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#09090B] flex">
+      <a href="#dashboard-content" className="skip-to-content">Skip to content</a>
       <CommandPalette brandId={brandId} />
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 bg-white dark:bg-zinc-900/95 border-r border-zinc-200 dark:border-zinc-800 flex-col fixed h-full z-20 sidebar-gradient">
+      <aside className="hidden lg:flex w-64 bg-white dark:bg-zinc-900/95 border-r border-zinc-200 dark:border-zinc-800 flex-col fixed h-full z-20 sidebar-gradient" aria-label="Dashboard sidebar">
         <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
           <Link href="/dashboard" className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600 mb-3">
             <ArrowLeft className="h-3 w-3" />
@@ -164,7 +165,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
       <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
         <div className="px-4 h-14 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <button onClick={() => setMobileMenuOpen(true)} className="p-1.5">
+            <button onClick={() => setMobileMenuOpen(true)} className="p-1.5" aria-label="Open navigation menu" aria-expanded={mobileMenuOpen}>
               <Menu className="h-5 w-5" />
             </button>
             <div className="flex items-center gap-2">
@@ -177,7 +178,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
               <span className="font-semibold text-sm truncate max-w-[150px]">{brand.name}</span>
             </div>
           </div>
-          <button onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')} className="p-1.5">
+          <button onClick={() => setTheme(resolved === 'dark' ? 'light' : 'dark')} className="p-1.5" aria-label={resolved === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}>
             {resolved === 'dark' ? <Sun className="h-4 w-4" /> : <Moon className="h-4 w-4" />}
           </button>
         </div>
@@ -206,7 +207,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
                   <ArrowLeft className="h-3 w-3" />
                   All Brands
                 </Link>
-                <button onClick={() => setMobileMenuOpen(false)}>
+                <button onClick={() => setMobileMenuOpen(false)} aria-label="Close navigation menu">
                   <X className="h-5 w-5 text-zinc-400" />
                 </button>
               </div>
@@ -240,7 +241,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="flex-1 lg:ml-64 pt-14 lg:pt-0">
+      <main id="dashboard-content" className="flex-1 lg:ml-64 pt-14 lg:pt-0" role="main">
         <motion.div
           key={pathname}
           initial={{ opacity: 0, y: 8 }}

@@ -129,6 +129,53 @@ h4, h5, h6 {
   background-clip: text;
 }
 
+/* ==================== Focus Indicators (WCAG 2.4.7) ==================== */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Remove default outlines only when using mouse (focus without :focus-visible) */
+:focus:not(:focus-visible) {
+  outline: none;
+}
+
+/* ==================== Skip to Content ==================== */
+.skip-to-content {
+  position: absolute;
+  top: -100%;
+  left: 16px;
+  z-index: 9999;
+  padding: 8px 16px;
+  background: var(--bg-surface);
+  color: var(--text-primary);
+  border: 2px solid var(--accent);
+  border-radius: var(--radius-md);
+  font-size: 0.875rem;
+  font-weight: 500;
+  text-decoration: none;
+  transition: top 0.15s ease;
+  box-shadow: var(--shadow-lg);
+}
+
+.skip-to-content:focus {
+  top: 16px;
+}
+
+/* ==================== Screen Reader Only ==================== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
 /* ==================== Scrollbar ==================== */
 ::-webkit-scrollbar {
   width: 6px;
