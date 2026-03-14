@@ -60,7 +60,7 @@ export default function SignupPage() {
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Create your account</h1>
-          <p className="text-slate-500">Start building your brand&apos;s digital palace</p>
+          <p className="text-slate-500 dark:text-slate-400">Start building your brand&apos;s digital palace</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm">
@@ -121,7 +121,7 @@ export default function SignupPage() {
 
         <p className="text-center text-sm text-slate-500 mt-6">
           Already have an account?{' '}
-          <Link href="/login" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/login" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
             Sign in
           </Link>
         </p>

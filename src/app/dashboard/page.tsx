@@ -75,10 +75,10 @@ export default function DashboardListPage() {
 
       <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
         <div className="flex items-center justify-between mb-2">
-          <h1 className="text-2xl sm:text-3xl font-bold">Your Brands</h1>
+          <h1 className="text-2xl sm:text-3xl font-bold text-slate-900 dark:text-white">Your Brands</h1>
           {user && <p className="text-sm text-slate-400 hidden sm:block">Welcome, {user.name}</p>}
         </div>
-        <p className="text-slate-500 mb-8">Manage your brand ecosystems</p>
+        <p className="text-slate-500 dark:text-slate-400 mb-8">Manage your brand ecosystems</p>
 
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -93,8 +93,8 @@ export default function DashboardListPage() {
             <div className="h-16 w-16 rounded-2xl bg-slate-100 dark:bg-slate-700 flex items-center justify-center mx-auto mb-4">
               <span className="text-2xl">🏛️</span>
             </div>
-            <h2 className="text-xl font-semibold mb-2">No brands yet</h2>
-            <p className="text-slate-500 mb-6">Create your first brand ecosystem to get started.</p>
+            <h2 className="text-xl font-semibold mb-2 text-slate-900 dark:text-white">No brands yet</h2>
+            <p className="text-slate-500 dark:text-slate-400 mb-6">Create your first brand ecosystem to get started.</p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link href="/create">
                 <Button variant="brand">

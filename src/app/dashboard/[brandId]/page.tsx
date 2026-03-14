@@ -124,12 +124,12 @@ export default function BrandDashboardPage() {
         className="mb-8"
       >
         <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-2">
-          <h1 className="text-2xl font-bold">{data.brand.name}</h1>
+          <h1 className="text-2xl font-bold text-slate-900 dark:text-white">{data.brand.name}</h1>
           <Badge variant={data.brand.status === 'launched' ? 'success' : 'secondary'}>
             {data.brand.status}
           </Badge>
         </div>
-        <p className="text-slate-500">{data.brand.tagline || 'No tagline'}</p>
+        <p className="text-slate-500 dark:text-slate-400">{data.brand.tagline || 'No tagline'}</p>
       </motion.div>
 
       {/* Stats Grid */}
@@ -146,7 +146,7 @@ export default function BrandDashboardPage() {
                 <div className={`h-10 w-10 rounded-xl flex items-center justify-center mb-3 ${stat.bg}`}>
                   <stat.icon className={`h-5 w-5 ${stat.color}`} />
                 </div>
-                <p className="text-2xl font-bold">
+                <p className="text-2xl font-bold text-slate-900 dark:text-white">
                   <AnimatedCounter value={stat.value} />
                 </p>
                 <p className="text-xs text-slate-400 mt-1">{stat.label}</p>
@@ -226,7 +226,7 @@ export default function BrandDashboardPage() {
       </div>
 
       {/* Quick Links */}
-      <h2 className="text-lg font-semibold mb-4">Quick Access</h2>
+      <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Quick Access</h2>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {quickLinks.map((link, i) => (
           <motion.div
@@ -242,7 +242,7 @@ export default function BrandDashboardPage() {
                     <link.icon className="h-5 w-5" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <p className="font-medium text-sm">{link.label}</p>
+                    <p className="font-medium text-sm text-slate-900 dark:text-white">{link.label}</p>
                     <p className="text-xs text-slate-400">{link.desc}</p>
                   </div>
                   <ArrowRight className="h-4 w-4 text-slate-300 group-hover:text-slate-500 transition-colors" />
@@ -254,7 +254,7 @@ export default function BrandDashboardPage() {
       </div>
 
       {/* Active Channels */}
-      <h2 className="text-lg font-semibold mb-4">Active Channels</h2>
+      <h2 className="text-lg font-semibold mb-4 text-slate-900 dark:text-white">Active Channels</h2>
       <Card>
         <CardContent className="p-6">
           <div className="flex flex-wrap gap-2">

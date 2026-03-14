@@ -38,14 +38,14 @@ export default function TemplatesPage() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
           >
-            <div className="inline-flex items-center gap-2 rounded-full bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue-800 px-4 py-1.5 text-sm text-blue-600 dark:text-blue-400 mb-6">
+            <div className="inline-flex items-center gap-2 rounded-full bg-indigo-50 dark:bg-indigo-950/50 border border-indigo-200/50 dark:border-indigo-800/50 px-4 py-1.5 text-sm text-indigo-600 dark:text-indigo-400 mb-6">
               <Sparkles className="h-3.5 w-3.5" />
               Category Starter Kits
             </div>
-            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4">
+            <h1 className="text-3xl sm:text-4xl font-bold tracking-tight mb-4 text-slate-900 dark:text-white">
               Start with a template
             </h1>
-            <p className="text-slate-500 text-lg max-w-xl mx-auto">
+            <p className="text-slate-500 dark:text-slate-400 text-lg max-w-xl mx-auto">
               Pre-built brand ecosystems for every industry. Pick a template, customize with AI, and launch.
             </p>
           </motion.div>
@@ -175,8 +175,8 @@ function TemplateCard({
       onClick={onSelect}
       className={`w-full text-left bg-white dark:bg-slate-800 rounded-xl border-2 overflow-hidden transition-all hover:shadow-lg cursor-pointer ${
         isSelected
-          ? 'border-blue-500 shadow-lg shadow-blue-500/10'
-          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+          ? 'border-indigo-500 dark:border-indigo-400 shadow-lg shadow-indigo-500/10'
+          : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
       }`}
     >
       <div className="h-20 p-4 flex items-end" style={{ backgroundColor: template.primaryColor }}>

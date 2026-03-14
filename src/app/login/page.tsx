@@ -59,7 +59,7 @@ export default function LoginPage() {
             </div>
           </Link>
           <h1 className="text-2xl font-bold text-slate-900 dark:text-white mb-1">Welcome back</h1>
-          <p className="text-slate-500">Sign in to your Mayasura account</p>
+          <p className="text-slate-500 dark:text-slate-400">Sign in to your Mayasura account</p>
         </div>
 
         <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 p-8 shadow-sm">
@@ -110,7 +110,7 @@ export default function LoginPage() {
 
         <p className="text-center text-sm text-slate-500 mt-6">
           Don&apos;t have an account?{' '}
-          <Link href="/signup" className="text-blue-600 hover:text-blue-700 font-medium">
+          <Link href="/signup" className="text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 font-medium">
             Sign up
           </Link>
         </p>

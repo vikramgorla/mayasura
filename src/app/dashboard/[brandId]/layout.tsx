@@ -75,11 +75,11 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
   );
 
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F1A] flex">
       <CommandPalette brandId={brandId} />
 
       {/* Desktop Sidebar */}
-      <aside className="hidden lg:flex w-64 bg-white dark:bg-slate-800 border-r border-slate-200 dark:border-slate-700 flex-col fixed h-full z-20">
+      <aside className="hidden lg:flex w-64 bg-white dark:bg-slate-900/95 border-r border-slate-200 dark:border-slate-800 flex-col fixed h-full z-20 sidebar-gradient">
         <div className="p-4 border-b border-slate-200 dark:border-slate-700">
           <Link href="/dashboard" className="flex items-center gap-2 text-xs text-slate-400 hover:text-slate-600 mb-3">
             <ArrowLeft className="h-3 w-3" />
