@@ -6,6 +6,7 @@ import { ToastProvider } from './ui/toast';
 import { CommandPalette } from './command-palette';
 import { ErrorBoundary } from './error-boundary';
 import { AuthProvider } from './auth-provider';
+import { OfflineBanner } from './offline-banner';
 
 export function ClientProviders({ children }: { children: ReactNode }) {
   return (
@@ -15,6 +16,7 @@ export function ClientProviders({ children }: { children: ReactNode }) {
           <ToastProvider>
             {children}
             <CommandPalette />
+            <OfflineBanner />
           </ToastProvider>
         </AuthProvider>
       </ThemeProvider>

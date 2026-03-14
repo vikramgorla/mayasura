@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { useBrandSite, BrandPlaceholder } from './layout';
 import { LayoutSections } from '@/components/site/section-renderer';
 import { getDefaultLayout } from '@/lib/page-layout';
@@ -10,6 +11,50 @@ import {
   SPACING_MAP,
   BORDER_RADIUS_MAP,
 } from '@/lib/design-settings';
+
+// ─── Template-specific animation variants ────────────────────────
+const heroAnimations = {
+  minimal: {
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } } },
+    item: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.8, ease: 'easeOut' } } },
+  },
+  bold: {
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.05 } } },
+    item: { hidden: { opacity: 0, y: 60 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.33, 1, 0.68, 1] } } },
+  },
+  editorial: {
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } } },
+    item: { hidden: { opacity: 0, x: -20 }, show: { opacity: 1, x: 0, transition: { duration: 0.6, ease: 'easeOut' } } },
+  },
+  playful: {
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } } },
+    item: { hidden: { opacity: 0, y: 20, scale: 0.95 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, type: 'spring', stiffness: 200, damping: 20 } } },
+  },
+  classic: {
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.15 } } },
+    item: { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.7, ease: 'easeOut' } } },
+  },
+};
+
+const scrollReveal = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: 'easeOut' } },
+};
+
+const scrollStagger = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+};
+
+const scrollItem = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: 'easeOut' } },
+};
+
+function getHeroAnim(templateId: string) {
+  if (templateId in heroAnimations) return heroAnimations[templateId as keyof typeof heroAnimations];
+  return heroAnimations.minimal;
+}
 
 export default function BrandHomePage() {
   const data = useBrandSite();
@@ -43,24 +88,26 @@ export default function BrandHomePage() {
 
   // ===== HERO SECTION =====
   const renderHero = () => {
+    const anim = getHeroAnim(templateId);
+
     // MINIMAL — Massive whitespace, light-weight typography
     if (templateId === 'minimal') {
       return (
         <section className="t-hero">
           <div className="max-w-6xl mx-auto px-5 sm:px-8">
-            <div className="max-w-3xl">
+            <motion.div className="max-w-3xl" variants={anim.container} initial="hidden" animate="show">
               {brand.industry && (
-                <span className="text-xs font-normal uppercase tracking-[0.2em] mb-8 block" style={{ color: `${textColor}25` }}>
+                <motion.span variants={anim.item} className="text-xs font-normal uppercase tracking-[0.2em] mb-8 block" style={{ color: `${textColor}25` }}>
                   {brand.industry}
-                </span>
+                </motion.span>
               )}
-              <h1 className="t-hero-heading mb-8" style={{ ...headingStyle, fontWeight: 300 }}>
+              <motion.h1 variants={anim.item} className="t-hero-heading mb-8" style={{ ...headingStyle, fontWeight: 300 }}>
                 {brand.tagline || brand.name}
-              </h1>
-              <p className="t-hero-desc" style={{ color: `${textColor}35` }}>
+              </motion.h1>
+              <motion.p variants={anim.item} className="t-hero-desc" style={{ color: `${textColor}35` }}>
                 {brand.description || `Welcome to ${brand.name}.`}
-              </p>
-              <div className="flex flex-wrap gap-4 mt-12">
+              </motion.p>
+              <motion.div variants={anim.item} className="flex flex-wrap gap-4 mt-12">
                 {channels.includes('ecommerce') && (
                   <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: textColor, color: bgColor }}>
                     Shop Now
@@ -69,8 +116,8 @@ export default function BrandHomePage() {
                 <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
                   Learn More
                 </Link>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
       );
@@ -118,31 +165,33 @@ export default function BrandHomePage() {
       );
     }
 
-    // BOLD — Massive viewport-filling heading
+    // BOLD — Massive viewport-filling heading with dramatic slide-up
     if (templateId === 'bold') {
       return (
         <section className="t-hero" style={{ backgroundColor: '#000000' }}>
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
-            <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] mb-8" style={{ color: accentColor }}>
-              — {brand.industry || brand.name}
-            </span>
-            <h1 className="t-hero-heading mb-8" style={{ ...headingStyle, color: '#FFFFFF' }}>
-              {(brand.tagline || brand.name).toUpperCase()}
-            </h1>
-            <p className="t-hero-desc" style={{ color: '#FFFFFF60' }}>
-              {brand.description || `Welcome to ${brand.name}.`}
-            </p>
-            <div className="h-0.5 w-16 mt-4 mb-10" style={{ backgroundColor: accentColor }} />
-            <div className="flex flex-wrap gap-4">
-              {channels.includes('ecommerce') && (
-                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
-                  SHOP NOW
+            <motion.div variants={anim.container} initial="hidden" animate="show">
+              <motion.span variants={anim.item} className="inline-block text-xs font-bold uppercase tracking-[0.2em] mb-8" style={{ color: accentColor }}>
+                — {brand.industry || brand.name}
+              </motion.span>
+              <motion.h1 variants={anim.item} className="t-hero-heading mb-8" style={{ ...headingStyle, color: '#FFFFFF' }}>
+                {(brand.tagline || brand.name).toUpperCase()}
+              </motion.h1>
+              <motion.p variants={anim.item} className="t-hero-desc" style={{ color: '#FFFFFF60' }}>
+                {brand.description || `Welcome to ${brand.name}.`}
+              </motion.p>
+              <motion.div variants={anim.item} className="h-0.5 w-16 mt-4 mb-10" style={{ backgroundColor: accentColor }} />
+              <motion.div variants={anim.item} className="flex flex-wrap gap-4">
+                {channels.includes('ecommerce') && (
+                  <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
+                    SHOP NOW
+                  </Link>
+                )}
+                <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={{ ...secondaryBtnStyle, borderColor: '#FFFFFF20', color: '#FFFFFF' }}>
+                  LEARN MORE
                 </Link>
-              )}
-              <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={{ ...secondaryBtnStyle, borderColor: '#FFFFFF20', color: '#FFFFFF' }}>
-                LEARN MORE
-              </Link>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
       );
@@ -470,14 +519,21 @@ export default function BrandHomePage() {
 
           {/* MINIMAL — gap-px grid */}
           {templateId === 'minimal' && (
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ backgroundColor: `${textColor}06` }}>
+            <motion.div
+              variants={scrollStagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-80px" }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-px"
+              style={{ backgroundColor: `${textColor}06` }}
+            >
               {features.map(f => (
-                <div key={f.title} className="p-8 sm:p-10" style={{ backgroundColor: bgColor }}>
+                <motion.div key={f.title} variants={scrollItem} className="p-8 sm:p-10" style={{ backgroundColor: bgColor }}>
                   <h3 className="text-sm font-normal mb-2" style={{ fontFamily: brand.font_heading, fontWeight: 400 }}>{f.title}</h3>
                   <p className="text-sm" style={{ color: `${textColor}35` }}>{f.desc}</p>
-                </div>
+                </motion.div>
               ))}
-            </div>
+            </motion.div>
           )}
 
           {/* EDITORIAL — Flat with dividers */}
@@ -597,8 +653,15 @@ export default function BrandHomePage() {
             </Link>
           </div>
 
-          <div className={`grid grid-cols-1 sm:grid-cols-2 ${templateId === 'bold' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}>
+          <motion.div
+            variants={scrollStagger}
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-60px" }}
+            className={`grid grid-cols-1 sm:grid-cols-2 ${templateId === 'bold' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}
+          >
             {products.slice(0, templateId === 'bold' ? 4 : 3).map((product) => (
+              <motion.div key={product.id} variants={scrollItem}>
               <Link
                 key={product.id}
                 href={`/shop/${slug}/product/${product.id}`}
@@ -618,7 +681,7 @@ export default function BrandHomePage() {
                   }}
                 >
                   {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                    <img src={product.image_url} alt={product.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   ) : (
                     <svg className="w-10 h-10" style={{ color: `${textColor}08` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -648,8 +711,9 @@ export default function BrandHomePage() {
                   )}
                 </div>
               </Link>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
 
           <div className="mt-8 text-center sm:hidden">
             <Link href={`/site/${slug}/products`} className="text-sm font-medium" style={{ color: accentColor }}>

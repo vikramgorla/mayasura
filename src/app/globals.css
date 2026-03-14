@@ -216,8 +216,8 @@ h4, h5, h6 {
 }
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
 }
 
 .animate-fade-in {
@@ -319,6 +319,11 @@ h4, h5, h6 {
   .safe-area-bottom {
     padding-bottom: env(safe-area-inset-bottom);
   }
+}
+
+/* Smooth scrolling globally */
+html {
+  scroll-behavior: smooth;
 }
 
 /* Fix horizontal overflow at small viewports */

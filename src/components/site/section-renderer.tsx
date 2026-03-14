@@ -158,60 +158,81 @@ function NewsletterSection({ section, brand, template }: { section: PageSection 
   return (
     <section className="t-section">
       <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
-        <div
-          className="py-12 sm:py-16 px-8 sm:px-16 text-center"
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          className="py-14 sm:py-20 px-8 sm:px-16 text-center relative overflow-hidden"
           style={{
-            backgroundColor: `${textColor}04`,
-            borderRadius: tp?.borderRadius || '8px',
+            background: isDark
+              ? `linear-gradient(135deg, ${accentColor}20 0%, #11111180 100%)`
+              : `linear-gradient(135deg, ${accentColor}08 0%, ${accentColor}15 50%, ${textColor}04 100%)`,
+            borderRadius: templateId === 'playful' ? '24px' : templateId === 'classic' ? '16px' : tp?.borderRadius || '8px',
           }}
         >
-          <h2
-            className="text-xl sm:text-2xl mb-3"
-            style={{
-              fontFamily: brand.font_heading,
-              fontWeight: tp?.typography.headingWeight || '600',
-              color: textColor,
-            }}
-          >
-            {config.heading || 'Stay Updated'}
-          </h2>
-          <p className="text-sm mb-6" style={{ color: `${textColor}45` }}>
-            {config.subheading || 'Subscribe to our newsletter.'}
-          </p>
-          {subscribed ? (
-            <p className="text-sm font-medium" style={{ color: accentColor }}>
-              ✓ Subscribed! Thank you.
+          {/* Decorative gradient blob */}
+          <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] pointer-events-none" style={{ backgroundColor: `${accentColor}10` }} />
+          <div className="relative z-10">
+            <h2
+              className="text-xl sm:text-2xl mb-3"
+              style={{
+                fontFamily: brand.font_heading,
+                fontWeight: tp?.typography.headingWeight || '600',
+                color: textColor,
+              }}
+            >
+              {config.heading || 'Stay Updated'}
+            </h2>
+            <p className="text-sm mb-8" style={{ color: `${textColor}55` }}>
+              {config.subheading || `Join 1,000+ subscribers who get the latest from ${brand.name}.`}
             </p>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex gap-2 max-w-sm mx-auto">
-              <input
-                type="email"
-                placeholder="Email address"
-                value={email}
-                onChange={e => setEmail(e.target.value)}
-                className="flex-1 px-4 py-2.5 text-sm border outline-none transition-colors"
-                style={{
-                  borderColor: `${textColor}12`,
-                  color: textColor,
-                  backgroundColor: 'transparent',
-                  borderRadius: tp?.borderRadius || '0',
-                }}
-                required
-              />
-              <button
-                type="submit"
-                className="px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-80"
-                style={{
-                  backgroundColor: isDark ? accentColor : textColor,
-                  color: isDark ? '#FFFFFF' : bgColor,
-                  borderRadius: tp?.borderRadius || '0',
-                }}
-              >
-                {config.buttonText || 'Subscribe'}
-              </button>
-            </form>
-          )}
-        </div>
+            <AnimatePresence mode="wait">
+              {subscribed ? (
+                <motion.div
+                  key="success"
+                  initial={{ opacity: 0, scale: 0.9 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  className="flex flex-col items-center gap-2"
+                >
+                  <span className="text-3xl mb-2">✨</span>
+                  <p className="text-sm font-medium" style={{ color: accentColor }}>
+                    You&apos;re subscribed! Thank you for joining.
+                  </p>
+                </motion.div>
+              ) : (
+                <motion.form key="form" onSubmit={handleSubmit} className="flex gap-2 max-w-md mx-auto">
+                  <input
+                    type="email"
+                    placeholder="Enter your email"
+                    value={email}
+                    onChange={e => setEmail(e.target.value)}
+                    className="flex-1 px-4 py-3 text-sm border outline-none transition-all focus:ring-2"
+                    style={{
+                      borderColor: `${textColor}12`,
+                      color: textColor,
+                      backgroundColor: isDark ? '#FFFFFF08' : '#FFFFFF',
+                      borderRadius: templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : tp?.borderRadius || '0',
+                      // @ts-expect-error -- ring-color custom property
+                      '--tw-ring-color': `${accentColor}30`,
+                    }}
+                    required
+                  />
+                  <button
+                    type="submit"
+                    className="px-6 py-3 text-sm font-medium transition-all hover:opacity-90 hover:shadow-lg"
+                    style={{
+                      backgroundColor: isDark ? accentColor : textColor,
+                      color: isDark ? '#FFFFFF' : bgColor,
+                      borderRadius: templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : tp?.borderRadius || '0',
+                    }}
+                  >
+                    {config.buttonText || 'Subscribe'}
+                  </button>
+                </motion.form>
+              )}
+            </AnimatePresence>
+          </div>
+        </motion.div>
       </div>
     </section>
   );

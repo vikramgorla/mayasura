@@ -71,7 +71,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext.Provider value={contextValue}>
       {children}
-      <div className="fixed bottom-4 right-4 z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none" role="status" aria-live="polite" aria-label="Notifications">
+      <div className="fixed z-[100] flex flex-col gap-2 max-w-sm w-full pointer-events-none bottom-4 left-1/2 -translate-x-1/2 sm:translate-x-0 sm:left-auto sm:top-4 sm:right-4 sm:bottom-auto px-4 sm:px-0" role="status" aria-live="polite" aria-label="Notifications">
         <AnimatePresence mode="popLayout">
           {toasts.map((t) => {
             const Icon = icons[t.type];
@@ -79,10 +79,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <motion.div
                 key={t.id}
                 layout
-                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                initial={{ opacity: 0, y: -12, scale: 0.96 }}
                 animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, x: 20, scale: 0.95 }}
-                transition={{ duration: 0.2, ease: 'easeOut' }}
+                exit={{ opacity: 0, scale: 0.96, x: 40 }}
+                transition={{ type: 'spring', damping: 25, stiffness: 350 }}
                 className={cn(
                   'pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-xl backdrop-blur-md',
                   styles[t.type]

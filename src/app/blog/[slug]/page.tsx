@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { motion } from 'framer-motion';
 import { useBlogSite } from './layout';
 import { BlogPost } from '@/lib/types';
 
@@ -51,8 +52,10 @@ export default function BlogListingPage() {
 
   const categories = ['all', ...new Set(posts.map((p) => p.category).filter(Boolean))] as string[];
   const filtered = filter === 'all' ? posts : posts.filter((p) => p.category === filter);
+  const featured = filtered.length > 0 ? filtered[0] : null;
+  const remaining = filtered.slice(1);
 
-  const containerWidth = templateId === 'bold' ? 'max-w-7xl' : templateId === 'editorial' ? 'max-w-5xl' : 'max-w-3xl';
+  const containerWidth = templateId === 'bold' ? 'max-w-7xl' : templateId === 'editorial' ? 'max-w-5xl' : 'max-w-4xl';
 
   // Filter button style per template
   const filterBtnStyle = (active: boolean): React.CSSProperties => {
@@ -85,6 +88,18 @@ export default function BlogListingPage() {
       border: active ? 'none' : `1px solid ${textColor}10`,
       borderRadius: '0',
     };
+  };
+
+  // Tag/category badge style
+  const tagBadgeStyle: React.CSSProperties = {
+    backgroundColor: `${accentColor}12`,
+    color: accentColor,
+    borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : '4px',
+    fontSize: '0.625rem',
+    fontWeight: 600,
+    padding: '2px 8px',
+    letterSpacing: '0.04em',
+    textTransform: 'uppercase' as const,
   };
 
   return (
@@ -186,179 +201,191 @@ export default function BlogListingPage() {
             {templateId === 'playful' ? 'No posts yet. Check back soon! ✍️' : 'No posts yet. Check back soon.'}
           </p>
         </div>
-      ) : templateId === 'editorial' ? (
-        // EDITORIAL — Magazine layout: featured post + side list
-        <div>
-          {/* Featured first post */}
-          {filtered[0] && (
-            <Link href={`/blog/${slug}/${filtered[0].slug}`} className="group block mb-12 pb-12 border-b" style={{ borderColor: `${textColor}08` }}>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-                <div className="aspect-[16/10]" style={{ backgroundColor: `${textColor}04` }}>
-                  <div className="w-full h-full flex items-center justify-center">
-                    <span className="text-4xl" style={{ color: `${textColor}08` }}>✦</span>
+      ) : (
+        <>
+          {/* Featured post — large card at top */}
+          {featured && (
+            <motion.div
+              className="mb-16"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5 }}
+            >
+              <Link
+                href={`/blog/${slug}/${featured.slug}`}
+                className="group block"
+                style={{
+                  borderRadius: templateId === 'playful' ? '24px' : templateId === 'classic' ? '16px' : templateId === 'bold' ? '0' : '0',
+                  overflow: 'hidden',
+                  border: templateId === 'bold' ? `2px solid ${textColor}10` : `1px solid ${textColor}06`,
+                  boxShadow: templateId === 'classic' ? '8px 8px 16px rgba(0,0,0,0.04), -8px -8px 16px rgba(255,255,255,0.7)' : undefined,
+                }}
+              >
+                {/* Featured image area */}
+                <div
+                  className="aspect-[21/9] flex items-center justify-center relative overflow-hidden"
+                  style={{ backgroundColor: isDark ? '#111111' : `${accentColor}06` }}
+                >
+                  <div className="absolute inset-0 flex items-center justify-center">
+                    <span className="text-6xl transition-transform duration-500 group-hover:scale-110" style={{ color: `${textColor}06` }}>
+                      {templateId === 'playful' ? '📖' : '✦'}
+                    </span>
+                  </div>
+                  {/* Featured badge */}
+                  <div className="absolute top-4 left-4">
+                    <span
+                      className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest"
+                      style={{
+                        backgroundColor: accentColor,
+                        color: '#FFFFFF',
+                        borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : '6px',
+                      }}
+                    >
+                      Featured
+                    </span>
                   </div>
                 </div>
-                <div>
-                  <div className="flex items-center gap-3 mb-4">
-                    {filtered[0].category && (
-                      <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: accentColor }}>
-                        {filtered[0].category}
+
+                {/* Content */}
+                <div className="p-6 sm:p-8">
+                  <div className="flex items-center gap-3 mb-4 flex-wrap">
+                    {featured.category && (
+                      <span style={tagBadgeStyle}>{featured.category}</span>
+                    )}
+                    <span className="text-[11px]" style={{ color: `${textColor}35` }}>
+                      {readingTime(featured.content)}
+                    </span>
+                    {featured.published_at && (
+                      <span className="text-[11px]" style={{ color: `${textColor}25` }}>
+                        {new Date(featured.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
                       </span>
                     )}
-                    <span className="text-[10px] uppercase tracking-wider" style={{ color: `${textColor}30` }}>
-                      {readingTime(filtered[0].content)}
+                  </div>
+                  <h2
+                    className="text-xl sm:text-2xl font-bold mb-3 group-hover:opacity-70 transition-opacity"
+                    style={{
+                      fontFamily: brand.font_heading,
+                      textTransform: templateId === 'bold' ? 'uppercase' : undefined,
+                    }}
+                  >
+                    {featured.title}
+                  </h2>
+                  {featured.excerpt && (
+                    <p className="text-sm leading-relaxed line-clamp-3" style={{ color: `${textColor}50` }}>
+                      {featured.excerpt}
+                    </p>
+                  )}
+                  <div className="mt-4">
+                    <span
+                      className="text-sm font-medium"
+                      style={{
+                        color: accentColor,
+                        fontWeight: templateId === 'bold' ? 700 : 500,
+                      }}
+                    >
+                      {templateId === 'bold' ? 'READ MORE →' : templateId === 'playful' ? 'Read More →' : 'Read article →'}
                     </span>
                   </div>
-                  <h2 className="text-2xl font-bold mb-3 group-hover:opacity-60 transition-opacity" style={{ fontFamily: brand.font_heading }}>
-                    {filtered[0].title}
-                  </h2>
-                  {filtered[0].excerpt && (
-                    <p className="text-sm leading-relaxed line-clamp-3" style={{ color: `${textColor}50` }}>
-                      {filtered[0].excerpt}
-                    </p>
-                  )}
-                  {filtered[0].published_at && (
-                    <p className="text-xs mt-4" style={{ color: `${textColor}30` }}>
-                      {new Date(filtered[0].published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                    </p>
-                  )}
                 </div>
-              </div>
-            </Link>
+              </Link>
+            </motion.div>
           )}
 
-          {/* Remaining posts in columns */}
-          {filtered.length > 1 && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
-              {filtered.slice(1).map((post, i) => (
-                <article key={post.id}>
-                  {i > 0 && i > 1 && <div className="md:hidden h-px my-8" style={{ backgroundColor: `${textColor}08` }} />}
-                  <Link href={`/blog/${slug}/${post.slug}`} className="group block py-6 border-b" style={{ borderColor: `${textColor}06` }}>
-                    <div className="flex items-center gap-3 mb-2">
-                      {post.category && (
-                        <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: `${textColor}35` }}>
-                          {post.category}
-                        </span>
-                      )}
-                      <span className="text-[10px]" style={{ color: `${textColor}25` }}>
-                        {readingTime(post.content)}
-                      </span>
-                    </div>
-                    <h3 className="text-base font-semibold group-hover:opacity-60 transition-opacity" style={{ fontFamily: brand.font_heading }}>
-                      {post.title}
-                    </h3>
-                  </Link>
-                </article>
-              ))}
-            </div>
-          )}
-        </div>
-      ) : templateId === 'bold' ? (
-        // BOLD — Zine-like grid with thick borders
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((post) => (
-            <Link
-              key={post.id}
-              href={`/blog/${slug}/${post.slug}`}
-              className="group block border-2 p-6 transition-transform hover:translate-y-[-2px]"
-              style={{ borderColor: `${textColor}12` }}
+          {/* Remaining posts grid */}
+          {remaining.length > 0 && (
+            <motion.div
+              className={`grid grid-cols-1 ${templateId === 'bold' ? 'md:grid-cols-2 lg:grid-cols-3' : 'md:grid-cols-2'} gap-8`}
+              initial="hidden"
+              animate="visible"
+              variants={{
+                hidden: {},
+                visible: { transition: { staggerChildren: 0.08 } },
+              }}
             >
-              <span className="text-[10px] font-bold uppercase tracking-widest" style={{ color: accentColor }}>
-                {post.category || 'Article'}
-              </span>
-              <h3 className="text-lg font-bold uppercase mt-2 mb-3 group-hover:opacity-60 transition-opacity" style={{ fontFamily: brand.font_heading }}>
-                {post.title}
-              </h3>
-              {post.excerpt && (
-                <p className="text-xs line-clamp-2 mb-4" style={{ color: `${textColor}40` }}>
-                  {post.excerpt}
-                </p>
-              )}
-              <div className="flex items-center gap-3">
-                {post.published_at && (
-                  <span className="text-[10px] uppercase tracking-wider" style={{ color: `${textColor}25` }}>
-                    {new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}
-                  </span>
-                )}
-                <span className="text-[10px] uppercase tracking-wider" style={{ color: `${textColor}20` }}>
-                  {readingTime(post.content)}
-                </span>
-              </div>
-            </Link>
-          ))}
-        </div>
-      ) : templateId === 'playful' ? (
-        // PLAYFUL — Card-based layout with pastel backgrounds
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filtered.map((post, i) => {
-            const pastels = ['#FFF7ED', '#EFF6FF', '#F0FDF4', '#FAF5FF', '#FFF1F2'];
-            return (
-              <Link
-                key={post.id}
-                href={`/blog/${slug}/${post.slug}`}
-                className="group block p-6 transition-all hover:translate-y-[-4px] hover:shadow-lg"
-                style={{ backgroundColor: pastels[i % pastels.length], borderRadius: '20px' }}
-              >
-                <span className="text-xs font-semibold" style={{ color: accentColor }}>
-                  {post.category || 'Article'}
-                </span>
-                <h3 className="text-base font-bold mt-2 mb-3 group-hover:opacity-60 transition-opacity" style={{ fontFamily: brand.font_heading, color: '#1F2937' }}>
-                  {post.title}
-                </h3>
-                {post.excerpt && (
-                  <p className="text-xs line-clamp-2 mb-4" style={{ color: '#1F293780' }}>
-                    {post.excerpt}
-                  </p>
-                )}
-                <div className="flex items-center gap-2 text-[10px]" style={{ color: '#1F293750' }}>
-                  {post.published_at && (
-                    <span>{new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric' })}</span>
-                  )}
-                  <span>· {readingTime(post.content)}</span>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
-      ) : (
-        // MINIMAL / CLASSIC — Clean list with dividers
-        <div className="space-y-0">
-          {filtered.map((post, i) => (
-            <article key={post.id}>
-              {i > 0 && (
-                <div className="h-px my-10" style={{ backgroundColor: `${textColor}06` }} />
-              )}
-              <Link href={`/blog/${slug}/${post.slug}`} className="group block">
-                <div className="flex items-center gap-3 mb-4">
-                  {post.category && (
-                    <span className="text-[10px] font-medium uppercase tracking-widest" style={{ color: `${textColor}35` }}>
-                      {post.category}
-                    </span>
-                  )}
-                  {post.published_at && (
-                    <span className="text-[10px] uppercase tracking-wider" style={{ color: `${textColor}25` }}>
-                      {new Date(post.published_at).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}
-                    </span>
-                  )}
-                  <span className="text-[10px] uppercase tracking-wider" style={{ color: `${textColor}20` }}>
-                    {readingTime(post.content)}
-                  </span>
-                </div>
-                <h2
-                  className={`${templateId === 'classic' ? 'text-lg' : 'text-xl sm:text-2xl'} font-semibold mb-3 group-hover:opacity-60 transition-opacity`}
-                  style={{ fontFamily: brand.font_heading, fontWeight: templateId === 'minimal' ? 400 : 600 }}
-                >
-                  {post.title}
-                </h2>
-                {post.excerpt && (
-                  <p className="text-sm leading-relaxed line-clamp-2" style={{ color: `${textColor}45` }}>
-                    {post.excerpt}
-                  </p>
-                )}
-              </Link>
-            </article>
-          ))}
-        </div>
+              {remaining.map((post) => {
+                const tags = (() => {
+                  try { return JSON.parse(post.tags || '[]'); } catch { return []; }
+                })();
+
+                return (
+                  <motion.article
+                    key={post.id}
+                    variants={{
+                      hidden: { opacity: 0, y: 20 },
+                      visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+                    }}
+                  >
+                    <Link
+                      href={`/blog/${slug}/${post.slug}`}
+                      className="group block h-full"
+                      style={{
+                        borderRadius: templateId === 'playful' ? '20px' : templateId === 'classic' ? '12px' : templateId === 'bold' ? '0' : '0',
+                        overflow: 'hidden',
+                        border: templateId === 'bold' ? `2px solid ${textColor}10` : `1px solid ${textColor}06`,
+                        boxShadow: templateId === 'classic' ? '6px 6px 12px rgba(0,0,0,0.04), -6px -6px 12px rgba(255,255,255,0.7)' : undefined,
+                        display: 'flex',
+                        flexDirection: 'column',
+                      }}
+                    >
+                      {/* Card image area */}
+                      <div
+                        className="aspect-[16/9] flex items-center justify-center relative transition-colors group-hover:opacity-80"
+                        style={{
+                          backgroundColor: isDark ? '#111111' : templateId === 'playful'
+                            ? ['#FFF7ED', '#EFF6FF', '#F0FDF4', '#FAF5FF'][remaining.indexOf(post) % 4]
+                            : `${textColor}03`,
+                        }}
+                      >
+                        <span className="text-2xl" style={{ color: `${textColor}08` }}>
+                          {templateId === 'playful' ? '✍️' : '✦'}
+                        </span>
+                      </div>
+
+                      <div className="p-5 flex-1 flex flex-col">
+                        <div className="flex items-center gap-2 mb-3 flex-wrap">
+                          {post.category && (
+                            <span style={tagBadgeStyle}>{post.category}</span>
+                          )}
+                          {tags.slice(0, 2).map((tag: string) => (
+                            <span key={tag} className="text-[10px] px-2 py-0.5" style={{
+                              backgroundColor: `${textColor}05`,
+                              color: `${textColor}45`,
+                              borderRadius: templateId === 'playful' ? '9999px' : '3px',
+                            }}>
+                              #{tag}
+                            </span>
+                          ))}
+                        </div>
+                        <h3
+                          className="text-base font-semibold mb-2 group-hover:opacity-60 transition-opacity"
+                          style={{
+                            fontFamily: brand.font_heading,
+                            textTransform: templateId === 'bold' ? 'uppercase' : undefined,
+                          }}
+                        >
+                          {post.title}
+                        </h3>
+                        {post.excerpt && (
+                          <p className="text-xs line-clamp-2 mb-4 flex-1" style={{ color: `${textColor}45` }}>
+                            {post.excerpt}
+                          </p>
+                        )}
+                        <div className="flex items-center gap-3 text-[11px] mt-auto" style={{ color: `${textColor}30` }}>
+                          {post.published_at && (
+                            <span>
+                              {new Date(post.published_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                            </span>
+                          )}
+                          <span>· {readingTime(post.content)}</span>
+                        </div>
+                      </div>
+                    </Link>
+                  </motion.article>
+                );
+              })}
+            </motion.div>
+          )}
+        </>
       )}
     </div>
   );
