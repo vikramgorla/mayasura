@@ -248,43 +248,17 @@ export interface PreviewColors {
   border: string;
 }
 
-import type {
-  ButtonShape,
-  ButtonSize,
-  ButtonVariant,
-  SpacingDensity,
-  BorderRadiusPreset,
-} from '@/components/design/style-controls';
-
-// ─── Design mapping helpers ──────────────────────────────────────
-
-const BORDER_RADIUS_MAP: Record<BorderRadiusPreset, string> = {
-  'none': '0px',
-  'subtle': '4px',
-  'rounded': '8px',
-  'extra-rounded': '16px',
-  'pill': '9999px',
-};
-
-const SPACING_MAP: Record<SpacingDensity, { sectionPadding: string; cardGap: string; sectionPaddingPx: number }> = {
-  'compact': { sectionPadding: '32px', cardGap: '12px', sectionPaddingPx: 32 },
-  'normal': { sectionPadding: '48px', cardGap: '16px', sectionPaddingPx: 48 },
-  'generous': { sectionPadding: '64px', cardGap: '20px', sectionPaddingPx: 64 },
-  'spacious': { sectionPadding: '96px', cardGap: '24px', sectionPaddingPx: 96 },
-};
-
-const BUTTON_SHAPE_MAP: Record<ButtonShape, string> = {
-  'sharp': '0px',
-  'soft': '4px',
-  'rounded': '8px',
-  'pill': '9999px',
-};
-
-const BUTTON_SIZE_MAP: Record<ButtonSize, { px: string; py: string; fontSize: string }> = {
-  'small': { px: '12px', py: '6px', fontSize: '11px' },
-  'medium': { px: '20px', py: '10px', fontSize: '13px' },
-  'large': { px: '28px', py: '14px', fontSize: '15px' },
-};
+import {
+  BORDER_RADIUS_MAP,
+  SPACING_MAP,
+  BUTTON_SHAPE_MAP,
+  BUTTON_SIZE_MAP,
+  type ButtonShape,
+  type ButtonSize,
+  type ButtonVariant,
+  type SpacingDensity,
+  type BorderRadiusPreset,
+} from '@/lib/design-settings';
 
 function getButtonStyle(
   variant: ButtonVariant,
