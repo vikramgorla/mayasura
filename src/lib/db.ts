@@ -205,15 +205,16 @@ export function createBrand(brand: {
   user_id?: string;
 }) {
   const db = getDb();
-  const stmt = db.prepare(`
-    INSERT INTO brands (id, name, tagline, description, industry, logo_url, primary_color, secondary_color, accent_color, font_heading, font_body, brand_voice, channels, status, user_id)
-    VALUES (@id, @name, @tagline, @description, @industry, @logo_url, @primary_color, @secondary_color, @accent_color, @font_heading, @font_body, @brand_voice, @channels, @status, @user_id)
-  `);
-  return stmt.run({
-    ...brand,
+  
+  // Detect available columns to handle v1 databases gracefully
+  const cols = db.prepare("PRAGMA table_info(brands)").all() as Array<{ name: string }>;
+  const colNames = new Set(cols.map(c => c.name));
+  
+  const data: Record<string, unknown> = {
+    id: brand.id,
+    name: brand.name,
     tagline: brand.tagline || null,
     description: brand.description || null,
-    industry: brand.industry || null,
     logo_url: brand.logo_url || null,
     primary_color: brand.primary_color || '#0f172a',
     secondary_color: brand.secondary_color || '#f8fafc',
@@ -223,8 +224,17 @@ export function createBrand(brand: {
     brand_voice: brand.brand_voice || null,
     channels: brand.channels || '[]',
     status: brand.status || 'draft',
-    user_id: brand.user_id || null,
-  });
+  };
+  
+  // Only include columns that exist in the table
+  if (colNames.has('industry')) data.industry = brand.industry || null;
+  if (colNames.has('user_id')) data.user_id = brand.user_id || null;
+  
+  const fields = Object.keys(data);
+  const placeholders = fields.map(f => `@${f}`);
+  const sql = `INSERT INTO brands (${fields.join(', ')}) VALUES (${placeholders.join(', ')})`;
+  
+  return db.prepare(sql).run(data);
 }
 
 export function getBrand(id: string) {
