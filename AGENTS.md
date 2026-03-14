@@ -19,6 +19,15 @@ This workspace is for designing and building **Mayasura** — an open-source fra
 - Document architectural decisions with rationale
 - Keep research separate from decisions
 
+## Development Style (NON-NEGOTIABLE)
+
+1. **GitHub Issue first** — Create a GitHub issue BEFORE starting any feature, fix, or change. Every single change needs a tracked issue with proper labels.
+2. **Granular commits** — Commit in small, logical pieces. NOT one giant commit. Each commit references its issue number (e.g., `fix(dark-mode): use CSS variables #42`).
+3. **Push frequently** — Don't batch pushes. Push after each logical unit of work.
+4. **Every subagent** must follow this workflow — include these rules in every spawn task.
+
+This applies to ALL work — features, fixes, refactors, docs. No exceptions.
+
 ## Key Files
 
 - `SOUL.md` — identity and mission
