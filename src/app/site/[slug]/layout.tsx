@@ -4,6 +4,7 @@ import { useEffect, useState, createContext, useContext } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { Brand } from '@/lib/types';
+import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
 
 interface BrandSiteData {
   brand: Brand;
@@ -25,6 +26,7 @@ interface BrandSiteData {
     published_at: string;
   }>;
   settings?: Record<string, string>;
+  websiteTemplate?: WebsiteTemplate;
 }
 
 const BrandSiteContext = createContext<BrandSiteData | null>(null);
@@ -32,7 +34,7 @@ export function useBrandSite() {
   return useContext(BrandSiteContext);
 }
 
-function BrandNav({ brand }: { brand: Brand }) {
+function BrandNav({ brand, template }: { brand: Brand; template?: WebsiteTemplate }) {
   const slug = brand.slug || brand.id;
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -96,6 +98,7 @@ function BrandNav({ brand }: { brand: Brand }) {
               style={{
                 backgroundColor: brand.primary_color,
                 color: brand.secondary_color,
+                borderRadius: template?.preview.borderRadius || '0px',
               }}
             >
               Shop
@@ -290,7 +293,12 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
         if (!r.ok) throw new Error('Not found');
         return r.json();
       })
-      .then((d) => setData(d))
+      .then((d) => {
+        // Resolve website template from settings
+        const templateId = d.settings?.website_template || 'minimal';
+        const websiteTemplate = getWebsiteTemplate(templateId);
+        setData({ ...d, websiteTemplate });
+      })
       .catch(() => setError(true));
   }, [slug]);
 
@@ -341,7 +349,7 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
           fontFamily: data.brand.font_body || 'Inter',
         }}
       >
-        <BrandNav brand={data.brand} />
+        <BrandNav brand={data.brand} template={data.websiteTemplate} />
         <main className="flex-1">{children}</main>
         <BrandFooter brand={data.brand} />
       </div>

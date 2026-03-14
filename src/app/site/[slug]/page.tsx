@@ -7,76 +7,183 @@ export default function BrandHomePage() {
   const data = useBrandSite();
   if (!data) return null;
 
-  const { brand, products, blogPosts } = data;
+  const { brand, products, blogPosts, websiteTemplate: template } = data;
   const slug = brand.slug || brand.id;
   const channels = JSON.parse(brand.channels || '[]') as string[];
+  const templateId = template?.id || 'minimal';
+  const radius = template?.preview.borderRadius || '0px';
+  const tp = template?.preview;
+
+  // Template-specific heading style
+  const headingStyle = {
+    fontFamily: brand.font_heading,
+    fontWeight: tp?.typography.headingWeight || '600',
+    letterSpacing: tp?.typography.headingTracking || '-0.02em',
+    textTransform: (tp?.typography.headingCase || 'normal') as React.CSSProperties['textTransform'],
+  };
+
+  // Button style based on template
+  const primaryBtnStyle: React.CSSProperties = {
+    backgroundColor: brand.primary_color,
+    color: brand.secondary_color,
+    borderRadius: radius,
+  };
+
+  const secondaryBtnStyle: React.CSSProperties = {
+    borderColor: `${brand.primary_color}20`,
+    color: brand.primary_color,
+    borderRadius: radius,
+  };
+
+  // Hero rendering based on template
+  const renderHero = () => {
+    const industry = brand.industry && (
+      <span
+        className="inline-block text-xs font-medium uppercase tracking-widest mb-6"
+        style={{ color: `${brand.primary_color}50` }}
+      >
+        {brand.industry}
+      </span>
+    );
+
+    const heading = (
+      <h1 style={headingStyle}>
+        {brand.tagline || brand.name}
+      </h1>
+    );
+
+    const description = (
+      <p
+        className="text-lg sm:text-xl leading-relaxed"
+        style={{ color: `${brand.primary_color}60` }}
+      >
+        {brand.description || `Welcome to ${brand.name}. We're here to serve you.`}
+      </p>
+    );
+
+    const buttons = (
+      <div className="flex flex-wrap gap-4">
+        {channels.includes('ecommerce') && (
+          <Link href={`/shop/${slug}`} className="px-7 py-3 text-sm font-medium tracking-wide transition-opacity hover:opacity-85" style={primaryBtnStyle}>
+            Shop Now
+          </Link>
+        )}
+        <Link href={`/site/${slug}/about`} className="px-7 py-3 text-sm font-medium tracking-wide border transition-colors hover:opacity-70" style={secondaryBtnStyle}>
+          Learn More
+        </Link>
+      </div>
+    );
+
+    switch (tp?.heroStyle) {
+      case 'centered':
+        return (
+          <section className="py-24 sm:py-32 lg:py-40">
+            <div className="max-w-6xl mx-auto px-5 sm:px-8 text-center">
+              <div className="max-w-3xl mx-auto">
+                {industry}
+                <div className="text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] mb-8">{heading}</div>
+                <div className="mb-12 max-w-xl mx-auto">{description}</div>
+                <div className="flex flex-wrap justify-center gap-4">
+                  {channels.includes('ecommerce') && (
+                    <Link href={`/shop/${slug}`} className="px-7 py-3 text-sm font-medium tracking-wide transition-opacity hover:opacity-85" style={primaryBtnStyle}>
+                      Shop Now
+                    </Link>
+                  )}
+                  <Link href={`/site/${slug}/about`} className="px-7 py-3 text-sm font-medium tracking-wide border transition-colors hover:opacity-70" style={secondaryBtnStyle}>
+                    Learn More
+                  </Link>
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'split':
+        return (
+          <section className="py-20 sm:py-28 lg:py-36">
+            <div className="max-w-6xl mx-auto px-5 sm:px-8">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-12 items-center">
+                <div>
+                  {industry}
+                  <div className="text-[clamp(2rem,5vw,3.5rem)] leading-[1.1] mb-8">{heading}</div>
+                  <div className="mb-10">{description}</div>
+                  {buttons}
+                </div>
+                <div className="aspect-[4/5]" style={{ backgroundColor: `${brand.primary_color}04`, borderRadius: radius }} />
+              </div>
+            </div>
+          </section>
+        );
+
+      case 'full-width':
+        return (
+          <section className="py-28 sm:py-36 lg:py-44" style={{ backgroundColor: `${brand.primary_color}04` }}>
+            <div className="max-w-6xl mx-auto px-5 sm:px-8">
+              {industry}
+              <div className="text-[clamp(3rem,8vw,6rem)] leading-[1.02] mb-8">{heading}</div>
+              <div className="mb-12 max-w-2xl">{description}</div>
+              {buttons}
+            </div>
+          </section>
+        );
+
+      case 'stacked':
+        return (
+          <section className="py-20 sm:py-28">
+            <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center">
+              {industry}
+              <div className="text-[clamp(2rem,5vw,3.5rem)] leading-[1.12] mb-6">{heading}</div>
+              <div className="mb-10 max-w-xl mx-auto">{description}</div>
+              <div className="flex flex-wrap justify-center gap-4 mb-12">
+                {channels.includes('ecommerce') && (
+                  <Link href={`/shop/${slug}`} className="px-7 py-3 text-sm font-medium tracking-wide transition-opacity hover:opacity-85" style={primaryBtnStyle}>
+                    Shop Now
+                  </Link>
+                )}
+                <Link href={`/site/${slug}/about`} className="px-7 py-3 text-sm font-medium tracking-wide border transition-colors hover:opacity-70" style={secondaryBtnStyle}>
+                  Learn More
+                </Link>
+              </div>
+              <div className="aspect-[16/9] mx-auto" style={{ backgroundColor: `${brand.primary_color}04`, borderRadius: radius }} />
+            </div>
+          </section>
+        );
+
+      default: // left-aligned (minimal)
+        return (
+          <section className="py-24 sm:py-32 lg:py-40">
+            <div className="max-w-6xl mx-auto px-5 sm:px-8">
+              <div className="max-w-3xl">
+                {industry}
+                <div className="text-[clamp(2.5rem,6vw,4.5rem)] leading-[1.08] mb-8">{heading}</div>
+                <div className="mb-12 max-w-xl">{description}</div>
+                {buttons}
+              </div>
+            </div>
+          </section>
+        );
+    }
+  };
 
   return (
     <>
-      {/* Hero — Typography-driven, clean background */}
-      <section className="py-24 sm:py-32 lg:py-40">
-        <div className="max-w-6xl mx-auto px-5 sm:px-8">
-          <div className="max-w-3xl">
-            {brand.industry && (
-              <span
-                className="inline-block text-xs font-medium uppercase tracking-widest mb-6"
-                style={{ color: `${brand.primary_color}50` }}
-              >
-                {brand.industry}
-              </span>
-            )}
-            <h1
-              className="text-[clamp(2.5rem,6vw,4.5rem)] font-semibold leading-[1.08] tracking-tight mb-8"
-              style={{ fontFamily: brand.font_heading }}
-            >
-              {brand.tagline || brand.name}
-            </h1>
-            <p
-              className="text-lg sm:text-xl leading-relaxed mb-12 max-w-xl"
-              style={{ color: `${brand.primary_color}60` }}
-            >
-              {brand.description || `Welcome to ${brand.name}. We're here to serve you.`}
-            </p>
-            <div className="flex flex-wrap gap-4">
-              {channels.includes('ecommerce') && (
-                <Link
-                  href={`/shop/${slug}`}
-                  className="px-7 py-3 text-sm font-medium tracking-wide transition-opacity hover:opacity-85"
-                  style={{
-                    backgroundColor: brand.primary_color,
-                    color: brand.secondary_color,
-                  }}
-                >
-                  Shop Now
-                </Link>
-              )}
-              <Link
-                href={`/site/${slug}/about`}
-                className="px-7 py-3 text-sm font-medium tracking-wide border transition-colors hover:opacity-70"
-                style={{
-                  borderColor: `${brand.primary_color}20`,
-                  color: brand.primary_color,
-                }}
-              >
-                Learn More
-              </Link>
-            </div>
-          </div>
-        </div>
-      </section>
+      {/* Hero */}
+      {renderHero()}
 
       {/* Divider */}
-      <div className="max-w-6xl mx-auto px-5 sm:px-8">
-        <div className="h-px" style={{ backgroundColor: `${brand.primary_color}08` }} />
-      </div>
+      {templateId !== 'bold' && (
+        <div className="max-w-6xl mx-auto px-5 sm:px-8">
+          <div className="h-px" style={{ backgroundColor: `${brand.primary_color}08` }} />
+        </div>
+      )}
 
-      {/* Values — Clean cards with subtle borders */}
-      <section className="py-20 sm:py-28">
+      {/* Values */}
+      <section className={templateId === 'playful' ? 'py-16 sm:py-24' : 'py-20 sm:py-28'}>
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <div className="mb-14">
             <h2
-              className="text-2xl sm:text-3xl font-semibold tracking-tight mb-3"
-              style={{ fontFamily: brand.font_heading }}
+              className="text-2xl sm:text-3xl mb-3"
+              style={headingStyle}
             >
               Why {brand.name}
             </h2>
@@ -87,38 +194,72 @@ export default function BrandHomePage() {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ backgroundColor: `${brand.primary_color}08` }}>
-            {[
-              {
-                title: 'Quality First',
-                desc: 'Every product and service is crafted with meticulous attention to detail and unwavering quality standards.',
-              },
-              {
-                title: 'Customer Focus',
-                desc: 'Your satisfaction drives us. We listen, adapt, and deliver experiences that exceed expectations.',
-              },
-              {
-                title: 'Innovation',
-                desc: 'We constantly push boundaries to bring you the latest and most thoughtful solutions in our space.',
-              },
-            ].map((feature) => (
-              <div
-                key={feature.title}
-                className="p-8 sm:p-10"
-                style={{ backgroundColor: brand.secondary_color }}
-              >
-                <h3
-                  className="text-base font-semibold mb-3"
-                  style={{ fontFamily: brand.font_heading }}
-                >
-                  {feature.title}
-                </h3>
-                <p className="text-sm leading-relaxed" style={{ color: `${brand.primary_color}55` }}>
-                  {feature.desc}
-                </p>
-              </div>
-            ))}
-          </div>
+          {(() => {
+            const features = [
+              { title: 'Quality First', desc: 'Every product and service is crafted with meticulous attention to detail and unwavering quality standards.' },
+              { title: 'Customer Focus', desc: 'Your satisfaction drives us. We listen, adapt, and deliver experiences that exceed expectations.' },
+              { title: 'Innovation', desc: 'We constantly push boundaries to bring you the latest and most thoughtful solutions in our space.' },
+            ];
+
+            // Different card layouts per template
+            switch (tp?.cardStyle) {
+              case 'elevated':
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {features.map(f => (
+                      <div key={f.title} className="p-8 shadow-sm border" style={{ borderColor: `${brand.primary_color}08`, borderRadius: radius, backgroundColor: brand.secondary_color }}>
+                        <h3 className="text-base font-semibold mb-3" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                        <p className="text-sm leading-relaxed" style={{ color: `${brand.primary_color}55` }}>{f.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                );
+              case 'bordered':
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {features.map(f => (
+                      <div key={f.title} className="p-8 border-2" style={{ borderColor: `${brand.primary_color}15`, borderRadius: radius }}>
+                        <h3 className="text-base font-semibold mb-3" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                        <p className="text-sm leading-relaxed" style={{ color: `${brand.primary_color}55` }}>{f.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                );
+              case 'rounded':
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    {features.map(f => (
+                      <div key={f.title} className="p-8" style={{ backgroundColor: `${brand.primary_color}04`, borderRadius: radius }}>
+                        <h3 className="text-base font-semibold mb-3" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                        <p className="text-sm leading-relaxed" style={{ color: `${brand.primary_color}55` }}>{f.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                );
+              case 'flat':
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+                    {features.map(f => (
+                      <div key={f.title}>
+                        <h3 className="text-base font-semibold mb-3" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                        <p className="text-sm leading-relaxed" style={{ color: `${brand.primary_color}55` }}>{f.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                );
+              default: // minimal — gap-px grid
+                return (
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-px" style={{ backgroundColor: `${brand.primary_color}08` }}>
+                    {features.map(f => (
+                      <div key={f.title} className="p-8 sm:p-10" style={{ backgroundColor: brand.secondary_color }}>
+                        <h3 className="text-base font-semibold mb-3" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                        <p className="text-sm leading-relaxed" style={{ color: `${brand.primary_color}55` }}>{f.desc}</p>
+                      </div>
+                    ))}
+                  </div>
+                );
+            }
+          })()}
         </div>
       </section>
 
@@ -156,7 +297,7 @@ export default function BrandHomePage() {
                 >
                   <div
                     className="aspect-[4/3] mb-4 overflow-hidden"
-                    style={{ backgroundColor: `${brand.primary_color}04` }}
+                    style={{ backgroundColor: `${brand.primary_color}04`, borderRadius: radius }}
                   >
                     {product.image_url ? (
                       <img
@@ -235,7 +376,7 @@ export default function BrandHomePage() {
                   {/* Image placeholder */}
                   <div
                     className="aspect-[16/10] mb-5"
-                    style={{ backgroundColor: `${brand.primary_color}04` }}
+                    style={{ backgroundColor: `${brand.primary_color}04`, borderRadius: radius }}
                   />
                   <div className="flex items-center gap-3 mb-3">
                     {post.category && (
@@ -278,11 +419,11 @@ export default function BrandHomePage() {
         <div className="max-w-6xl mx-auto px-5 sm:px-8">
           <div
             className="py-16 sm:py-20 px-8 sm:px-16 text-center"
-            style={{ backgroundColor: `${brand.primary_color}04` }}
+            style={{ backgroundColor: `${brand.primary_color}04`, borderRadius: radius }}
           >
             <h2
-              className="text-2xl sm:text-3xl font-semibold tracking-tight mb-4"
-              style={{ fontFamily: brand.font_heading }}
+              className="text-2xl sm:text-3xl mb-4"
+              style={headingStyle}
             >
               Ready to get started?
             </h2>
@@ -299,10 +440,7 @@ export default function BrandHomePage() {
                 <Link
                   href={`/shop/${slug}`}
                   className="px-7 py-3 text-sm font-medium tracking-wide transition-opacity hover:opacity-85"
-                  style={{
-                    backgroundColor: brand.primary_color,
-                    color: brand.secondary_color,
-                  }}
+                  style={primaryBtnStyle}
                 >
                   Visit Shop
                 </Link>
@@ -310,10 +448,7 @@ export default function BrandHomePage() {
               <Link
                 href={`/site/${slug}/contact`}
                 className="px-7 py-3 text-sm font-medium tracking-wide border transition-colors hover:opacity-70"
-                style={{
-                  borderColor: `${brand.primary_color}20`,
-                  color: brand.primary_color,
-                }}
+                style={secondaryBtnStyle}
               >
                 Contact Us
               </Link>
@@ -321,10 +456,7 @@ export default function BrandHomePage() {
                 <Link
                   href={`/chat/${slug}`}
                   className="px-7 py-3 text-sm font-medium tracking-wide border transition-colors hover:opacity-70"
-                  style={{
-                    borderColor: `${brand.primary_color}20`,
-                    color: brand.primary_color,
-                  }}
+                  style={secondaryBtnStyle}
                 >
                   Chat Now
                 </Link>

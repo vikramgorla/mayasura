@@ -1,8 +1,10 @@
 'use client';
 
-import { ArrowLeft, ArrowRight } from 'lucide-react';
+import { useState, useEffect } from 'react';
+import { ArrowLeft, ArrowRight, Sparkles } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { BrandData, FONT_OPTIONS } from '@/lib/types';
+import { WEBSITE_TEMPLATES } from '@/lib/website-templates';
 
 interface Props {
   data: BrandData;
@@ -10,6 +12,22 @@ interface Props {
   onNext: () => void;
   onBack: () => void;
 }
+
+interface TemplateRecommendation {
+  templateId: string;
+  name: string;
+  description: string;
+  reason: string;
+  rank: number;
+}
+
+const TEMPLATE_PREVIEWS: Record<string, { icon: string; accent: string }> = {
+  minimal: { icon: '◻', accent: 'Whitespace-heavy, sharp edges' },
+  editorial: { icon: '◧', accent: 'Asymmetric grids, strong type' },
+  bold: { icon: '■', accent: 'High contrast, big statements' },
+  classic: { icon: '▣', accent: 'Structured, trustworthy' },
+  playful: { icon: '●', accent: 'Rounded, soft, friendly' },
+};
 
 const COLOR_PRESETS = [
   { name: 'Indigo Night', primary: '#1E1B4B', secondary: '#EEF2FF', accent: '#6366F1' },
@@ -24,14 +42,98 @@ const COLOR_PRESETS = [
 ];
 
 export default function StepIdentity({ data, updateData, onNext, onBack }: Props) {
+  const [recommendations, setRecommendations] = useState<TemplateRecommendation[]>([]);
+  const [loadingRecs, setLoadingRecs] = useState(false);
+  const selectedTemplate = (data as BrandData & { websiteTemplate?: string }).websiteTemplate || 'minimal';
+
+  useEffect(() => {
+    if (data.industry) {
+      setLoadingRecs(true);
+      fetch('/api/ai/suggest', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          type: 'website-template',
+          industry: data.industry,
+          brandVoice: data.brandVoice,
+        }),
+      })
+        .then(r => r.json())
+        .then(d => {
+          if (d.recommendations) setRecommendations(d.recommendations);
+        })
+        .catch(() => {})
+        .finally(() => setLoadingRecs(false));
+    }
+  }, [data.industry, data.brandVoice]);
+
+  const handleSelectTemplate = (templateId: string) => {
+    updateData({ websiteTemplate: templateId } as Partial<BrandData>);
+  };
+
   return (
     <div className="animate-fade-in">
       <div className="mb-8">
         <h2 className="text-2xl sm:text-3xl font-bold mb-2 text-slate-900 dark:text-white">Visual Identity</h2>
-        <p className="text-slate-500 dark:text-slate-400">Define your brand&apos;s visual language — colors and typography.</p>
+        <p className="text-slate-500 dark:text-slate-400">Define your brand&apos;s visual language — template, colors, and typography.</p>
       </div>
 
       <div className="space-y-8">
+        {/* Website Template Selection */}
+        <div>
+          <div className="flex items-center justify-between mb-3">
+            <label className="block text-sm font-medium text-slate-700 dark:text-slate-300">Website Template</label>
+            {recommendations.length > 0 && (
+              <span className="inline-flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400">
+                <Sparkles className="h-3 w-3" />
+                AI recommended
+              </span>
+            )}
+          </div>
+          {loadingRecs && (
+            <div className="mb-3 text-xs text-slate-400 animate-pulse">Analyzing best template for your industry...</div>
+          )}
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {WEBSITE_TEMPLATES.map((template) => {
+              const rec = recommendations.find(r => r.templateId === template.id);
+              const isSelected = selectedTemplate === template.id;
+              const preview = TEMPLATE_PREVIEWS[template.id];
+              return (
+                <button
+                  key={template.id}
+                  onClick={() => handleSelectTemplate(template.id)}
+                  className={`relative text-left p-4 rounded-xl border-2 transition-all ${
+                    isSelected
+                      ? 'border-indigo-500 dark:border-indigo-400 shadow-md shadow-indigo-500/10'
+                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'
+                  }`}
+                >
+                  {rec && rec.rank === 1 && (
+                    <span className="absolute -top-2 -right-2 bg-indigo-500 text-white text-[10px] font-semibold px-2 py-0.5 rounded-full">
+                      Best fit
+                    </span>
+                  )}
+                  <div className="text-2xl mb-2">{preview?.icon || '□'}</div>
+                  <h4 className="text-sm font-semibold text-slate-900 dark:text-white mb-1">
+                    {template.name}
+                  </h4>
+                  <p className="text-[11px] text-slate-500 dark:text-slate-400 mb-2">
+                    {template.description}
+                  </p>
+                  <p className="text-[10px] text-slate-400 dark:text-slate-500">
+                    {preview?.accent}
+                  </p>
+                </button>
+              );
+            })}
+          </div>
+          {recommendations.length > 0 && recommendations[0] && (
+            <p className="mt-3 text-xs text-slate-400 dark:text-slate-500">
+              💡 {recommendations[0].reason}
+            </p>
+          )}
+        </div>
+
         {/* Color Presets */}
         <div>
           <label className="block text-sm font-medium mb-3 text-slate-700 dark:text-slate-300">Color Palette</label>

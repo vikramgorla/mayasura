@@ -105,6 +105,15 @@ function CreatePageContent() {
       
       const brandId = result.brand.id;
 
+      // Step 1.5: Save website template setting
+      if (data.websiteTemplate) {
+        await fetch(`/api/brands/${brandId}/settings`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ key: 'website_template', value: data.websiteTemplate }),
+        }).catch(err => console.error('Template setting error:', err));
+      }
+
       // Step 2: Create products (batched, with error handling)
       if (data.products.length > 0) {
         const productPromises = data.products.map(product =>

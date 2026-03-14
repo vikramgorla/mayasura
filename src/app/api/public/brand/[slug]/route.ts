@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrandBySlug, getProductsByBrand, getBlogPosts, getBrandPages } from '@/lib/db';
+import { getBrandBySlug, getProductsByBrand, getBlogPosts, getBrandPages, getBrandSettings } from '@/lib/db';
 import { Brand } from '@/lib/types';
 
 export async function GET(
@@ -17,6 +17,7 @@ export async function GET(
     const products = getProductsByBrand(brand.id);
     const blogPosts = getBlogPosts(brand.id, true); // published only
     const pages = getBrandPages(brand.id, true); // published only
+    const settings = getBrandSettings(brand.id);
 
     return NextResponse.json({
       brand: {
@@ -39,6 +40,7 @@ export async function GET(
       products,
       blogPosts,
       pages,
+      settings,
     });
   } catch (error) {
     console.error('Error fetching public brand:', error);

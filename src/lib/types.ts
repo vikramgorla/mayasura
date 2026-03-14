@@ -23,6 +23,7 @@ export interface BrandData {
   fontHeading: string;
   fontBody: string;
   logoUrl?: string;
+  websiteTemplate?: string;
   
   // Step 3: Products
   products: Product[];

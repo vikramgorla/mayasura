@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { suggestBrandNames, suggestTaglines, generateProductDescription, analyzeBrandVoice } from '@/lib/ai';
+import { WEBSITE_TEMPLATES, suggestTemplateForIndustry } from '@/lib/website-templates';
 
 export async function POST(request: NextRequest) {
   try {
@@ -41,6 +42,49 @@ export async function POST(request: NextRequest) {
         }
         const voice = await analyzeBrandVoice(description);
         return NextResponse.json({ voice });
+      }
+
+      case 'website-template': {
+        const { industry, brandVoice } = body;
+        if (!industry) {
+          return NextResponse.json({ error: 'Industry is required' }, { status: 400 });
+        }
+
+        // Get ranked template IDs based on industry
+        const ranked = suggestTemplateForIndustry(industry);
+
+        // Build response with full template info and reasoning
+        const recommendations = ranked.map((id, index) => {
+          const template = WEBSITE_TEMPLATES.find(t => t.id === id)!;
+          let reason = '';
+
+          if (index === 0) {
+            reason = `Best match for ${industry}. ${template.description}`;
+          } else if (index === 1) {
+            reason = `Strong alternative. ${template.description}`;
+          } else {
+            reason = template.description;
+          }
+
+          if (brandVoice) {
+            const voiceLower = brandVoice.toLowerCase();
+            if (voiceLower.includes('minimal') && id === 'minimal') reason += ' Aligns with your minimal brand voice.';
+            if (voiceLower.includes('bold') && id === 'bold') reason += ' Matches your bold brand personality.';
+            if (voiceLower.includes('playful') && id === 'playful') reason += ' Fits your playful tone.';
+            if (voiceLower.includes('professional') && id === 'classic') reason += ' Suits your professional voice.';
+          }
+
+          return {
+            templateId: id,
+            name: template.name,
+            description: template.description,
+            bestFor: template.bestFor,
+            reason,
+            rank: index + 1,
+          };
+        });
+
+        return NextResponse.json({ recommendations });
       }
 
       default:
