@@ -38,9 +38,10 @@ export default function ChatPage() {
       .catch(() => setError(true));
   }, [slug]);
 
-  // Load Google Fonts
+  // Load fonts
   useEffect(() => {
     if (!brand) return;
+    const templateId = template?.id || 'minimal';
     const fonts = [brand.font_heading, brand.font_body].filter(Boolean) as string[];
     if (fonts.length === 0) return;
     const url = buildGoogleFontsUrl(fonts);
@@ -51,7 +52,7 @@ export default function ChatPage() {
       link.href = url;
       document.head.appendChild(link);
     }
-  }, [brand]);
+  }, [brand, template]);
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
@@ -62,9 +63,7 @@ export default function ChatPage() {
       <div className="min-h-screen flex items-center justify-center bg-white text-zinc-900">
         <div className="text-center">
           <h1 className="text-2xl font-semibold mb-3">Chatbot not found</h1>
-          <Link href="/" className="text-sm font-medium underline underline-offset-4 hover:opacity-70">
-            ← Back to Mayasura
-          </Link>
+          <Link href="/" className="text-sm font-medium underline underline-offset-4 hover:opacity-70">← Back to Mayasura</Link>
         </div>
       </div>
     );
@@ -72,20 +71,17 @@ export default function ChatPage() {
 
   if (!brand) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-pulse flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded bg-zinc-100" />
-          <div className="h-3 w-24 rounded bg-zinc-100" />
-        </div>
+      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
+        <div className="animate-pulse h-8 w-32 rounded bg-zinc-200" />
       </div>
     );
   }
 
   const templateId = template?.id || 'minimal';
   const isDark = templateId === 'bold';
-  const textColor = isDark ? '#FFFFFF' : brand.primary_color;
-  const bgColor = isDark ? '#000000' : brand.secondary_color;
-  const accentColor = brand.accent_color || textColor;
+  const bgColor = isDark ? '#000000' : brand.secondary_color || '#f8fafc';
+  const textColor = isDark ? '#FFFFFF' : brand.primary_color || '#0f172a';
+  const accentColor = brand.accent_color;
 
   const handleSend = async (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -117,79 +113,16 @@ export default function ChatPage() {
   };
 
   // Message bubble radius per template
-  const userBubbleStyle: React.CSSProperties = (() => {
-    if (templateId === 'bold') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '0',
-      border: `2px solid ${accentColor}`,
-    };
-    if (templateId === 'playful') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '20px 20px 4px 20px',
-    };
-    if (templateId === 'classic') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '12px 12px 4px 12px',
-    };
-    if (templateId === 'editorial') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '2px',
-    };
-    return {
-      backgroundColor: textColor, color: bgColor, borderRadius: '2px',
-    };
-  })();
-
-  const assistantBubbleStyle: React.CSSProperties = (() => {
-    if (templateId === 'bold') return {
-      backgroundColor: `${textColor}06`, borderRadius: '0',
-      border: `2px solid ${textColor}10`,
-    };
-    if (templateId === 'playful') return {
-      backgroundColor: '#FFFFFF', borderRadius: '20px 20px 20px 4px',
-      boxShadow: '0 2px 8px rgba(0,0,0,0.06)',
-    };
-    if (templateId === 'classic') return {
-      backgroundColor: bgColor, borderRadius: '12px 12px 12px 4px',
-      boxShadow: '3px 3px 6px rgba(0,0,0,0.04), -3px -3px 6px rgba(255,255,255,0.6)',
-    };
-    return {
-      backgroundColor: `${textColor}05`, borderRadius: '2px',
-      border: `1px solid ${textColor}08`,
-    };
-  })();
-
-  // Input style
-  const chatInputStyle: React.CSSProperties = (() => {
-    if (templateId === 'bold') return {
-      borderColor: `${textColor}15`, backgroundColor: `${textColor}04`,
-      borderWidth: '2px', borderRadius: '0',
-    };
-    if (templateId === 'playful') return {
-      borderColor: `${textColor}10`, backgroundColor: '#FFFFFF',
-      borderWidth: '2px', borderRadius: '16px',
-    };
-    if (templateId === 'classic') return {
-      borderColor: `${textColor}10`, backgroundColor: bgColor,
-      borderWidth: '1px', borderRadius: '12px',
-      boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.03), inset -2px -2px 4px rgba(255,255,255,0.5)',
-    };
-    return {
-      borderColor: `${textColor}10`, backgroundColor: 'transparent',
-      borderWidth: '1px', borderRadius: '4px',
-    };
-  })();
-
-  const sendBtnStyle: React.CSSProperties = {
-    backgroundColor: isDark ? accentColor : textColor,
-    color: isDark ? '#FFFFFF' : bgColor,
-    borderRadius: templateId === 'playful' ? '12px' : templateId === 'classic' ? '10px' : '0',
-    fontWeight: templateId === 'bold' ? 700 : 500,
-    letterSpacing: templateId === 'bold' ? '0.08em' : undefined,
-    textTransform: templateId === 'bold' ? 'uppercase' as const : undefined,
-    fontSize: templateId === 'bold' ? '0.6875rem' : '0.875rem',
+  const getBubbleRadius = (role: 'user' | 'assistant') => {
+    if (templateId === 'bold') return '0';
+    if (templateId === 'playful') return role === 'user' ? '24px 24px 4px 24px' : '24px 24px 24px 4px';
+    return role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px';
   };
 
   return (
     <div
-      className="min-h-screen flex flex-col"
       data-template={templateId}
+      className="min-h-screen flex flex-col"
       style={{
         backgroundColor: bgColor,
         color: textColor,
@@ -198,72 +131,89 @@ export default function ChatPage() {
     >
       {/* Header */}
       <header
-        className="border-b px-5 py-3"
-        style={{
-          borderColor: `${textColor}08`,
-          borderBottomWidth: templateId === 'bold' ? '2px' : '1px',
-        }}
+        className="px-4 py-3"
+        style={
+          isDark
+            ? { backgroundColor: '#000000', borderBottom: `2px solid #FFFFFF10` }
+            : { backgroundColor: `${bgColor}f0`, borderBottom: `1px solid ${textColor}08`, backdropFilter: 'blur(16px)' }
+        }
       >
         <div className="max-w-3xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div
               className="h-10 w-10 flex items-center justify-center text-sm font-bold"
               style={{
-                backgroundColor: `${accentColor}12`,
+                backgroundColor: `${accentColor}15`,
                 color: accentColor,
-                borderRadius: templateId === 'playful' ? '14px' : templateId === 'classic' ? '10px' : templateId === 'bold' ? '0' : '8px',
+                borderRadius: templateId === 'bold' ? '0' : templateId === 'playful' ? '16px' : '12px',
               }}
             >
               {brand.name[0]}
             </div>
             <div>
               <h1
-                className="font-medium text-sm"
+                className="font-semibold text-sm"
                 style={{
                   fontFamily: brand.font_heading,
-                  textTransform: templateId === 'bold' ? 'uppercase' as const : undefined,
-                  letterSpacing: templateId === 'bold' ? '0.06em' : undefined,
-                  fontSize: templateId === 'bold' ? '0.6875rem' : undefined,
-                  fontWeight: templateId === 'bold' ? 700 : 500,
+                  fontWeight: templateId === 'minimal' ? 400 : templateId === 'bold' ? 700 : 600,
+                  textTransform: templateId === 'bold' ? 'uppercase' : undefined,
+                  letterSpacing: templateId === 'bold' ? '0.05em' : undefined,
                 }}
               >
                 {brand.name}
               </h1>
-              <p className="text-xs" style={{ color: `${textColor}45` }}>
-                {templateId === 'bold' ? 'AI ASSISTANT' : 'AI Assistant'}
+              <p className="text-xs" style={{ color: `${textColor}50` }}>
+                {templateId === 'playful' ? '🤖 AI Assistant' : 'AI Assistant'}
               </p>
             </div>
           </div>
           <div className="flex items-center gap-4">
             <Link
               href={`/site/${slug}`}
-              className="text-xs transition-opacity hover:opacity-60"
-              style={{ color: `${textColor}55` }}
+              className="text-xs"
+              style={{ color: `${textColor}60` }}
             >
               {templateId === 'bold' ? 'WEBSITE' : 'Visit Website'}
             </Link>
-            <div className="h-2 w-2 rounded-full" style={{ backgroundColor: '#22c55e' }} />
+            <div
+              className="h-2 w-2"
+              style={{
+                backgroundColor: '#22c55e',
+                borderRadius: templateId === 'bold' ? '0' : '9999px',
+              }}
+            />
           </div>
         </div>
       </header>
 
       {/* Messages */}
       <div className="flex-1 overflow-y-auto">
-        <div className="max-w-3xl mx-auto px-5 py-6 space-y-5">
+        <div className="max-w-3xl mx-auto px-4 py-6 space-y-6">
           {messages.length === 0 && (
             <div className="text-center py-16">
               <div
                 className="h-16 w-16 flex items-center justify-center text-2xl font-bold mx-auto mb-6"
                 style={{
-                  backgroundColor: `${accentColor}10`,
+                  backgroundColor: `${accentColor}12`,
                   color: accentColor,
-                  borderRadius: templateId === 'playful' ? '20px' : templateId === 'classic' ? '14px' : templateId === 'bold' ? '0' : '12px',
+                  borderRadius: templateId === 'bold' ? '0' : templateId === 'playful' ? '24px' : '16px',
                 }}
               >
-                {brand.name[0]}
+                {templateId === 'playful' ? '👋' : brand.name[0]}
               </div>
-              <h2 className="text-xl font-semibold mb-2" style={{ fontFamily: brand.font_heading }}>
-                {templateId === 'playful' ? `Hi! Welcome to ${brand.name} 👋` : templateId === 'bold' ? `WELCOME TO ${brand.name.toUpperCase()}` : `Hi! Welcome to ${brand.name}`}
+              <h2
+                className="text-xl mb-2"
+                style={{
+                  fontFamily: brand.font_heading,
+                  fontWeight: templateId === 'minimal' ? 400 : templateId === 'bold' ? 700 : 600,
+                  textTransform: templateId === 'bold' ? 'uppercase' : undefined,
+                }}
+              >
+                {templateId === 'playful'
+                  ? `Hey! Welcome to ${brand.name} 🎉`
+                  : templateId === 'bold'
+                  ? `WELCOME TO ${brand.name.toUpperCase()}`
+                  : `Welcome to ${brand.name}`}
               </h2>
               <p className="text-sm mb-8" style={{ color: `${textColor}45` }}>
                 Ask me anything about our products and services.
@@ -280,15 +230,11 @@ export default function ChatPage() {
                       setInput(suggestion);
                       setTimeout(() => handleSend(), 0);
                     }}
-                    className="px-4 py-2 text-sm border transition-all hover:opacity-70"
+                    className="px-4 py-2 text-sm transition-all hover:opacity-80"
                     style={{
-                      borderColor: `${textColor}12`,
-                      borderRadius: templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : templateId === 'bold' ? '0' : '4px',
-                      borderWidth: templateId === 'bold' ? '2px' : '1px',
-                      fontSize: templateId === 'bold' ? '0.6875rem' : undefined,
-                      fontWeight: templateId === 'bold' ? 700 : undefined,
-                      letterSpacing: templateId === 'bold' ? '0.04em' : undefined,
-                      textTransform: templateId === 'bold' ? 'uppercase' as const : undefined,
+                      border: `${templateId === 'bold' ? '2' : '1'}px solid ${textColor}12`,
+                      borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : '12px',
+                      backgroundColor: templateId === 'playful' ? `${textColor}04` : 'transparent',
                     }}
                   >
                     {suggestion}
@@ -305,7 +251,15 @@ export default function ChatPage() {
             >
               <div
                 className="max-w-[80%] px-4 py-3 text-sm leading-relaxed"
-                style={msg.role === 'user' ? userBubbleStyle : assistantBubbleStyle}
+                style={{
+                  borderRadius: getBubbleRadius(msg.role),
+                  ...(msg.role === 'user'
+                    ? { backgroundColor: accentColor, color: '#fff' }
+                    : {
+                        backgroundColor: isDark ? '#111111' : `${textColor}06`,
+                        border: `1px solid ${textColor}08`,
+                      }),
+                }}
               >
                 {msg.content}
               </div>
@@ -314,11 +268,26 @@ export default function ChatPage() {
 
           {sending && (
             <div className="flex justify-start">
-              <div className="px-4 py-3" style={assistantBubbleStyle}>
+              <div
+                className="px-4 py-3"
+                style={{
+                  borderRadius: getBubbleRadius('assistant'),
+                  backgroundColor: isDark ? '#111111' : `${textColor}06`,
+                  border: `1px solid ${textColor}08`,
+                }}
+              >
                 <div className="flex gap-1">
-                  <div className="h-2 w-2 rounded-full animate-bounce" style={{ backgroundColor: accentColor, animationDelay: '0ms' }} />
-                  <div className="h-2 w-2 rounded-full animate-bounce" style={{ backgroundColor: accentColor, animationDelay: '150ms' }} />
-                  <div className="h-2 w-2 rounded-full animate-bounce" style={{ backgroundColor: accentColor, animationDelay: '300ms' }} />
+                  {[0, 150, 300].map((delay) => (
+                    <div
+                      key={delay}
+                      className="h-2 w-2 animate-bounce"
+                      style={{
+                        backgroundColor: accentColor,
+                        animationDelay: `${delay}ms`,
+                        borderRadius: templateId === 'bold' ? '0' : '9999px',
+                      }}
+                    />
+                  ))}
                 </div>
               </div>
             </div>
@@ -329,33 +298,39 @@ export default function ChatPage() {
       </div>
 
       {/* Input */}
-      <div
-        className="border-t px-5 py-4"
-        style={{
-          borderColor: `${textColor}08`,
-          borderTopWidth: templateId === 'bold' ? '2px' : '1px',
-        }}
-      >
+      <div className="px-4 py-4" style={{ borderTop: `1px solid ${textColor}08` }}>
         <form onSubmit={handleSend} className="max-w-3xl mx-auto flex gap-3">
           <input
             type="text"
             value={input}
             onChange={(e) => setInput(e.target.value)}
-            placeholder={templateId === 'playful' ? 'Type a message... 💬' : 'Type a message...'}
-            className="flex-1 px-4 py-3 border outline-none text-sm"
-            style={chatInputStyle}
+            placeholder="Type a message..."
+            className="flex-1 px-4 py-3 text-sm outline-none"
+            style={{
+              border: `${templateId === 'bold' ? '2' : '1'}px solid ${textColor}12`,
+              borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : '12px',
+              backgroundColor: isDark ? '#111111' : `${textColor}03`,
+              color: textColor,
+            }}
             disabled={sending}
           />
           <button
             type="submit"
             disabled={sending || !input.trim()}
-            className="px-6 py-3 text-sm font-medium transition-all hover:opacity-90 disabled:opacity-50"
-            style={sendBtnStyle}
+            className="px-6 py-3 text-sm font-semibold transition-all hover:opacity-90 disabled:opacity-50"
+            style={{
+              backgroundColor: accentColor,
+              color: '#fff',
+              borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : '12px',
+              fontWeight: templateId === 'bold' ? 700 : 600,
+              textTransform: templateId === 'bold' ? 'uppercase' : undefined,
+              letterSpacing: templateId === 'bold' ? '0.05em' : undefined,
+            }}
           >
-            {templateId === 'bold' ? 'SEND' : 'Send'}
+            {templateId === 'playful' ? '🚀' : 'Send'}
           </button>
         </form>
-        <p className="text-center text-xs mt-3" style={{ color: `${textColor}20` }}>
+        <p className="text-center text-xs mt-3 max-w-3xl mx-auto" style={{ color: `${textColor}20` }}>
           Powered by {brand.name} AI · Built with Mayasura
         </p>
       </div>
