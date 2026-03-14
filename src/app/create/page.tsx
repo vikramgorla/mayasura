@@ -29,9 +29,9 @@ const initialData: BrandData = {
   tagline: '',
   industry: '',
   description: '',
-  primaryColor: '#0f172a',
-  secondaryColor: '#f8fafc',
-  accentColor: '#3b82f6',
+  primaryColor: '#1E1B4B',
+  secondaryColor: '#F5F3FF',
+  accentColor: '#4F46E5',
   fontHeading: 'Inter',
   fontBody: 'Inter',
   products: [],
@@ -91,21 +91,21 @@ function CreatePageContent() {
           status: 'launched',
         }),
       });
-
+      
       if (!res.ok) {
         const errData = await res.json().catch(() => ({}));
         throw new Error(errData.error || `Server error: ${res.status}`);
       }
-
+      
       const result = await res.json();
-
+      
       if (!result.brand?.id) {
         throw new Error('Brand creation failed — no ID returned');
       }
-
+      
       const brandId = result.brand.id;
 
-      // Step 2: Create products (batched with error handling)
+      // Step 2: Create products (batched, with error handling)
       if (data.products.length > 0) {
         const productPromises = data.products.map(product =>
           fetch(`/api/brands/${brandId}/products`, {
@@ -137,10 +137,10 @@ function CreatePageContent() {
       try {
         const confetti = (await import('canvas-confetti')).default;
         confetti({
-          particleCount: 100,
-          spread: 70,
+          particleCount: 150,
+          spread: 100,
           origin: { y: 0.6 },
-          colors: [data.primaryColor, data.accentColor, '#22c55e'],
+          colors: ['#4F46E5', '#7C3AED', '#A855F7', '#22C55E', '#F59E0B'],
         });
       } catch {} // Silent fail if confetti doesn't load
 
@@ -166,45 +166,58 @@ function CreatePageContent() {
     }
   };
 
+  const progress = ((step - 1) / 5) * 100;
+
   return (
-    <div className="min-h-screen bg-slate-50 dark:bg-slate-900">
+    <div className="min-h-screen bg-slate-50 dark:bg-[#0B0F1A]">
       {/* Header */}
-      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800 sticky top-0 z-20">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2 text-sm text-slate-500 hover:text-slate-900 dark:hover:text-white">
+          <Link href="/" className="flex items-center gap-2 text-sm text-slate-500 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
             <ArrowLeft className="h-4 w-4" />
             <span className="hidden sm:inline">Back to home</span>
           </Link>
-          <span className="text-sm text-slate-500">
+          <span className="text-sm text-slate-500 dark:text-slate-400">
             Step {step} of 6
           </span>
         </div>
       </div>
 
-      {/* Progress */}
-      <div className="bg-white dark:bg-slate-800 border-b border-slate-200 dark:border-slate-700">
+      {/* Progress Bar — sleek gradient line */}
+      <div className="bg-white/80 dark:bg-slate-900/80 backdrop-blur-lg border-b border-slate-200 dark:border-slate-800">
         <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-6">
+          {/* Gradient progress line */}
+          <div className="h-1.5 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden mb-4">
+            <motion.div
+              className="h-full rounded-full bg-gradient-to-r from-indigo-600 via-violet-500 to-purple-500"
+              initial={{ width: 0 }}
+              animate={{ width: `${progress}%` }}
+              transition={{ duration: 0.4, ease: 'easeOut' }}
+            />
+          </div>
+          
+          {/* Step indicators */}
           <div className="flex items-center gap-1 sm:gap-2">
             {STEPS.map((s) => (
               <div key={s.id} className="flex items-center flex-1">
                 <div className="flex items-center gap-2 sm:gap-3 flex-1">
                   <div className={`flex-shrink-0 h-7 w-7 sm:h-8 sm:w-8 rounded-full flex items-center justify-center text-[10px] sm:text-xs font-semibold transition-all duration-300 ${
                     step > s.id
-                      ? 'bg-emerald-500 text-white'
+                      ? 'bg-gradient-to-r from-emerald-500 to-emerald-400 text-white shadow-sm shadow-emerald-500/25'
                       : step === s.id
-                      ? 'bg-slate-900 dark:bg-white text-white dark:text-slate-900'
-                      : 'bg-slate-100 dark:bg-slate-700 text-slate-400'
+                      ? 'bg-gradient-to-r from-indigo-600 to-violet-600 text-white shadow-md shadow-indigo-500/25'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-400 dark:text-slate-500'
                   }`}>
                     {step > s.id ? <Check className="h-3.5 w-3.5" /> : s.id}
                   </div>
                   <div className="hidden lg:block min-w-0">
-                    <p className={`text-xs font-medium truncate ${step >= s.id ? 'text-slate-900 dark:text-white' : 'text-slate-400'}`}>
+                    <p className={`text-xs font-medium truncate ${step >= s.id ? 'text-slate-900 dark:text-white' : 'text-slate-400 dark:text-slate-500'}`}>
                       {s.name}
                     </p>
                   </div>
                 </div>
                 {s.id < 6 && (
-                  <div className={`h-px flex-1 mx-1 sm:mx-2 transition-all duration-300 ${step > s.id ? 'bg-emerald-500' : 'bg-slate-200 dark:bg-slate-700'}`} />
+                  <div className={`h-px flex-1 mx-1 sm:mx-2 transition-all duration-300 ${step > s.id ? 'bg-emerald-400' : 'bg-slate-200 dark:bg-slate-800'}`} />
                 )}
               </div>
             ))}
@@ -230,8 +243,8 @@ function CreatePageContent() {
 export default function CreatePage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 border-t-slate-900" />
+      <div className="min-h-screen flex items-center justify-center bg-slate-50 dark:bg-[#0B0F1A]">
+        <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-200 dark:border-slate-700 border-t-indigo-600 dark:border-t-indigo-400" />
       </div>
     }>
       <CreatePageContent />
