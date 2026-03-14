@@ -1,104 +1,73 @@
-import { describe, it, expect, beforeEach, afterEach } from 'vitest';
-import { render, screen, act } from '@testing-library/react';
+import { describe, it, expect } from 'vitest';
+import { render, screen, act, waitFor } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
 import { ToastProvider, useToast } from '@/components/ui/toast';
 
-// Helper component to trigger toasts
-function ToastTrigger({ type, title, description }: { type: string; title: string; description?: string }) {
+// Helper component to trigger toasts programmatically
+function ToastTrigger() {
   const toast = useToast();
 
-  const handleClick = () => {
-    switch (type) {
-      case 'success':
-        toast.success(title, description);
-        break;
-      case 'error':
-        toast.error(title, description);
-        break;
-      case 'info':
-        toast.info(title, description);
-        break;
-      case 'warning':
-        toast.warning(title, description);
-        break;
-      default:
-        toast.toast({ type: 'info', title, description });
-    }
-  };
-
-  return <button onClick={handleClick}>Trigger</button>;
+  return (
+    <div>
+      <button onClick={() => toast.success('Success!', 'It worked')}>Success</button>
+      <button onClick={() => toast.error('Error!', 'Something failed')}>Error</button>
+      <button onClick={() => toast.info('Info!', 'Just FYI')}>Info</button>
+      <button onClick={() => toast.warning('Warning!', 'Watch out')}>Warning</button>
+    </div>
+  );
 }
 
-function renderWithToast(type = 'success', title = 'Test Toast', description?: string) {
+function renderToasts() {
   return render(
     <ToastProvider>
-      <ToastTrigger type={type} title={title} description={description} />
+      <ToastTrigger />
     </ToastProvider>
   );
 }
 
 describe('Toast', () => {
-  beforeEach(() => {
-    vi.useFakeTimers();
-  });
-
-  afterEach(() => {
-    vi.useRealTimers();
-  });
-
   it('renders a success toast when triggered', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    renderWithToast('success', 'Save successful');
-    await user.click(screen.getByText('Trigger'));
-    expect(screen.getByText('Save successful')).toBeInTheDocument();
+    const user = userEvent.setup();
+    renderToasts();
+    await user.click(screen.getByText('Success'));
+    expect(screen.getByText('Success!')).toBeInTheDocument();
+    expect(screen.getByText('It worked')).toBeInTheDocument();
   });
 
   it('renders an error toast', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    renderWithToast('error', 'Something went wrong');
-    await user.click(screen.getByText('Trigger'));
-    expect(screen.getByText('Something went wrong')).toBeInTheDocument();
+    const user = userEvent.setup();
+    renderToasts();
+    await user.click(screen.getByText('Error'));
+    expect(screen.getByText('Error!')).toBeInTheDocument();
+    expect(screen.getByText('Something failed')).toBeInTheDocument();
   });
 
   it('renders an info toast', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    renderWithToast('info', 'Info message');
-    await user.click(screen.getByText('Trigger'));
-    expect(screen.getByText('Info message')).toBeInTheDocument();
+    const user = userEvent.setup();
+    renderToasts();
+    await user.click(screen.getByText('Info'));
+    expect(screen.getByText('Info!')).toBeInTheDocument();
+    expect(screen.getByText('Just FYI')).toBeInTheDocument();
   });
 
   it('renders a warning toast', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    renderWithToast('warning', 'Be careful');
-    await user.click(screen.getByText('Trigger'));
-    expect(screen.getByText('Be careful')).toBeInTheDocument();
+    const user = userEvent.setup();
+    renderToasts();
+    await user.click(screen.getByText('Warning'));
+    expect(screen.getByText('Warning!')).toBeInTheDocument();
+    expect(screen.getByText('Watch out')).toBeInTheDocument();
   });
 
-  it('renders toast with description', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    renderWithToast('success', 'Saved', 'Your changes have been saved');
-    await user.click(screen.getByText('Trigger'));
-    expect(screen.getByText('Saved')).toBeInTheDocument();
-    expect(screen.getByText('Your changes have been saved')).toBeInTheDocument();
-  });
-
-  it('auto-dismisses after timeout', async () => {
-    const user = userEvent.setup({ advanceTimers: vi.advanceTimersByTime });
-    renderWithToast('success', 'Will disappear');
-    await user.click(screen.getByText('Trigger'));
-
-    expect(screen.getByText('Will disappear')).toBeInTheDocument();
-
-    // Advance past the 4000ms default duration
-    act(() => {
-      vi.advanceTimersByTime(5000);
-    });
-
-    expect(screen.queryByText('Will disappear')).not.toBeInTheDocument();
+  it('can show multiple toasts', async () => {
+    const user = userEvent.setup();
+    renderToasts();
+    await user.click(screen.getByText('Success'));
+    await user.click(screen.getByText('Error'));
+    expect(screen.getByText('Success!')).toBeInTheDocument();
+    expect(screen.getByText('Error!')).toBeInTheDocument();
   });
 
   it('throws error when useToast is used outside provider', () => {
-    // Suppress console.error for this test
     const spy = vi.spyOn(console, 'error').mockImplementation(() => {});
 
     function BadComponent() {
@@ -112,4 +81,21 @@ describe('Toast', () => {
 
     spy.mockRestore();
   });
+
+  it('auto-dismisses toasts after timeout', async () => {
+    renderToasts();
+
+    // Use real timers — click to create toast
+    const user = userEvent.setup();
+    await user.click(screen.getByText('Success'));
+    expect(screen.getByText('Success!')).toBeInTheDocument();
+
+    // Wait for real auto-dismiss (4000ms default + buffer)
+    await waitFor(
+      () => {
+        expect(screen.queryByText('Success!')).not.toBeInTheDocument();
+      },
+      { timeout: 6000 }
+    );
+  }, 10000); // 10s timeout for this test
 });
