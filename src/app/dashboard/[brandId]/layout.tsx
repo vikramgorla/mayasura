@@ -48,6 +48,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, setTheme, resolved } = useTheme();
   const toast = useToast();
+  const shortcuts = useKeyboardShortcutsModal();
 
   useEffect(() => {
     fetch(`/api/brands/${brandId}`)
@@ -161,25 +162,40 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
         </div>
 
         <nav className="flex-1 p-3 overflow-y-auto">
-          <ul className="space-y-1">
-            {navItems.map((item) => {
+          <ul className="space-y-0.5">
+            {navItems.map((item, index) => {
               const href = `/dashboard/${brandId}${item.href}`;
               const isActive = pathname === href;
               return (
-                <li key={item.href || 'overview'}>
+                <motion.li
+                  key={item.href || 'overview'}
+                  initial={{ opacity: 0, x: -8 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ delay: index * 0.03, duration: 0.2 }}
+                >
                   <Link
                     href={href}
                     className={cn(
-                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-colors',
+                      'flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm transition-all duration-150 group relative',
                       isActive
-                        ? 'bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-white font-medium'
-                        : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-700/50'
+                        ? 'bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 font-medium'
+                        : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/60'
                     )}
                   >
-                    <item.icon className="h-4 w-4" />
+                    {isActive && (
+                      <motion.div
+                        layoutId="nav-active-indicator"
+                        className="absolute left-0 top-1/2 -translate-y-1/2 w-0.5 h-5 bg-violet-600 dark:bg-violet-400 rounded-full"
+                        transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                      />
+                    )}
+                    <item.icon className={cn(
+                      'h-4 w-4 transition-transform duration-150',
+                      isActive ? 'text-violet-600 dark:text-violet-400' : 'group-hover:scale-110'
+                    )} />
                     {item.label}
                   </Link>
-                </li>
+                </motion.li>
               );
             })}
           </ul>
@@ -206,9 +222,19 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
             <div className="h-4 w-4 rounded-full" style={{ backgroundColor: brand.accent_color }} />
           </div>
           <p className="text-xs text-zinc-400">{brand.font_heading} / {brand.font_body}</p>
-          <div className="text-xs text-zinc-400">
-            <kbd className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-600 text-[10px]">⌘K</kbd>
-            <span className="ml-1.5">Command Palette</span>
+          <div className="flex items-center justify-between text-xs text-zinc-400">
+            <div>
+              <kbd className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-600 text-[10px]">⌘K</kbd>
+              <span className="ml-1.5">Palette</span>
+            </div>
+            <button
+              onClick={() => shortcuts.setOpen(true)}
+              className="flex items-center gap-1 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+              title="Keyboard shortcuts (⌘?)"
+            >
+              <Keyboard className="h-3.5 w-3.5" />
+              <kbd className="px-1 py-0.5 rounded border border-zinc-200 dark:border-zinc-600 text-[10px]">⌘?</kbd>
+            </button>
           </div>
           <div className="pt-3 border-t border-zinc-200 dark:border-zinc-800 flex items-center justify-between">
             <UserNav />
@@ -216,6 +242,9 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
           </div>
         </div>
       </aside>
+
+      {/* Keyboard Shortcuts Modal */}
+      <KeyboardShortcutsModal open={shortcuts.open} onClose={shortcuts.onClose} />
 
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">
@@ -271,7 +300,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
                 </button>
               </div>
               <nav className="flex-1 p-3 overflow-y-auto">
-                <ul className="space-y-1">
+                <ul className="space-y-0.5">
                   {navItems.map((item) => {
                     const href = `/dashboard/${brandId}${item.href}`;
                     const isActive = pathname === href;
@@ -280,13 +309,13 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
                         <Link
                           href={href}
                           className={cn(
-                            'flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-colors',
+                            'flex items-center gap-3 px-3 py-3 rounded-lg text-sm transition-all duration-150',
                             isActive
-                              ? 'bg-zinc-100 dark:bg-zinc-700 text-zinc-900 dark:text-white font-medium'
-                              : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50'
+                              ? 'bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 font-medium'
+                              : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-50 dark:hover:bg-zinc-800/60'
                           )}
                         >
-                          <item.icon className="h-5 w-5" />
+                          <item.icon className={cn('h-5 w-5', isActive ? 'text-violet-600 dark:text-violet-400' : '')} />
                           {item.label}
                         </Link>
                       </li>
@@ -302,14 +331,17 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
       {/* Main Content */}
       <main id="dashboard-content" className="flex-1 lg:ml-64 pt-14 lg:pt-0" role="main">
         <ErrorBoundary>
-          <motion.div
-            key={pathname}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 }}
-          >
-            {children}
-          </motion.div>
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={pathname}
+              initial={{ opacity: 0, y: 6, filter: 'blur(2px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              exit={{ opacity: 0, y: -4 }}
+              transition={{ duration: 0.18, ease: [0.25, 0.46, 0.45, 0.94] }}
+            >
+              {children}
+            </motion.div>
+          </AnimatePresence>
         </ErrorBoundary>
       </main>
     </div>
