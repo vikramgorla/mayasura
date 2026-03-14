@@ -53,11 +53,11 @@ export default function StrategyPage() {
   return (
     <div className="p-4 sm:p-8">
       <div className="mb-8">
-        <h1 className="text-2xl font-bold flex items-center gap-2">
+        <h1 className="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
           <Sparkles className="h-6 w-6 text-blue-600" />
           AI Strategy Advisor
         </h1>
-        <p className="text-slate-500 text-sm mt-1">Get AI-powered insights and recommendations for your brand</p>
+        <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Get AI-powered insights and recommendations for your brand</p>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
@@ -67,7 +67,7 @@ export default function StrategyPage() {
               <div className={`h-11 w-11 rounded-xl flex items-center justify-center mb-3 ${option.color}`}>
                 <option.icon className="h-5 w-5" />
               </div>
-              <h3 className="font-semibold text-sm mb-1">{option.label}</h3>
+              <h3 className="font-semibold text-sm mb-1 text-slate-900 dark:text-white">{option.label}</h3>
               <p className="text-xs text-slate-400 mb-4">{option.desc}</p>
               <Button
                 variant="outline"

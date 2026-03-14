@@ -149,11 +149,11 @@ export default function SupportPage() {
     <div className="p-4 sm:p-8">
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
             <HeadphonesIcon className="h-6 w-6" />
             Customer Support
           </h1>
-          <p className="text-slate-500 text-sm mt-1">Manage support tickets and customer inquiries</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Manage support tickets and customer inquiries</p>
         </div>
         <Button variant="brand" size="sm" onClick={() => setShowForm(true)}>
           <Plus className="h-3.5 w-3.5" />
@@ -165,15 +165,15 @@ export default function SupportPage() {
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         <Card><CardContent className="p-4">
           <p className="text-xs text-slate-400 mb-1">Total Tickets</p>
-          <p className="text-2xl font-bold">{stats.total}</p>
+          <p className="text-2xl font-bold text-slate-900 dark:text-white">{stats.total}</p>
         </CardContent></Card>
         <Card><CardContent className="p-4">
           <p className="text-xs text-slate-400 mb-1">Open</p>
-          <p className="text-2xl font-bold text-amber-600">{stats.open}</p>
+          <p className="text-2xl font-bold text-amber-600 dark:text-amber-400">{stats.open}</p>
         </CardContent></Card>
         <Card><CardContent className="p-4">
           <p className="text-xs text-slate-400 mb-1">Resolved</p>
-          <p className="text-2xl font-bold text-emerald-600">{stats.resolved}</p>
+          <p className="text-2xl font-bold text-emerald-600 dark:text-emerald-400">{stats.resolved}</p>
         </CardContent></Card>
         <Card><CardContent className="p-4">
           <p className="text-xs text-slate-400 mb-1">Satisfaction</p>
@@ -195,21 +195,21 @@ export default function SupportPage() {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">Customer Name</label>
+                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Customer Name</label>
                     <Input value={form.customer_name} onChange={e => setForm(p => ({ ...p, customer_name: e.target.value }))} placeholder="John Doe" />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">Email</label>
+                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Email</label>
                     <Input type="email" value={form.customer_email} onChange={e => setForm(p => ({ ...p, customer_email: e.target.value }))} placeholder="john@example.com" />
                   </div>
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-4">
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">Subject</label>
+                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Subject</label>
                     <Input value={form.subject} onChange={e => setForm(p => ({ ...p, subject: e.target.value }))} placeholder="Issue summary" />
                   </div>
                   <div>
-                    <label className="block text-xs text-slate-500 mb-1">Priority</label>
+                    <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Priority</label>
                     <Select
                       value={form.priority}
                       onValueChange={v => setForm(p => ({ ...p, priority: v }))}
@@ -223,7 +223,7 @@ export default function SupportPage() {
                   </div>
                 </div>
                 <div className="mb-4">
-                  <label className="block text-xs text-slate-500 mb-1">Message</label>
+                  <label className="block text-xs text-slate-500 dark:text-slate-400 mb-1">Message</label>
                   <Textarea value={form.message} onChange={e => setForm(p => ({ ...p, message: e.target.value }))} placeholder="Describe the issue..." rows={3} />
                 </div>
                 <div className="flex justify-end gap-2">
@@ -295,7 +295,7 @@ export default function SupportPage() {
           >
             <div className="p-4 border-b border-slate-100 dark:border-slate-700">
               <div className="flex items-center justify-between mb-2">
-                <h3 className="font-semibold text-sm">{selectedTicketData.subject}</h3>
+                <h3 className="font-semibold text-sm text-slate-900 dark:text-white">{selectedTicketData.subject}</h3>
                 <button onClick={() => { setSelectedTicket(null); setSelectedTicketData(null); }}>
                   <X className="h-4 w-4 text-slate-400" />
                 </button>

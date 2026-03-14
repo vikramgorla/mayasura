@@ -17,9 +17,9 @@ interface ContentItem {
 }
 
 const contentTypes = [
-  { type: 'blog', label: 'Blog Post', icon: BookOpen, color: 'bg-blue-50 text-blue-600' },
-  { type: 'social', label: 'Social Media', icon: Share2, color: 'bg-purple-50 text-purple-600' },
-  { type: 'email', label: 'Email Template', icon: Mail, color: 'bg-amber-50 text-amber-600' },
+  { type: 'blog', label: 'Blog Post', icon: BookOpen, color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' },
+  { type: 'social', label: 'Social Media', icon: Share2, color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' },
+  { type: 'email', label: 'Email Template', icon: Mail, color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' },
 ];
 
 export default function ContentPage() {
@@ -60,22 +60,22 @@ export default function ContentPage() {
   };
 
   const typeIcons: Record<string, { icon: React.ElementType; color: string }> = {
-    blog: { icon: BookOpen, color: 'bg-blue-50 text-blue-600' },
-    social: { icon: Share2, color: 'bg-purple-50 text-purple-600' },
-    email: { icon: Mail, color: 'bg-amber-50 text-amber-600' },
-    landing: { icon: FileText, color: 'bg-emerald-50 text-emerald-600' },
-    about: { icon: FileText, color: 'bg-slate-50 text-slate-600' },
+    blog: { icon: BookOpen, color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' },
+    social: { icon: Share2, color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400' },
+    email: { icon: Mail, color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400' },
+    landing: { icon: FileText, color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400' },
+    about: { icon: FileText, color: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400' },
   };
 
   return (
-    <div className="p-8">
+    <div className="p-4 sm:p-8">
       <div className="flex items-center justify-between mb-8">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-2">
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-slate-900 dark:text-white">
             <FileText className="h-6 w-6" />
             Content Hub
           </h1>
-          <p className="text-slate-500 text-sm mt-1">Generate and manage brand content with AI</p>
+          <p className="text-slate-500 dark:text-slate-400 text-sm mt-1">Generate and manage brand content with AI</p>
         </div>
       </div>
 
@@ -83,7 +83,7 @@ export default function ContentPage() {
       <Card className="mb-8">
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
-            <Sparkles className="h-4 w-4 text-blue-600" />
+            <Sparkles className="h-4 w-4 text-indigo-600 dark:text-indigo-400" />
             Generate Content
           </CardTitle>
         </CardHeader>
@@ -133,15 +133,15 @@ export default function ContentPage() {
 
       {/* Content List */}
       {content.length === 0 ? (
-        <div className="bg-white border border-slate-200 rounded-xl p-12 text-center">
-          <FileText className="h-12 w-12 text-slate-300 mx-auto mb-4" />
-          <h3 className="font-semibold mb-1">No content yet</h3>
-          <p className="text-sm text-slate-400">Generate some content using the buttons above</p>
+        <div className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl p-12 text-center">
+          <FileText className="h-12 w-12 text-slate-300 dark:text-slate-600 mx-auto mb-4" />
+          <h3 className="font-semibold mb-1 text-slate-900 dark:text-white">No content yet</h3>
+          <p className="text-sm text-slate-400 dark:text-slate-500">Generate some content using the buttons above</p>
         </div>
       ) : (
         <div className="space-y-4">
           {content.map((item) => {
-            const typeInfo = typeIcons[item.type] || { icon: FileText, color: 'bg-slate-50 text-slate-600' };
+            const typeInfo = typeIcons[item.type] || { icon: FileText, color: 'bg-slate-50 dark:bg-slate-800 text-slate-600 dark:text-slate-400' };
             const Icon = typeInfo.icon;
             return (
               <Card key={item.id} className="group">
@@ -152,11 +152,11 @@ export default function ContentPage() {
                     </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-sm truncate">{item.title}</h3>
+                        <h3 className="font-semibold text-sm truncate text-slate-900 dark:text-white">{item.title}</h3>
                         <Badge variant="secondary" className="capitalize flex-shrink-0">{item.type}</Badge>
                       </div>
-                      <p className="text-sm text-slate-500 leading-relaxed line-clamp-3 whitespace-pre-wrap">{item.body}</p>
-                      <p className="text-xs text-slate-300 mt-2">
+                      <p className="text-sm text-slate-500 dark:text-slate-400 leading-relaxed line-clamp-3 whitespace-pre-wrap">{item.body}</p>
+                      <p className="text-xs text-slate-300 dark:text-slate-600 mt-2">
                         {new Date(item.created_at).toLocaleDateString()}
                       </p>
                     </div>
@@ -164,7 +164,7 @@ export default function ContentPage() {
                       variant="ghost"
                       size="icon"
                       onClick={() => deleteContentItem(item.id)}
-                      className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 hover:bg-red-50 h-8 w-8 flex-shrink-0"
+                      className="opacity-0 group-hover:opacity-100 text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-950/30 h-8 w-8 flex-shrink-0"
                     >
                       <Trash2 className="h-3.5 w-3.5" />
                     </Button>
