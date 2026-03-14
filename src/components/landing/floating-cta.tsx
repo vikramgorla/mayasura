@@ -36,11 +36,11 @@ export function FloatingCTA() {
           className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-full bg-zinc-900/95 dark:bg-white/95 backdrop-blur-xl shadow-2xl shadow-black/20 border border-zinc-700/50 dark:border-zinc-300/50"
         >
           <span className="text-sm font-medium text-white dark:text-zinc-900 hidden sm:inline">
-            Ready to build your brand?
+            Create Your Brand — Free
           </span>
           <Link href="/create">
             <Button size="sm" variant="brand" className="rounded-full text-xs h-8 px-4">
-              Start Free
+              Get Started
               <ArrowRight className="h-3 w-3" />
             </Button>
           </Link>
