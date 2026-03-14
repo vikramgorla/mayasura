@@ -1,10 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createBrand, getAllBrands } from '@/lib/db';
+import { getSession } from '@/lib/auth';
 import { nanoid } from 'nanoid';
 
 export async function GET() {
   try {
-    const brands = getAllBrands();
+    const session = await getSession();
+    const brands = getAllBrands(session?.userId);
     return NextResponse.json({ brands });
   } catch (error) {
     console.error('Error fetching brands:', error);
@@ -20,12 +22,15 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Brand name is required' }, { status: 400 });
     }
 
+    const session = await getSession();
     const id = nanoid(12);
+    
     createBrand({
       id,
       name: body.name,
       tagline: body.tagline,
       description: body.description,
+      industry: body.industry,
       logo_url: body.logo_url,
       primary_color: body.primary_color,
       secondary_color: body.secondary_color,
@@ -35,6 +40,7 @@ export async function POST(request: NextRequest) {
       brand_voice: body.brand_voice,
       channels: body.channels ? JSON.stringify(body.channels) : undefined,
       status: body.status || 'draft',
+      user_id: session?.userId,
     });
 
     const brand = { id, ...body };
