@@ -1,66 +1,148 @@
 # 🏛️ Mayasura
 
-**Build your brand's digital palace in minutes.**
+> The divine architect of digital ecosystems — an open-source framework that lets any brand instantiate their complete digital communication stack in minutes.
 
-Mayasura is an open-source framework that lets any brand instantiate their complete digital consumer communication ecosystem — website, chatbot, e-commerce, content, and more — all AI-powered, all in one click.
+**Live:** [mayasura-web-production.up.railway.app](https://mayasura-web-production.up.railway.app)
 
-## Features
+## ✨ Features (v2)
 
-- **🧙 AI-Guided Wizard** — 6-step brand creation with AI assistance at every step
-- **🌐 Website Generation** — Landing pages, product pages, about & contact
-- **🤖 AI Chatbot** — Intelligent customer support that knows your brand
-- **🛒 E-Commerce** — Product catalog and storefront
-- **📧 Email Templates** — Welcome sequences, newsletters
-- **📊 Dashboard** — Manage your entire brand ecosystem
-- **🎨 Swiss-Style Design** — Clean, professional, beautiful
+### 🔐 Authentication
+- JWT-based session management with `jose`
+- Password hashing with `bcryptjs`
+- Login/signup pages with secure cookie sessions
 
-## Tech Stack
+### 🎨 Design System
+- CSS custom properties for theming (colors, spacing, typography, shadows)
+- Dark mode support (system preference + manual toggle)
+- Component library: Dialog, Tabs, Tooltip, Avatar, Progress, Skeleton, Switch, Select, Accordion
+- Toast notification system with animations
+- Micro-animations throughout (framer-motion)
 
-- **Frontend**: Next.js 15 (App Router), Tailwind CSS, shadcn/ui components
-- **Backend**: Next.js API Routes
-- **AI**: Anthropic Claude API
-- **Database**: SQLite via better-sqlite3
-- **Deployment**: Railway
+### 📱 Mobile-First
+- Slide-out mobile menu with animated transitions
+- Touch-friendly 44×44px tap targets
+- Responsive wizard, dashboard, and all pages
+- Mobile-optimized cards, tables, and navigation
 
-## Getting Started
+### 📦 Starter Kit Templates
+10 industry templates with pre-filled brand data:
+
+| 🍕 Restaurant | 👗 Fashion | 💻 Tech/SaaS | 🏋️ Fitness | 📚 Education |
+|:-:|:-:|:-:|:-:|:-:|
+| 🏠 Real Estate | ✂️ Beauty | 🎵 Music | 🛒 Retail | 🏥 Healthcare |
+
+Each includes: products, colors, fonts, brand voice, channels, chatbot persona.
+
+### 🎧 Customer Support
+- Ticket management system (create, track, resolve)
+- Priority levels (low/medium/high/urgent)
+- Status workflow: open → in-progress → resolved → closed
+- Message threads (customer/agent/AI)
+- Support analytics dashboard
+
+### 🧠 AI Strategy Advisor
+- Brand strategy analysis (strengths, opportunities, positioning)
+- Competitor analysis with differentiation suggestions
+- SEO optimization (keywords, meta descriptions, content topics)
+- Content calendar generation (2-week plan)
+- Brand consistency checker with scoring
+
+### 🖥️ Website Preview
+- Desktop/tablet/mobile viewport toggle
+- Live multi-section preview (Hero, Products, About, Testimonials, Contact)
+- Download as static HTML
+
+### ⌘ Command Palette
+- `⌘K` / `Ctrl+K` for quick navigation
+- Context-aware actions (brand-specific when in dashboard)
+
+### 🎉 UX Polish
+- Confetti animation on brand launch (uses brand colors!)
+- Animated stat counters
+- Brand health score
+- Onboarding checklist
+- Skeleton loading states
+- Error boundaries
+- Toast notifications for all actions
+- Page transitions with framer-motion
+
+## 🏗️ Architecture
+
+```
+Next.js 15 (App Router) + TypeScript
+├── SQLite (better-sqlite3) — database
+├── Anthropic Claude API — AI features
+├── framer-motion — animations
+├── cmdk — command palette
+├── jose — JWT auth (edge-compatible)
+├── bcryptjs — password hashing
+├── canvas-confetti — celebrations
+├── @dnd-kit — drag-and-drop
+├── Tailwind CSS v4 — styling
+├── shadcn/ui-inspired — component library
+└── Vitest — testing (42 tests)
+```
+
+## 🚀 Getting Started
 
 ```bash
 # Clone
-git clone https://github.com/vikramgorla/mayasura.git
+git clone git@github.com:vikramgorla/mayasura.git
 cd mayasura
 
-# Install dependencies
+# Install
 npm install
 
-# Set up environment
+# Environment
 cp .env.example .env
-# Add your ANTHROPIC_API_KEY
+# Add your ANTHROPIC_API_KEY to .env
 
-# Run development server
+# Run
 npm run dev
+
+# Test
+npm test
+
+# Build
+npm run build
 ```
 
-Open [http://localhost:3000](http://localhost:3000) to start building your brand.
+## 📁 Project Structure
 
-## Environment Variables
+```
+src/
+├── app/
+│   ├── api/            # API routes (brands, auth, ai, tickets, strategy)
+│   ├── create/         # Brand creation wizard
+│   ├── dashboard/      # Brand management dashboard
+│   │   └── [brandId]/  # Per-brand pages (overview, website, chatbot, products, content, support, strategy, analytics)
+│   ├── login/          # Login page
+│   ├── signup/         # Signup page
+│   └── templates/      # Template gallery
+├── components/
+│   ├── ui/             # Design system components
+│   ├── wizard/         # Wizard step components
+│   ├── command-palette.tsx
+│   ├── theme-provider.tsx
+│   ├── error-boundary.tsx
+│   └── client-providers.tsx
+├── hooks/              # Custom React hooks
+├── lib/                # Core utilities (db, auth, ai, types, templates)
+└── __tests__/          # Test suites
+```
 
-| Variable | Description |
-|----------|------------|
-| `ANTHROPIC_API_KEY` | Anthropic API key for AI features |
-| `DATABASE_PATH` | Path to SQLite database (default: `./data/mayasura.db`) |
+## 🧪 Testing
 
-## Architecture
+```bash
+npm test              # Run all tests
+npm run test:watch    # Watch mode
+npm run test:coverage # With coverage
+```
 
-See [ARCHITECTURE.md](./ARCHITECTURE.md) for detailed architectural decisions.
+42 tests across 6 suites: utils, types, templates, auth, hooks, components.
 
-## Roadmap
+## 📄 License
 
-See [ROADMAP.md](./ROADMAP.md) for development phases.
+MIT — Built with ❤️ by Vikram Gorla
 
-## License
-
-MIT — see [LICENSE](./LICENSE).
-
----
-
-*Named after Mayasura, the divine architect from the Mahabharata who built the Maya Sabha — the palace of illusions that amazed even the gods.*
+*Inspired by Mayasura, the divine architect from the Mahabharata who built the Maya Sabha — the palace of illusions.*
