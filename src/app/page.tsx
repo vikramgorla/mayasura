@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowRight, Globe, MessageSquare, ShoppingBag, BarChart3, Layers, FileText } from "lucide-react";
+import { ArrowRight, Globe, MessageSquare, ShoppingBag, BarChart3, Layers, FileText, Sparkles, Code2, Puzzle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
 
@@ -152,18 +152,17 @@ export default function Home() {
           <motion.div
             variants={container}
             initial="hidden"
-            whileInView="show"
-            viewport={{ once: true }}
+            animate="show"
             className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4"
           >
             {features.map((f) => (
               <motion.div
                 key={f.title}
                 variants={item}
-                className={`${f.span} group bg-[var(--bg-surface)] rounded-xl border border-[var(--border-primary)] p-6 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors`}
+                className={`${f.span} group bg-[var(--bg-surface)] rounded-xl border border-[var(--border-primary)] p-6 hover:border-zinc-300 dark:hover:border-zinc-600 hover:shadow-md transition-all`}
               >
-                <div className="h-9 w-9 rounded-lg bg-violet-50 dark:bg-violet-950/40 flex items-center justify-center mb-4 group-hover:bg-violet-100 dark:group-hover:bg-violet-900/30 transition-colors">
-                  <f.icon className="h-4.5 w-4.5 text-violet-600 dark:text-violet-400" />
+                <div className="h-11 w-11 rounded-xl bg-violet-100 dark:bg-violet-950/50 flex items-center justify-center mb-4 group-hover:bg-violet-200 dark:group-hover:bg-violet-900/40 transition-colors">
+                  <f.icon className="h-5 w-5 text-violet-600 dark:text-violet-400" />
                 </div>
                 <h3 className="font-display font-semibold text-base mb-1.5 text-[var(--text-primary)]">{f.title}</h3>
                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{f.desc}</p>
@@ -184,20 +183,19 @@ export default function Home() {
               Our AI-guided wizard makes brand creation effortless.
             </p>
           </div>
-          <div className="space-y-8">
+          <div className="space-y-6">
             {steps.map((step, i) => (
               <motion.div
                 key={step.number}
                 initial={{ opacity: 0, x: -16 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.1 }}
-                className="flex gap-5 items-start"
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 0.3 + i * 0.1 }}
+                className="flex gap-5 items-start bg-[var(--bg-surface)] rounded-xl border border-[var(--border-primary)] p-5"
               >
-                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 flex items-center justify-center text-lg font-bold font-display">
+                <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-violet-600 text-white flex items-center justify-center text-lg font-bold font-display">
                   {step.number}
                 </div>
-                <div className="pt-1">
+                <div className="pt-0.5">
                   <h3 className="font-display text-lg font-semibold mb-1 text-[var(--text-primary)]">{step.title}</h3>
                   <p className="text-sm text-[var(--text-secondary)] leading-relaxed">{step.desc}</p>
                 </div>
@@ -220,11 +218,14 @@ export default function Home() {
           </div>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
             {[
-              { title: 'AI-Powered', desc: 'Claude AI generates content, product descriptions, chatbot responses, and brand strategy.' },
-              { title: 'Open Source', desc: 'Fully open-source. Own your data, customize everything, deploy anywhere you want.' },
-              { title: 'Composable', desc: 'Every component is modular. Swap, extend, or replace any piece of the stack.' },
+              { icon: Sparkles, title: 'AI-Powered', desc: 'Claude AI generates content, product descriptions, chatbot responses, and brand strategy.' },
+              { icon: Code2, title: 'Open Source', desc: 'Fully open-source. Own your data, customize everything, deploy anywhere you want.' },
+              { icon: Puzzle, title: 'Composable', desc: 'Every component is modular. Swap, extend, or replace any piece of the stack.' },
             ].map((f) => (
               <div key={f.title} className="text-center p-6">
+                <div className="h-12 w-12 rounded-xl bg-white/10 flex items-center justify-center mx-auto mb-4">
+                  <f.icon className="h-6 w-6 text-violet-400" />
+                </div>
                 <h3 className="font-display font-semibold text-base mb-2 text-white">{f.title}</h3>
                 <p className="text-sm text-zinc-400 leading-relaxed">{f.desc}</p>
               </div>
