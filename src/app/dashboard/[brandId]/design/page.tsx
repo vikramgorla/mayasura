@@ -422,6 +422,11 @@ export default function DesignStudioPage() {
               colors={colors}
               headingFont={headingFont}
               bodyFont={bodyFont}
+              buttonShape={buttonShape}
+              buttonSize={buttonSize}
+              buttonVariant={buttonVariant}
+              spacing={spacing}
+              borderRadius={borderRadius}
             />
           )}
         </div>

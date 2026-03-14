@@ -248,6 +248,89 @@ export interface PreviewColors {
   border: string;
 }
 
+import type {
+  ButtonShape,
+  ButtonSize,
+  ButtonVariant,
+  SpacingDensity,
+  BorderRadiusPreset,
+} from '@/components/design/style-controls';
+
+// ─── Design mapping helpers ──────────────────────────────────────
+
+const BORDER_RADIUS_MAP: Record<BorderRadiusPreset, string> = {
+  'none': '0px',
+  'subtle': '4px',
+  'rounded': '8px',
+  'extra-rounded': '16px',
+  'pill': '9999px',
+};
+
+const SPACING_MAP: Record<SpacingDensity, { sectionPadding: string; cardGap: string; sectionPaddingPx: number }> = {
+  'compact': { sectionPadding: '32px', cardGap: '12px', sectionPaddingPx: 32 },
+  'normal': { sectionPadding: '48px', cardGap: '16px', sectionPaddingPx: 48 },
+  'generous': { sectionPadding: '64px', cardGap: '20px', sectionPaddingPx: 64 },
+  'spacious': { sectionPadding: '96px', cardGap: '24px', sectionPaddingPx: 96 },
+};
+
+const BUTTON_SHAPE_MAP: Record<ButtonShape, string> = {
+  'sharp': '0px',
+  'soft': '4px',
+  'rounded': '8px',
+  'pill': '9999px',
+};
+
+const BUTTON_SIZE_MAP: Record<ButtonSize, { px: string; py: string; fontSize: string }> = {
+  'small': { px: '12px', py: '6px', fontSize: '11px' },
+  'medium': { px: '20px', py: '10px', fontSize: '13px' },
+  'large': { px: '28px', py: '14px', fontSize: '15px' },
+};
+
+function getButtonStyle(
+  variant: ButtonVariant,
+  accentColor: string,
+  shape: ButtonShape,
+  size: ButtonSize,
+  bgColor: string,
+): React.CSSProperties {
+  const sz = BUTTON_SIZE_MAP[size];
+  const base: React.CSSProperties = {
+    borderRadius: BUTTON_SHAPE_MAP[shape],
+    padding: `${sz.py} ${sz.px}`,
+    fontSize: sz.fontSize,
+    fontWeight: 500,
+    display: 'inline-block',
+    lineHeight: 1.2,
+  };
+  if (variant === 'solid') {
+    return { ...base, backgroundColor: accentColor, color: '#FFFFFF', border: 'none' };
+  }
+  if (variant === 'outline') {
+    return { ...base, backgroundColor: 'transparent', color: accentColor, border: `1.5px solid ${accentColor}` };
+  }
+  // ghost
+  return { ...base, backgroundColor: `${accentColor}12`, color: accentColor, border: 'none' };
+}
+
+function getOutlineButtonStyle(
+  textColor: string,
+  shape: ButtonShape,
+  size: ButtonSize,
+): React.CSSProperties {
+  const sz = BUTTON_SIZE_MAP[size];
+  return {
+    borderRadius: BUTTON_SHAPE_MAP[shape],
+    padding: `${sz.py} ${sz.px}`,
+    fontSize: sz.fontSize,
+    fontWeight: 500,
+    display: 'inline-block',
+    lineHeight: 1.2,
+    backgroundColor: 'transparent',
+    border: `1.5px solid ${textColor}25`,
+    color: textColor,
+  };
+}
+
 function templateColorsToPreview(tc: { text: string; background: string; accent: string; surface: string; muted: string; border: string }): PreviewColors {
   return {
     primary: tc.text,
@@ -266,12 +349,22 @@ export function TemplateDetailPreview({
   colors,
   headingFont,
   bodyFont,
+  buttonShape = 'rounded',
+  buttonSize = 'medium',
+  buttonVariant = 'solid',
+  spacing = 'normal',
+  borderRadius = 'rounded',
 }: {
   template: WebsiteTemplate;
   brandName?: string;
   colors?: PreviewColors;
   headingFont?: string;
   bodyFont?: string;
+  buttonShape?: ButtonShape;
+  buttonSize?: ButtonSize;
+  buttonVariant?: ButtonVariant;
+  spacing?: SpacingDensity;
+  borderRadius?: BorderRadiusPreset;
 }) {
   const [viewport, setViewport] = useState<Viewport>('desktop');
 
@@ -279,17 +372,26 @@ export function TemplateDetailPreview({
   const tp = template.preview;
   const hFont = headingFont || template.fonts.heading;
   const bFont = bodyFont || template.fonts.body;
-  const isDark = template.id === 'bold' || (colors && isColorDark(c.secondary));
+  const isDark = (colors && isColorDark(c.secondary)) || (!colors && template.id === 'bold');
 
   const textColor = isDark ? '#FFFFFF' : c.text;
   const bgColor = c.secondary;
   const accentColor = c.accent;
+  const rad = BORDER_RADIUS_MAP[borderRadius];
+  const sp = SPACING_MAP[spacing];
+  const isMobile = viewport === 'mobile';
+  const name = brandName || 'Your Brand';
 
   const viewportWidths: Record<Viewport, string> = {
     desktop: '100%',
     tablet: '768px',
     mobile: '375px',
   };
+
+  const headingCase = tp.typography.headingCase === 'uppercase' ? 'uppercase' as const : undefined;
+
+  const primaryBtn = getButtonStyle(buttonVariant, accentColor, buttonShape, buttonSize, bgColor);
+  const secondaryBtn = getOutlineButtonStyle(textColor, buttonShape, buttonSize);
 
   return (
     <div className="rounded-xl border border-zinc-200 dark:border-zinc-700 overflow-hidden bg-zinc-50 dark:bg-zinc-900/50">
@@ -337,54 +439,50 @@ export function TemplateDetailPreview({
             </div>
             <div className="flex-1 ml-1">
               <div className="bg-white dark:bg-zinc-600 rounded px-2 py-0.5 text-[9px] text-zinc-400 max-w-[200px]">
-                yourbrand.com
+                {name.toLowerCase().replace(/\s+/g, '')}.com
               </div>
             </div>
           </div>
 
           {/* Simulated Site */}
-          <div style={{ backgroundColor: bgColor }}>
-            {/* Nav */}
+          <div style={{ backgroundColor: bgColor, fontFamily: bFont }}>
+
+            {/* ── 1. Nav Bar ────────────────────────────── */}
             <div
-              className="flex items-center justify-between px-4 py-3"
-              style={{ backgroundColor: isDark ? '#000000' : textColor }}
+              className="flex items-center justify-between px-5 py-3"
+              style={{ backgroundColor: isDark ? c.primary : textColor }}
             >
               <span
                 className="text-xs font-semibold"
                 style={{
                   color: bgColor,
                   fontFamily: hFont,
-                  textTransform: tp.typography.headingCase === 'uppercase' ? 'uppercase' : undefined,
+                  fontWeight: Number(tp.typography.headingWeight) || 600,
+                  textTransform: headingCase,
+                  letterSpacing: tp.typography.headingTracking,
                 }}
               >
-                {brandName || 'Your Brand'}
+                {name}
               </span>
               <div className="flex items-center gap-3">
                 {['Home', 'Products', 'Blog', 'Contact'].map(l => (
-                  <span key={l} className="text-[9px]" style={{ color: `${bgColor}77` }}>
-                    {tp.typography.headingCase === 'uppercase' ? l.toUpperCase() : l}
+                  <span key={l} className="text-[9px]" style={{ color: `${bgColor}77`, fontFamily: bFont }}>
+                    {headingCase === 'uppercase' ? l.toUpperCase() : l}
                   </span>
                 ))}
-                <span
-                  className="text-[9px] px-2 py-1 font-medium"
-                  style={{
-                    backgroundColor: accentColor,
-                    color: '#FFFFFF',
-                    borderRadius: tp.borderRadius,
-                  }}
-                >
+                <span style={{ ...primaryBtn, fontSize: '9px', padding: '4px 10px' }}>
                   Shop
                 </span>
               </div>
             </div>
 
-            {/* Hero */}
+            {/* ── 2. Hero Section ───────────────────────── */}
             <div
               className={cn(
                 'px-6',
                 tp.heroStyle === 'centered' || tp.heroStyle === 'stacked' ? 'text-center' : '',
-                tp.spacing === 'spacious' ? 'py-14' : tp.spacing === 'generous' ? 'py-10' : tp.spacing === 'compact' ? 'py-6' : 'py-8',
               )}
+              style={{ paddingTop: sp.sectionPadding, paddingBottom: sp.sectionPadding }}
             >
               <h2
                 className="mb-2 leading-tight"
@@ -392,70 +490,106 @@ export function TemplateDetailPreview({
                   fontFamily: hFont,
                   fontWeight: Number(tp.typography.headingWeight),
                   letterSpacing: tp.typography.headingTracking,
-                  textTransform: tp.typography.headingCase === 'uppercase' ? 'uppercase' : undefined,
+                  textTransform: headingCase,
                   color: textColor,
-                  fontSize: viewport === 'mobile' ? '18px' : '24px',
+                  fontSize: isMobile ? '18px' : '24px',
                 }}
               >
-                {brandName || 'Your Brand'} — Where Quality Meets Design
+                {name} — Where Quality Meets Design
               </h2>
               <p
-                className="text-sm mb-4 max-w-lg"
+                className="mb-5 max-w-lg"
                 style={{
                   fontFamily: bFont,
-                  color: `${textColor}55`,
+                  color: c.muted,
+                  fontSize: '13px',
+                  lineHeight: 1.6,
                   marginLeft: tp.heroStyle === 'centered' || tp.heroStyle === 'stacked' ? 'auto' : undefined,
                   marginRight: tp.heroStyle === 'centered' || tp.heroStyle === 'stacked' ? 'auto' : undefined,
                 }}
               >
                 Discover our curated collection of premium products designed with care and crafted to perfection.
               </p>
-              <div className="flex gap-2" style={{ justifyContent: tp.heroStyle === 'centered' || tp.heroStyle === 'stacked' ? 'center' : 'flex-start' }}>
-                <span
-                  className="text-xs px-4 py-2 font-medium"
-                  style={{
-                    backgroundColor: isDark ? accentColor : textColor,
-                    color: isDark ? '#FFFFFF' : bgColor,
-                    borderRadius: tp.borderRadius,
-                  }}
-                >
-                  Shop Now
-                </span>
-                <span
-                  className="text-xs px-4 py-2 font-medium"
-                  style={{
-                    border: `1px solid ${textColor}20`,
-                    color: textColor,
-                    borderRadius: tp.borderRadius,
-                  }}
-                >
-                  Learn More
-                </span>
+              <div className="flex gap-2 flex-wrap" style={{ justifyContent: tp.heroStyle === 'centered' || tp.heroStyle === 'stacked' ? 'center' : 'flex-start' }}>
+                <span style={primaryBtn}>Shop Now</span>
+                <span style={secondaryBtn}>Learn More</span>
               </div>
             </div>
 
-            {/* Product Cards */}
-            <div className="px-6 pb-8">
+            {/* ── 3. Features Section ───────────────────── */}
+            <div style={{ padding: `${sp.sectionPadding} 24px`, backgroundColor: c.surface }}>
               <h3
-                className="text-base font-semibold mb-4"
+                className="mb-1"
                 style={{
                   fontFamily: hFont,
                   color: textColor,
                   fontWeight: Number(tp.typography.headingWeight),
-                  textTransform: tp.typography.headingCase === 'uppercase' ? 'uppercase' : undefined,
+                  textTransform: headingCase,
+                  fontSize: '16px',
+                  letterSpacing: tp.typography.headingTracking,
                 }}
               >
-                {tp.typography.headingCase === 'uppercase' ? 'PRODUCTS' : 'Products'}
+                {headingCase === 'uppercase' ? 'WHY CHOOSE US' : 'Why Choose Us'}
               </h3>
-              <div className={cn('grid gap-3', viewport === 'mobile' ? 'grid-cols-1' : 'grid-cols-3')}>
-                {['Premium Coffee', 'Artisan Candle', 'Leather Journal'].map((name, i) => (
+              <p className="mb-4" style={{ color: c.muted, fontSize: '12px', fontFamily: bFont }}>
+                Everything you need to build a remarkable brand
+              </p>
+              <div className={cn('grid', isMobile ? 'grid-cols-1' : 'grid-cols-3')} style={{ gap: sp.cardGap }}>
+                {[
+                  { icon: '⚡', title: 'Lightning Fast', desc: 'Optimized performance at every level' },
+                  { icon: '🎨', title: 'Beautiful Design', desc: 'Crafted with pixel-perfect attention' },
+                  { icon: '🔒', title: 'Secure & Reliable', desc: 'Enterprise-grade security built in' },
+                ].map((feature, i) => (
+                  <div
+                    key={i}
+                    style={{
+                      backgroundColor: bgColor,
+                      borderRadius: rad,
+                      border: `1px solid ${c.border}`,
+                      padding: '16px',
+                    }}
+                  >
+                    <span className="text-lg mb-2 block">{feature.icon}</span>
+                    <p
+                      className="font-medium mb-1"
+                      style={{ fontFamily: hFont, color: textColor, fontSize: '12px', fontWeight: Number(tp.typography.headingWeight) }}
+                    >
+                      {feature.title}
+                    </p>
+                    <p style={{ color: c.muted, fontSize: '11px', lineHeight: 1.5, fontFamily: bFont }}>
+                      {feature.desc}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* ── 4. Product Cards ──────────────────────── */}
+            <div style={{ padding: `${sp.sectionPadding} 24px` }}>
+              <h3
+                className="mb-1"
+                style={{
+                  fontFamily: hFont,
+                  color: textColor,
+                  fontWeight: Number(tp.typography.headingWeight),
+                  textTransform: headingCase,
+                  fontSize: '16px',
+                  letterSpacing: tp.typography.headingTracking,
+                }}
+              >
+                {headingCase === 'uppercase' ? 'PRODUCTS' : 'Products'}
+              </h3>
+              <p className="mb-4" style={{ color: c.muted, fontSize: '12px', fontFamily: bFont }}>
+                Our curated selection
+              </p>
+              <div className={cn('grid', isMobile ? 'grid-cols-1' : 'grid-cols-3')} style={{ gap: sp.cardGap }}>
+                {['Premium Coffee', 'Artisan Candle', 'Leather Journal'].map((pname, i) => (
                   <div
                     key={i}
                     style={{
                       backgroundColor: c.surface,
-                      borderRadius: tp.borderRadius,
-                      border: tp.cardStyle === 'bordered' ? `1px solid ${c.border}` : tp.cardStyle === 'minimal' ? 'none' : undefined,
-                      boxShadow: tp.cardStyle === 'elevated' ? '0 2px 8px rgba(0,0,0,0.06)' : undefined,
+                      borderRadius: rad,
+                      border: `1px solid ${c.border}`,
                       overflow: 'hidden',
                     }}
                   >
@@ -464,28 +598,224 @@ export function TemplateDetailPreview({
                       style={{ backgroundColor: `${c.muted}10` }}
                     />
                     <div className="p-3">
-                      <p className="text-xs font-medium" style={{ fontFamily: hFont, color: textColor }}>{name}</p>
-                      <p className="text-[10px] mt-0.5" style={{ color: c.muted }}>$29.00</p>
+                      <p style={{ fontFamily: hFont, color: textColor, fontSize: '12px', fontWeight: 600 }}>{pname}</p>
+                      <p style={{ color: c.muted, fontSize: '10px', marginTop: '2px' }}>$29.00</p>
+                      <div className="mt-2">
+                        <span style={{ ...primaryBtn, fontSize: '9px', padding: '4px 10px' }}>
+                          Add to Cart
+                        </span>
+                      </div>
                     </div>
                   </div>
                 ))}
               </div>
             </div>
 
-            {/* Footer */}
+            {/* ── 5. Testimonial Section ────────────────── */}
             <div
-              className="px-6 py-4 flex items-center justify-between"
               style={{
-                backgroundColor: isDark ? '#000000' : textColor,
+                padding: `${sp.sectionPadding} 24px`,
+                backgroundColor: c.surface,
+              }}
+            >
+              <h3
+                className="mb-4"
+                style={{
+                  fontFamily: hFont,
+                  color: textColor,
+                  fontWeight: Number(tp.typography.headingWeight),
+                  textTransform: headingCase,
+                  fontSize: '16px',
+                  letterSpacing: tp.typography.headingTracking,
+                  textAlign: 'center',
+                }}
+              >
+                {headingCase === 'uppercase' ? 'WHAT PEOPLE SAY' : 'What People Say'}
+              </h3>
+              <div
+                className="max-w-md mx-auto text-center"
+                style={{
+                  padding: '20px',
+                  borderRadius: rad,
+                  border: `1px solid ${c.border}`,
+                  backgroundColor: bgColor,
+                }}
+              >
+                <p
+                  className="italic mb-3"
+                  style={{ color: c.muted, fontSize: '13px', lineHeight: 1.6, fontFamily: bFont }}
+                >
+                  &ldquo;This product completely transformed how we do business. The quality is unmatched and the design is beautiful.&rdquo;
+                </p>
+                <p
+                  className="font-medium"
+                  style={{ color: textColor, fontSize: '12px', fontFamily: hFont }}
+                >
+                  Sarah Johnson
+                </p>
+                <p style={{ color: c.muted, fontSize: '10px' }}>CEO, Acme Corp</p>
+              </div>
+            </div>
+
+            {/* ── 6. Newsletter Section ─────────────────── */}
+            <div
+              style={{ padding: `${sp.sectionPadding} 24px` }}
+              className="text-center"
+            >
+              <h3
+                className="mb-1"
+                style={{
+                  fontFamily: hFont,
+                  color: textColor,
+                  fontWeight: Number(tp.typography.headingWeight),
+                  textTransform: headingCase,
+                  fontSize: '16px',
+                  letterSpacing: tp.typography.headingTracking,
+                }}
+              >
+                {headingCase === 'uppercase' ? 'STAY IN THE LOOP' : 'Stay in the Loop'}
+              </h3>
+              <p className="mb-4" style={{ color: c.muted, fontSize: '12px', fontFamily: bFont }}>
+                Get updates on new products and exclusive offers
+              </p>
+              <div
+                className={cn('flex mx-auto max-w-sm', isMobile ? 'flex-col gap-2' : 'gap-2')}
+                style={{ justifyContent: 'center' }}
+              >
+                <input
+                  type="text"
+                  placeholder="your@email.com"
+                  readOnly
+                  className="flex-1 outline-none"
+                  style={{
+                    borderRadius: rad,
+                    border: `1px solid ${c.border}`,
+                    backgroundColor: c.surface,
+                    color: textColor,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontFamily: bFont,
+                  }}
+                />
+                <span style={primaryBtn}>Subscribe</span>
+              </div>
+            </div>
+
+            {/* ── 7. Contact Form ───────────────────────── */}
+            <div style={{ padding: `${sp.sectionPadding} 24px`, backgroundColor: c.surface }}>
+              <h3
+                className="mb-1"
+                style={{
+                  fontFamily: hFont,
+                  color: textColor,
+                  fontWeight: Number(tp.typography.headingWeight),
+                  textTransform: headingCase,
+                  fontSize: '16px',
+                  letterSpacing: tp.typography.headingTracking,
+                }}
+              >
+                {headingCase === 'uppercase' ? 'GET IN TOUCH' : 'Get in Touch'}
+              </h3>
+              <p className="mb-4" style={{ color: c.muted, fontSize: '12px', fontFamily: bFont }}>
+                We&apos;d love to hear from you
+              </p>
+              <div className="max-w-sm space-y-2">
+                <div className={cn('grid gap-2', isMobile ? 'grid-cols-1' : 'grid-cols-2')}>
+                  <input
+                    type="text"
+                    placeholder="Name"
+                    readOnly
+                    className="outline-none w-full"
+                    style={{
+                      borderRadius: rad,
+                      border: `1px solid ${c.border}`,
+                      backgroundColor: bgColor,
+                      color: textColor,
+                      padding: '8px 12px',
+                      fontSize: '12px',
+                      fontFamily: bFont,
+                    }}
+                  />
+                  <input
+                    type="text"
+                    placeholder="Email"
+                    readOnly
+                    className="outline-none w-full"
+                    style={{
+                      borderRadius: rad,
+                      border: `1px solid ${c.border}`,
+                      backgroundColor: bgColor,
+                      color: textColor,
+                      padding: '8px 12px',
+                      fontSize: '12px',
+                      fontFamily: bFont,
+                    }}
+                  />
+                </div>
+                <textarea
+                  placeholder="Your message..."
+                  readOnly
+                  rows={3}
+                  className="outline-none w-full resize-none"
+                  style={{
+                    borderRadius: rad,
+                    border: `1px solid ${c.border}`,
+                    backgroundColor: bgColor,
+                    color: textColor,
+                    padding: '8px 12px',
+                    fontSize: '12px',
+                    fontFamily: bFont,
+                  }}
+                />
+                <div>
+                  <span style={primaryBtn}>Send Message</span>
+                </div>
+              </div>
+            </div>
+
+            {/* ── 8. Footer ─────────────────────────────── */}
+            <div
+              className="px-6 py-5"
+              style={{
+                backgroundColor: isDark ? c.primary : textColor,
                 borderTop: `1px solid ${textColor}08`,
               }}
             >
-              <span className="text-[9px]" style={{ color: `${bgColor}55` }}>
-                © 2026 {brandName || 'Your Brand'}
-              </span>
-              <span className="text-[9px]" style={{ color: `${bgColor}35` }}>
-                Powered by Mayasura
-              </span>
+              <div className={cn('flex mb-4', isMobile ? 'flex-col gap-3' : 'items-start justify-between')}>
+                <div>
+                  <span
+                    className="text-xs font-semibold block mb-1"
+                    style={{
+                      color: bgColor,
+                      fontFamily: hFont,
+                      textTransform: headingCase,
+                    }}
+                  >
+                    {name}
+                  </span>
+                  <span className="text-[9px]" style={{ color: `${bgColor}55` }}>
+                    Quality meets design
+                  </span>
+                </div>
+                <div className="flex gap-4">
+                  {['About', 'Products', 'Blog', 'Contact'].map(l => (
+                    <span key={l} className="text-[9px]" style={{ color: `${bgColor}55` }}>
+                      {headingCase === 'uppercase' ? l.toUpperCase() : l}
+                    </span>
+                  ))}
+                </div>
+              </div>
+              <div
+                className="flex items-center justify-between pt-3"
+                style={{ borderTop: `1px solid ${bgColor}10` }}
+              >
+                <span className="text-[8px]" style={{ color: `${bgColor}40` }}>
+                  © 2026 {name}. All rights reserved.
+                </span>
+                <span className="text-[8px]" style={{ color: `${bgColor}30` }}>
+                  Powered by Mayasura
+                </span>
+              </div>
             </div>
           </div>
         </motion.div>
@@ -497,6 +827,7 @@ export function TemplateDetailPreview({
 // Helper: check if a color is dark
 function isColorDark(hex: string): boolean {
   const c = hex.replace('#', '');
+  if (c.length < 6) return false;
   const r = parseInt(c.substring(0, 2), 16);
   const g = parseInt(c.substring(2, 4), 16);
   const b = parseInt(c.substring(4, 6), 16);
