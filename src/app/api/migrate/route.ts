@@ -29,7 +29,8 @@ export async function POST() {
     // brands: user_id
     if (hasTable('brands') && !hasColumn('brands', 'user_id')) {
       db.exec('ALTER TABLE brands ADD COLUMN user_id TEXT');
-      results.push('Added brands.user_id');
+      try { db.exec('CREATE INDEX IF NOT EXISTS idx_brands_user ON brands(user_id)'); } catch { /* ok */ }
+      results.push('Added brands.user_id + index');
     }
 
     // products: sort_order

@@ -127,7 +127,6 @@ function initializeDatabase(db: Database.Database) {
     CREATE INDEX IF NOT EXISTS idx_tickets_brand ON tickets(brand_id);
     CREATE INDEX IF NOT EXISTS idx_ticket_messages_ticket ON ticket_messages(ticket_id);
     CREATE INDEX IF NOT EXISTS idx_activities_brand ON activities(brand_id);
-    CREATE INDEX IF NOT EXISTS idx_brands_user ON brands(user_id);
     CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
   `);
 
