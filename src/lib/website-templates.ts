@@ -328,6 +328,54 @@ export const WEBSITE_TEMPLATES: WebsiteTemplate[] = [
       accentUsage: 'moderate',
     },
   },
+  {
+    id: 'neon',
+    name: 'Neon',
+    description: 'Dark-first design with vibrant neon accent colors. Electrifying presence for tech and gaming brands.',
+    bestFor: ['gaming', 'tech', 'music', 'entertainment', 'esports', 'crypto', 'ai', 'nightlife'],
+    fonts: {
+      heading: 'Space Grotesk',
+      body: 'Inter',
+      headingWeight: '800',
+    },
+    colors: {
+      light: { text: '#0D0D1A', background: '#F0F0FF', accent: '#7C3AED', surface: '#FFFFFF', muted: '#6B7280', border: '#DDD6FE' },
+      dark: { text: '#F0F0FF', background: '#050510', accent: '#A855F7', surface: '#0D0D1A', muted: '#6B7280', border: '#1E1B4B' },
+    },
+    preview: {
+      heroStyle: 'centered',
+      cardStyle: 'bordered',
+      navStyle: 'minimal',
+      typography: { headingWeight: '800', headingTracking: '-0.04em', headingCase: 'normal', bodySize: '15px' },
+      spacing: 'normal',
+      borderRadius: '8px',
+      accentUsage: 'bold',
+    },
+  },
+  {
+    id: 'organic',
+    name: 'Organic',
+    description: 'Earthy, warm tones with rounded shapes and natural textures. Perfect for wellness and food brands.',
+    bestFor: ['wellness', 'food', 'organic', 'yoga', 'spa', 'beauty', 'health', 'nature', 'sustainability'],
+    fonts: {
+      heading: 'Nunito',
+      body: 'Nunito',
+      headingWeight: '700',
+    },
+    colors: {
+      light: { text: '#3D2B1F', background: '#FDFAF5', accent: '#8B6914', surface: '#FFFFFF', muted: '#8C7B6B', border: '#E8D5B7' },
+      dark: { text: '#F5EDD8', background: '#1C150E', accent: '#D4A853', surface: '#2A1F14', muted: '#8C7B6B', border: '#3D2E1E' },
+    },
+    preview: {
+      heroStyle: 'stacked',
+      cardStyle: 'rounded',
+      navStyle: 'centered',
+      typography: { headingWeight: '700', headingTracking: '-0.01em', headingCase: 'normal', bodySize: '16px' },
+      spacing: 'generous',
+      borderRadius: '24px',
+      accentUsage: 'moderate',
+    },
+  },
 ];
 
 export function getWebsiteTemplate(id: string): WebsiteTemplate | undefined {

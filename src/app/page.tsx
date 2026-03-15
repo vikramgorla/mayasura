@@ -8,7 +8,7 @@ import {
   Sparkles, Code2, Puzzle, Check, ChevronDown, Star, Zap, Shield, Palette,
   MousePointerClick, Bot, Building2, ShoppingCart, Utensils, Briefcase,
   Stethoscope, GraduationCap, Camera, Music, Dumbbell, Leaf, Heart,
-  Github, Twitter, Linkedin, ExternalLink, Play, Monitor
+  Github, Twitter, Linkedin, ExternalLink, Play, Monitor, X, Volume2
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
@@ -48,6 +48,173 @@ function AnimatedCounter({ end, suffix = '', duration = 2000 }: { end: number; s
   }, [isInView, end, duration]);
 
   return <span ref={ref}>{count}{suffix}</span>;
+}
+
+// ─── Typing Effect ──────────────────────────────────────────────
+const brandTypes = ['Restaurant', 'Boutique', 'Agency', 'Studio', 'Clinic', 'Startup', 'Portfolio', 'Brand'];
+
+function TypingEffect() {
+  const [index, setIndex] = useState(0);
+  const [displayed, setDisplayed] = useState('');
+  const [phase, setPhase] = useState<'typing' | 'pausing' | 'deleting'>('typing');
+
+  useEffect(() => {
+    const word = brandTypes[index];
+    let timeout: ReturnType<typeof setTimeout>;
+
+    if (phase === 'typing') {
+      if (displayed.length < word.length) {
+        timeout = setTimeout(() => setDisplayed(word.slice(0, displayed.length + 1)), 80);
+      } else {
+        timeout = setTimeout(() => setPhase('pausing'), 1800);
+      }
+    } else if (phase === 'pausing') {
+      timeout = setTimeout(() => setPhase('deleting'), 200);
+    } else {
+      if (displayed.length > 0) {
+        timeout = setTimeout(() => setDisplayed(displayed.slice(0, -1)), 45);
+      } else {
+        setIndex((i) => (i + 1) % brandTypes.length);
+        setPhase('typing');
+      }
+    }
+    return () => clearTimeout(timeout);
+  }, [displayed, phase, index]);
+
+  return (
+    <span className="gradient-text inline-flex items-baseline">
+      {displayed}
+      <motion.span
+        animate={{ opacity: [1, 0] }}
+        transition={{ duration: 0.6, repeat: Infinity, repeatType: 'reverse' }}
+        className="ml-0.5 inline-block w-[3px] h-[0.85em] bg-violet-500 rounded-sm align-baseline"
+        aria-hidden="true"
+      />
+    </span>
+  );
+}
+
+// ─── Urgency Banner ──────────────────────────────────────────────
+function UrgencyBanner({ onDismiss }: { onDismiss: () => void }) {
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -48 }}
+      animate={{ opacity: 1, y: 0 }}
+      exit={{ opacity: 0, y: -48 }}
+      transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+      className="fixed top-0 left-0 right-0 z-[60] bg-gradient-to-r from-violet-600 via-purple-600 to-indigo-600 text-white px-4 py-2.5 flex items-center justify-center gap-3"
+    >
+      <span className="relative flex h-2 w-2 flex-shrink-0">
+        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-white opacity-75" />
+        <span className="relative inline-flex rounded-full h-2 w-2 bg-white" />
+      </span>
+      <p className="text-xs sm:text-sm font-medium text-center">
+        <span className="font-semibold">Limited time:</span> Free tier includes premium AI features — no credit card needed
+      </p>
+      <Link href="/create" className="hidden sm:inline-flex items-center gap-1 text-xs font-semibold underline underline-offset-2 whitespace-nowrap hover:opacity-80 transition-opacity">
+        Claim now <ArrowRight className="h-3 w-3" />
+      </Link>
+      <button
+        onClick={onDismiss}
+        aria-label="Dismiss banner"
+        className="ml-2 flex-shrink-0 h-5 w-5 rounded-full hover:bg-white/20 flex items-center justify-center transition-colors"
+      >
+        <X className="h-3 w-3" aria-hidden="true" />
+      </button>
+    </motion.div>
+  );
+}
+
+// ─── Video Section ───────────────────────────────────────────────
+function VideoPlaceholder() {
+  const [playing, setPlaying] = useState(false);
+  return (
+    <motion.div
+      initial="hidden"
+      whileInView="visible"
+      viewport={{ once: true, margin: "-80px" }}
+      variants={fadeInUp}
+      className="relative rounded-2xl overflow-hidden cursor-pointer group shadow-2xl shadow-violet-500/10"
+      onClick={() => setPlaying(true)}
+      role="button"
+      aria-label="Watch Mayasura demo video"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === 'Enter' && setPlaying(true)}
+    >
+      {/* Gradient video thumbnail */}
+      <div className="aspect-video w-full bg-gradient-to-br from-violet-900 via-purple-800 to-indigo-900 relative flex items-center justify-center">
+        {/* Background pattern */}
+        <div className="absolute inset-0 opacity-20" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px), radial-gradient(circle at 75% 75%, white 1px, transparent 1px)', backgroundSize: '48px 48px' }} />
+        {/* Animated orbs */}
+        <motion.div animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 6, repeat: Infinity }} className="absolute top-[15%] left-[10%] w-40 h-40 bg-violet-500/30 rounded-full blur-[60px]" />
+        <motion.div animate={{ scale: [1, 0.9, 1] }} transition={{ duration: 8, repeat: Infinity }} className="absolute bottom-[15%] right-[10%] w-48 h-48 bg-indigo-500/30 rounded-full blur-[60px]" />
+        {/* Mockup elements */}
+        <div className="absolute inset-0 flex items-center justify-center opacity-30">
+          <div className="w-[55%] bg-white/10 rounded-xl p-4 backdrop-blur-sm border border-white/10">
+            <div className="flex items-center gap-2 mb-3">
+              <div className="h-2.5 w-2.5 rounded-full bg-red-400" />
+              <div className="h-2.5 w-2.5 rounded-full bg-yellow-400" />
+              <div className="h-2.5 w-2.5 rounded-full bg-green-400" />
+              <div className="flex-1 bg-white/10 rounded h-4 mx-2" />
+            </div>
+            <div className="space-y-2">
+              <div className="h-3 bg-white/20 rounded w-3/4" />
+              <div className="h-3 bg-white/15 rounded w-full" />
+              <div className="h-3 bg-white/10 rounded w-2/3" />
+              <div className="flex gap-2 mt-3">
+                <div className="h-6 w-20 bg-violet-500/50 rounded" />
+                <div className="h-6 w-16 bg-white/10 rounded" />
+              </div>
+            </div>
+          </div>
+        </div>
+        {/* Play button */}
+        <motion.div
+          className="relative z-10 flex flex-col items-center gap-4"
+          animate={playing ? {} : { scale: [1, 1.04, 1] }}
+          transition={{ duration: 3, repeat: Infinity }}
+        >
+          <div className="h-20 w-20 rounded-full bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center group-hover:bg-white/25 transition-colors shadow-2xl shadow-black/30">
+            <Play className="h-8 w-8 text-white fill-white ml-1" />
+          </div>
+          <div className="text-center">
+            <p className="text-white font-semibold text-base">Watch the 90-second demo</p>
+            <p className="text-white/60 text-sm mt-1">See how a brand goes from zero to live</p>
+          </div>
+        </motion.div>
+        {/* Duration badge */}
+        <div className="absolute bottom-4 right-4 bg-black/50 backdrop-blur-sm rounded-lg px-2.5 py-1 flex items-center gap-1.5">
+          <Volume2 className="h-3 w-3 text-white/70" />
+          <span className="text-white/90 text-xs font-medium">1:32</span>
+        </div>
+      </div>
+      {/* "Coming soon" modal overlay when clicked */}
+      <AnimatePresence>
+        {playing && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center"
+            onClick={(e) => { e.stopPropagation(); setPlaying(false); }}
+          >
+            <div className="bg-white dark:bg-zinc-900 rounded-2xl p-8 text-center max-w-sm mx-4 shadow-2xl">
+              <div className="h-14 w-14 rounded-2xl bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center mx-auto mb-4">
+                <Play className="h-6 w-6 text-violet-600" />
+              </div>
+              <h3 className="font-display font-bold text-lg text-zinc-900 dark:text-white mb-2">Demo coming soon</h3>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-5">In the meantime, try the live demo — create a brand in 5 minutes.</p>
+              <Link href="/create" onClick={(e) => e.stopPropagation()}>
+                <button className="w-full py-2.5 px-4 bg-violet-600 hover:bg-violet-700 text-white rounded-xl font-semibold text-sm transition-colors">
+                  Try Live Demo
+                </button>
+              </Link>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
+  );
 }
 
 // ─── Animation Variants ─────────────────────────────────────────
@@ -260,6 +427,8 @@ function BrowserMockup({ template }: { template: typeof templatePreviews[0] }) {
 // ─── Main Page ───────────────────────────────────────────────────
 export default function Home() {
   const [activeTemplate, setActiveTemplate] = useState(0);
+  const [showBanner, setShowBanner] = useState(true);
+  const [billingAnnual, setBillingAnnual] = useState(false);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
@@ -269,10 +438,17 @@ export default function Home() {
       >
         Skip to content
       </a>
+      <AnimatePresence>
+        {showBanner && <UrgencyBanner onDismiss={() => setShowBanner(false)} />}
+      </AnimatePresence>
       <FloatingCTA />
       <ScrollCTAModal />
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)]/80 backdrop-blur-xl border-b border-[var(--border-primary)]" role="navigation" aria-label="Main navigation">
+      <nav
+        className={`fixed left-0 right-0 z-50 bg-[var(--bg-primary)]/80 backdrop-blur-xl border-b border-[var(--border-primary)] transition-[top] duration-300 ${showBanner ? 'top-[42px]' : 'top-0'}`}
+        role="navigation"
+        aria-label="Main navigation"
+      >
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
           <Link href="/" className="flex items-center gap-2" aria-label="Mayasura home">
             <div className="h-7 w-7 rounded-md bg-violet-700 flex items-center justify-center" aria-hidden="true">
@@ -301,7 +477,7 @@ export default function Home() {
       </nav>
 
       {/* ═══════════ HERO ═══════════ */}
-      <section id="main-content" className="relative pt-28 sm:pt-36 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden" aria-label="Hero">
+      <section id="main-content" className={`relative pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden transition-[padding-top] duration-300 ${showBanner ? 'pt-36 sm:pt-44' : 'pt-28 sm:pt-36'}`} aria-label="Hero">
         {/* Animated gradient mesh background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -345,12 +521,34 @@ export default function Home() {
                 transition={{ duration: 0.5, delay: 0.05 }}
                 className="font-display text-4xl sm:text-5xl lg:text-[3.5rem] font-bold tracking-tight leading-[1.08] mb-5 text-[var(--text-primary)]"
               >
-                Launch your brand&apos;s
+                Launch your{' '}
+                <span className="whitespace-nowrap"><TypingEffect /></span>
                 <br />
                 <span className="gradient-text">digital empire</span>
                 <br />
                 in minutes
               </motion.h1>
+              {/* Trusted by counter */}
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4, delay: 0.08 }}
+                className="flex items-center gap-2 mb-5"
+              >
+                <div className="flex -space-x-2">
+                  {['SC', 'MR', 'PS', 'JK', 'AL'].map((initials, i) => (
+                    <div key={initials} className="h-7 w-7 rounded-full border-2 border-[var(--bg-primary)] bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-[9px] font-bold text-white" style={{ zIndex: 5 - i }}>
+                      {initials}
+                    </div>
+                  ))}
+                </div>
+                <p className="text-xs text-[var(--text-secondary)]">
+                  <span className="font-semibold text-[var(--text-primary)]">
+                    <AnimatedCounter end={10000} suffix="+" duration={2000} />
+                  </span>{' '}
+                  brands already building
+                </p>
+              </motion.div>
               <motion.p
                 initial={{ opacity: 0, y: 16 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -427,6 +625,28 @@ export default function Home() {
       <Suspense fallback={<SectionSkeleton height={260} />}>
         <SocialProof />
       </Suspense>
+
+      {/* ═══════════ VIDEO DEMO ═══════════ */}
+      <section className="py-16 sm:py-20 px-4 sm:px-6">
+        <div className="max-w-4xl mx-auto">
+          <motion.div
+            initial="hidden"
+            whileInView="visible"
+            viewport={{ once: true, margin: "-80px" }}
+            variants={fadeInUp}
+            className="text-center mb-8"
+          >
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 dark:bg-violet-950/50 border border-violet-200 dark:border-violet-800 text-xs font-medium text-violet-600 dark:text-violet-400 mb-4">
+              <Play className="h-3 w-3 fill-current" />
+              See it in action
+            </span>
+            <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight text-[var(--text-primary)]">
+              Zero to launched in 90 seconds
+            </h2>
+          </motion.div>
+          <VideoPlaceholder />
+        </div>
+      </section>
 
       {/* ═══════════ FEATURE GRID (3×2) ═══════════ */}
       <section className="py-20 sm:py-28 px-4 sm:px-6">
@@ -610,7 +830,7 @@ export default function Home() {
             whileInView="visible"
             viewport={{ once: true, margin: "-100px" }}
             variants={fadeInUp}
-            className="text-center mb-14"
+            className="text-center mb-10"
           >
             <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight mb-3 text-[var(--text-primary)]">
               Simple, transparent pricing
@@ -619,6 +839,40 @@ export default function Home() {
               Start free. Scale as you grow. No hidden fees, ever.
             </p>
           </motion.div>
+
+          {/* Billing toggle */}
+          <div className="flex items-center justify-center gap-3 mb-10">
+            <span className={`text-sm font-medium transition-colors ${!billingAnnual ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>Monthly</span>
+            <button
+              onClick={() => setBillingAnnual(!billingAnnual)}
+              role="switch"
+              aria-checked={billingAnnual}
+              aria-label="Toggle annual billing"
+              className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors focus:outline-none focus:ring-2 focus:ring-violet-500 focus:ring-offset-2 ${billingAnnual ? 'bg-violet-600' : 'bg-zinc-200 dark:bg-zinc-700'}`}
+            >
+              <motion.span
+                layout
+                className="inline-block h-4 w-4 transform rounded-full bg-white shadow-md"
+                animate={{ x: billingAnnual ? 24 : 4 }}
+                transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+              />
+            </button>
+            <span className={`text-sm font-medium transition-colors ${billingAnnual ? 'text-[var(--text-primary)]' : 'text-[var(--text-tertiary)]'}`}>
+              Annual
+            </span>
+            <AnimatePresence>
+              {billingAnnual && (
+                <motion.span
+                  initial={{ opacity: 0, scale: 0.8, x: -8 }}
+                  animate={{ opacity: 1, scale: 1, x: 0 }}
+                  exit={{ opacity: 0, scale: 0.8, x: -8 }}
+                  className="px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-400 text-xs font-semibold"
+                >
+                  Save 20%
+                </motion.span>
+              )}
+            </AnimatePresence>
+          </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6 max-w-4xl mx-auto">
             {/* Free Tier */}
@@ -636,6 +890,9 @@ export default function Home() {
                 <span className="text-4xl font-bold text-[var(--text-primary)]">$0</span>
                 <span className="text-sm text-[var(--text-tertiary)]">/month</span>
               </div>
+              {billingAnnual && (
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 -mt-4 mb-3 font-medium">Always free</p>
+              )}
               <ul className="space-y-3 mb-8">
                 {['1 brand', '5 products', 'All 12+ templates', 'AI brand generation', 'Website & chatbot', 'Community support'].map(f => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">
@@ -660,17 +917,33 @@ export default function Home() {
               transition={{ delay: 0.1 }}
               className="bg-[var(--bg-surface)] rounded-2xl border-2 border-violet-600 p-6 sm:p-7 relative shadow-xl shadow-violet-500/10 sm:col-span-2 lg:col-span-1 cursor-default"
             >
-              <div className="absolute -top-3 left-1/2 -translate-x-1/2">
+              <div className="absolute -top-3 left-1/2 -translate-x-1/2 flex items-center gap-2">
                 <span className="px-3 py-1 rounded-full bg-violet-600 text-white text-xs font-medium shadow-lg">
                   Most Popular
                 </span>
               </div>
               <h3 className="font-display font-semibold text-lg mb-1 text-[var(--text-primary)]">Pro</h3>
               <p className="text-sm text-[var(--text-secondary)] mb-5">For growing brands</p>
-              <div className="mb-6">
-                <span className="text-4xl font-bold text-[var(--text-primary)]">$19</span>
+              <div className="mb-1">
+                <AnimatePresence mode="wait">
+                  <motion.span
+                    key={billingAnnual ? 'annual' : 'monthly'}
+                    initial={{ opacity: 0, y: -8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: 8 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-4xl font-bold text-[var(--text-primary)]"
+                  >
+                    {billingAnnual ? '$15' : '$19'}
+                  </motion.span>
+                </AnimatePresence>
                 <span className="text-sm text-[var(--text-tertiary)]">/month</span>
               </div>
+              {billingAnnual ? (
+                <p className="text-xs text-emerald-600 dark:text-emerald-400 mb-5 font-medium">Billed $182/yr · save $46</p>
+              ) : (
+                <div className="mb-5" />
+              )}
               <ul className="space-y-3 mb-8">
                 {['Unlimited brands', 'Unlimited products', 'Custom domain', 'Priority AI generation', 'Full e-commerce suite', 'Advanced analytics', 'Priority support', 'Custom CSS'].map(f => (
                   <li key={f} className="flex items-center gap-2.5 text-sm text-[var(--text-secondary)]">

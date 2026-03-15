@@ -52,6 +52,14 @@ const heroAnimations: Record<string, { container: Variants; item: Variants }> = 
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.15 } } },
     item: { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.25, 0.1, 0.25, 1] } } },
   },
+  neon: {
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.07, delayChildren: 0.05 } } },
+    item: { hidden: { opacity: 0, y: 40, filter: 'blur(8px)' }, show: { opacity: 1, y: 0, filter: 'blur(0px)', transition: { duration: 0.5, ease: [0.33, 1, 0.68, 1] as const } } },
+  },
+  organic: {
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.14, delayChildren: 0.2 } } },
+    item: { hidden: { opacity: 0, y: 20, scale: 0.96 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] } } },
+  },
 };
 
 const scrollStagger: Variants = {
@@ -88,7 +96,7 @@ function TestimonialsCarousel({
   template?: { id: string; preview?: { borderRadius: string; typography: { headingWeight: string; headingTracking: string } } };
 }) {
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold' || templateId === 'tech';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const accentColor = brand.accent_color || textColor;
   const tp = template?.preview;
@@ -265,9 +273,9 @@ export default function BrandHomePage() {
   const templateId = template?.id || 'minimal';
   const tp = template?.preview;
 
-  const isDark = templateId === 'bold' || templateId === 'tech';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
-  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : '#000000') : brand.secondary_color;
+  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : templateId === 'neon' ? '#050510' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
 
   // Design settings — applied from Design Studio
