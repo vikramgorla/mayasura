@@ -205,11 +205,54 @@ export default function ShopPage() {
           )}
 
           {filtered.length === 0 ? (
-            <div className="text-center py-20">
-              <p className="text-sm" style={{ color: `${textColor}35` }}>
-                {templateId === 'playful' ? 'No products yet. Check back soon! 🛍️' : 'No products available yet.'}
+            <motion.div
+              className="text-center py-24"
+              initial={{ opacity: 0, y: 16 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4 }}
+            >
+              <div
+                className="w-20 h-20 rounded-full flex items-center justify-center mx-auto mb-6 text-3xl"
+                style={{ backgroundColor: `${textColor}06` }}
+              >
+                {templateId === 'playful' ? '🛍️' : templateId === 'bold' ? '∅' : '○'}
+              </div>
+              <h3
+                className="text-lg mb-2"
+                style={{
+                  fontFamily: brand.font_heading,
+                  fontWeight: templateId === 'bold' ? 700 : 500,
+                  textTransform: templateId === 'bold' ? 'uppercase' as const : undefined,
+                  letterSpacing: templateId === 'bold' ? '0.06em' : undefined,
+                  color: textColor,
+                }}
+              >
+                {filter !== 'all'
+                  ? (templateId === 'bold' ? `NO ${filter.toUpperCase()} PRODUCTS` : `No ${filter} products`)
+                  : (templateId === 'playful' ? 'Nothing here yet! 🌱' : templateId === 'bold' ? 'NO PRODUCTS YET' : 'No products yet')}
+              </h3>
+              <p className="text-sm mb-8" style={{ color: `${textColor}40` }}>
+                {filter !== 'all'
+                  ? 'Try a different category or browse all products.'
+                  : 'Check back soon — products are on their way.'}
               </p>
-            </div>
+              {filter !== 'all' && (
+                <button
+                  onClick={() => setFilter('all')}
+                  className="px-6 py-2.5 text-sm font-medium transition-opacity hover:opacity-80"
+                  style={{
+                    backgroundColor: isDark ? accentColor : textColor,
+                    color: isDark ? '#FFFFFF' : bgColor,
+                    borderRadius: templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : '0',
+                    fontWeight: templateId === 'bold' ? 700 : 500,
+                    letterSpacing: templateId === 'bold' ? '0.08em' : undefined,
+                    textTransform: templateId === 'bold' ? 'uppercase' as const : undefined,
+                  }}
+                >
+                  {templateId === 'bold' ? 'BROWSE ALL' : templateId === 'playful' ? 'Browse All ✨' : 'Browse All'}
+                </button>
+              )}
+            </motion.div>
           ) : (
             <motion.div
               className={`grid grid-cols-1 sm:grid-cols-2 ${templateId === 'bold' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} xl:grid-cols-4 gap-6`}

@@ -4,13 +4,15 @@ import { useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Loader2 } from 'lucide-react';
 
-// Signup now redirects to the unified login/signup page (login page handles both modes)
+// Signup redirects to the unified auth page at /login?mode=signup
+// All query params (redirect, shop, etc.) are preserved
 function SignupRedirect() {
   const router = useRouter();
   const searchParams = useSearchParams();
 
   useEffect(() => {
     const params = new URLSearchParams(searchParams.toString());
+    params.set('mode', 'signup');
     router.replace(`/login?${params.toString()}`);
   }, [router, searchParams]);
 
