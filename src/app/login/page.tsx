@@ -127,7 +127,9 @@ function PasswordStrengthBar({ password }: { password: string }) {
 type Mode = 'login' | 'signup';
 
 function AuthForm() {
-  const [mode, setMode] = useState<Mode>('login');
+  const searchParams = useSearchParams();
+  const initialMode: Mode = searchParams.get('mode') === 'signup' ? 'signup' : 'login';
+  const [mode, setMode] = useState<Mode>(initialMode);
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -135,7 +137,6 @@ function AuthForm() {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const router = useRouter();
-  const searchParams = useSearchParams();
   const redirect = searchParams.get('redirect') || '/dashboard';
   const isGuest = searchParams.get('guest') === '1';
   const shopRedirect = searchParams.get('shop');
