@@ -34,13 +34,13 @@ interface ChecklistItem {
 }
 
 // ─── Progress Ring ────────────────────────────────────────────────
-function ProgressRing({ percent, size = 56, strokeWidth = 4 }: { percent: number; size?: number; strokeWidth?: number }) {
+function ProgressRing({ percent, size = 48, strokeWidth = 4 }: { percent: number; size?: number; strokeWidth?: number }) {
   const radius = (size - strokeWidth) / 2;
   const circumference = radius * 2 * Math.PI;
   const offset = circumference - (percent / 100) * circumference;
 
   return (
-    <div className="relative" style={{ width: size, height: size }}>
+    <div className="relative flex-shrink-0" style={{ width: size, height: size }}>
       <svg width={size} height={size} className="transform -rotate-90">
         <circle
           cx={size / 2}
@@ -48,7 +48,7 @@ function ProgressRing({ percent, size = 56, strokeWidth = 4 }: { percent: number
           r={radius}
           fill="none"
           stroke="currentColor"
-          className="text-zinc-100 dark:text-zinc-800"
+          className="text-zinc-200 dark:text-zinc-700"
           strokeWidth={strokeWidth}
         />
         <motion.circle
@@ -56,7 +56,7 @@ function ProgressRing({ percent, size = 56, strokeWidth = 4 }: { percent: number
           cy={size / 2}
           r={radius}
           fill="none"
-          stroke="url(#progress-gradient)"
+          stroke="url(#progress-gradient-float)"
           strokeWidth={strokeWidth}
           strokeLinecap="round"
           strokeDasharray={circumference}
@@ -65,14 +65,14 @@ function ProgressRing({ percent, size = 56, strokeWidth = 4 }: { percent: number
           transition={{ duration: 1, ease: 'easeOut' }}
         />
         <defs>
-          <linearGradient id="progress-gradient" x1="0%" y1="0%" x2="100%" y2="0%">
+          <linearGradient id="progress-gradient-float" x1="0%" y1="0%" x2="100%" y2="0%">
             <stop offset="0%" stopColor="#7C3AED" />
             <stop offset="100%" stopColor="#6366F1" />
           </linearGradient>
         </defs>
       </svg>
       <div className="absolute inset-0 flex items-center justify-center">
-        <span className="text-xs font-bold text-zinc-900 dark:text-white">{Math.round(percent)}%</span>
+        <span className="text-[10px] font-bold text-zinc-900 dark:text-white tabular-nums">{Math.round(percent)}%</span>
       </div>
     </div>
   );
@@ -216,35 +216,30 @@ const TOUR_STEPS = [
     title: 'Your Command Center',
     description: 'This is your dashboard — a real-time view of your brand\'s performance, activity, and health score.',
     emoji: '🏛️',
-    position: { top: '80px', left: '50%' },
   },
   {
     id: 'stats',
     title: 'Live Analytics',
     description: 'Track page views, visitors, subscribers, and revenue at a glance. All updated in real time.',
     emoji: '📊',
-    position: { top: '180px', left: '50%' },
   },
   {
     id: 'quickactions',
     title: 'Quick Actions',
     description: 'Add products, write blog posts, check analytics, or design your brand — all in one click.',
     emoji: '⚡',
-    position: { top: '320px', left: '50%' },
   },
   {
     id: 'design',
     title: 'Design Studio',
     description: 'Make it uniquely yours. Choose from templates, palettes, fonts, and button styles with live preview.',
     emoji: '🎨',
-    position: { top: '50%', left: '50%' },
   },
   {
     id: 'done',
     title: 'You\'re All Set! 🎉',
     description: 'That\'s a quick look around. Complete the checklist below to launch your brand.',
     emoji: '🚀',
-    position: { top: '50%', left: '50%' },
   },
 ];
 
@@ -344,7 +339,6 @@ function SampleDataButton({ brandId, onDone }: { brandId: string; onDone: () => 
   const handleLoadSampleData = useCallback(async () => {
     setLoading(true);
     try {
-      // Create sample products
       const sampleProducts = [
         {
           name: 'Premium Starter Kit',
@@ -372,7 +366,6 @@ function SampleDataButton({ brandId, onDone }: { brandId: string; onDone: () => 
         });
       }
 
-      // Create sample blog post
       await fetch(`/api/brands/${brandId}/blog`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -410,7 +403,7 @@ function SampleDataButton({ brandId, onDone }: { brandId: string; onDone: () => 
     <button
       onClick={handleLoadSampleData}
       disabled={loading}
-      className="flex items-center gap-1.5 text-xs text-zinc-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 transition-colors disabled:opacity-50"
+      className="flex items-center gap-1.5 text-xs text-zinc-400 dark:text-zinc-500 hover:text-violet-600 dark:hover:text-violet-400 transition-colors disabled:opacity-50"
     >
       <Database className="h-3.5 w-3.5" />
       {loading ? 'Loading...' : 'Use demo data'}
@@ -418,7 +411,7 @@ function SampleDataButton({ brandId, onDone }: { brandId: string; onDone: () => 
   );
 }
 
-// ─── Main Onboarding Checklist ────────────────────────────────────
+// ─── Floating Onboarding Checklist (bottom-right) ─────────────────
 export function OnboardingChecklist({
   brandId,
   brandName,
@@ -430,7 +423,7 @@ export function OnboardingChecklist({
   hasDesignCustomization,
 }: OnboardingChecklistProps) {
   const [dismissed, setDismissed] = useState(false);
-  const [collapsed, setCollapsed] = useState(false);
+  const [collapsed, setCollapsed] = useState(true); // Start collapsed
   const [manualChecks, setManualChecks] = useState<Record<string, boolean>>({});
   const [showWelcome, setShowWelcome] = useState(false);
   const [showTour, setShowTour] = useState(false);
@@ -445,10 +438,11 @@ export function OnboardingChecklist({
         const parsed = JSON.parse(stored);
         if (parsed.dismissed) setDismissed(true);
         if (parsed.manualChecks) setManualChecks(parsed.manualChecks);
-        if (parsed.collapsed) setCollapsed(parsed.collapsed);
+        if (typeof parsed.collapsed === 'boolean') setCollapsed(parsed.collapsed);
         if (parsed.confettiFired) setConfettiFired(true);
       } else {
-        // First time — show welcome modal
+        // First time — show welcome modal + expand checklist
+        setCollapsed(false);
         setTimeout(() => setShowWelcome(true), 800);
       }
     } catch {
@@ -457,7 +451,7 @@ export function OnboardingChecklist({
   }, [brandId]);
 
   // Persist to localStorage
-  const persist = (updates: { dismissed?: boolean; manualChecks?: Record<string, boolean>; collapsed?: boolean; confettiFired?: boolean }) => {
+  const persist = useCallback((updates: { dismissed?: boolean; manualChecks?: Record<string, boolean>; collapsed?: boolean; confettiFired?: boolean }) => {
     try {
       const stored = localStorage.getItem(`onboarding-${brandId}`);
       const current = stored ? JSON.parse(stored) : {};
@@ -466,7 +460,7 @@ export function OnboardingChecklist({
     } catch {
       // ignore
     }
-  };
+  }, [brandId]);
 
   const items: ChecklistItem[] = [
     {
@@ -497,17 +491,8 @@ export function OnboardingChecklist({
       isComplete: productCount > 0 || !!manualChecks['product'],
     },
     {
-      id: 'blog',
-      label: 'Write a blog post',
-      description: 'Share your story and boost SEO',
-      href: `/dashboard/${brandId}/blog`,
-      icon: FileText,
-      color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600',
-      isComplete: blogPostCount > 0 || !!manualChecks['blog'],
-    },
-    {
       id: 'chatbot',
-      label: 'Configure chatbot',
+      label: 'Set up your chatbot',
       description: 'AI assistant trained on your brand voice',
       href: `/dashboard/${brandId}/chatbot`,
       icon: MessageSquare,
@@ -516,12 +501,12 @@ export function OnboardingChecklist({
     },
     {
       id: 'preview',
-      label: 'Preview your site',
-      description: 'See how visitors experience your brand',
-      href: brandSlug ? `/site/${brandSlug}` : `/dashboard/${brandId}/website`,
+      label: 'Publish your website',
+      description: 'Go live and let visitors find you',
+      href: brandSlug ? `/site/${brandSlug}` : `/dashboard/${brandId}/settings`,
       icon: Eye,
       color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600',
-      isComplete: !!manualChecks['preview'],
+      isComplete: blogPostCount > 0 || !!manualChecks['preview'],
       external: !!brandSlug,
     },
   ];
@@ -540,7 +525,7 @@ export function OnboardingChecklist({
       persist({ confettiFired: true });
     }
     prevAllCompleteRef.current = allComplete;
-  }, [allComplete, confettiFired]);
+  }, [allComplete, confettiFired, persist]);
 
   const handleDismiss = () => {
     setDismissed(true);
@@ -574,72 +559,68 @@ export function OnboardingChecklist({
         <GuidedTour onClose={() => setShowTour(false)} />
       )}
 
-      <AnimatePresence>
+      {/* Floating card — fixed bottom-right */}
+      <div className="fixed bottom-6 right-6 z-30 w-[340px] max-w-[calc(100vw-24px)]">
         <motion.div
-          initial={{ opacity: 0, y: -10, height: 0 }}
-          animate={{ opacity: 1, y: 0, height: 'auto' }}
-          exit={{ opacity: 0, y: -10, height: 0 }}
-          transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
-          className="mb-8"
+          initial={{ opacity: 0, y: 24, scale: 0.95 }}
+          animate={{ opacity: 1, y: 0, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 320, damping: 28 }}
         >
-          <Card className="overflow-hidden border-violet-200/50 dark:border-violet-800/30 bg-gradient-to-br from-white via-violet-50/20 to-white dark:from-zinc-900 dark:via-violet-950/10 dark:to-zinc-900">
-            <CardContent className="p-5 sm:p-6">
-              {/* Header */}
-              <div className="flex items-start justify-between mb-4">
-                <div className="flex items-center gap-4">
-                  <ProgressRing percent={percent} />
-                  <div>
-                    <div className="flex items-center gap-2 mb-1">
-                      <Sparkles className="h-4 w-4 text-violet-500" />
-                      <h3 className="font-semibold text-sm text-zinc-900 dark:text-white">
-                        {allComplete ? '🎉 All set! Your brand is ready' : 'Set up your brand'}
-                      </h3>
-                    </div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400">
-                      {allComplete
-                        ? "You've completed all the steps. Your digital palace is ready."
-                        : `${completedCount} of ${totalCount} steps complete — let's build your palace`
-                      }
-                    </p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={() => setShowTour(true)}
-                    className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                    aria-label="Start guided tour"
-                    title="Take a tour"
-                  >
-                    <HelpCircle className="h-4 w-4" />
-                  </button>
-                  <button
-                    onClick={handleToggleCollapse}
-                    className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                    aria-label={collapsed ? 'Expand checklist' : 'Collapse checklist'}
-                  >
-                    {collapsed ? <ChevronDown className="h-4 w-4" /> : <ChevronUp className="h-4 w-4" />}
-                  </button>
-                  <button
-                    onClick={handleDismiss}
-                    className="p-1.5 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
-                    aria-label="Dismiss onboarding checklist"
-                  >
-                    <X className="h-4 w-4" />
-                  </button>
-                </div>
+          <Card className="overflow-hidden border-violet-200/60 dark:border-violet-800/40 bg-white dark:bg-zinc-900 shadow-2xl shadow-black/10 dark:shadow-black/40">
+            {/* Header bar */}
+            <div className="flex items-center gap-3 px-4 py-3 bg-gradient-to-r from-violet-600 to-indigo-600">
+              <ProgressRing percent={percent} size={36} strokeWidth={3} />
+              <div className="flex-1 min-w-0">
+                <p className="text-xs font-semibold text-white leading-tight">
+                  {allComplete ? '🎉 All done!' : 'Getting started'}
+                </p>
+                <p className="text-[10px] text-white/70 mt-0.5">
+                  {completedCount}/{totalCount} steps complete
+                </p>
               </div>
+              <div className="flex items-center gap-1">
+                <button
+                  onClick={() => setShowTour(true)}
+                  className="h-6 w-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white transition-colors"
+                  aria-label="Take a tour"
+                  title="Take a tour"
+                >
+                  <HelpCircle className="h-3.5 w-3.5" />
+                </button>
+                <button
+                  onClick={handleToggleCollapse}
+                  className="h-6 w-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white transition-colors"
+                  aria-label={collapsed ? 'Expand checklist' : 'Collapse checklist'}
+                >
+                  {collapsed
+                    ? <ChevronUp className="h-3.5 w-3.5" />
+                    : <ChevronDown className="h-3.5 w-3.5" />
+                  }
+                </button>
+                <button
+                  onClick={handleDismiss}
+                  className="h-6 w-6 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center text-white/80 hover:text-white transition-colors"
+                  aria-label="Dismiss onboarding checklist"
+                >
+                  <X className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            </div>
 
-              {/* Collapsible content */}
-              <AnimatePresence>
-                {!collapsed && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: 'auto' }}
-                    exit={{ opacity: 0, height: 0 }}
-                    transition={{ duration: 0.25, ease: 'easeInOut' }}
-                  >
+            {/* Collapsible body */}
+            <AnimatePresence initial={false}>
+              {!collapsed && (
+                <motion.div
+                  key="body"
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: 'auto', opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ type: 'spring', stiffness: 340, damping: 30 }}
+                  style={{ overflow: 'hidden' }}
+                >
+                  <CardContent className="p-3">
                     {/* Checklist items */}
-                    <div className="space-y-1.5 mb-4">
+                    <div className="space-y-1">
                       {items.map((item, i) => {
                         const ItemWrapper = item.external
                           ? ({ children, className }: { children: React.ReactNode; className: string }) => (
@@ -652,19 +633,19 @@ export function OnboardingChecklist({
                         return (
                           <motion.div
                             key={item.id}
-                            initial={{ opacity: 0, x: -8 }}
+                            initial={{ opacity: 0, x: -10 }}
                             animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: i * 0.04, duration: 0.3 }}
+                            transition={{ delay: i * 0.05, duration: 0.25 }}
                           >
                             <ItemWrapper
-                              className={`flex items-center gap-3.5 p-3 rounded-xl transition-all duration-200 group ${
+                              className={`flex items-center gap-2.5 p-2.5 rounded-xl transition-all duration-200 group ${
                                 item.isComplete
-                                  ? 'bg-emerald-50/50 dark:bg-emerald-950/10'
-                                  : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/50 cursor-pointer'
+                                  ? 'opacity-60 cursor-default'
+                                  : 'hover:bg-zinc-50 dark:hover:bg-zinc-800/70 cursor-pointer'
                               }`}
                             >
-                              {/* Check circle */}
-                              <div className={`h-7 w-7 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
+                              {/* Animated check circle */}
+                              <div className={`h-6 w-6 rounded-full flex items-center justify-center flex-shrink-0 transition-all duration-300 ${
                                 item.isComplete
                                   ? 'bg-emerald-500 text-white shadow-sm shadow-emerald-500/30'
                                   : 'border-2 border-zinc-200 dark:border-zinc-700 group-hover:border-violet-400 dark:group-hover:border-violet-500'
@@ -675,33 +656,30 @@ export function OnboardingChecklist({
                                     animate={{ scale: 1 }}
                                     transition={{ type: 'spring', stiffness: 500, damping: 20 }}
                                   >
-                                    <Check className="h-3.5 w-3.5" />
+                                    <Check className="h-3 w-3" />
                                   </motion.div>
                                 )}
                               </div>
 
                               {/* Icon */}
-                              <div className={`h-8 w-8 rounded-lg flex items-center justify-center flex-shrink-0 ${item.color}`}>
-                                <item.icon className="h-4 w-4" />
+                              <div className={`h-7 w-7 rounded-lg flex items-center justify-center flex-shrink-0 ${item.color}`}>
+                                <item.icon className="h-3.5 w-3.5" />
                               </div>
 
                               {/* Text */}
                               <div className="flex-1 min-w-0">
-                                <p className={`text-sm font-medium ${
+                                <p className={`text-xs font-medium leading-tight ${
                                   item.isComplete
                                     ? 'text-zinc-400 dark:text-zinc-500 line-through'
-                                    : 'text-zinc-900 dark:text-white group-hover:text-violet-600 dark:group-hover:text-violet-400'
+                                    : 'text-zinc-800 dark:text-zinc-200 group-hover:text-violet-600 dark:group-hover:text-violet-400'
                                 } transition-colors`}>
                                   {item.label}
-                                </p>
-                                <p className="text-xs text-zinc-400 dark:text-zinc-500 hidden sm:block">
-                                  {item.description}
                                 </p>
                               </div>
 
                               {/* Arrow */}
                               {!item.isComplete && (
-                                <ArrowRight className="h-4 w-4 text-zinc-300 group-hover:text-violet-500 transition-colors flex-shrink-0" />
+                                <ArrowRight className="h-3.5 w-3.5 text-zinc-300 group-hover:text-violet-500 transition-colors flex-shrink-0" />
                               )}
                             </ItemWrapper>
                           </motion.div>
@@ -709,8 +687,8 @@ export function OnboardingChecklist({
                       })}
                     </div>
 
-                    {/* Footer row */}
-                    <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                    {/* Footer */}
+                    <div className="flex items-center justify-between mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
                       <SampleDataButton
                         brandId={brandId}
                         onDone={() => setRefreshKey(k => k + 1)}
@@ -718,27 +696,29 @@ export function OnboardingChecklist({
 
                       {allComplete ? (
                         <motion.div
-                          initial={{ opacity: 0, y: 10 }}
-                          animate={{ opacity: 1, y: 0 }}
-                          transition={{ delay: 0.3 }}
-                          className="flex items-center gap-2"
+                          initial={{ opacity: 0, scale: 0.9 }}
+                          animate={{ opacity: 1, scale: 1 }}
+                          transition={{ delay: 0.2 }}
                         >
-                          <p className="text-xs text-zinc-500">Your brand ecosystem is live.</p>
-                          <Button size="sm" variant="outline" onClick={handleDismiss} className="text-xs h-7">
+                          <Button size="sm" variant="outline" onClick={handleDismiss} className="text-xs h-7 px-3">
                             Dismiss
                           </Button>
                         </motion.div>
                       ) : (
-                        <p className="text-xs text-zinc-400">{totalCount - completedCount} steps left</p>
+                        <span className="text-[10px] text-zinc-400">
+                          <Sparkles className="h-3 w-3 inline mr-1 text-violet-400" />
+                          {totalCount - completedCount} steps left
+                        </span>
                       )}
                     </div>
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </CardContent>
+                  </CardContent>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </Card>
         </motion.div>
-      </AnimatePresence>
+      </div>
+
       {/* Hidden ref to suppress unused refreshKey warning */}
       <span className="hidden" aria-hidden="true" data-refresh={refreshKey} />
     </>
