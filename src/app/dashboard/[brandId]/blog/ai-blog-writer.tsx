@@ -10,6 +10,7 @@ import {
   RefreshCw,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
+import { AiStepIndicator } from "./ai-step-indicator";
 
 interface AiBlogWriterProps {
   brandId: string;
@@ -17,12 +18,7 @@ interface AiBlogWriterProps {
   onCancel: () => void;
 }
 
-const STEPS = [
-  { num: 1, label: "Topic", description: "What to write about" },
-  { num: 2, label: "Outline", description: "Structure the article" },
-  { num: 3, label: "Article", description: "Generate full content" },
-  { num: 4, label: "SEO", description: "Optimize for search" },
-];
+// Step definitions moved to ai-step-indicator.tsx
 
 export function AiBlogWriter({
   brandId,
@@ -127,44 +123,7 @@ export function AiBlogWriter({
         </div>
       </div>
 
-      {/* Step Indicator */}
-      <div className="flex items-center gap-2 mb-8">
-        {STEPS.map((s, i) => (
-          <div key={s.num} className="flex items-center gap-2">
-            <div
-              className={`w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-colors ${
-                step > s.num
-                  ? "bg-green-500 text-white"
-                  : step === s.num
-                    ? "bg-violet-600 text-white"
-                    : "bg-[var(--bg-secondary)] text-[var(--text-tertiary)]"
-              }`}
-            >
-              {step > s.num ? <Check className="h-3.5 w-3.5" /> : s.num}
-            </div>
-            <span
-              className={`text-xs hidden sm:inline ${
-                step === s.num
-                  ? "font-medium text-[var(--text-primary)]"
-                  : "text-[var(--text-tertiary)]"
-              }`}
-            >
-              {s.label}
-            </span>
-            {i < STEPS.length - 1 && (
-              <div
-                className="w-8 h-px"
-                style={{
-                  backgroundColor:
-                    step > s.num
-                      ? "var(--accent)"
-                      : "var(--border-primary)",
-                }}
-              />
-            )}
-          </div>
-        ))}
-      </div>
+      <AiStepIndicator currentStep={step} />
 
       {/* Error */}
       {genError && (

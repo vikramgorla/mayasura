@@ -9,12 +9,11 @@ import {
   Package,
   ArrowUp,
   ArrowDown,
-  Loader2,
-  X,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { ProductForm } from "./product-form";
 
 interface Product {
   id: string;
@@ -34,19 +33,7 @@ export default function ProductsPage() {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
-  const [editingId, setEditingId] = useState<string | null>(null);
-  const [saving, setSaving] = useState(false);
-
-  // Form state
-  const [form, setForm] = useState({
-    name: "",
-    description: "",
-    price: "",
-    currency: "USD",
-    imageUrl: "",
-    category: "",
-    status: "active",
-  });
+  const [editingProduct, setEditingProduct] = useState<Product | null>(null);
 
   const fetchProducts = useCallback(async () => {
     try {
@@ -65,70 +52,6 @@ export default function ProductsPage() {
   useEffect(() => {
     fetchProducts();
   }, [fetchProducts]);
-
-  function resetForm() {
-    setForm({
-      name: "",
-      description: "",
-      price: "",
-      currency: "USD",
-      imageUrl: "",
-      category: "",
-      status: "active",
-    });
-    setEditingId(null);
-    setShowForm(false);
-  }
-
-  function startEdit(product: Product) {
-    setForm({
-      name: product.name,
-      description: product.description || "",
-      price: product.price.toString(),
-      currency: product.currency,
-      imageUrl: product.imageUrl || "",
-      category: product.category || "",
-      status: product.status,
-    });
-    setEditingId(product.id);
-    setShowForm(true);
-  }
-
-  async function handleSave() {
-    if (!form.name.trim()) return;
-    setSaving(true);
-
-    const payload = {
-      name: form.name.trim(),
-      description: form.description.trim() || undefined,
-      price: parseFloat(form.price) || 0,
-      currency: form.currency,
-      imageUrl: form.imageUrl.trim() || undefined,
-      category: form.category.trim() || undefined,
-      status: form.status,
-    };
-
-    try {
-      const url = editingId
-        ? `/api/v1/brands/${brandId}/products/${editingId}`
-        : `/api/v1/brands/${brandId}/products`;
-
-      const res = await fetch(url, {
-        method: editingId ? "PUT" : "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
-      });
-
-      if (res.ok) {
-        resetForm();
-        fetchProducts();
-      }
-    } catch {
-      // silent
-    } finally {
-      setSaving(false);
-    }
-  }
 
   async function handleDelete(id: string) {
     if (!confirm("Delete this product?")) return;
@@ -167,6 +90,12 @@ export default function ProductsPage() {
     fetchProducts();
   }
 
+  function handleFormSaved() {
+    setShowForm(false);
+    setEditingProduct(null);
+    fetchProducts();
+  }
+
   if (loading) {
     return (
       <div className="space-y-4">
@@ -185,18 +114,13 @@ export default function ProductsPage() {
     <div>
       <div className="flex items-center justify-between mb-6">
         <div>
-          <h1 className="text-xl font-bold text-[var(--text-primary)]">
-            Products
-          </h1>
+          <h1 className="text-xl font-bold text-[var(--text-primary)]">Products</h1>
           <p className="text-sm text-[var(--text-secondary)]">
             {products.length} product{products.length !== 1 ? "s" : ""}
           </p>
         </div>
         <Button
-          onClick={() => {
-            resetForm();
-            setShowForm(true);
-          }}
+          onClick={() => { setEditingProduct(null); setShowForm(true); }}
           variant="brand"
           size="sm"
         >
@@ -205,79 +129,19 @@ export default function ProductsPage() {
         </Button>
       </div>
 
-      {/* Product Form */}
       {showForm && (
-        <div className="mb-6 p-4 border border-[var(--border-primary)] rounded-lg bg-[var(--bg-surface)]">
-          <div className="flex items-center justify-between mb-4">
-            <h2 className="font-semibold text-[var(--text-primary)]">
-              {editingId ? "Edit Product" : "New Product"}
-            </h2>
-            <button onClick={resetForm}>
-              <X className="h-4 w-4 text-[var(--text-secondary)]" />
-            </button>
-          </div>
-
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-            <input
-              placeholder="Product name *"
-              value={form.name}
-              onChange={(e) => setForm({ ...form, name: e.target.value })}
-              className="px-3 py-2 border border-[var(--border-primary)] rounded-lg text-sm bg-[var(--bg-primary)] text-[var(--text-primary)]"
-            />
-            <input
-              placeholder="Category"
-              value={form.category}
-              onChange={(e) => setForm({ ...form, category: e.target.value })}
-              className="px-3 py-2 border border-[var(--border-primary)] rounded-lg text-sm bg-[var(--bg-primary)] text-[var(--text-primary)]"
-            />
-            <input
-              type="number"
-              placeholder="Price"
-              value={form.price}
-              onChange={(e) => setForm({ ...form, price: e.target.value })}
-              className="px-3 py-2 border border-[var(--border-primary)] rounded-lg text-sm bg-[var(--bg-primary)] text-[var(--text-primary)]"
-            />
-            <input
-              placeholder="Image URL"
-              value={form.imageUrl}
-              onChange={(e) => setForm({ ...form, imageUrl: e.target.value })}
-              className="px-3 py-2 border border-[var(--border-primary)] rounded-lg text-sm bg-[var(--bg-primary)] text-[var(--text-primary)]"
-            />
-            <textarea
-              placeholder="Description"
-              value={form.description}
-              onChange={(e) =>
-                setForm({ ...form, description: e.target.value })
-              }
-              rows={2}
-              className="sm:col-span-2 px-3 py-2 border border-[var(--border-primary)] rounded-lg text-sm bg-[var(--bg-primary)] text-[var(--text-primary)] resize-none"
-            />
-          </div>
-
-          <div className="flex gap-2 mt-4">
-            <Button
-              onClick={handleSave}
-              disabled={saving || !form.name.trim()}
-              variant="brand"
-              size="sm"
-            >
-              {saving && <Loader2 className="h-3 w-3 mr-1 animate-spin" />}
-              {editingId ? "Save Changes" : "Add Product"}
-            </Button>
-            <Button onClick={resetForm} variant="ghost" size="sm">
-              Cancel
-            </Button>
-          </div>
-        </div>
+        <ProductForm
+          brandId={brandId}
+          product={editingProduct}
+          onSaved={handleFormSaved}
+          onCancel={() => { setShowForm(false); setEditingProduct(null); }}
+        />
       )}
 
-      {/* Product List */}
       {products.length === 0 ? (
         <div className="text-center py-16 border border-dashed border-[var(--border-primary)] rounded-lg">
           <Package className="mx-auto mb-3 h-10 w-10 text-[var(--text-tertiary)]" />
-          <p className="font-medium text-[var(--text-primary)]">
-            Add your first product
-          </p>
+          <p className="font-medium text-[var(--text-primary)]">Add your first product</p>
           <p className="text-sm text-[var(--text-secondary)] mt-1">
             Products will appear in your shop.
           </p>
@@ -289,7 +153,6 @@ export default function ProductsPage() {
               key={product.id}
               className="flex items-center gap-4 p-3 border border-[var(--border-primary)] rounded-lg bg-[var(--bg-surface)]"
             >
-              {/* Reorder */}
               <div className="flex flex-col gap-0.5">
                 <button
                   onClick={() => handleReorder(product.id, "up")}
@@ -307,59 +170,31 @@ export default function ProductsPage() {
                 </button>
               </div>
 
-              {/* Image */}
               <div className="w-12 h-12 rounded-md overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center shrink-0">
                 {product.imageUrl ? (
                   // eslint-disable-next-line @next/next/no-img-element
-                  <img
-                    src={product.imageUrl}
-                    alt={product.name}
-                    className="w-full h-full object-cover"
-                  />
+                  <img src={product.imageUrl} alt={product.name} className="w-full h-full object-cover" />
                 ) : (
                   <Package className="h-5 w-5 text-[var(--text-tertiary)]" />
                 )}
               </div>
 
-              {/* Info */}
               <div className="flex-1 min-w-0">
-                <p className="font-medium text-sm text-[var(--text-primary)] truncate">
-                  {product.name}
-                </p>
+                <p className="font-medium text-sm text-[var(--text-primary)] truncate">{product.name}</p>
                 <div className="flex items-center gap-2 mt-0.5">
                   <span className="text-sm font-semibold text-[var(--accent)]">
-                    {new Intl.NumberFormat("en-US", {
-                      style: "currency",
-                      currency: product.currency,
-                    }).format(product.price)}
+                    {new Intl.NumberFormat("en-US", { style: "currency", currency: product.currency }).format(product.price)}
                   </span>
-                  {product.category && (
-                    <Badge variant="secondary">{product.category}</Badge>
-                  )}
-                  <Badge
-                    variant={
-                      product.status === "active" ? "default" : "secondary"
-                    }
-                  >
-                    {product.status}
-                  </Badge>
+                  {product.category && <Badge variant="secondary">{product.category}</Badge>}
+                  <Badge variant={product.status === "active" ? "default" : "secondary"}>{product.status}</Badge>
                 </div>
               </div>
 
-              {/* Actions */}
               <div className="flex gap-1 shrink-0">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => startEdit(product)}
-                >
+                <Button variant="ghost" size="icon" onClick={() => { setEditingProduct(product); setShowForm(true); }}>
                   <Pencil className="h-3.5 w-3.5" />
                 </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  onClick={() => handleDelete(product.id)}
-                >
+                <Button variant="ghost" size="icon" onClick={() => handleDelete(product.id)}>
                   <Trash2 className="h-3.5 w-3.5 text-red-500" />
                 </Button>
               </div>
