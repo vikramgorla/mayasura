@@ -51,9 +51,16 @@ const BUTTON_SIZE_MAP: Record<
 export function designSettingsToCSSVars(
   settings: DesignSettings
 ): Record<string, string> {
-  const spacing = SPACING_MAP[settings.spacingDensity || "normal"];
-  const buttonShape = BUTTON_SHAPE_MAP[settings.buttonShape || "rounded"];
-  const buttonSize = BUTTON_SIZE_MAP[settings.buttonSize || "medium"];
+  const spacing = {
+    section: SPACING_MAP[settings.spacingDensity || "normal"]?.section ?? "48px",
+    gap: SPACING_MAP[settings.spacingDensity || "normal"]?.gap ?? "16px",
+  };
+  const buttonShape = BUTTON_SHAPE_MAP[settings.buttonShape || "rounded"] ?? "8px";
+  const buttonSize = {
+    px: BUTTON_SIZE_MAP[settings.buttonSize || "medium"]?.px ?? "24px",
+    py: BUTTON_SIZE_MAP[settings.buttonSize || "medium"]?.py ?? "12px",
+    fontSize: BUTTON_SIZE_MAP[settings.buttonSize || "medium"]?.fontSize ?? "14px",
+  };
   const accentText = getTextOnColor(settings.accentColor || "#5B21B6");
 
   return {
