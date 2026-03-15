@@ -242,7 +242,16 @@ function initializeDatabase(db: Database.Database) {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
+    CREATE TABLE IF NOT EXISTS brand_strategies (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      type TEXT NOT NULL,
+      result TEXT NOT NULL DEFAULT '{}',
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
     -- Indexes
+    CREATE INDEX IF NOT EXISTS idx_brand_strategies_brand ON brand_strategies(brand_id, type);
     CREATE INDEX IF NOT EXISTS idx_notifications_brand ON notifications(brand_id);
     CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand_id);
     CREATE INDEX IF NOT EXISTS idx_content_brand ON content(brand_id);
@@ -575,6 +584,40 @@ export function createProduct(product: {
     category: product.category || null,
     sort_order: product.sort_order || 0,
   });
+}
+
+// ─── Brand Strategies ────────────────────────────────────────────
+export function saveStrategy(brandId: string, type: string, result: unknown) {
+  const db = getDb();
+  const id = crypto.randomUUID();
+  // Upsert: delete old of same type, insert new
+  db.prepare('DELETE FROM brand_strategies WHERE brand_id = ? AND type = ?').run(brandId, type);
+  db.prepare('INSERT INTO brand_strategies (id, brand_id, type, result) VALUES (?, ?, ?, ?)').run(
+    id, brandId, type, JSON.stringify(result)
+  );
+  return id;
+}
+
+export function getStrategies(brandId: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM brand_strategies WHERE brand_id = ? ORDER BY created_at DESC').all(brandId) as Array<{
+    id: string;
+    brand_id: string;
+    type: string;
+    result: string;
+    created_at: string;
+  }>;
+}
+
+export function getStrategyByType(brandId: string, type: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM brand_strategies WHERE brand_id = ? AND type = ? ORDER BY created_at DESC LIMIT 1').get(brandId, type) as {
+    id: string;
+    brand_id: string;
+    type: string;
+    result: string;
+    created_at: string;
+  } | undefined;
 }
 
 export function getProductsByBrand(brandId: string) {

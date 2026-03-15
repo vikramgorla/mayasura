@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getProductsByBrand, getContentByBrand } from '@/lib/db';
+import { getProductsByBrand, getContentByBrand, saveStrategy, getStrategies } from '@/lib/db';
 import { requireBrandOwner } from '@/lib/api-auth';
 import Anthropic from '@anthropic-ai/sdk';
 
@@ -115,6 +115,8 @@ Return JSON: {
     try {
       const match = text.match(/\{[\s\S]*\}/);
       const result = match ? JSON.parse(match[0]) : { error: 'Failed to parse response' };
+      // Auto-save strategy result
+      saveStrategy(id, type, result);
       return NextResponse.json({ result, type });
     } catch {
       return NextResponse.json({ result: text, type });
@@ -122,5 +124,28 @@ Return JSON: {
   } catch (error) {
     console.error('Strategy error:', error);
     return NextResponse.json({ error: 'Failed to generate strategy' }, { status: 500 });
+  }
+}
+
+// GET — retrieve saved strategies
+export async function GET(
+  _request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+
+    const strategies = getStrategies(id);
+    const parsed = strategies.map(s => ({
+      ...s,
+      result: JSON.parse(s.result),
+    }));
+
+    return NextResponse.json({ strategies: parsed });
+  } catch (error) {
+    console.error('Get strategies error:', error);
+    return NextResponse.json({ error: 'Failed to load strategies' }, { status: 500 });
   }
 }
