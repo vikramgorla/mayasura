@@ -213,7 +213,7 @@ function CreatePageContent() {
           method: 'PUT',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ key: 'website_template', value: data.websiteTemplate }),
-        }).catch(err => console.error('Template setting error:', err));
+        }).catch(() => {});
       }
 
       // Step 2: Create products (batched, with error handling)
@@ -224,7 +224,7 @@ function CreatePageContent() {
             headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(product),
           }).catch(err => {
-            console.error('Product creation error:', err);
+            // Product creation error - handled silently
             return null;
           })
         );
@@ -259,7 +259,7 @@ function CreatePageContent() {
 
       toast.success('🎉 Brand launched!', `${data.name} is live`);
     } catch (error) {
-      console.error('Launch error:', error);
+      // Launch error - handled by toast
       const message = error instanceof Error ? error.message : 'Unknown error occurred';
       toast.error('Launch failed', message);
       setIsLaunching(false);

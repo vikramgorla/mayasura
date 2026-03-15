@@ -119,7 +119,7 @@ export default function StepBasics({ data, updateData, onNext }: Props) {
       const result = await res.json();
       setSuggestedNames(result.suggestions || []);
     } catch (e) {
-      console.error('Name suggestion error:', e);
+      // handled by toast
     }
     setLoadingNames(false);
   };
@@ -146,7 +146,7 @@ export default function StepBasics({ data, updateData, onNext }: Props) {
       const result = await res.json();
       setSuggestedTaglines(result.suggestions || []);
     } catch (e) {
-      console.error('Tagline suggestion error:', e);
+      // handled by toast
     }
     setLoadingTaglines(false);
   };

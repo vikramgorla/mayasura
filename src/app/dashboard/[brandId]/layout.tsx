@@ -221,7 +221,10 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
             <div className="h-4 w-4 rounded-full border border-zinc-200 dark:border-zinc-600" style={{ backgroundColor: brand.secondary_color }} />
             <div className="h-4 w-4 rounded-full" style={{ backgroundColor: brand.accent_color }} />
           </div>
-          <p className="text-xs text-zinc-400">{brand.font_heading} / {brand.font_body}</p>
+          <div className="flex items-center gap-2">
+            <p className="text-xs text-zinc-400">{brand.font_heading} / {brand.font_body}</p>
+            <span className="px-1.5 py-0.5 rounded text-[9px] font-mono font-medium bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400">v3.3</span>
+          </div>
           <div className="flex items-center justify-between text-xs text-zinc-400">
             <div>
               <kbd className="px-1.5 py-0.5 rounded border border-zinc-200 dark:border-zinc-600 text-[10px]">⌘K</kbd>

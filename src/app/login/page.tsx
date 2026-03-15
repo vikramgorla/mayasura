@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { ArrowRight, Eye, EyeOff, Github, Loader2, CheckCircle2, AlertCircle } from 'lucide-react';
 import { useToast } from '@/components/ui/toast';
+import { SharedFooter } from '@/components/shared-footer';
 
 // Password strength calculator
 function getPasswordStrength(password: string): { score: number; label: string; color: string } {
@@ -492,12 +493,17 @@ function AuthForm() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-        <Loader2 className="h-6 w-6 animate-spin text-violet-600" />
+    <div className="min-h-screen flex flex-col bg-zinc-50 dark:bg-zinc-900">
+      <div className="flex-1">
+        <Suspense fallback={
+          <div className="min-h-[80vh] flex items-center justify-center">
+            <Loader2 className="h-6 w-6 animate-spin text-violet-600" />
+          </div>
+        }>
+          <AuthForm />
+        </Suspense>
       </div>
-    }>
-      <AuthForm />
-    </Suspense>
+      <SharedFooter minimal />
+    </div>
   );
 }

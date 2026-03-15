@@ -56,7 +56,7 @@ export default function StepContent({ data, updateData, onNext, onBack }: Props)
         });
       }
     } catch (e) {
-      console.error('Voice analysis error:', e);
+      // handled by toast
     }
     setAnalyzingVoice(false);
   };

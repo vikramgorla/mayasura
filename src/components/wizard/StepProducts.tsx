@@ -131,7 +131,7 @@ export default function StepProducts({ data, updateData, onNext, onBack }: Props
         updateProduct(index, { description: result.description });
       }
     } catch (e) {
-      console.error('Description generation error:', e);
+      // handled by toast
     }
     setLoading(null);
   };

@@ -11,6 +11,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { SharedNav } from '@/components/shared-nav';
+import { SharedFooter } from '@/components/shared-footer';
 import { STARTER_TEMPLATES, StarterTemplate } from '@/lib/templates';
 
 /* ─── Category definitions ──────────────────────────────────── */
@@ -372,6 +373,8 @@ export default function TemplatesPage() {
           />
         )}
       </AnimatePresence>
+
+      <SharedFooter minimal />
     </div>
   );
 }
