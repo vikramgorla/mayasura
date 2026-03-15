@@ -1,9 +1,12 @@
 import { NextResponse } from 'next/server';
 import { getDb } from '@/lib/db';
+import { requireAuth } from '@/lib/api-auth';
 
 // One-time migration endpoint — safe to call multiple times (idempotent)
 export async function POST() {
   try {
+    const { error } = await requireAuth();
+    if (error) return error;
     const db = getDb();
 
     const results: string[] = [];

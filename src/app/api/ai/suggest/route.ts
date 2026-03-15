@@ -1,9 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { suggestBrandNames, suggestTaglines, generateProductDescription, analyzeBrandVoice, generateColorPalette, generateCopy } from '@/lib/ai';
+import { suggestBrandNames, suggestTaglines, generateProductDescription, analyzeBrandVoice } from '@/lib/ai';
 import { WEBSITE_TEMPLATES, suggestTemplateForIndustry } from '@/lib/website-templates';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
   try {
+    const { error } = await requireAuth();
+    if (error) return error;
+
     const body = await request.json();
     const { type } = body;
 

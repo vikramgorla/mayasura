@@ -1,8 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { analyzeSEO } from '@/lib/ai';
+import { requireAuth } from '@/lib/api-auth';
 
 export async function POST(request: NextRequest) {
   try {
+    const { error } = await requireAuth();
+    if (error) return error;
+
     const body = await request.json();
     const { title, description, content, industry } = body;
 
