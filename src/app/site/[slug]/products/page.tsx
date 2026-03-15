@@ -348,7 +348,7 @@ export default function ProductsPage() {
   const tc = isDark ? '#FFFFFF' : brand.primary_color;
   const ac = brand.accent_color || tc;
   const dsRadius = BORDER_RADIUS_MAP[designSettings.borderRadius];
-  const maxW = tid === 'bold' ? 'max-w-7xl' : 'max-w-6xl';
+  const maxW = tid === 'bold' || tid === 'corporate' ? 'max-w-7xl' : tid === 'portfolio' ? 'max-w-7xl' : 'max-w-6xl';
   const isBold = tid === 'bold';
 
   const hs: React.CSSProperties = {
@@ -373,20 +373,33 @@ export default function ProductsPage() {
     if (isBold) return { backgroundColor: active ? ac : 'transparent', color: active ? '#FFF' : `${tc}50`, border: `2px solid ${active ? ac : `${tc}15`}`, borderRadius: '0', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' };
     if (tid === 'playful') return { backgroundColor: active ? ac : `${tc}05`, color: active ? '#FFF' : `${tc}60`, border: 'none', borderRadius: '9999px', fontWeight: 600 };
     if (tid === 'classic') return { backgroundColor: active ? ac : 'transparent', color: active ? '#FFF' : `${tc}50`, border: `1px solid ${active ? ac : `${tc}12`}`, borderRadius: '8px', fontWeight: 500 };
+    if (tid === 'startup') return { backgroundColor: active ? ac : `${tc}04`, color: active ? '#FFF' : `${tc}55`, border: 'none', borderRadius: '9999px', fontWeight: 600, boxShadow: active ? '0 2px 8px rgba(99,102,241,0.2)' : 'none' };
+    if (tid === 'portfolio') return { backgroundColor: 'transparent', color: active ? tc : `${tc}35`, border: 'none', borderRadius: '0', fontWeight: 400, borderBottom: active ? `2px solid ${tc}` : '2px solid transparent', paddingBottom: '0.5rem' };
+    if (tid === 'magazine') return { backgroundColor: 'transparent', color: active ? tc : `${tc}40`, border: 'none', borderRadius: '0', fontWeight: 600, fontVariant: 'small-caps' as const, fontSize: '0.8125rem', borderBottom: active ? `2px solid ${tc}` : 'none' };
+    if (tid === 'boutique') return { backgroundColor: 'transparent', color: active ? tc : `${tc}40`, border: `1px solid ${active ? tc : `${tc}12`}`, borderRadius: '0', fontWeight: 400, letterSpacing: '0.12em', textTransform: 'uppercase', fontSize: '0.625rem' };
+    if (tid === 'tech') return { backgroundColor: active ? '#10B98120' : 'transparent', color: active ? '#10B981' : `${tc}40`, border: `1px solid ${active ? '#10B981' : `${tc}15`}`, borderRadius: '6px', fontWeight: 600, fontFamily: "'JetBrains Mono', monospace" };
+    if (tid === 'wellness') return { backgroundColor: active ? `${ac}15` : 'transparent', color: active ? ac : `${tc}45`, border: 'none', borderRadius: '9999px', fontWeight: 400, letterSpacing: '0.03em' };
+    if (tid === 'restaurant') return { backgroundColor: active ? ac : 'transparent', color: active ? '#FFF' : `${tc}50`, border: `1px solid ${active ? ac : `${tc}15`}`, borderRadius: '4px', fontWeight: 600 };
+    if (tid === 'neon') return { backgroundColor: active ? `${ac}25` : 'transparent', color: active ? ac : `${tc}35`, border: `1px solid ${active ? ac : `${tc}12`}`, borderRadius: '0', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.06em' };
+    if (tid === 'organic') return { backgroundColor: active ? `${ac}18` : `${tc}04`, color: active ? ac : `${tc}45`, border: 'none', borderRadius: '20px', fontWeight: 600 };
+    if (tid === 'artisan') return { backgroundColor: active ? tc : 'transparent', color: active ? bgColor : `${tc}50`, border: `2px solid ${active ? tc : `${tc}15`}`, borderRadius: '4px', fontWeight: 600, fontFamily: "'JetBrains Mono', monospace", fontSize: '0.6875rem' };
+    if (tid === 'corporate') return { backgroundColor: active ? ac : 'transparent', color: active ? '#FFF' : `${tc}50`, border: `1px solid ${active ? ac : `${tc}12`}`, borderRadius: '6px', fontWeight: 600 };
     return { backgroundColor: active ? tc : 'transparent', color: active ? bgColor : `${tc}50`, border: active ? 'none' : `1px solid ${tc}12`, borderRadius: '0' };
   };
 
+  const sortRadius = isBold ? '0' : tid === 'playful' || tid === 'startup' || tid === 'wellness' ? '12px' : tid === 'classic' || tid === 'tech' || tid === 'corporate' ? '8px' : tid === 'boutique' || tid === 'neon' || tid === 'magazine' ? '0' : tid === 'organic' ? '16px' : tid === 'artisan' || tid === 'restaurant' ? '4px' : dsRadius;
+
   const sortBtnStyle: React.CSSProperties = {
-    border: `1px solid ${isDark ? `${tc}15` : `${tc}10`}`, borderRadius: isBold ? '0' : tid === 'playful' ? '12px' : tid === 'classic' ? '8px' : dsRadius,
+    border: `1px solid ${isDark ? `${tc}15` : `${tc}10`}`, borderRadius: sortRadius,
     color: `${tc}60`, backgroundColor: isDark ? '#FFFFFF06' : 'transparent', padding: '0.5rem 0.875rem', fontSize: '0.75rem', fontWeight: isBold ? 700 : 500,
   };
 
   const viewBtn = (active: boolean): React.CSSProperties => ({
-    backgroundColor: active ? (isDark ? '#FFFFFF10' : `${tc}08`) : 'transparent', borderRadius: isBold ? '0' : '6px', padding: '0.375rem', transition: 'background-color 0.15s',
+    backgroundColor: active ? (isDark ? '#FFFFFF10' : `${tc}08`) : 'transparent', borderRadius: isBold || tid === 'neon' ? '0' : '6px', padding: '0.375rem', transition: 'background-color 0.15s',
   });
 
-  const imgRadius = tid === 'playful' ? '16px' : tid === 'classic' ? '8px' : isBold ? '0' : dsRadius;
-  const cardRadius = tid === 'playful' ? '20px' : tid === 'classic' ? '8px' : isBold ? '0' : dsRadius;
+  const imgRadius = tid === 'playful' ? '16px' : tid === 'classic' ? '8px' : isBold || tid === 'neon' || tid === 'boutique' || tid === 'magazine' ? '0' : tid === 'wellness' || tid === 'organic' ? '16px' : tid === 'startup' ? '12px' : tid === 'portfolio' ? '0' : tid === 'artisan' || tid === 'restaurant' ? '4px' : tid === 'tech' || tid === 'corporate' ? '8px' : dsRadius;
+  const cardRadius = tid === 'playful' ? '20px' : tid === 'classic' ? '8px' : isBold || tid === 'neon' || tid === 'boutique' || tid === 'magazine' ? '0' : tid === 'wellness' ? '20px' : tid === 'organic' ? '24px' : tid === 'startup' ? '16px' : tid === 'portfolio' ? '0' : tid === 'artisan' || tid === 'restaurant' ? '4px' : tid === 'tech' || tid === 'corporate' ? '8px' : dsRadius;
 
   /* ─── Price display ─────────────────────────────────────────── */
   const Price = ({ price, currency }: { price: number | null; currency: string }) =>
@@ -431,12 +444,92 @@ export default function ProductsPage() {
       </AnimatePresence>
 
       {/* ═══════ HEADER ═══════ */}
-      <section className="t-hero" style={isBold ? { minHeight: 'auto', padding: '5rem 0 3rem' } : {}}>
-        <div className={`${maxW} mx-auto px-5 sm:px-8 ${tid === 'playful' ? 'text-center' : ''}`}>
+      <section className="t-hero" style={isBold ? { minHeight: 'auto', padding: '5rem 0 3rem' } : tid === 'boutique' ? { minHeight: 'auto', padding: '7rem 0 4rem' } : tid === 'portfolio' ? { minHeight: 'auto', padding: '4rem 0 2rem' } : {}}>
+        <div className={`${maxW} mx-auto px-5 sm:px-8 ${tid === 'playful' || tid === 'startup' || tid === 'wellness' || tid === 'organic' || tid === 'boutique' || tid === 'neon' ? 'text-center' : ''}`}>
           {tid === 'playful' ? (
             <>
               <span className="t-badge mb-6 inline-flex" style={{ backgroundColor: `${ac}15`, color: ac }}>🛍️ Products</span>
               <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Our Collection ✨</h1>
+            </>
+          ) : tid === 'startup' ? (
+            <>
+              <span className="t-badge mb-6 inline-flex" style={{ backgroundColor: `${ac}12`, color: ac, borderRadius: '9999px' }}>Products</span>
+              <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3.2rem)' }}>Explore Our Products</h1>
+              <div className="flex justify-center gap-8 mt-6">
+                {[{ n: products.length.toString(), l: 'Products' }, { n: new Set(products.map(p => p.category).filter(Boolean)).size.toString(), l: 'Categories' }].map(s => (
+                  <div key={s.l} className="text-center">
+                    <div className="text-2xl font-bold" style={{ color: ac }}>{s.n}</div>
+                    <div className="text-xs mt-1" style={{ color: `${tc}40` }}>{s.l}</div>
+                  </div>
+                ))}
+              </div>
+            </>
+          ) : tid === 'portfolio' ? (
+            <>
+              <h1 className="t-hero-heading mb-2" style={{ ...hs, fontSize: 'clamp(2rem, 6vw, 4rem)', fontWeight: 400 }}>Work</h1>
+              <p className="text-sm" style={{ color: `${tc}35`, letterSpacing: '0.05em', textTransform: 'uppercase' as const }}>{products.length} pieces</p>
+            </>
+          ) : tid === 'magazine' ? (
+            <>
+              <div className="mb-4" style={{ borderBottom: `2px solid ${tc}`, paddingBottom: '0.75rem' }}>
+                <h1 className="t-hero-heading" style={{ ...hs, fontSize: 'clamp(2.5rem, 6vw, 4.5rem)', fontWeight: 700 }}>The Collection</h1>
+              </div>
+              <p className="text-sm mt-3" style={{ color: `${tc}50`, fontStyle: 'italic' }}>Curated selections — {products.length} items</p>
+            </>
+          ) : tid === 'boutique' ? (
+            <>
+              <span className="text-[10px] uppercase tracking-[0.3em] mb-6 block" style={{ color: `${tc}35` }}>◆ Collection ◆</span>
+              <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(1.8rem, 4vw, 2.8rem)', fontWeight: 400, letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>Our Catalogue</h1>
+              <div className="w-12 h-px mx-auto mt-4" style={{ backgroundColor: ac }} />
+            </>
+          ) : tid === 'tech' ? (
+            <>
+              <div className="flex items-center gap-3 mb-4">
+                <span className="text-xs font-mono" style={{ color: '#10B981' }}>{'>'}</span>
+                <span className="text-xs font-mono" style={{ color: `${tc}40` }}>~/products</span>
+              </div>
+              <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Products</h1>
+              <p className="text-xs font-mono" style={{ color: `${tc}35` }}>{`// ${products.length} items loaded`}</p>
+            </>
+          ) : tid === 'wellness' ? (
+            <>
+              <span className="text-xs tracking-[0.15em] mb-6 block" style={{ color: `${tc}35`, fontWeight: 300 }}>Our Offerings</span>
+              <h1 className="t-hero-heading mb-4" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 300, letterSpacing: '0.02em' }}>Curated for You</h1>
+              <p className="text-sm mx-auto" style={{ color: `${tc}40`, maxWidth: '420px', lineHeight: 1.8 }}>Products designed to bring balance and well-being to your everyday life.</p>
+            </>
+          ) : tid === 'restaurant' ? (
+            <>
+              <span className="text-xs uppercase tracking-[0.15em] mb-4 block" style={{ color: ac, fontWeight: 600 }}>Our Menu</span>
+              <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>The Menu</h1>
+              <div className="flex items-center gap-3 mt-3">
+                <div className="h-px flex-1" style={{ backgroundColor: `${tc}12` }} />
+                <span className="text-xs" style={{ color: `${tc}35` }}>{products.length} items</span>
+                <div className="h-px flex-1" style={{ backgroundColor: `${tc}12` }} />
+              </div>
+            </>
+          ) : tid === 'neon' ? (
+            <>
+              <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2.2rem, 6vw, 4rem)', fontWeight: 800, textShadow: `0 0 40px ${ac}40` }}>PRODUCTS</h1>
+              <p className="text-sm" style={{ color: `${tc}40` }}>{products.length} items in the grid</p>
+            </>
+          ) : tid === 'organic' ? (
+            <>
+              <span className="text-xs tracking-[0.1em] mb-4 block" style={{ color: `${tc}40` }}>🌿 Our Products</span>
+              <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3.2rem)', fontWeight: 700 }}>Naturally Crafted</h1>
+            </>
+          ) : tid === 'artisan' ? (
+            <>
+              <div className="inline-block mb-4 px-3 py-1" style={{ border: `2px solid ${tc}15` }}>
+                <span className="text-[10px] font-mono uppercase tracking-[0.15em]" style={{ color: `${tc}50` }}>Product Catalog</span>
+              </div>
+              <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3.2rem)' }}>Handmade Collection</h1>
+              <p className="text-xs font-mono" style={{ color: `${tc}35` }}>Est. {new Date().getFullYear()} · {products.length} Items</p>
+            </>
+          ) : tid === 'corporate' ? (
+            <>
+              <span className="text-xs font-semibold uppercase tracking-[0.12em] mb-4 block" style={{ color: ac }}>Product Suite</span>
+              <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 4.5vw, 3rem)' }}>Our Solutions</h1>
+              <p className="text-sm mt-3" style={{ color: `${tc}45` }}>{products.length} products designed for enterprise performance.</p>
             </>
           ) : (
             <>
@@ -448,9 +541,11 @@ export default function ProductsPage() {
               {isBold && <div className="h-0.5 w-16 mt-4" style={{ backgroundColor: ac }} />}
             </>
           )}
-          <p className="text-sm mt-3" style={{ color: `${tc}45` }}>
-            {products.length} {products.length === 1 ? 'product' : 'products'} {tid === 'playful' ? 'to explore' : 'available'}
-          </p>
+          {!['startup', 'portfolio', 'boutique', 'tech', 'wellness', 'restaurant', 'neon', 'organic', 'artisan', 'corporate', 'magazine'].includes(tid) && (
+            <p className="text-sm mt-3" style={{ color: `${tc}45` }}>
+              {products.length} {products.length === 1 ? 'product' : 'products'} {tid === 'playful' ? 'to explore' : 'available'}
+            </p>
+          )}
         </div>
       </section>
 
@@ -563,7 +658,7 @@ export default function ProductsPage() {
                 </motion.div>
               ) : (
                 /* Grid view */
-                <div className={`grid grid-cols-1 sm:grid-cols-2 ${isBold ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-${tid === 'playful' ? '8' : '6'}`}>
+                <div className={`grid grid-cols-1 sm:grid-cols-2 ${isBold || tid === 'corporate' ? 'lg:grid-cols-4' : tid === 'portfolio' ? 'lg:grid-cols-3 xl:grid-cols-4' : tid === 'magazine' ? 'lg:grid-cols-2' : 'lg:grid-cols-3'} ${tid === 'playful' ? 'gap-8' : tid === 'portfolio' ? 'gap-3' : tid === 'magazine' ? 'gap-8' : tid === 'wellness' || tid === 'organic' ? 'gap-8' : 'gap-6'}`}>
                   <AnimatePresence mode="popLayout">
                     {filtered.map((p, idx) => (
                       <ScrollRevealCard key={p.id} delay={Math.min(idx * 0.06, 0.4)}>
@@ -575,13 +670,39 @@ export default function ProductsPage() {
                                 ? { backgroundColor: '#FFF', borderRadius: cardRadius, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }
                                 : isBold
                                 ? { border: `2px solid ${tc}12`, borderRadius: cardRadius }
+                                : tid === 'startup'
+                                ? { backgroundColor: '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid ${tc}10`, boxShadow: '0 4px 16px rgba(99,102,241,0.06)' }
+                                : tid === 'portfolio'
+                                ? { overflow: 'hidden', borderRadius: cardRadius }
+                                : tid === 'magazine'
+                                ? { overflow: 'hidden', borderBottom: `1px solid ${tc}10` }
+                                : tid === 'boutique'
+                                ? { overflow: 'hidden', border: `1px solid ${tc}08`, borderRadius: cardRadius }
+                                : tid === 'tech'
+                                ? { backgroundColor: '#0D1520', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid #10B98120` }
+                                : tid === 'wellness'
+                                ? { backgroundColor: '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.03)' }
+                                : tid === 'restaurant'
+                                ? { backgroundColor: '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)', border: `1px solid ${tc}08` }
+                                : tid === 'neon'
+                                ? { backgroundColor: '#0A0A1A', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid ${ac}20` }
+                                : tid === 'organic'
+                                ? { backgroundColor: '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.03)' }
+                                : tid === 'artisan'
+                                ? { overflow: 'hidden', border: `2px solid ${tc}12`, borderRadius: cardRadius }
+                                : tid === 'corporate'
+                                ? { backgroundColor: '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid ${tc}10` }
                                 : { backgroundColor: isDark ? '#FFFFFF08' : '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid ${isDark ? `${tc}18` : `${tc}18`}`, boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)' }
                             }
                           >
                             {/* Image wrapper */}
                             <div
                               className="t-product-image mb-0 overflow-hidden relative"
-                              style={{ backgroundColor: isDark ? '#111' : `${tc}08`, borderRadius: `${imgRadius} ${imgRadius} 0 0` }}
+                              style={{
+                                backgroundColor: isDark || tid === 'tech' || tid === 'neon' ? '#111' : `${tc}08`,
+                                borderRadius: `${imgRadius} ${imgRadius} 0 0`,
+                                aspectRatio: tid === 'portfolio' ? '4/5' : tid === 'magazine' ? '3/2' : tid === 'boutique' ? '3/4' : undefined,
+                              }}
                             >
                               {p.image_url
                                 ? <img src={p.image_url} alt={p.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -591,37 +712,77 @@ export default function ProductsPage() {
                               {/* Hover overlay: Quick View + Add to Cart */}
                               <div
                                 className="absolute inset-0 flex items-center justify-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                style={{ backgroundColor: `${isDark ? '#000' : tc}40` }}
+                                style={{ backgroundColor: tid === 'neon' ? `${ac}15` : `${isDark || tid === 'tech' ? '#000' : tc}40` }}
                               >
                                 <button
                                   onClick={() => setQuickViewProduct(p)}
                                   aria-label={`Quick view ${p.name}`}
                                   className="px-3 py-2 text-xs font-medium flex items-center gap-1.5 transition-transform hover:scale-105"
                                   style={{
-                                    backgroundColor: isDark ? ac : '#FFF',
-                                    color: isDark ? '#FFF' : tc,
-                                    borderRadius: tid === 'playful' ? '9999px' : isBold ? '0' : '6px',
+                                    backgroundColor: isDark || tid === 'tech' || tid === 'neon' ? ac : '#FFF',
+                                    color: isDark || tid === 'tech' || tid === 'neon' ? '#FFF' : tc,
+                                    borderRadius: tid === 'playful' || tid === 'startup' || tid === 'wellness' ? '9999px' : isBold || tid === 'neon' || tid === 'boutique' ? '0' : '6px',
                                   }}
                                 >
-                                  <EyeIcon color={isDark ? '#FFF' : tc} />
-                                  {tLabel(tid, 'Quick View', 'QUICK VIEW', 'Quick View')}
+                                  <EyeIcon color={isDark || tid === 'tech' || tid === 'neon' ? '#FFF' : tc} />
+                                  {tid === 'boutique' ? 'VIEW' : tid === 'tech' ? '> view' : tid === 'neon' ? 'INSPECT' : tLabel(tid, 'Quick View', 'QUICK VIEW', 'Quick View')}
                                 </button>
                               </div>
+
+                              {/* Boutique: price badge overlay */}
+                              {tid === 'boutique' && p.price != null && p.price > 0 && (
+                                <div className="absolute bottom-3 right-3 px-2.5 py-1 text-xs" style={{ backgroundColor: '#FFF', color: tc, letterSpacing: '0.05em' }}>
+                                  {p.currency || 'USD'} {p.price.toFixed(2)}
+                                </div>
+                              )}
                             </div>
 
                             {/* Info area */}
-                            <div className={tid === 'playful' ? 'px-4 pb-4' : isBold ? 'p-4' : 'p-4'}>
-                              <Category cat={p.category} />
-                              <h3 className="text-sm font-medium mb-1 group-hover:opacity-60 transition-opacity"
-                                style={{ fontFamily: brand.font_heading, textTransform: isBold ? 'uppercase' : undefined, letterSpacing: isBold ? '0.02em' : undefined }}>
+                            <div className={tid === 'playful' ? 'px-4 pb-4' : tid === 'portfolio' ? 'p-3' : tid === 'magazine' ? 'py-4' : tid === 'boutique' ? 'p-5 text-center' : tid === 'wellness' || tid === 'organic' ? 'p-5' : isBold ? 'p-4' : 'p-4'}>
+                              {/* Category */}
+                              {tid === 'tech' && p.category ? (
+                                <span className="text-[10px] font-mono text-emerald-400 mb-1 block">{`// ${p.category}`}</span>
+                              ) : tid === 'magazine' && p.category ? (
+                                <span className="text-[10px] font-semibold uppercase tracking-widest mb-1 block" style={{ color: ac, fontVariant: 'small-caps' }}>{p.category}</span>
+                              ) : tid === 'boutique' && p.category ? (
+                                <span className="text-[9px] uppercase tracking-[0.2em] mb-2 block" style={{ color: `${tc}35` }}>{p.category}</span>
+                              ) : tid === 'artisan' && p.category ? (
+                                <span className="text-[10px] font-mono uppercase tracking-wider mb-1 block" style={{ color: `${tc}40` }}>[{p.category}]</span>
+                              ) : (
+                                <Category cat={p.category} />
+                              )}
+
+                              {/* Product name */}
+                              <h3 className={`text-sm mb-1 group-hover:opacity-60 transition-opacity ${tid === 'boutique' ? 'tracking-wide' : ''}`}
+                                style={{
+                                  fontFamily: tid === 'tech' ? "'JetBrains Mono', monospace" : brand.font_heading,
+                                  textTransform: isBold || tid === 'boutique' ? 'uppercase' : undefined,
+                                  letterSpacing: isBold ? '0.02em' : tid === 'boutique' ? '0.06em' : undefined,
+                                  fontWeight: tid === 'portfolio' || tid === 'wellness' ? 400 : tid === 'magazine' ? 600 : 500,
+                                }}>
                                 {p.name}
                               </h3>
-                              {p.description && <p className="text-xs line-clamp-2 mb-2" style={{ color: `${tc}40` }}>{p.description}</p>}
 
-                              <div className="flex items-center justify-between gap-2 mt-2">
-                                <Price price={p.price} currency={p.currency} />
-                                <AddToCartButton product={p} ac={ac} tc={tc} bgColor={bgColor} tid={tid} isBold={isBold} />
-                              </div>
+                              {/* Description */}
+                              {p.description && tid !== 'portfolio' && (
+                                <p className={`text-xs line-clamp-2 mb-2 ${tid === 'magazine' ? 'line-clamp-3 leading-relaxed' : ''}`} style={{ color: tid === 'tech' ? '#64748B' : `${tc}40` }}>{p.description}</p>
+                              )}
+
+                              {/* Price + cart */}
+                              {tid === 'boutique' ? (
+                                <div className="mt-3">
+                                  <AddToCartButton product={p} ac={ac} tc={tc} bgColor={bgColor} tid={tid} isBold={isBold} />
+                                </div>
+                              ) : tid === 'portfolio' ? (
+                                <div className="mt-1">
+                                  <Price price={p.price} currency={p.currency} />
+                                </div>
+                              ) : (
+                                <div className="flex items-center justify-between gap-2 mt-2">
+                                  <Price price={p.price} currency={p.currency} />
+                                  <AddToCartButton product={p} ac={ac} tc={tc} bgColor={bgColor} tid={tid} isBold={isBold} />
+                                </div>
+                              )}
                             </div>
                           </div>
                         </motion.div>
