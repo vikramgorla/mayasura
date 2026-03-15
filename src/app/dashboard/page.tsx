@@ -115,7 +115,7 @@ export default function DashboardListPage() {
                       </div>
                     </div>
                     <div className="p-4">
-                      <p className="text-sm text-zinc-500 mb-3 line-clamp-2">
+                      <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-3 line-clamp-2">
                         {brand.tagline || 'No tagline'}
                       </p>
                       <div className="flex items-center justify-between">

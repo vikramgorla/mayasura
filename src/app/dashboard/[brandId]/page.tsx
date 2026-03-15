@@ -392,7 +392,7 @@ export default function BrandDashboardPage() {
                   {recommendations.length > 0 && (
                     <div className="space-y-1.5">
                       {recommendations.map((rec, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs text-zinc-500">
+                        <div key={i} className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                           <Zap className="h-3 w-3 text-amber-500 flex-shrink-0" />
                           {rec}
                         </div>

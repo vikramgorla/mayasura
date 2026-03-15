@@ -46,10 +46,10 @@ interface Stats {
 }
 
 const priorityColors: Record<string, string> = {
-  low: 'bg-zinc-100 text-zinc-700',
-  medium: 'bg-blue-100 text-blue-700',
-  high: 'bg-amber-100 text-amber-700',
-  urgent: 'bg-red-100 text-red-700',
+  low: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300',
+  medium: 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-400',
+  high: 'bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400',
+  urgent: 'bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-400',
 };
 
 const statusIcons: Record<string, typeof Clock> = {

@@ -178,7 +178,7 @@ function markdownToHtml(md: string): string {
     // Unordered lists
     .replace(/^- (.+)$/gm, '<li>$1</li>')
     // Blockquotes
-    .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-zinc-300 pl-4 italic text-zinc-500">$1</blockquote>')
+    .replace(/^> (.+)$/gm, '<blockquote class="border-l-4 border-zinc-300 dark:border-zinc-600 pl-4 italic text-zinc-500 dark:text-zinc-400">$1</blockquote>')
     // Paragraphs (double newline)
     .replace(/\n\n/g, '</p><p>')
     // Single newlines

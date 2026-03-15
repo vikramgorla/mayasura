@@ -514,7 +514,7 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
 
   if (error) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-white text-zinc-900 px-6">
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white dark:bg-zinc-950 text-zinc-900 dark:text-white px-6">
         {/* SVG illustration */}
         <svg className="w-32 h-32 mb-8 opacity-10" viewBox="0 0 120 120" fill="none">
           <circle cx="60" cy="60" r="56" stroke="#000" strokeWidth="2" />
@@ -525,7 +525,7 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
         </svg>
         <div className="text-center max-w-sm">
           <h1 className="text-4xl font-light tracking-tight mb-3 text-zinc-900">404</h1>
-          <h2 className="text-lg font-medium mb-3 text-zinc-700">Brand not found</h2>
+          <h2 className="text-lg font-medium mb-3 text-zinc-700 dark:text-zinc-300">Brand not found</h2>
           <p className="text-zinc-400 mb-8 text-sm leading-relaxed">
             This brand doesn&apos;t exist or hasn&apos;t been launched yet. Check the URL or explore Mayasura.
           </p>
@@ -550,10 +550,10 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
 
   if (!data) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white">
+      <div className="min-h-screen flex items-center justify-center bg-white dark:bg-zinc-950">
         <div className="flex flex-col items-center gap-6">
           {/* Skeleton nav */}
-          <div className="w-full max-w-6xl px-5 sm:px-8 py-5 flex items-center justify-between fixed top-0 left-0 right-0 bg-white border-b border-zinc-100">
+          <div className="w-full max-w-6xl px-5 sm:px-8 py-5 flex items-center justify-between fixed top-0 left-0 right-0 bg-white dark:bg-zinc-950 border-b border-zinc-100 dark:border-zinc-800">
             <div className="h-5 w-32 rounded-full bg-zinc-100 animate-pulse" />
             <div className="hidden sm:flex items-center gap-6">
               {[1,2,3,4].map((i) => <div key={i} className="h-3 w-14 rounded-full bg-zinc-100 animate-pulse" />)}

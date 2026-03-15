@@ -143,7 +143,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
       {/* Desktop Sidebar */}
       <aside className="hidden lg:flex w-64 bg-white dark:bg-zinc-900/95 border-r border-zinc-200 dark:border-zinc-800 flex-col fixed h-full z-20 sidebar-gradient" aria-label="Dashboard sidebar">
         <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
-          <Link href="/dashboard" className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600 mb-3">
+          <Link href="/dashboard" className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 mb-3">
             <ArrowLeft className="h-3 w-3" />
             All Brands
           </Link>
@@ -291,7 +291,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
               className="lg:hidden fixed left-0 top-0 bottom-0 z-50 w-72 bg-white dark:bg-zinc-800 shadow-2xl flex flex-col"
             >
               <div className="p-4 border-b border-zinc-200 dark:border-zinc-700 flex items-center justify-between">
-                <Link href="/dashboard" className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600">
+                <Link href="/dashboard" className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
                   <ArrowLeft className="h-3 w-3" />
                   All Brands
                 </Link>

@@ -233,7 +233,7 @@ export default function ChatbotPage() {
         {activeTab === 'faqs' && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
-              <p className="text-sm text-zinc-500">{faqs.length} FAQ entries — the chatbot will use these to answer questions</p>
+              <p className="text-sm text-zinc-500 dark:text-zinc-400">{faqs.length} FAQ entries — the chatbot will use these to answer questions</p>
               <Button onClick={() => setAddingFaq(true)} size="sm">
                 <Plus className="h-4 w-4 mr-1" /> Add FAQ
               </Button>
@@ -272,7 +272,7 @@ export default function ChatbotPage() {
               <Card>
                 <CardContent className="p-12 text-center">
                   <MessageSquare className="h-12 w-12 text-zinc-300 mx-auto mb-4" />
-                  <p className="text-zinc-500 mb-2">No FAQs yet</p>
+                  <p className="text-zinc-500 dark:text-zinc-400 mb-2">No FAQs yet</p>
                   <p className="text-sm text-zinc-400 mb-4">Add question-answer pairs to help your chatbot respond better</p>
                   <Button onClick={() => setAddingFaq(true)}>
                     <Plus className="h-4 w-4 mr-1" /> Add First FAQ

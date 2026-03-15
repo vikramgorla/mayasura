@@ -608,7 +608,7 @@ function IntegrationsTab({ brandId, settings: initialSettings }: { brandId: stri
       </IntegrationSection>
 
       {/* Webhooks */}
-      <IntegrationSection title="Webhooks" icon={<Plug className="h-4 w-4 text-zinc-500" />}>
+      <IntegrationSection title="Webhooks" icon={<Plug className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />}>
         <p className="text-xs text-zinc-400 mb-2">
           Receive POST notifications when events occur. URLs must be HTTPS.
         </p>

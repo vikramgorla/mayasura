@@ -149,7 +149,7 @@ export default function WebsitePage() {
             <Globe className="h-5 w-5" />
             Website
           </h1>
-          <p className="text-zinc-500 text-xs mt-0.5">Preview and edit your website layout</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-xs mt-0.5">Preview and edit your website layout</p>
         </div>
         <div className="flex items-center gap-2 flex-wrap">
           {/* View mode toggle */}
@@ -164,7 +164,7 @@ export default function WebsitePage() {
                 className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-medium transition-colors ${
                   viewMode === v.id
                     ? 'bg-white dark:bg-zinc-600 shadow-sm text-zinc-900 dark:text-white'
-                    : 'text-zinc-400 hover:text-zinc-600'
+                    : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'
                 }`}
               >
                 <v.icon className="h-3.5 w-3.5" />
@@ -188,7 +188,7 @@ export default function WebsitePage() {
                     className={`p-1.5 rounded-md transition-colors ${
                       viewport === v.id
                         ? 'bg-white dark:bg-zinc-600 shadow-sm text-zinc-900 dark:text-white'
-                        : 'text-zinc-400 hover:text-zinc-600'
+                        : 'text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300'
                     }`}
                   >
                     <v.icon className="h-3.5 w-3.5" />
@@ -310,7 +310,7 @@ export default function WebsitePage() {
                           viewport === 'mobile' ? 'grid-cols-1' : viewport === 'tablet' ? 'grid-cols-2' : 'grid-cols-3'
                         }`}>
                           {products.slice(0, 6).map((product) => (
-                            <div key={product.id} className="bg-white rounded-lg p-4 border border-zinc-100">
+                            <div key={product.id} className="bg-white dark:bg-zinc-800 rounded-lg p-4 border border-zinc-100 dark:border-zinc-700">
                               <div className="h-20 rounded-md mb-3 flex items-center justify-center" style={{ backgroundColor: brand.accent_color + '15' }}>
                                 <span className="text-2xl">📦</span>
                               </div>

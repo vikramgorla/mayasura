@@ -16,11 +16,11 @@ import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 type StrategyType = 'brand-strategy' | 'competitor-analysis' | 'seo-suggestions' | 'content-calendar' | 'brand-consistency';
 
 const strategyOptions = [
-  { type: 'brand-strategy' as const, icon: Target, label: 'Brand Strategy', desc: 'Analyze strengths, opportunities, and positioning', color: 'bg-blue-50 text-blue-600' },
-  { type: 'competitor-analysis' as const, icon: Users, label: 'Competitor Analysis', desc: 'Identify competitors and differentiation strategies', color: 'bg-purple-50 text-purple-600' },
-  { type: 'seo-suggestions' as const, icon: Search, label: 'SEO Optimization', desc: 'Keywords, content topics, and meta suggestions', color: 'bg-emerald-50 text-emerald-600' },
-  { type: 'content-calendar' as const, icon: Calendar, label: 'Content Calendar', desc: 'AI-generated 2-week content plan', color: 'bg-amber-50 text-amber-600' },
-  { type: 'brand-consistency' as const, icon: Shield, label: 'Brand Consistency', desc: 'Check if your messaging is consistent', color: 'bg-rose-50 text-rose-600' },
+  { type: 'brand-strategy' as const, icon: Target, label: 'Brand Strategy', desc: 'Analyze strengths, opportunities, and positioning', color: 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400' },
+  { type: 'competitor-analysis' as const, icon: Users, label: 'Competitor Analysis', desc: 'Identify competitors and differentiation strategies', color: 'bg-purple-50 dark:bg-purple-950/50 text-purple-600 dark:text-purple-400' },
+  { type: 'seo-suggestions' as const, icon: Search, label: 'SEO Optimization', desc: 'Keywords, content topics, and meta suggestions', color: 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400' },
+  { type: 'content-calendar' as const, icon: Calendar, label: 'Content Calendar', desc: 'AI-generated 2-week content plan', color: 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400' },
+  { type: 'brand-consistency' as const, icon: Shield, label: 'Brand Consistency', desc: 'Check if your messaging is consistent', color: 'bg-rose-50 dark:bg-rose-950/50 text-rose-600 dark:text-rose-400' },
 ];
 
 export default function StrategyPage() {
@@ -76,7 +76,7 @@ export default function StrategyPage() {
                 <option.icon className="h-5 w-5" />
               </div>
               <h3 className="font-semibold text-sm mb-1 text-zinc-900 dark:text-white">{option.label}</h3>
-              <p className="text-xs text-zinc-400 mb-4">{option.desc}</p>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-4">{option.desc}</p>
               <Button
                 variant="outline"
                 size="sm"
@@ -120,7 +120,7 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
     return (
       <Card>
         <CardContent className="p-6">
-          <pre className="text-sm text-zinc-600 whitespace-pre-wrap">{String(result)}</pre>
+          <pre className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap">{String(result)}</pre>
         </CardContent>
       </Card>
     );
@@ -143,8 +143,8 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
             {renderList('Opportunities', result.opportunities as string[], 'blue')}
             {result.positioning ? (
               <div>
-                <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">Positioning</h4>
-                <p className="text-sm text-zinc-700 dark:text-zinc-300">{String(result.positioning)}</p>
+                <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase mb-2">Positioning</h4>
+                <p className="text-sm text-zinc-600 dark:text-zinc-300">{String(result.positioning)}</p>
               </div>
             ) : null}
             {renderList('Recommendations', result.recommendations as string[], 'amber')}
@@ -167,7 +167,7 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
           <div className="space-y-4">
             {result.primaryKeywords ? (
               <div>
-                <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">Primary Keywords</h4>
+                <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase mb-2">Primary Keywords</h4>
                 <div className="flex flex-wrap gap-2">
                   {(result.primaryKeywords as string[]).map((kw, i) => (
                     <Badge key={i} variant="secondary">{kw}</Badge>
@@ -177,7 +177,7 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
             ) : null}
             {result.longTailKeywords ? (
               <div>
-                <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">Long-Tail Keywords</h4>
+                <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase mb-2">Long-Tail Keywords</h4>
                 <div className="flex flex-wrap gap-2">
                   {(result.longTailKeywords as string[]).map((kw, i) => (
                     <Badge key={i} variant="outline">{kw}</Badge>
@@ -188,8 +188,8 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
             {renderList('Content Topics', result.contentTopics as string[], 'purple')}
             {result.metaDescription ? (
               <div>
-                <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">Meta Description</h4>
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-700 rounded-lg p-3">{String(result.metaDescription)}</p>
+                <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase mb-2">Meta Description</h4>
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 bg-zinc-50 dark:bg-zinc-800 rounded-lg p-3">{String(result.metaDescription)}</p>
               </div>
             ) : null}
           </div>
@@ -202,16 +202,16 @@ function StrategyResult({ type, result }: { type: StrategyType; result: Record<s
             {result.calendar ? (
               <div className="space-y-2">
                 {(result.calendar as Array<{ day: number; type: string; title: string; description: string }>).map((item, i) => (
-                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-700/50">
-                    <div className="h-8 w-8 rounded-lg bg-zinc-200 dark:bg-zinc-600 flex items-center justify-center text-xs font-semibold flex-shrink-0">
+                  <div key={i} className="flex items-start gap-3 p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800/50">
+                    <div className="h-8 w-8 rounded-lg bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center text-xs font-semibold flex-shrink-0 text-zinc-700 dark:text-zinc-300">
                       D{item.day}
                     </div>
                     <div className="min-w-0">
                       <div className="flex items-center gap-2">
-                        <span className="text-sm font-medium">{item.title}</span>
+                        <span className="text-sm font-medium text-zinc-900 dark:text-white">{item.title}</span>
                         <Badge variant="secondary" className="text-[10px]">{item.type}</Badge>
                       </div>
-                      <p className="text-xs text-zinc-400 mt-0.5">{item.description}</p>
+                      <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">{item.description}</p>
                     </div>
                   </div>
                 ))}
@@ -241,7 +241,7 @@ function renderList(title: string, items: string[] | undefined, color: string) {
   if (!items || !Array.isArray(items) || items.length === 0) return null;
   return (
     <div>
-      <h4 className="text-xs font-semibold text-zinc-500 uppercase mb-2">{title}</h4>
+      <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase mb-2">{title}</h4>
       <ul className="space-y-1.5">
         {items.map((item, i) => (
           <li key={i} className="flex items-start gap-2 text-sm">
