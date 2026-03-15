@@ -13,6 +13,7 @@ import { ScrollToTop } from '@/components/site/scroll-to-top';
 import { CookieConsent } from '@/components/site/cookie-consent';
 import { NewsletterPopup } from '@/components/site/newsletter-popup';
 import { SiteMeta, SitemapHint } from '@/components/site/site-meta';
+import { SearchOverlay } from '@/components/site/search-overlay';
 import {
   resolveDesignSettings,
   designSettingsToCSSVars,
@@ -118,6 +119,7 @@ function BrandNav({ brand, template, designSettings }: { brand: Brand; template?
   const slug = brand.slug || brand.id;
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [searchOpen, setSearchOpen] = useState(false);
   const templateId = template?.id || 'minimal';
   const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
@@ -128,6 +130,18 @@ function BrandNav({ brand, template, designSettings }: { brand: Brand; template?
     const handleScroll = () => setScrolled(window.scrollY > 20);
     window.addEventListener('scroll', handleScroll, { passive: true });
     return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleKey = (e: KeyboardEvent) => {
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setSearchOpen((o) => !o);
+      }
+      if (e.key === 'Escape') setSearchOpen(false);
+    };
+    document.addEventListener('keydown', handleKey);
+    return () => document.removeEventListener('keydown', handleKey);
   }, []);
 
   const navLinks = [
@@ -235,6 +249,18 @@ function BrandNav({ brand, template, designSettings }: { brand: Brand; template?
                 {templateId === 'bold' ? link.label.toUpperCase() : link.label}
               </Link>
             ))}
+            {/* Search icon button */}
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="p-1.5 rounded-lg transition-opacity hover:opacity-70"
+              style={{ color: `${textColor}77` }}
+              aria-label="Search"
+              title="Search (⌘K)"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </button>
             <Link
               href={`/shop/${slug}`}
               className="transition-all hover:opacity-90"
@@ -244,10 +270,21 @@ function BrandNav({ brand, template, designSettings }: { brand: Brand; template?
             </Link>
           </div>
 
-          {/* Mobile hamburger */}
+          {/* Mobile: search + hamburger */}
+          <div className="md:hidden flex items-center gap-1">
+            <button
+              onClick={() => setSearchOpen(true)}
+              className="p-2"
+              style={{ color: textColor }}
+              aria-label="Search"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </button>
           <button
             onClick={() => setMenuOpen(!menuOpen)}
-            className="md:hidden p-2 -mr-2"
+            className="p-2 -mr-2"
             style={{ color: textColor }}
             aria-label={menuOpen ? 'Close navigation menu' : 'Open navigation menu'}
             aria-expanded={menuOpen}
@@ -260,8 +297,20 @@ function BrandNav({ brand, template, designSettings }: { brand: Brand; template?
               )}
             </svg>
           </button>
+          </div>
         </div>
       </div>
+
+      {/* Search overlay */}
+      <SearchOverlay
+        open={searchOpen}
+        onClose={() => setSearchOpen(false)}
+        slug={slug}
+        textColor={textColor}
+        bgColor={bgColor || '#ffffff'}
+        accentColor={accentColor || textColor}
+        templateId={templateId}
+      />
 
       {/* Mobile menu — animated slide-down */}
       <AnimatePresence>
