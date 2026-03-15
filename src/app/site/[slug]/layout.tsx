@@ -118,9 +118,9 @@ function BrandNav({ brand, template, designSettings }: { brand: Brand; template?
   const [menuOpen, setMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold' || templateId === 'tech';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
-  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : '#000000') : brand.secondary_color;
+  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : templateId === 'neon' ? '#050510' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
 
   useEffect(() => {
@@ -299,9 +299,9 @@ function BrandNav({ brand, template, designSettings }: { brand: Brand; template?
 function BrandFooter({ brand, template, designSettings }: { brand: Brand; template?: WebsiteTemplate; designSettings: ResolvedDesignSettings }) {
   const slug = brand.slug || brand.id;
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold' || templateId === 'tech';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
-  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : '#000000') : brand.secondary_color;
+  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : templateId === 'neon' ? '#050510' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
   const [email, setEmail] = useState('');
   const [subscribed, setSubscribed] = useState(false);

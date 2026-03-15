@@ -59,8 +59,8 @@ export default function AboutPage() {
   const slug = brand.slug || brand.id;
   const tid = template?.id || 'minimal';
   const tp = template?.preview;
-  const isDark = tid === 'bold';
-  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const isDark = tid === 'bold' || tid === 'tech' || tid === 'neon';
+  const bgColor = isDark ? (tid === 'tech' ? '#0A0F1A' : tid === 'neon' ? '#050510' : '#000000') : brand.secondary_color;
   const tc = isDark ? '#FFFFFF' : brand.primary_color;
   const ac = brand.accent_color || tc;
   const dsRadius = BORDER_RADIUS_MAP[designSettings.borderRadius];

@@ -43,7 +43,7 @@ interface SectionProps {
 function TestimonialsSection({ section, brand, template }: { section: PageSection } & SectionProps) {
   const config = section.config as TestimonialsConfig;
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const bgColor = isDark ? '#000000' : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
@@ -99,7 +99,7 @@ function TestimonialsSection({ section, brand, template }: { section: PageSectio
 function StatsSection({ section, brand, template }: { section: PageSection } & SectionProps) {
   const config = section.config as StatsConfig;
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const accentColor = brand.accent_color || textColor;
   const tp = template?.preview;
@@ -158,7 +158,7 @@ function StatsSection({ section, brand, template }: { section: PageSection } & S
 function NewsletterSection({ section, brand, template }: { section: PageSection } & SectionProps) {
   const config = section.config as NewsletterConfig;
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const bgColor = isDark ? '#000000' : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
@@ -266,7 +266,7 @@ function NewsletterSection({ section, brand, template }: { section: PageSection 
 function FaqSection({ section, brand, template }: { section: PageSection } & SectionProps) {
   const config = section.config as FaqConfig;
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const accentColor = brand.accent_color || textColor;
   const tp = template?.preview;
@@ -339,7 +339,7 @@ function FaqSection({ section, brand, template }: { section: PageSection } & Sec
 function ContactCtaSection({ section, brand, template }: { section: PageSection } & SectionProps) {
   const config = section.config as ContactCtaConfig;
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const bgColor = isDark ? '#000000' : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
