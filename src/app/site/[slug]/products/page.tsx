@@ -410,7 +410,7 @@ export default function ProductsPage() {
             bgColor={bgColor}
             tid={tid}
             isBold={isBold}
-            brand={{ name: brand.name, font_heading: brand.font_heading, slug: brand.slug, id: brand.id }}
+            brand={{ name: brand.name, font_heading: brand.font_heading, slug: brand.slug ?? undefined, id: brand.id }}
           />
         )}
       </AnimatePresence>
