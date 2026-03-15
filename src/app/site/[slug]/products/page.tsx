@@ -40,7 +40,7 @@ const GridIcon = ({ color }: { color: string }) => <SvgIcon color={color} paths=
 const ListIcon = ({ color }: { color: string }) => <SvgIcon color={color} paths={<><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><circle cx="4" cy="6" r="1" fill={color}/><circle cx="4" cy="12" r="1" fill={color}/><circle cx="4" cy="18" r="1" fill={color}/></>} />;
 const ChevronIcon = ({ color }: { color: string }) => <SvgIcon color={color} size={14} paths={<polyline points="6 9 12 15 18 9" strokeWidth={2}/>} />;
 const BoxIcon = ({ color }: { color: string }) => (
-  <svg className="w-10 h-10" style={{ color: `${color}10` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1} aria-hidden="true">
+  <svg className="w-10 h-10" style={{ color: `${color}25` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1} aria-hidden="true">
     <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
   </svg>
 );
@@ -574,14 +574,14 @@ export default function ProductsPage() {
                               tid === 'playful'
                                 ? { backgroundColor: '#FFF', borderRadius: cardRadius, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }
                                 : isBold
-                                ? { borderColor: `${tc}12` }
-                                : {}
+                                ? { border: `2px solid ${tc}12`, borderRadius: cardRadius }
+                                : { backgroundColor: isDark ? '#FFFFFF06' : '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid ${isDark ? `${tc}10` : `${tc}08`}`, boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' }
                             }
                           >
                             {/* Image wrapper */}
                             <div
-                              className="t-product-image mb-4 overflow-hidden relative"
-                              style={{ backgroundColor: isDark ? '#111' : `${tc}04`, borderRadius: imgRadius }}
+                              className="t-product-image mb-0 overflow-hidden relative"
+                              style={{ backgroundColor: isDark ? '#111' : `${tc}06`, borderRadius: `${imgRadius} ${imgRadius} 0 0` }}
                             >
                               {p.image_url
                                 ? <img src={p.image_url} alt={p.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
@@ -610,7 +610,7 @@ export default function ProductsPage() {
                             </div>
 
                             {/* Info area */}
-                            <div className={tid === 'playful' ? 'px-4 pb-4' : isBold ? 'p-4' : ''}>
+                            <div className={tid === 'playful' ? 'px-4 pb-4' : isBold ? 'p-4' : 'p-4'}>
                               <Category cat={p.category} />
                               <h3 className="text-sm font-medium mb-1 group-hover:opacity-60 transition-opacity"
                                 style={{ fontFamily: brand.font_heading, textTransform: isBold ? 'uppercase' : undefined, letterSpacing: isBold ? '0.02em' : undefined }}>

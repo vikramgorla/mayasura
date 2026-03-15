@@ -327,7 +327,7 @@ export default function BrandHomePage() {
               <motion.h1 variants={anim.item} className="t-hero-heading mb-8" style={{ ...headingStyle, fontWeight: 300 }}>
                 {brand.tagline || brand.name}
               </motion.h1>
-              <motion.p variants={anim.item} className="t-hero-desc" style={{ color: `${textColor}35` }}>
+              <motion.p variants={anim.item} className="t-hero-desc" style={{ color: `${textColor}50` }}>
                 {brand.description || `Welcome to ${brand.name}.`}
               </motion.p>
               <motion.div variants={anim.item} className="flex flex-wrap gap-4 mt-12">
@@ -830,7 +830,7 @@ export default function BrandHomePage() {
               {features.map(f => (
                 <motion.div key={f.title} variants={scrollItem} className="p-8 sm:p-10" style={{ backgroundColor: bgColor }}>
                   <h3 className="text-sm font-normal mb-2" style={{ fontFamily: brand.font_heading, fontWeight: 400 }}>{f.title}</h3>
-                  <p className="text-sm" style={{ color: `${textColor}35` }}>{f.desc}</p>
+                  <p className="text-sm" style={{ color: `${textColor}50` }}>{f.desc}</p>
                 </motion.div>
               ))}
             </motion.div>
@@ -913,6 +913,46 @@ export default function BrandHomePage() {
               })}
             </div>
           )}
+
+          {/* GENERIC FALLBACK — For all other templates (startup, portfolio, magazine, boutique, tech, wellness, restaurant, neon, organic, artisan, corporate) */}
+          {!['minimal', 'editorial', 'bold', 'classic', 'playful'].includes(templateId) && (
+            <motion.div
+              variants={scrollStagger}
+              initial="hidden"
+              whileInView="visible"
+              viewport={{ once: true, margin: "-60px" }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
+            >
+              {features.map((f, i) => (
+                <motion.div
+                  key={f.title}
+                  variants={scrollItem}
+                  className="p-8 transition-all hover:translate-y-[-2px]"
+                  style={{
+                    backgroundColor: isDark ? `${textColor}04` : ds.surfaceColor || '#FFFFFF',
+                    borderRadius: tp?.borderRadius || dsRadius || '8px',
+                    border: `1px solid ${isDark ? `${textColor}10` : ds.borderColor || `${textColor}08`}`,
+                    boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                    textAlign: templateId === 'wellness' || templateId === 'organic' || templateId === 'startup' ? 'center' as const : undefined,
+                  }}
+                >
+                  <div
+                    className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 text-lg ${templateId === 'wellness' || templateId === 'organic' || templateId === 'startup' ? 'mx-auto' : ''}`}
+                    style={{ backgroundColor: `${accentColor}12`, color: accentColor }}
+                  >
+                    {templateId === 'neon' || templateId === 'tech' ? f.icon : f.emoji}
+                  </div>
+                  <h3 className="text-sm font-semibold mb-2" style={{
+                    fontFamily: brand.font_heading,
+                    fontWeight: tp?.typography.headingWeight || '600',
+                    textTransform: templateId === 'corporate' ? 'uppercase' as const : undefined,
+                    letterSpacing: templateId === 'corporate' ? '0.02em' : undefined,
+                  }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}55` }}>{f.desc}</p>
+                </motion.div>
+              ))}
+            </motion.div>
+          )}
         </div>
       </section>
     );
@@ -972,27 +1012,26 @@ export default function BrandHomePage() {
                 style={
                   templateId === 'bold' ? { border: `2px solid ${textColor}10` }
                   : templateId === 'playful' ? { backgroundColor: '#FFFFFF', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }
-                  : templateId === 'minimal' || templateId === 'editorial' ? {}
-                  : { backgroundColor: ds.surfaceColor, borderRadius: dsRadius, border: `1px solid ${ds.borderColor}`, overflow: 'hidden' }
+                  : { backgroundColor: isDark ? `${textColor}04` : ds.surfaceColor || '#FFFFFF', borderRadius: dsRadius || '8px', border: `1px solid ${isDark ? `${textColor}08` : ds.borderColor || `${textColor}06`}`, overflow: 'hidden' }
                 }
               >
                 <div
                   className="aspect-square mb-0 overflow-hidden flex items-center justify-center"
                   style={{
-                    backgroundColor: isDark ? '#111111' : `${textColor}04`,
-                    borderRadius: templateId === 'playful' || templateId === 'bold' ? '0' : imgRadius,
-                    marginBottom: templateId === 'playful' || templateId === 'bold' ? 0 : '1rem',
+                    backgroundColor: isDark ? '#111111' : `${textColor}06`,
+                    borderRadius: templateId === 'playful' || templateId === 'bold' ? '0' : `${imgRadius} ${imgRadius} 0 0`,
+                    marginBottom: 0,
                   }}
                 >
                   {product.image_url ? (
                     <img src={product.image_url} alt={product.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
                   ) : (
-                    <svg className="w-10 h-10" style={{ color: `${textColor}08` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
+                    <svg className="w-10 h-10" style={{ color: `${textColor}20` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                   )}
                 </div>
-                <div className={templateId === 'playful' || templateId === 'bold' ? 'p-4' : 'mt-4'}>
+                <div className={templateId === 'playful' || templateId === 'bold' ? 'p-4' : 'p-4'}>
                   {product.category && (
                     <span className="text-[10px] font-medium uppercase tracking-widest mb-1 block" style={{
                       color: templateId === 'bold' ? accentColor : `${textColor}30`,
