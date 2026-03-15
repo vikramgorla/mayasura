@@ -1,7 +1,24 @@
 import Anthropic from '@anthropic-ai/sdk';
 
-const client = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
+// Lazy-initialize the client so the module doesn't crash on import when the key is missing.
+let _client: Anthropic | null = null;
+function getClient(): Anthropic {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error(
+      'ANTHROPIC_API_KEY is not configured. Set it in Settings → Integrations or as an environment variable.'
+    );
+  }
+  if (!_client) {
+    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  }
+  return _client;
+}
+
+/** @deprecated Use getClient() — kept for backwards compatibility within this file */
+const client = new Proxy({} as Anthropic, {
+  get(_target, prop) {
+    return (getClient() as Record<string | symbol, unknown>)[prop];
+  },
 });
 
 export async function suggestBrandNames(industry: string, keywords: string[]): Promise<string[]> {

@@ -283,6 +283,7 @@ function ContentCalendarGrid({ brandId }: { brandId: string }) {
   const now = new Date();
   const [month, setMonth] = useState(now.getMonth());
   const [year, setYear] = useState(now.getFullYear());
+  // Content calendar uses sample data — persistence requires a content_calendar table (future feature).
   const [posts] = useState<CalendarPost[]>(MOCK_CALENDAR_POSTS);
   const [selected, setSelected] = useState<number | null>(null);
 
@@ -313,6 +314,7 @@ function ContentCalendarGrid({ brandId }: { brandId: string }) {
           <CardTitle className="text-sm flex items-center gap-2">
             <Calendar className="h-4 w-4 text-amber-500" />
             Content Calendar
+            <Badge variant="secondary" className="text-[10px] ml-1">Sample Data</Badge>
           </CardTitle>
           <div className="flex items-center gap-2">
             <button onClick={goBack} className="h-7 w-7 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
@@ -489,6 +491,8 @@ function CompetitorMentionTracker() {
 
 // ─── Brand Health Metrics Card ───────────────────────────────────
 function BrandHealthMetricsCard({ brandId }: { brandId: string }) {
+  // These metrics are hardcoded placeholder values showing the UI concept.
+  // Real values will come from the AI Health Report (Run Health Report button).
   const metrics = [
     { label: 'Profile Completeness', value: 78, icon: Target, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/30', trend: '+5%' },
     { label: 'Content Consistency', value: 85, icon: BarChart2, color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-950/30', trend: '+12%' },
@@ -507,6 +511,7 @@ function BrandHealthMetricsCard({ brandId }: { brandId: string }) {
           <CardTitle className="text-sm flex items-center gap-2">
             <Activity className="h-4 w-4 text-violet-500" />
             Brand Health Dashboard
+            <Badge variant="secondary" className="text-[10px] ml-1">UI Preview</Badge>
           </CardTitle>
           <div className="flex items-center gap-2">
             <div className={`text-2xl font-bold ${overall >= 80 ? 'text-emerald-500' : overall >= 60 ? 'text-amber-500' : 'text-red-500'}`}>
@@ -603,6 +608,7 @@ const IMPACT_COLORS = {
 };
 
 function GrowthPlaybook() {
+  // Playbook checkmarks are session-only (in-memory). Persistence is a future feature.
   const [checked, setChecked] = useState<Set<string>>(new Set());
 
   const toggle = (id: string) => setChecked(prev => {
