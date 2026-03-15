@@ -24,102 +24,108 @@ export interface ColorPalette {
 }
 
 // ─── Preset Palettes ─────────────────────────────────────────────
+// All palettes validated for WCAG AA contrast:
+// - text on secondary (bg): ≥4.5:1
+// - muted on secondary: ≥3:1
+// - surface vs secondary: ≥5% lightness difference
+// - border visible against surface AND secondary
+// - accent works as button bg with auto text color
 export const COLOR_PALETTES: ColorPalette[] = [
   {
     id: 'midnight',
     name: 'Midnight',
     description: 'Dark navy + gold',
-    colors: { primary: '#0F172A', secondary: '#F8FAFC', accent: '#D4A84B', text: '#0F172A', muted: '#64748B', surface: '#FFFFFF', border: '#E2E8F0' },
+    colors: { primary: '#0F172A', secondary: '#F8FAFC', accent: '#B8922E', text: '#0F172A', muted: '#64748B', surface: '#E8ECF2', border: '#CDD4E0' },
   },
   {
     id: 'ocean',
     name: 'Ocean',
     description: 'Blues + teal accent',
-    colors: { primary: '#0C4A6E', secondary: '#F0F9FF', accent: '#0891B2', text: '#0C4A6E', muted: '#64748B', surface: '#FFFFFF', border: '#BAE6FD' },
+    colors: { primary: '#0C4A6E', secondary: '#F0F9FF', accent: '#0891B2', text: '#0C4A6E', muted: '#546E7A', surface: '#DAEDF8', border: '#9ECEE8' },
   },
   {
     id: 'forest',
     name: 'Forest',
     description: 'Deep greens + warm cream',
-    colors: { primary: '#14532D', secondary: '#FDF8F0', accent: '#16A34A', text: '#14532D', muted: '#6B7280', surface: '#FFFFFF', border: '#D1D5DB' },
+    colors: { primary: '#14532D', secondary: '#FDF8F0', accent: '#15803D', text: '#14532D', muted: '#5C6560', surface: '#F2E9D8', border: '#C5BFAB' },
   },
   {
     id: 'sunset',
     name: 'Sunset',
     description: 'Warm oranges + deep purple',
-    colors: { primary: '#431407', secondary: '#FFFBEB', accent: '#EA580C', text: '#431407', muted: '#78716C', surface: '#FFFFFF', border: '#FDE68A' },
+    colors: { primary: '#431407', secondary: '#FFFBEB', accent: '#D9520A', text: '#431407', muted: '#78716C', surface: '#F5EDD4', border: '#E5D5A0' },
   },
   {
     id: 'rose',
     name: 'Rose',
     description: 'Soft pinks + deep rose',
-    colors: { primary: '#4C0519', secondary: '#FFF1F2', accent: '#E11D48', text: '#4C0519', muted: '#71717A', surface: '#FFFFFF', border: '#FECDD3' },
+    colors: { primary: '#4C0519', secondary: '#FFF1F2', accent: '#E11D48', text: '#4C0519', muted: '#71717A', surface: '#FADCE0', border: '#F0B8C0' },
   },
   {
     id: 'monochrome',
     name: 'Monochrome',
     description: 'Pure black/white/gray',
-    colors: { primary: '#09090B', secondary: '#FAFAFA', accent: '#3F3F46', text: '#09090B', muted: '#71717A', surface: '#FFFFFF', border: '#E4E4E7' },
+    colors: { primary: '#09090B', secondary: '#FAFAFA', accent: '#3F3F46', text: '#09090B', muted: '#71717A', surface: '#EBEBEB', border: '#D4D4D8' },
   },
   {
     id: 'neon',
     name: 'Neon',
     description: 'Black + neon green/cyan',
-    colors: { primary: '#000000', secondary: '#0A0A0A', accent: '#22D3EE', text: '#FAFAFA', muted: '#A1A1AA', surface: '#18181B', border: '#27272A' },
+    colors: { primary: '#000000', secondary: '#0A0A0A', accent: '#06B6D4', text: '#F4F4F5', muted: '#A1A1AA', surface: '#1E1E2E', border: '#333347' },
   },
   {
     id: 'earth',
     name: 'Earth',
     description: 'Terracotta + olive + cream',
-    colors: { primary: '#44403C', secondary: '#FAFAF9', accent: '#B45309', text: '#292524', muted: '#78716C', surface: '#FFFFFF', border: '#D6D3D1' },
+    colors: { primary: '#44403C', secondary: '#FAFAF9', accent: '#A34A09', text: '#292524', muted: '#78716C', surface: '#EDEBE7', border: '#C8C3BC' },
   },
   {
     id: 'lavender',
     name: 'Lavender',
     description: 'Soft purples + warm gray',
-    colors: { primary: '#3B0764', secondary: '#FAF5FF', accent: '#7C3AED', text: '#3B0764', muted: '#71717A', surface: '#FFFFFF', border: '#DDD6FE' },
+    colors: { primary: '#3B0764', secondary: '#FAF5FF', accent: '#7C3AED', text: '#3B0764', muted: '#71717A', surface: '#EBDFF6', border: '#C9B8E8' },
   },
   {
     id: 'arctic',
     name: 'Arctic',
     description: 'Cool blues + white + steel',
-    colors: { primary: '#1E3A5F', secondary: '#F8FAFC', accent: '#3B82F6', text: '#1E3A5F', muted: '#94A3B8', surface: '#FFFFFF', border: '#CBD5E1' },
+    colors: { primary: '#1E3A5F', secondary: '#F8FAFC', accent: '#2563EB', text: '#1E3A5F', muted: '#6B7F99', surface: '#E5EBF2', border: '#B8C8D8' },
   },
   {
     id: 'coral-reef',
     name: 'Coral Reef',
     description: 'Warm coral + turquoise + sand',
-    colors: { primary: '#B83B5E', secondary: '#FFF5F0', accent: '#0E9AA7', text: '#3D1C2F', muted: '#9A8C8C', surface: '#FFFFFF', border: '#F0D9CF' },
+    colors: { primary: '#B83B5E', secondary: '#FFF5F0', accent: '#0E8A96', text: '#3D1C2F', muted: '#887070', surface: '#F5E8E0', border: '#E0C8BE' },
   },
   {
     id: 'studio',
     name: 'Studio',
     description: 'Charcoal + warm white + sienna',
-    colors: { primary: '#2D2D2D', secondary: '#FAF8F5', accent: '#C75B2A', text: '#1A1A1A', muted: '#8C8C8C', surface: '#FFFFFF', border: '#E8E4DF' },
+    colors: { primary: '#2D2D2D', secondary: '#FAF8F5', accent: '#C75B2A', text: '#1A1A1A', muted: '#7A7A7A', surface: '#EDE8E2', border: '#D4CEC6' },
   },
   {
     id: 'minimal-ink',
     name: 'Minimal Ink',
     description: 'Near-black + white + blue accent',
-    colors: { primary: '#111111', secondary: '#FFFFFF', accent: '#2563EB', text: '#111111', muted: '#6B7280', surface: '#FAFAFA', border: '#E5E7EB' },
+    colors: { primary: '#111111', secondary: '#FFFFFF', accent: '#2563EB', text: '#111111', muted: '#6B7280', surface: '#F0F1F3', border: '#D1D5DB' },
   },
   {
     id: 'candy',
     name: 'Candy',
     description: 'Bright pink + cyan + warm yellow',
-    colors: { primary: '#E91E8C', secondary: '#FFF8FC', accent: '#06B6D4', text: '#1F1235', muted: '#9B8BA0', surface: '#FFFFFF', border: '#F5D0E8' },
+    colors: { primary: '#C4167A', secondary: '#FFF8FC', accent: '#0891B2', text: '#1F1235', muted: '#887098', surface: '#F7DFEC', border: '#E8B8D4' },
   },
   {
     id: 'vintage',
     name: 'Vintage',
     description: 'Sepia + parchment + olive green',
-    colors: { primary: '#5C3D2E', secondary: '#F5F0E1', accent: '#6B7F3B', text: '#3C2A1E', muted: '#8B7D6B', surface: '#FFFDF7', border: '#DDD5C4' },
+    colors: { primary: '#5C3D2E', secondary: '#F5F0E1', accent: '#5A6E30', text: '#3C2A1E', muted: '#8B7D6B', surface: '#FFFDF7', border: '#D0C8B4' },
   },
   {
     id: 'tech-dark',
     name: 'Tech Dark',
     description: 'Dark gray + black + electric blue',
-    colors: { primary: '#0A0A0F', secondary: '#0F0F17', accent: '#3B82F6', text: '#E2E8F0', muted: '#64748B', surface: '#1A1A2E', border: '#1E293B' },
+    colors: { primary: '#0A0A0F', secondary: '#0F0F17', accent: '#3B82F6', text: '#E2E8F0', muted: '#8090A8', surface: '#1C1C30', border: '#2A3550' },
   },
 ];
 
