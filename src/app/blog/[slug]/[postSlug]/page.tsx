@@ -268,9 +268,9 @@ export default function BlogPostPage() {
   const templateId = template?.id || 'minimal';
   const tp = template?.preview;
 
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
-  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : templateId === 'neon' ? '#050510' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
 
   const headingStyle: React.CSSProperties = {

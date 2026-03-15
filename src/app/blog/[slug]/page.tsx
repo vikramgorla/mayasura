@@ -137,7 +137,7 @@ function BlogCard({
   post: BlogPost; slug: string; textColor: string; accentColor: string;
   templateId: string; bgColor: string; index: number;
 }) {
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const tags = (() => { try { return JSON.parse(post.tags || '[]'); } catch { return []; } })();
 
   const tagBadgeStyle: React.CSSProperties = {
@@ -286,9 +286,9 @@ export default function BlogListingPage() {
   const templateId = template?.id || 'minimal';
   const tp = template?.preview;
 
-  const isDark = templateId === 'bold';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
-  const bgColor = isDark ? '#000000' : brand.secondary_color;
+  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : templateId === 'neon' ? '#050510' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
 
   const headingStyle: React.CSSProperties = {

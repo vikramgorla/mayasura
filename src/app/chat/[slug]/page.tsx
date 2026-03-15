@@ -157,8 +157,8 @@ export default function ChatPage() {
   }
 
   const templateId = template?.id || 'minimal';
-  const isDark = templateId === 'bold';
-  const bgColor = isDark ? '#000000' : brand.secondary_color || '#f8fafc';
+  const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
+  const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : templateId === 'neon' ? '#050510' : '#000000') : brand.secondary_color || '#f8fafc';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color || '#0f172a';
   const accentColor = brand.accent_color;
 

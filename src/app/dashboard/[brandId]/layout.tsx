@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Globe, MessageSquare, Package, FileText,
   BarChart3, ArrowLeft, HeadphonesIcon, Sparkles, Menu, X,
   Download, Moon, Sun, Settings, ShoppingBag, Newspaper, Paintbrush,
-  Keyboard, MessageSquareQuote, Share2,
+  Keyboard, MessageSquareQuote, Share2, Bell,
 } from 'lucide-react';
 import { PageLoader } from '@/components/ui/loading';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -20,6 +20,7 @@ import { NotificationBell } from '@/components/notification-bell';
 import { useToast } from '@/components/ui/toast';
 import { UserNav } from '@/components/user-nav';
 import { KeyboardShortcutsModal, useKeyboardShortcutsModal } from '@/components/keyboard-shortcuts-modal';
+import { WhatsNewModal, useWhatsNew } from '@/components/whats-new-modal';
 
 // Lazy-load heavy components
 const CommandPalette = lazy(() => import('@/components/command-palette').then(m => ({ default: m.CommandPalette })));
@@ -52,6 +53,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
   const { theme, setTheme, resolved } = useTheme();
   const toast = useToast();
   const shortcuts = useKeyboardShortcutsModal();
+  const whatsNew = useWhatsNew();
 
   useEffect(() => {
     fetch(`/api/brands/${brandId}`)
@@ -207,6 +209,16 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
 
         <div className="p-4 border-t border-zinc-200 dark:border-zinc-700 space-y-3">
           <button
+            onClick={whatsNew.openManually}
+            className="flex items-center gap-2 text-xs text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 w-full group"
+          >
+            <span className="relative flex h-3.5 w-3.5">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-violet-400 opacity-50 group-hover:opacity-75" />
+              <Bell className="relative h-3.5 w-3.5" />
+            </span>
+            What&apos;s New — v3.3
+          </button>
+          <button
             onClick={exportBrand}
             className="flex items-center gap-2 text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 w-full"
           >
@@ -252,6 +264,9 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
 
       {/* Keyboard Shortcuts Modal */}
       <KeyboardShortcutsModal open={shortcuts.open} onClose={shortcuts.onClose} />
+
+      {/* What's New Modal */}
+      <WhatsNewModal open={whatsNew.open} onClose={whatsNew.close} />
 
       {/* Mobile Header */}
       <div className="lg:hidden fixed top-0 left-0 right-0 z-30 bg-white dark:bg-zinc-800 border-b border-zinc-200 dark:border-zinc-700">

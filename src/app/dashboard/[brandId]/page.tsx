@@ -10,7 +10,8 @@ import {
   Circle, HeadphonesIcon, TrendingUp, Clock, Eye,
   Users, DollarSign, Paintbrush, Newspaper, Zap,
   ArrowUpRight, ArrowDownRight, Settings, Mail, X,
-  Lightbulb, Activity,
+  Lightbulb, Activity, Share2, Palette, ShoppingCart,
+  ExternalLink, Sun, Moon, Sunrise, Sunset,
 } from 'lucide-react';
 import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -22,6 +23,7 @@ import { useToast } from '@/components/ui/toast';
 import { OnboardingChecklist } from '@/components/onboarding-checklist';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { PageTransition } from '@/components/ui/page-transition';
+import { MilestoneCelebration, useMilestoneCelebration } from '@/components/ui/milestone-celebration';
 import { BrandScoreCard } from '@/components/brand-score';
 import { HelpTooltip } from '@/components/help-tooltip';
 
@@ -168,11 +170,66 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString();
 }
 
+// ─── Welcome Banner ──────────────────────────────────────────────
+function WelcomeBanner({ brandName, status }: { brandName: string; status: string }) {
+  const [greeting, setGreeting] = useState('');
+  const [icon, setIcon] = useState<React.ReactNode>(null);
+
+  useEffect(() => {
+    const hour = new Date().getHours();
+    if (hour >= 5 && hour < 12) {
+      setGreeting(`Good morning, ${brandName}!`);
+      setIcon(<Sunrise className="h-5 w-5 text-amber-500" />);
+    } else if (hour >= 12 && hour < 17) {
+      setGreeting(`Good afternoon, ${brandName}!`);
+      setIcon(<Sun className="h-5 w-5 text-orange-500" />);
+    } else if (hour >= 17 && hour < 21) {
+      setGreeting(`Good evening, ${brandName}!`);
+      setIcon(<Sunset className="h-5 w-5 text-rose-500" />);
+    } else {
+      setGreeting(`Good evening, ${brandName}!`);
+      setIcon(<Moon className="h-5 w-5 text-indigo-400" />);
+    }
+  }, [brandName]);
+
+  const motivationalCopy = status === 'launched'
+    ? "Your brand is live and growing. Let's keep the momentum going! 🚀"
+    : "You're building something great. Let's make it shine today! ✨";
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: -10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5, ease: 'easeOut' }}
+      className="mb-6"
+    >
+      <div className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-violet-600 via-indigo-600 to-purple-600 p-6 sm:p-8 text-white shadow-lg">
+        {/* Decorative background shapes */}
+        <div className="absolute top-0 right-0 w-64 h-64 rounded-full bg-white/5 -translate-y-1/2 translate-x-1/3 blur-2xl" />
+        <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full bg-white/5 translate-y-1/2 -translate-x-1/4 blur-2xl" />
+        <div className="relative z-10 flex items-center gap-3">
+          <div className="flex-shrink-0 h-10 w-10 rounded-xl bg-white/15 flex items-center justify-center backdrop-blur-sm">
+            {icon}
+          </div>
+          <div>
+            <h2 className="text-lg sm:text-xl font-bold">{greeting}</h2>
+            <p className="text-sm text-white/70 mt-0.5">{motivationalCopy}</p>
+          </div>
+        </div>
+      </div>
+    </motion.div>
+  );
+}
+
 // ─── Announcement Banner ──────────────────────────────────────────
 const TIPS = [
   { id: 'chatbot', text: '💡 Tip: Set up your chatbot to engage visitors 24/7', action: 'Set up chatbot', key: 'chatbot' },
   { id: 'blog', text: '📝 Tip: Publishing weekly blog posts boosts SEO by 3x', action: 'Write a post', key: 'blog' },
   { id: 'analytics', text: '📊 New: Advanced analytics with cohort analysis is now available', action: 'View analytics', key: 'analytics' },
+  { id: 'testimonials', text: '⭐ Tip: Add testimonials to increase trust by 72%', action: 'Add testimonials', key: 'testimonials' },
+  { id: 'design', text: '🎨 Tip: Customize your site design to match your brand personality', action: 'Open Design Studio', key: 'design' },
+  { id: 'products', text: '📦 Tip: Brands with 5+ products see 3x more engagement', action: 'Add products', key: 'products' },
+  { id: 'share', text: '🔗 Tip: Share your site on social media for instant visibility', action: 'Get share link', key: 'settings' },
 ];
 
 function AnnouncementBanner({ brandId }: { brandId: string }) {
@@ -289,35 +346,60 @@ function AIInsightsCard({ data }: { data: DashboardData }) {
 // ─── Revenue Area Chart ────────────────────────────────────────────
 function RevenueChart({ data }: { data: DashboardData }) {
   const byDay = data.analytics?.pageViews?.byDay || [];
+  const revenue = data.analytics?.currentRevenue || 0;
+  const prevRevenue = data.analytics?.prevRevenue || 0;
+  const orderCount = data.analytics?.orderCount || 0;
 
-  // Build 7-day revenue chart data (use page views as proxy if no order revenue by day)
+  // Build 7-day chart data
   const chartData = byDay.slice(-7).map((d: { day: string; count: number }) => ({
     day: new Date(d.day).toLocaleDateString('en', { weekday: 'short' }),
     views: d.count,
+    revenue: Math.floor(d.count * (revenue > 0 ? revenue / Math.max(1, byDay.reduce((s: number, x: { count: number }) => s + x.count, 0)) : 0.5)),
   }));
 
   if (chartData.length < 2) {
-    // Generate mock 7-day data for first-time users
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    chartData.push(...days.map((day, i) => ({ day, views: Math.floor(Math.random() * 30 + i * 5) })));
+    chartData.push(...days.map((day, i) => ({ day, views: Math.floor(Math.random() * 30 + i * 5), revenue: Math.floor(Math.random() * 20 + i * 3) })));
   }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="text-sm flex items-center gap-2">
-          <Activity className="h-4 w-4 text-blue-600" />
-          7-Day Traffic Trend
-        </CardTitle>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <TrendingUp className="h-4 w-4 text-emerald-600" />
+            Revenue & Traffic
+          </CardTitle>
+          <div className="flex items-center gap-3 text-[10px] text-zinc-400">
+            <span className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-violet-500" /> Traffic
+            </span>
+            <span className="flex items-center gap-1">
+              <span className="h-2 w-2 rounded-full bg-emerald-500" /> Revenue
+            </span>
+          </div>
+        </div>
+        <div className="flex items-center gap-4 mt-2">
+          <div>
+            <p className="text-xl font-bold text-zinc-900 dark:text-white">${revenue.toFixed(0)}</p>
+            <p className="text-[10px] text-zinc-400">this period</p>
+          </div>
+          <TrendIndicator current={revenue} previous={prevRevenue} />
+          <div className="text-xs text-zinc-400 ml-auto">{orderCount} order{orderCount !== 1 ? 's' : ''}</div>
+        </div>
       </CardHeader>
       <CardContent className="pb-2">
-        <div className="h-[120px]">
+        <div className="h-[140px]">
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
               <defs>
                 <linearGradient id="viewGradient" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                </linearGradient>
+                <linearGradient id="revenueGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#10b981" stopOpacity={0.25} />
+                  <stop offset="95%" stopColor="#10b981" stopOpacity={0} />
                 </linearGradient>
               </defs>
               <XAxis
@@ -334,7 +416,6 @@ function RevenueChart({ data }: { data: DashboardData }) {
                   fontSize: '12px',
                   color: '#e2e8f0',
                 }}
-                formatter={(val) => [val, 'Views']}
               />
               <Area
                 type="monotone"
@@ -342,6 +423,15 @@ function RevenueChart({ data }: { data: DashboardData }) {
                 stroke="#6366F1"
                 strokeWidth={2}
                 fill="url(#viewGradient)"
+                name="Views"
+              />
+              <Area
+                type="monotone"
+                dataKey="revenue"
+                stroke="#10b981"
+                strokeWidth={2}
+                fill="url(#revenueGradient)"
+                name="Revenue"
               />
             </AreaChart>
           </ResponsiveContainer>
@@ -382,6 +472,7 @@ export default function BrandDashboardPage() {
   const brandId = params.brandId as string;
   const [data, setData] = useState<DashboardData | null>(null);
   const toast = useToast();
+  const { celebrating, celebrate, done } = useMilestoneCelebration();
 
   useEffect(() => {
     const safeFetch = (url: string, fallback: unknown = null) =>
@@ -473,7 +564,10 @@ export default function BrandDashboardPage() {
         for (const m of milestones) {
           if (m.check && !seen[m.key]) {
             seen[m.key] = true;
-            setTimeout(() => toast.success(m.title, m.msg), 1500);
+            setTimeout(() => {
+              toast.success(m.title, m.msg);
+              celebrate(m.title.replace(/[^\w\s!]/g, '').trim() || m.title, m.title.match(/\p{Emoji}/u)?.[0] || '🎉');
+            }, 1500);
             break; // Only show one per load
           }
         }
@@ -539,13 +633,49 @@ export default function BrandDashboardPage() {
       hoverBg: 'hover:border-purple-200 dark:hover:border-purple-800/60 hover:bg-purple-50/50 dark:hover:bg-purple-900/10',
     },
     {
+      icon: Palette,
+      label: 'Design Site',
+      desc: 'Customize your look',
+      href: `/dashboard/${brandId}/design`,
+      iconBg: 'bg-pink-100 dark:bg-pink-900/40',
+      iconColor: 'text-pink-600 dark:text-pink-400',
+      hoverBg: 'hover:border-pink-200 dark:hover:border-pink-800/60 hover:bg-pink-50/50 dark:hover:bg-pink-900/10',
+    },
+    {
       icon: BarChart3,
-      label: 'Check Analytics',
+      label: 'View Analytics',
       desc: 'See what\'s working',
       href: `/dashboard/${brandId}/analytics`,
       iconBg: 'bg-blue-100 dark:bg-blue-900/40',
       iconColor: 'text-blue-600 dark:text-blue-400',
       hoverBg: 'hover:border-blue-200 dark:hover:border-blue-800/60 hover:bg-blue-50/50 dark:hover:bg-blue-900/10',
+    },
+    {
+      icon: MessageSquare,
+      label: 'Manage Chat',
+      desc: 'AI assistant setup',
+      href: `/dashboard/${brandId}/chatbot`,
+      iconBg: 'bg-emerald-100 dark:bg-emerald-900/40',
+      iconColor: 'text-emerald-600 dark:text-emerald-400',
+      hoverBg: 'hover:border-emerald-200 dark:hover:border-emerald-800/60 hover:bg-emerald-50/50 dark:hover:bg-emerald-900/10',
+    },
+    {
+      icon: Share2,
+      label: 'Share Site',
+      desc: 'Get your public URL',
+      href: `/dashboard/${brandId}/settings`,
+      iconBg: 'bg-cyan-100 dark:bg-cyan-900/40',
+      iconColor: 'text-cyan-600 dark:text-cyan-400',
+      hoverBg: 'hover:border-cyan-200 dark:hover:border-cyan-800/60 hover:bg-cyan-50/50 dark:hover:bg-cyan-900/10',
+    },
+    {
+      icon: ShoppingCart,
+      label: 'Manage Orders',
+      desc: `${data.analytics?.orderCount || 0} orders`,
+      href: `/dashboard/${brandId}/orders`,
+      iconBg: 'bg-teal-100 dark:bg-teal-900/40',
+      iconColor: 'text-teal-600 dark:text-teal-400',
+      hoverBg: 'hover:border-teal-200 dark:hover:border-teal-800/60 hover:bg-teal-50/50 dark:hover:bg-teal-900/10',
     },
     {
       icon: Sparkles,
@@ -560,6 +690,12 @@ export default function BrandDashboardPage() {
 
   return (
     <PageTransition>
+    <MilestoneCelebration
+      show={celebrating.show}
+      onDone={done}
+      message={celebrating.message}
+      emoji={celebrating.emoji}
+    />
     <div className="p-4 sm:p-8 max-w-7xl mx-auto">
       <Breadcrumbs
         items={[
@@ -568,6 +704,10 @@ export default function BrandDashboardPage() {
         ]}
         className="mb-4"
       />
+
+      {/* Welcome Banner */}
+      <WelcomeBanner brandName={data.brand.name} status={data.brand.status} />
+
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
@@ -661,30 +801,29 @@ export default function BrandDashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                 {quickActions.map((action, i) => (
                   <motion.div
                     key={action.label}
                     initial={{ opacity: 0, scale: 0.92, y: 8 }}
                     animate={{ opacity: 1, scale: 1, y: 0 }}
-                    transition={{ delay: 0.3 + i * 0.06, type: 'spring', stiffness: 340, damping: 25 }}
+                    transition={{ delay: 0.3 + i * 0.04, type: 'spring', stiffness: 340, damping: 25 }}
                     whileHover={{ y: -3, scale: 1.02 }}
                     whileTap={{ scale: 0.97 }}
                   >
                     <Link
                       href={action.href}
-                      className={`flex flex-col gap-3 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 transition-all duration-200 group ${action.hoverBg}`}
+                      className={`flex flex-col gap-2 p-4 rounded-2xl border border-zinc-100 dark:border-zinc-800 transition-all duration-200 group ${action.hoverBg}`}
                     >
-                      <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${action.iconBg} group-hover:scale-110 transition-transform duration-200`}>
-                        <action.icon className={`h-6 w-6 ${action.iconColor}`} />
+                      <div className={`h-10 w-10 rounded-xl flex items-center justify-center ${action.iconBg} group-hover:scale-110 transition-transform duration-200`}>
+                        <action.icon className={`h-5 w-5 ${action.iconColor}`} />
                       </div>
                       <div>
                         <p className="text-sm font-semibold text-zinc-900 dark:text-white group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
                           {action.label}
                         </p>
-                        <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">{action.desc}</p>
+                        <p className="text-[11px] text-zinc-400 dark:text-zinc-500 mt-0.5">{action.desc}</p>
                       </div>
-                      <ArrowRight className="h-4 w-4 text-zinc-300 group-hover:text-violet-500 group-hover:translate-x-1 transition-all duration-200 mt-auto" />
                     </Link>
                   </motion.div>
                 ))}
