@@ -1,5 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { suggestBrandNames, suggestTaglines, generateProductDescription, analyzeBrandVoice } from '@/lib/ai';
+import {
+  suggestBrandNames,
+  suggestTaglines,
+  generateProductDescription,
+  analyzeBrandVoice,
+  generateEmailSubjectLines,
+} from '@/lib/ai';
 import { WEBSITE_TEMPLATES, suggestTemplateForIndustry } from '@/lib/website-templates';
 import { requireAuth } from '@/lib/api-auth';
 
@@ -89,6 +95,31 @@ export async function POST(request: NextRequest) {
         });
 
         return NextResponse.json({ recommendations });
+      }
+
+      case 'email-subjects': {
+        const { brandName, topic, brandVoice, emailType } = body;
+        if (!brandName || !topic) {
+          return NextResponse.json(
+            { error: 'brandName and topic are required' },
+            { status: 400 }
+          );
+        }
+        const result = await generateEmailSubjectLines({ brandName, topic, brandVoice, emailType });
+        return NextResponse.json(result);
+      }
+
+      case 'cta-buttons': {
+        const { brandName, topic, brandVoice, emailType } = body;
+        if (!brandName || !topic) {
+          return NextResponse.json(
+            { error: 'brandName and topic are required' },
+            { status: 400 }
+          );
+        }
+        // Generate both; caller may only want CTAs but we reuse the combined endpoint
+        const result = await generateEmailSubjectLines({ brandName, topic, brandVoice, emailType });
+        return NextResponse.json({ ctaButtons: result.ctaButtons });
       }
 
       default:

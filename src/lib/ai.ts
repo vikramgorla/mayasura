@@ -283,3 +283,188 @@ Return as JSON: {"tone": "one-word tone", "personality": ["trait1", "trait2", "t
     return { tone: 'professional', personality: ['helpful'], sampleGreeting: 'Welcome!' };
   }
 }
+
+export async function analyzeVoiceCharacteristics(sampleText: string): Promise<{
+  tone: string;
+  formality: 'very formal' | 'formal' | 'neutral' | 'casual' | 'very casual';
+  formalityScore: number;
+  personalityTraits: string[];
+  writingStyle: string[];
+  targetAudience: string;
+  readabilityLevel: string;
+  emotionalTone: string;
+  recommendations: string[];
+}> {
+  const message = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1024,
+    messages: [
+      {
+        role: 'user',
+        content: `Analyze the brand voice in this sample text and return detailed characteristics:
+
+"${sampleText}"
+
+Return ONLY a JSON object with this structure:
+{
+  "tone": "overall tone in 2-3 words",
+  "formality": "very formal|formal|neutral|casual|very casual",
+  "formalityScore": 0-100,
+  "personalityTraits": ["trait1", "trait2", "trait3", "trait4"],
+  "writingStyle": ["style1", "style2", "style3"],
+  "targetAudience": "who this voice appeals to",
+  "readabilityLevel": "simple|moderate|sophisticated",
+  "emotionalTone": "what emotion this evokes",
+  "recommendations": ["rec1", "rec2", "rec3"]
+}`,
+      },
+    ],
+  });
+
+  const text = message.content[0].type === 'text' ? message.content[0].text : '';
+  try {
+    const match = text.match(/\{[\s\S]*\}/);
+    return match ? JSON.parse(match[0]) : {
+      tone: 'professional',
+      formality: 'neutral',
+      formalityScore: 50,
+      personalityTraits: ['helpful'],
+      writingStyle: ['clear'],
+      targetAudience: 'general audience',
+      readabilityLevel: 'moderate',
+      emotionalTone: 'neutral',
+      recommendations: [],
+    };
+  } catch {
+    return {
+      tone: 'professional',
+      formality: 'neutral',
+      formalityScore: 50,
+      personalityTraits: ['helpful'],
+      writingStyle: ['clear'],
+      targetAudience: 'general audience',
+      readabilityLevel: 'moderate',
+      emotionalTone: 'neutral',
+      recommendations: [],
+    };
+  }
+}
+
+export async function generateCompetitorPositioning(brandName: string, industry: string): Promise<{
+  marketLandscape: string;
+  competitorArchetypes: Array<{
+    archetype: string;
+    description: string;
+    weakness: string;
+  }>;
+  positioningAngles: Array<{
+    angle: string;
+    tagline: string;
+    rationale: string;
+    targetSegment: string;
+  }>;
+  differentiators: string[];
+  messagingRecommendations: string[];
+}> {
+  const message = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 2048,
+    messages: [
+      {
+        role: 'user',
+        content: `Generate competitive positioning suggestions for "${brandName}" in the ${industry} industry.
+
+Return ONLY a JSON object with this structure:
+{
+  "marketLandscape": "2-3 sentence overview of the competitive landscape",
+  "competitorArchetypes": [
+    {"archetype": "The Established Giant", "description": "...", "weakness": "..."},
+    {"archetype": "The Discount Player", "description": "...", "weakness": "..."},
+    {"archetype": "The Niche Expert", "description": "...", "weakness": "..."}
+  ],
+  "positioningAngles": [
+    {
+      "angle": "positioning angle name",
+      "tagline": "sample tagline",
+      "rationale": "why this works",
+      "targetSegment": "who to target"
+    }
+  ],
+  "differentiators": ["differentiator1", "differentiator2", "differentiator3"],
+  "messagingRecommendations": ["rec1", "rec2", "rec3"]
+}
+
+Provide 3-4 positioning angles and be specific to the ${industry} industry.`,
+      },
+    ],
+  });
+
+  const text = message.content[0].type === 'text' ? message.content[0].text : '';
+  try {
+    const match = text.match(/\{[\s\S]*\}/);
+    return match ? JSON.parse(match[0]) : {
+      marketLandscape: '',
+      competitorArchetypes: [],
+      positioningAngles: [],
+      differentiators: [],
+      messagingRecommendations: [],
+    };
+  } catch {
+    return {
+      marketLandscape: '',
+      competitorArchetypes: [],
+      positioningAngles: [],
+      differentiators: [],
+      messagingRecommendations: [],
+    };
+  }
+}
+
+export async function generateEmailSubjectLines(params: {
+  brandName: string;
+  topic: string;
+  brandVoice?: string;
+  emailType?: 'promotional' | 'newsletter' | 'welcome' | 'reengagement' | 'announcement';
+}): Promise<{
+  subjectLines: Array<{ text: string; previewText: string; type: string }>;
+  ctaButtons: Array<{ text: string; style: string }>;
+}> {
+  const message = await client.messages.create({
+    model: 'claude-sonnet-4-20250514',
+    max_tokens: 1024,
+    messages: [
+      {
+        role: 'user',
+        content: `Generate email subject lines and CTA button text for "${params.brandName}".
+
+Topic: ${params.topic}
+Email Type: ${params.emailType || 'promotional'}
+${params.brandVoice ? `Brand Voice: ${params.brandVoice}` : ''}
+
+Return ONLY a JSON object with this structure:
+{
+  "subjectLines": [
+    {"text": "subject line", "previewText": "preview text (40-90 chars)", "type": "direct|curiosity|urgency|question|benefit"},
+    {"text": "...", "previewText": "...", "type": "..."},
+    {"text": "...", "previewText": "...", "type": "..."},
+    {"text": "...", "previewText": "...", "type": "..."},
+    {"text": "...", "previewText": "...", "type": "..."}
+  ],
+  "ctaButtons": [
+    {"text": "button text", "style": "primary|secondary|urgent|gentle"},
+    {"text": "...", "style": "..."},
+    {"text": "...", "style": "..."}
+  ]
+}`,
+      },
+    ],
+  });
+
+  const text = message.content[0].type === 'text' ? message.content[0].text : '';
+  try {
+    const match = text.match(/\{[\s\S]*\}/);
+    return match ? JSON.parse(match[0]) : { subjectLines: [], ctaButtons: [] };
+  } catch {
+    return { subjectLines: [], ctaButtons: [] };
+  }
+}
