@@ -660,9 +660,27 @@ export function getContentByBrand(brandId: string, type?: string) {
   return db.prepare('SELECT * FROM content WHERE brand_id = ? ORDER BY created_at DESC').all(brandId);
 }
 
+export function updateContent(id: string, updates: { title?: string; body?: string; status?: string; metadata?: string }) {
+  const db = getDb();
+  const fields: string[] = [];
+  const values: Record<string, unknown> = { id };
+  if (updates.title !== undefined) { fields.push('title = @title'); values.title = updates.title; }
+  if (updates.body !== undefined) { fields.push('body = @body'); values.body = updates.body; }
+  if (updates.status !== undefined) { fields.push('status = @status'); values.status = updates.status; }
+  if (updates.metadata !== undefined) { fields.push('metadata = @metadata'); values.metadata = updates.metadata; }
+  if (fields.length === 0) return;
+  db.prepare(`UPDATE content SET ${fields.join(', ')} WHERE id = @id`).run(values);
+}
+
 export function deleteContent(id: string) {
   const db = getDb();
   return db.prepare('DELETE FROM content WHERE id = ?').run(id);
+}
+
+export function deleteContentBatch(ids: string[]) {
+  const db = getDb();
+  const placeholders = ids.map(() => '?').join(', ');
+  return db.prepare(`DELETE FROM content WHERE id IN (${placeholders})`).run(...ids);
 }
 
 // ==================== Chat operations ====================
