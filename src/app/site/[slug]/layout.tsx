@@ -10,6 +10,7 @@ import { type PageLayout, getDefaultLayout } from '@/lib/page-layout';
 import { useScrollAnimation } from '@/lib/use-scroll-animation';
 import { ScrollToTop } from '@/components/site/scroll-to-top';
 import { CookieConsent } from '@/components/site/cookie-consent';
+import { SiteMeta, SitemapHint } from '@/components/site/site-meta';
 import {
   resolveDesignSettings,
   designSettingsToCSSVars,
@@ -575,8 +576,26 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
     );
   }
 
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mayasura.app';
+  const brandSlug = data.brand.slug || data.brand.id;
+  const siteUrl = `${baseUrl}/site/${brandSlug}`;
+
   return (
     <BrandSiteContext.Provider value={data}>
+      {/* Site-level SEO: Organization schema + canonical + sitemap hint */}
+      <SiteMeta
+        title={data.brand.tagline || data.brand.name}
+        description={data.brand.description || `Welcome to ${data.brand.name}${data.brand.tagline ? ` — ${data.brand.tagline}` : ''}.`}
+        canonicalUrl={siteUrl}
+        ogImage={data.brand.logo_url || undefined}
+        org={{
+          brandName: data.brand.name,
+          description: data.brand.description,
+          url: siteUrl,
+          logoUrl: data.brand.logo_url,
+        }}
+      />
+      <SitemapHint sitemapUrl={`${baseUrl}/sitemap.xml`} />
       <div
         className="min-h-screen flex flex-col"
         data-template={data.websiteTemplate?.id || 'minimal'}

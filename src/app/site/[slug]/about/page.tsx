@@ -4,6 +4,7 @@ import { useRef } from 'react';
 import Link from 'next/link';
 import { motion, useScroll, useTransform } from 'framer-motion';
 import { useBrandSite, BrandPlaceholder } from '../layout';
+import { AboutPageMeta } from '@/components/site/site-meta';
 import { getPrimaryButtonStyle, getSecondaryButtonStyle, BORDER_RADIUS_MAP } from '@/lib/design-settings';
 
 /* ─── Animation Variants ──────────────────────────────────────── */
@@ -76,8 +77,14 @@ export default function AboutPage() {
 
   const cardRadius = tid === 'playful' ? '24px' : tid === 'classic' ? '12px' : tid === 'bold' ? '0' : dsRadius;
 
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mayasura.app';
+
   return (
     <>
+      <AboutPageMeta
+        org={{ brandName: brand.name, description: brand.description, url: `${baseUrl}/site/${slug}`, logoUrl: brand.logo_url }}
+        canonicalUrl={`${baseUrl}/site/${slug}/about`}
+      />
       {/* ═══════ HERO ═══════ */}
       <ParallaxHero brand={brand} tid={tid} hs={hs} tc={tc} ac={ac} bgColor={bgColor} isDark={isDark} />
 

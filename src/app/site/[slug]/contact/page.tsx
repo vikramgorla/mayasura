@@ -9,6 +9,7 @@ import {
   getSecondaryButtonStyle,
   BORDER_RADIUS_MAP,
 } from '@/lib/design-settings';
+import { ContactPageMeta } from '@/components/site/site-meta';
 
 /* ─── Validation helpers ──────────────────────────────────────── */
 interface FormErrors {
@@ -436,10 +437,20 @@ export default function ContactPage() {
     </>
   );
 
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mayasura.app';
+  const metaTags = (
+    <ContactPageMeta
+      org={{ brandName: brand.name, description: brand.description, url: `${baseUrl}/site/${slug}`, logoUrl: brand.logo_url }}
+      canonicalUrl={`${baseUrl}/site/${slug}/contact`}
+    />
+  );
+
   /* ═══════ SUCCESS STATE with animation ═══════ */
   if (sent) {
     return (
-      <section className="t-hero">
+      <>
+        {metaTags}
+        <section className="t-hero">
         <div className="max-w-xl mx-auto px-5 sm:px-8 text-center">
           <motion.div
             initial={{ scale: 0 }}
