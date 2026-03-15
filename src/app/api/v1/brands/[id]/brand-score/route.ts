@@ -3,13 +3,11 @@ import { eq, sql } from "drizzle-orm";
 import { requireBrandOwner, AuthError } from "@/lib/auth/guards";
 import { db } from "@/lib/db/client";
 import {
-  brands,
   products,
   blogPosts,
   testimonials,
   newsletterSubscribers,
   chatbotFaqs,
-  brandSettings,
   pageViews,
   content,
 } from "@/lib/db/schema";
@@ -25,14 +23,6 @@ interface ScoreItem {
   completed: boolean;
   points: number;
   href: string;
-}
-
-function countRows(
-  table: Parameters<typeof db.select>[0] extends undefined ? never : never,
-  ...args: unknown[]
-): number {
-  // This is a helper — but we'll just inline the queries
-  return 0;
 }
 
 export async function GET(_request: NextRequest, { params }: RouteParams) {
