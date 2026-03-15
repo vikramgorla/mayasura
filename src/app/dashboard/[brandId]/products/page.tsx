@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Package, Plus, Sparkles, Trash2, X, Edit, Image, Tag, Box, Search, Save, ShoppingBag } from 'lucide-react';
+import { Package, Plus, Sparkles, Trash2, X, Edit, Image, Tag, Box, Search, Save, ShoppingBag, CheckSquare, Square } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
@@ -11,6 +11,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 interface Product {
   id: string;
@@ -38,6 +39,7 @@ export default function ProductsPage() {
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const toast = useToast();
 
   const loadProducts = () => {
@@ -118,9 +120,41 @@ export default function ProductsPage() {
       const res = await fetch(`/api/brands/${brandId}/products?productId=${productId}`, { method: 'DELETE' });
       if (!res.ok) throw new Error();
       toast.success('Product deleted');
+      setSelectedIds(prev => { const next = new Set(prev); next.delete(productId); return next; });
       loadProducts();
     } catch {
       toast.error('Failed to delete product');
+    }
+  };
+
+  const batchDeleteProducts = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(`Delete ${selectedIds.size} product${selectedIds.size > 1 ? 's' : ''}?`)) return;
+    try {
+      const ids = Array.from(selectedIds).join(',');
+      const res = await fetch(`/api/brands/${brandId}/products?ids=${ids}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error();
+      toast.success(`${selectedIds.size} product${selectedIds.size > 1 ? 's' : ''} deleted`);
+      setSelectedIds(new Set());
+      loadProducts();
+    } catch {
+      toast.error('Failed to delete products');
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id); else next.add(id);
+      return next;
+    });
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === filteredProducts.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredProducts.map(p => p.id)));
     }
   };
 
@@ -153,6 +187,13 @@ export default function ProductsPage() {
 
   return (
     <div className="p-4 sm:p-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Products' },
+        ]}
+        className="mb-4"
+      />
       <div className="flex items-center justify-between mb-8">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
@@ -299,6 +340,22 @@ export default function ProductsPage() {
         </Card>
       )}
 
+      {/* Batch actions */}
+      {selectedIds.size > 0 && (
+        <div className="flex items-center gap-3 mb-4 p-3 bg-violet-50 dark:bg-violet-900/20 rounded-lg border border-violet-200 dark:border-violet-800">
+          <span className="text-sm font-medium text-violet-700 dark:text-violet-300">
+            {selectedIds.size} selected
+          </span>
+          <Button variant="ghost" size="sm" onClick={() => setSelectedIds(new Set())} className="text-xs">
+            Clear
+          </Button>
+          <Button variant="destructive" size="sm" onClick={batchDeleteProducts} className="ml-auto">
+            <Trash2 className="h-3.5 w-3.5 mr-1" />
+            Delete Selected
+          </Button>
+        </div>
+      )}
+
       {/* Products List */}
       {filteredProducts.length === 0 ? (
         searchQuery ? (
@@ -320,11 +377,38 @@ export default function ProductsPage() {
           />
         )
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="space-y-2">
+          {/* Select all header */}
+          <div className="flex items-center gap-3 px-2">
+            <button
+              onClick={toggleSelectAll}
+              className="p-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+              title={selectedIds.size === filteredProducts.length ? 'Deselect all' : 'Select all'}
+            >
+              {selectedIds.size === filteredProducts.length && filteredProducts.length > 0 ? (
+                <CheckSquare className="h-4 w-4 text-violet-600" />
+              ) : (
+                <Square className="h-4 w-4 text-zinc-300 dark:text-zinc-600" />
+              )}
+            </button>
+            <span className="text-xs text-zinc-400">Select all</span>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {filteredProducts.map((product) => (
-            <Card key={product.id} className="group hover:shadow-md transition-shadow">
+            <Card key={product.id} className={`group hover:shadow-md transition-all ${selectedIds.has(product.id) ? 'ring-2 ring-violet-400 dark:ring-violet-600' : ''}`}>
               <CardContent className="p-5">
                 <div className="flex items-start gap-4">
+                  {/* Selection checkbox */}
+                  <button
+                    onClick={() => toggleSelect(product.id)}
+                    className="mt-1 p-0.5 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors flex-shrink-0"
+                  >
+                    {selectedIds.has(product.id) ? (
+                      <CheckSquare className="h-4 w-4 text-violet-600" />
+                    ) : (
+                      <Square className="h-4 w-4 text-zinc-300 dark:text-zinc-600" />
+                    )}
+                  </button>
                   {product.image_url ? (
                     <img
                       src={product.image_url}
@@ -378,6 +462,7 @@ export default function ProductsPage() {
               </CardContent>
             </Card>
           ))}
+        </div>
         </div>
       )}
     </div>

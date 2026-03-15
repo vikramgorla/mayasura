@@ -7,6 +7,7 @@ import { BarChart3, Eye, ShoppingBag, FileText, Mail, MessageSquare, DollarSign,
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Sparkline } from '@/components/ui/sparkline';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 interface AnalyticsData {
   pageViews: {
@@ -176,6 +177,13 @@ export default function AnalyticsPage() {
 
   return (
     <div className="p-4 sm:p-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Analytics' },
+        ]}
+        className="mb-4"
+      />
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center justify-between mb-8">
           <div>

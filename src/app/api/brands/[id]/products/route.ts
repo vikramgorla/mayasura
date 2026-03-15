@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createProduct, getProductsByBrand, updateProduct, deleteProduct } from '@/lib/db';
+import { createProduct, getProductsByBrand, updateProduct, deleteProduct, deleteProductBatch } from '@/lib/db';
 import { requireBrandOwner, sanitizeInput, sanitizeObject } from '@/lib/api-auth';
 import { nanoid } from 'nanoid';
 
@@ -86,6 +86,17 @@ export async function DELETE(
 
     const { searchParams } = new URL(request.url);
     const productId = searchParams.get('productId');
+    const batchIds = searchParams.get('ids');
+
+    if (batchIds) {
+      const ids = batchIds.split(',').filter(Boolean);
+      if (ids.length === 0) {
+        return NextResponse.json({ error: 'No IDs provided' }, { status: 400 });
+      }
+      deleteProductBatch(ids);
+      return NextResponse.json({ success: true, deleted: ids.length });
+    }
+
     if (!productId) {
       return NextResponse.json({ error: 'Product ID required' }, { status: 400 });
     }

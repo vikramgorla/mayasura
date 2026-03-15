@@ -17,6 +17,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 interface Ticket {
   id: string;
@@ -157,6 +158,13 @@ export default function SupportPage() {
 
   return (
     <div className="p-4 sm:p-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Support' },
+        ]}
+        className="mb-4"
+      />
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-8">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">

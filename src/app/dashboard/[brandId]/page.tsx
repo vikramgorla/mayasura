@@ -18,6 +18,7 @@ import { Sparkline } from '@/components/ui/sparkline';
 import { Brand } from '@/lib/types';
 import { useToast } from '@/components/ui/toast';
 import { OnboardingChecklist } from '@/components/onboarding-checklist';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 interface DashboardData {
   brand: Brand;
@@ -291,6 +292,13 @@ export default function BrandDashboardPage() {
 
   return (
     <div className="p-4 sm:p-8 max-w-7xl mx-auto">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: data.brand.name },
+        ]}
+        className="mb-4"
+      />
       {/* Header */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}

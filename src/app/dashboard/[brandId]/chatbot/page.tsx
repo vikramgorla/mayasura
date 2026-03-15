@@ -10,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { LoadingDots } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
 import { Brand, ChatbotFaq } from '@/lib/types';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -108,6 +109,13 @@ export default function ChatbotPage() {
 
   return (
     <div className="p-4 sm:p-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Chatbot' },
+        ]}
+        className="mb-4"
+      />
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center justify-between mb-6">
           <div>

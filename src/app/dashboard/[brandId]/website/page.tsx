@@ -10,6 +10,7 @@ import {
 import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { Brand } from '@/lib/types';
 import { LayoutEditor } from '@/components/design/layout-editor';
 import {
@@ -137,6 +138,13 @@ export default function WebsitePage() {
       {/* Top bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 sm:px-6 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
         <div>
+          <Breadcrumbs
+            items={[
+              { label: 'Dashboard', href: '/dashboard' },
+              { label: 'Website' },
+            ]}
+            className="mb-1"
+          />
           <h1 className="text-lg font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
             <Globe className="h-5 w-5" />
             Website

@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
 import { Brand, INDUSTRY_CATEGORIES, TONE_OPTIONS } from '@/lib/types';
 import { WEBSITE_TEMPLATES } from '@/lib/website-templates';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 // ─── General Tab ─────────────────────────────────────────────────
 function GeneralTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<string, unknown>) => Promise<boolean> }) {
@@ -1127,6 +1128,13 @@ export default function SettingsPage() {
 
   return (
     <div className="p-4 sm:p-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Settings' },
+        ]}
+        className="mb-4"
+      />
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="mb-6">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Settings</h1>

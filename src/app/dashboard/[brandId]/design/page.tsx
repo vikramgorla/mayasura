@@ -10,6 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { useToast } from '@/components/ui/toast';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { Brand } from '@/lib/types';
 import { WEBSITE_TEMPLATES, type WebsiteTemplate } from '@/lib/website-templates';
 import { FontPicker, FontPreview } from '@/components/design/font-picker';
@@ -234,6 +235,12 @@ export default function DesignStudioPage() {
           >
             <ArrowLeft className="h-4 w-4" />
           </button>
+          <Breadcrumbs
+            items={[
+              { label: 'Dashboard', href: '/dashboard' },
+              { label: 'Design Studio' },
+            ]}
+          />
           <div>
             <h1 className="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
               <Paintbrush className="h-4 w-4 text-violet-600" />

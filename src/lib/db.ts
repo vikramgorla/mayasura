@@ -618,6 +618,12 @@ export function deleteProduct(id: string) {
   return db.prepare('DELETE FROM products WHERE id = ?').run(id);
 }
 
+export function deleteProductBatch(ids: string[]) {
+  const db = getDb();
+  const placeholders = ids.map(() => '?').join(', ');
+  return db.prepare(`DELETE FROM products WHERE id IN (${placeholders})`).run(...ids);
+}
+
 export function reorderProducts(updates: { id: string; sort_order: number }[]) {
   const db = getDb();
   const stmt = db.prepare('UPDATE products SET sort_order = @sort_order WHERE id = @id');

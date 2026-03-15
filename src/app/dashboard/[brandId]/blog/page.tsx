@@ -10,6 +10,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
 import { BlogPost, Brand } from '@/lib/types';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 // Simple markdown-to-HTML converter for preview
 function markdownToHtml(md: string): string {
@@ -201,6 +202,13 @@ export default function BlogManagementPage() {
 
   return (
     <div className="p-4 sm:p-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Blog' },
+        ]}
+        className="mb-4"
+      />
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="flex items-center justify-between mb-8">
           <div>

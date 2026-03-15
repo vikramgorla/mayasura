@@ -9,6 +9,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
 import { Order, Brand } from '@/lib/types';
+import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 
 const statusConfig: Record<string, { label: string; color: string; icon: typeof Clock }> = {
   pending: { label: 'Pending', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/30 dark:text-yellow-400', icon: Clock },
@@ -66,6 +67,13 @@ export default function OrdersPage() {
 
   return (
     <div className="p-4 sm:p-8">
+      <Breadcrumbs
+        items={[
+          { label: 'Dashboard', href: '/dashboard' },
+          { label: 'Orders' },
+        ]}
+        className="mb-4"
+      />
       <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }}>
         <div className="mb-8">
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-white">Orders</h1>
