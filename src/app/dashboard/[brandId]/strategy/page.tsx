@@ -1,12 +1,14 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles, Target, Users, Search, Calendar, Shield,
   ChevronRight, ChevronDown, Loader2, Clock, Save, RefreshCw,
-  Activity, Download, Share2
+  Activity, Download, Share2, TrendingUp, AlertCircle, CheckSquare,
+  Square, BarChart2, Eye, Megaphone, BookOpen, Zap, ArrowUpRight,
+  FileText, ListChecks, ChevronLeft
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -243,6 +245,541 @@ function HealthReportCard({ report }: { report: HealthReport }) {
   );
 }
 
+// ─── Monthly Content Calendar Grid ──────────────────────────────
+const MONTH_NAMES = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+const CONTENT_TYPES = ['Blog Post', 'Social', 'Email', 'Video', 'Product Feature', 'Promotion'];
+const TYPE_COLORS: Record<string, string> = {
+  'Blog Post': 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
+  'Social': 'bg-purple-100 dark:bg-purple-900/40 text-purple-700 dark:text-purple-300',
+  'Email': 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
+  'Video': 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300',
+  'Product Feature': 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300',
+  'Promotion': 'bg-orange-100 dark:bg-orange-900/40 text-orange-700 dark:text-orange-300',
+};
+
+interface CalendarPost {
+  day: number;
+  type: string;
+  title: string;
+}
+
+const MOCK_CALENDAR_POSTS: CalendarPost[] = [
+  { day: 2, type: 'Blog Post', title: 'Industry trends 2026' },
+  { day: 5, type: 'Social', title: 'Behind-the-scenes reel' },
+  { day: 8, type: 'Email', title: 'Weekly newsletter' },
+  { day: 10, type: 'Product Feature', title: 'New product spotlight' },
+  { day: 12, type: 'Social', title: 'Customer testimonial' },
+  { day: 15, type: 'Blog Post', title: 'How-to guide' },
+  { day: 17, type: 'Promotion', title: 'Mid-month offer' },
+  { day: 19, type: 'Video', title: 'Product demo walkthrough' },
+  { day: 22, type: 'Email', title: 'Product launch announcement' },
+  { day: 24, type: 'Social', title: 'Poll & engagement post' },
+  { day: 26, type: 'Blog Post', title: 'Case study: customer win' },
+  { day: 29, type: 'Social', title: 'Month wrap-up highlights' },
+  { day: 30, type: 'Email', title: 'Month-end summary' },
+];
+
+function ContentCalendarGrid({ brandId }: { brandId: string }) {
+  const now = new Date();
+  const [month, setMonth] = useState(now.getMonth());
+  const [year, setYear] = useState(now.getFullYear());
+  const [posts] = useState<CalendarPost[]>(MOCK_CALENDAR_POSTS);
+  const [selected, setSelected] = useState<number | null>(null);
+
+  const daysInMonth = new Date(year, month + 1, 0).getDate();
+  const firstDay = new Date(year, month, 1).getDay();
+
+  const goBack = () => {
+    if (month === 0) { setMonth(11); setYear(y => y - 1); }
+    else setMonth(m => m - 1);
+  };
+  const goNext = () => {
+    if (month === 11) { setMonth(0); setYear(y => y + 1); }
+    else setMonth(m => m + 1);
+  };
+
+  const postsByDay = posts.reduce<Record<number, CalendarPost[]>>((acc, p) => {
+    if (!acc[p.day]) acc[p.day] = [];
+    acc[p.day].push(p);
+    return acc;
+  }, {});
+
+  const selectedPost = selected ? postsByDay[selected] : null;
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Calendar className="h-4 w-4 text-amber-500" />
+            Content Calendar
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <button onClick={goBack} className="h-7 w-7 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+              <ChevronLeft className="h-3.5 w-3.5 text-zinc-500" />
+            </button>
+            <span className="text-sm font-medium text-zinc-900 dark:text-white min-w-[120px] text-center">
+              {MONTH_NAMES[month]} {year}
+            </span>
+            <button onClick={goNext} className="h-7 w-7 rounded-lg border border-zinc-200 dark:border-zinc-700 flex items-center justify-center hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors">
+              <ChevronRight className="h-3.5 w-3.5 text-zinc-500" />
+            </button>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        {/* Legend */}
+        <div className="flex flex-wrap gap-2 mb-4">
+          {Object.entries(TYPE_COLORS).map(([type, cls]) => (
+            <span key={type} className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${cls}`}>{type}</span>
+          ))}
+        </div>
+
+        {/* Grid header */}
+        <div className="grid grid-cols-7 gap-1 mb-1">
+          {['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(d => (
+            <div key={d} className="text-center text-[10px] font-semibold text-zinc-400 dark:text-zinc-500 py-1">{d}</div>
+          ))}
+        </div>
+
+        {/* Grid days */}
+        <div className="grid grid-cols-7 gap-1">
+          {/* Empty cells before first day */}
+          {Array.from({ length: firstDay }).map((_, i) => (
+            <div key={`empty-${i}`} />
+          ))}
+          {Array.from({ length: daysInMonth }).map((_, i) => {
+            const day = i + 1;
+            const dayPosts = postsByDay[day] || [];
+            const isToday = day === now.getDate() && month === now.getMonth() && year === now.getFullYear();
+            const isSelected = selected === day;
+            return (
+              <button
+                key={day}
+                onClick={() => setSelected(isSelected ? null : day)}
+                className={`min-h-[52px] rounded-lg border transition-all text-left p-1 relative ${
+                  isSelected ? 'border-violet-400 dark:border-violet-600 bg-violet-50 dark:bg-violet-950/30' :
+                  isToday ? 'border-violet-200 dark:border-violet-800 bg-violet-50/50 dark:bg-violet-950/10' :
+                  'border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800/50'
+                }`}
+              >
+                <span className={`text-[11px] font-medium block mb-0.5 ${isToday ? 'text-violet-600 dark:text-violet-400' : 'text-zinc-500 dark:text-zinc-400'}`}>{day}</span>
+                <div className="space-y-0.5">
+                  {dayPosts.slice(0, 2).map((p, pi) => (
+                    <div key={pi} className={`text-[9px] truncate px-1 rounded ${TYPE_COLORS[p.type] || 'bg-zinc-100 text-zinc-600'}`}>
+                      {p.type.slice(0, 3)}
+                    </div>
+                  ))}
+                  {dayPosts.length > 2 && (
+                    <div className="text-[9px] text-zinc-400 pl-1">+{dayPosts.length - 2}</div>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
+
+        {/* Selected day detail */}
+        <AnimatePresence>
+          {selected && selectedPost && (
+            <motion.div
+              initial={{ opacity: 0, y: -8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              className="mt-4 p-4 rounded-xl border border-violet-200 dark:border-violet-800 bg-violet-50 dark:bg-violet-950/20"
+            >
+              <p className="text-xs font-semibold text-violet-600 dark:text-violet-400 mb-2">
+                {MONTH_NAMES[month]} {selected} — {selectedPost.length} post{selectedPost.length > 1 ? 's' : ''} planned
+              </p>
+              {selectedPost.map((p, i) => (
+                <div key={i} className="flex items-center gap-2 mb-1 last:mb-0">
+                  <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium flex-shrink-0 ${TYPE_COLORS[p.type] || ''}`}>{p.type}</span>
+                  <span className="text-sm text-zinc-700 dark:text-zinc-300">{p.title}</span>
+                </div>
+              ))}
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Competitor Mention Tracker ──────────────────────────────────
+const MOCK_MENTIONS = [
+  { competitor: 'Shopify', platform: 'Twitter/X', snippet: 'Switched from Shopify to Mayasura — night and day difference in setup time', sentiment: 'positive', date: '2 hours ago' },
+  { competitor: 'Squarespace', platform: 'Reddit', snippet: 'How does Squarespace compare to these AI-first brand builders?', sentiment: 'neutral', date: '5 hours ago' },
+  { competitor: 'Webflow', platform: 'LinkedIn', snippet: 'Webflow is powerful but requires design skills, looking for alternatives', sentiment: 'negative', date: '1 day ago' },
+  { competitor: 'Wix', platform: 'Twitter/X', snippet: 'Wix is too limiting for e-commerce — any open-source alternatives?', sentiment: 'negative', date: '1 day ago' },
+  { competitor: 'Shopify', platform: 'HackerNews', snippet: 'Shopify pricing is getting out of hand for indie brands', sentiment: 'negative', date: '2 days ago' },
+  { competitor: 'WordPress', platform: 'Reddit', snippet: 'WordPress setup takes days, AI builders are the future', sentiment: 'negative', date: '3 days ago' },
+];
+
+function CompetitorMentionTracker() {
+  const sentimentBadge: Record<string, string> = {
+    positive: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300',
+    neutral: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400',
+    negative: 'bg-rose-100 dark:bg-rose-900/40 text-rose-700 dark:text-rose-300',
+  };
+
+  const platformBadge: Record<string, string> = {
+    'Twitter/X': 'bg-sky-50 dark:bg-sky-900/30 text-sky-600 dark:text-sky-400',
+    'Reddit': 'bg-orange-50 dark:bg-orange-900/30 text-orange-600 dark:text-orange-400',
+    'LinkedIn': 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+    'HackerNews': 'bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400',
+  };
+
+  const stats = MOCK_MENTIONS.reduce<Record<string, number>>((acc, m) => {
+    acc[m.competitor] = (acc[m.competitor] || 0) + 1;
+    return acc;
+  }, {});
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Eye className="h-4 w-4 text-rose-500" />
+          Competitor Mention Tracker
+          <Badge variant="secondary" className="text-[10px] ml-1">UI Preview</Badge>
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {/* Stats row */}
+        <div className="flex flex-wrap gap-3 mb-4">
+          {Object.entries(stats).map(([comp, count]) => (
+            <div key={comp} className="flex items-center gap-2 px-3 py-1.5 bg-zinc-50 dark:bg-zinc-800/50 rounded-lg border border-zinc-100 dark:border-zinc-800">
+              <span className="text-xs font-semibold text-zinc-900 dark:text-white">{comp}</span>
+              <span className="text-xs text-zinc-400">×{count}</span>
+            </div>
+          ))}
+        </div>
+
+        <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-4 flex items-center gap-1.5">
+          <AlertCircle className="h-3.5 w-3.5" />
+          Showing mock data — real tracking connects to social listening APIs
+        </p>
+
+        <div className="space-y-3">
+          {MOCK_MENTIONS.map((mention, i) => (
+            <motion.div
+              key={i}
+              initial={{ opacity: 0, x: -8 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className="p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-700 transition-colors"
+            >
+              <div className="flex items-center gap-2 mb-1.5 flex-wrap">
+                <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{mention.competitor}</span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${platformBadge[mention.platform] || 'bg-zinc-100 text-zinc-600'}`}>
+                  {mention.platform}
+                </span>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${sentimentBadge[mention.sentiment]}`}>
+                  {mention.sentiment}
+                </span>
+                <span className="text-[10px] text-zinc-400 ml-auto flex-shrink-0">{mention.date}</span>
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 italic leading-relaxed">&ldquo;{mention.snippet}&rdquo;</p>
+            </motion.div>
+          ))}
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Brand Health Metrics Card ───────────────────────────────────
+function BrandHealthMetricsCard({ brandId }: { brandId: string }) {
+  const metrics = [
+    { label: 'Profile Completeness', value: 78, icon: Target, color: 'text-blue-500', bg: 'bg-blue-50 dark:bg-blue-950/30', trend: '+5%' },
+    { label: 'Content Consistency', value: 85, icon: BarChart2, color: 'text-violet-500', bg: 'bg-violet-50 dark:bg-violet-950/30', trend: '+12%' },
+    { label: 'SEO Readiness', value: 62, icon: Search, color: 'text-emerald-500', bg: 'bg-emerald-50 dark:bg-emerald-950/30', trend: '+3%' },
+    { label: 'Engagement Score', value: 91, icon: TrendingUp, color: 'text-amber-500', bg: 'bg-amber-50 dark:bg-amber-950/30', trend: '+18%' },
+    { label: 'Brand Voice Score', value: 88, icon: Megaphone, color: 'text-rose-500', bg: 'bg-rose-50 dark:bg-rose-950/30', trend: '+7%' },
+    { label: 'Channel Coverage', value: 55, icon: Share2, color: 'text-cyan-500', bg: 'bg-cyan-50 dark:bg-cyan-950/30', trend: '+2%' },
+  ];
+
+  const overall = Math.round(metrics.reduce((sum, m) => sum + m.value, 0) / metrics.length);
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Activity className="h-4 w-4 text-violet-500" />
+            Brand Health Dashboard
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <div className={`text-2xl font-bold ${overall >= 80 ? 'text-emerald-500' : overall >= 60 ? 'text-amber-500' : 'text-red-500'}`}>
+              {overall}
+            </div>
+            <div>
+              <div className="text-[10px] font-semibold text-zinc-400">HEALTH</div>
+              <div className="text-[10px] font-semibold text-zinc-400">SCORE</div>
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          {metrics.map((m, i) => (
+            <motion.div
+              key={m.label}
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.05 }}
+              className={`p-3 rounded-xl ${m.bg} border border-transparent`}
+            >
+              <div className="flex items-center justify-between mb-2">
+                <div className="flex items-center gap-2">
+                  <m.icon className={`h-3.5 w-3.5 ${m.color}`} />
+                  <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{m.label}</span>
+                </div>
+                <div className="flex items-center gap-1.5">
+                  <span className="text-xs text-emerald-600 dark:text-emerald-400 font-medium">{m.trend}</span>
+                  <span className={`text-sm font-bold ${m.color}`}>{m.value}%</span>
+                </div>
+              </div>
+              <div className="h-1.5 bg-white/60 dark:bg-zinc-900/40 rounded-full overflow-hidden">
+                <motion.div
+                  initial={{ width: 0 }}
+                  animate={{ width: `${m.value}%` }}
+                  transition={{ duration: 0.8, delay: i * 0.1, ease: 'easeOut' }}
+                  className={`h-full rounded-full bg-gradient-to-r ${
+                    m.value >= 80 ? 'from-emerald-400 to-emerald-500' :
+                    m.value >= 60 ? 'from-amber-400 to-amber-500' :
+                    'from-red-400 to-red-500'
+                  }`}
+                />
+              </div>
+            </motion.div>
+          ))}
+        </div>
+        <div className="mt-4 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl border border-zinc-100 dark:border-zinc-800">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 flex items-start gap-2">
+            <Zap className="h-3.5 w-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <span>Boost your score by improving <strong className="text-zinc-700 dark:text-zinc-300">Channel Coverage</strong> (+45 pts potential) and <strong className="text-zinc-700 dark:text-zinc-300">SEO Readiness</strong> (+38 pts potential).</span>
+          </p>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Growth Playbook ─────────────────────────────────────────────
+interface PlaybookStep {
+  id: string;
+  phase: string;
+  title: string;
+  description: string;
+  impact: 'high' | 'medium' | 'low';
+  effort: 'low' | 'medium' | 'high';
+  timeframe: string;
+}
+
+const GROWTH_PLAYBOOK: PlaybookStep[] = [
+  { id: '1', phase: 'Foundation', title: 'Complete your brand profile', description: 'Fill in all brand details, upload logo, and set your brand voice to unlock better AI suggestions.', impact: 'high', effort: 'low', timeframe: 'This week' },
+  { id: '2', phase: 'Foundation', title: 'Add 10+ products with AI descriptions', description: 'Use the AI product description generator to create compelling, SEO-optimized copy for each product.', impact: 'high', effort: 'low', timeframe: 'This week' },
+  { id: '3', phase: 'Content', title: 'Publish your first 3 blog posts', description: 'Use AI Blog Generator to create industry-relevant content. Focus on how-to guides and industry insights.', impact: 'high', effort: 'medium', timeframe: 'Week 2' },
+  { id: '4', phase: 'Content', title: 'Set up the AI chatbot', description: 'Configure your chatbot with FAQs, product knowledge, and brand voice for 24/7 customer support.', impact: 'high', effort: 'medium', timeframe: 'Week 2' },
+  { id: '5', phase: 'Growth', title: 'Launch first email newsletter', description: 'Announce your brand to early subscribers. Use the social proof from your first sales as content.', impact: 'medium', effort: 'low', timeframe: 'Week 3' },
+  { id: '6', phase: 'Growth', title: 'Run a 20% launch discount campaign', description: 'Create limited-time discount codes to drive first purchases and build social proof.', impact: 'high', effort: 'low', timeframe: 'Week 3' },
+  { id: '7', phase: 'Scale', title: 'Collect and publish 5 testimonials', description: 'Reach out to early customers for reviews. Publish them on your website for social proof.', impact: 'medium', effort: 'medium', timeframe: 'Month 2' },
+  { id: '8', phase: 'Scale', title: 'Run competitor analysis & differentiate', description: 'Use AI Competitor Analysis to identify gaps in the market and sharpen your positioning.', impact: 'high', effort: 'medium', timeframe: 'Month 2' },
+  { id: '9', phase: 'Scale', title: 'Optimize SEO with keyword strategy', description: 'Run SEO Analysis and implement the top 5 keyword recommendations across your site and blog.', impact: 'high', effort: 'high', timeframe: 'Month 3' },
+  { id: '10', phase: 'Scale', title: 'Connect custom domain', description: 'Upgrade to Pro and connect your custom domain for a professional brand presence.', impact: 'medium', effort: 'low', timeframe: 'Month 3' },
+];
+
+const PHASE_COLORS: Record<string, string> = {
+  Foundation: 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-300',
+  Content: 'bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300',
+  Growth: 'bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300',
+  Scale: 'bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300',
+};
+
+const IMPACT_COLORS = {
+  high: 'text-emerald-600 dark:text-emerald-400',
+  medium: 'text-amber-600 dark:text-amber-400',
+  low: 'text-zinc-400',
+};
+
+function GrowthPlaybook() {
+  const [checked, setChecked] = useState<Set<string>>(new Set());
+
+  const toggle = (id: string) => setChecked(prev => {
+    const next = new Set(prev);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    return next;
+  });
+
+  const progress = Math.round((checked.size / GROWTH_PLAYBOOK.length) * 100);
+  const phases = [...new Set(GROWTH_PLAYBOOK.map(s => s.phase))];
+
+  return (
+    <Card>
+      <CardHeader className="pb-3">
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <ListChecks className="h-4 w-4 text-emerald-500" />
+            Growth Playbook
+            <span className="text-xs text-zinc-400 font-normal">AI-generated</span>
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            <div className="text-xs text-zinc-500">{checked.size}/{GROWTH_PLAYBOOK.length} done</div>
+            <div className="w-24 h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+              <motion.div
+                animate={{ width: `${progress}%` }}
+                transition={{ duration: 0.5 }}
+                className="h-full bg-gradient-to-r from-emerald-400 to-emerald-500 rounded-full"
+              />
+            </div>
+          </div>
+        </div>
+      </CardHeader>
+      <CardContent>
+        <div className="space-y-6">
+          {phases.map(phase => (
+            <div key={phase}>
+              <div className="flex items-center gap-2 mb-3">
+                <span className={`px-2.5 py-0.5 rounded-full text-[11px] font-semibold ${PHASE_COLORS[phase]}`}>{phase}</span>
+                <div className="flex-1 h-px bg-zinc-100 dark:bg-zinc-800" />
+              </div>
+              <div className="space-y-2.5">
+                {GROWTH_PLAYBOOK.filter(s => s.phase === phase).map((step) => {
+                  const done = checked.has(step.id);
+                  return (
+                    <motion.div
+                      key={step.id}
+                      layout
+                      className={`p-3.5 rounded-xl border transition-all cursor-pointer ${
+                        done
+                          ? 'border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/20 opacity-70'
+                          : 'border-zinc-100 dark:border-zinc-800 hover:border-zinc-200 dark:hover:border-zinc-700 bg-white dark:bg-zinc-900'
+                      }`}
+                      onClick={() => toggle(step.id)}
+                    >
+                      <div className="flex items-start gap-3">
+                        <div className="flex-shrink-0 mt-0.5">
+                          {done ? (
+                            <CheckSquare className="h-4 w-4 text-emerald-500" />
+                          ) : (
+                            <Square className="h-4 w-4 text-zinc-300 dark:text-zinc-600" />
+                          )}
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center gap-2 mb-0.5 flex-wrap">
+                            <span className={`text-sm font-medium ${done ? 'line-through text-zinc-400' : 'text-zinc-900 dark:text-white'}`}>
+                              {step.title}
+                            </span>
+                            <span className="text-[10px] text-zinc-400">{step.timeframe}</span>
+                          </div>
+                          {!done && (
+                            <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed mb-2">{step.description}</p>
+                          )}
+                          <div className="flex items-center gap-3">
+                            <span className={`text-[10px] font-semibold flex items-center gap-1 ${IMPACT_COLORS[step.impact]}`}>
+                              <ArrowUpRight className="h-3 w-3" />
+                              {step.impact} impact
+                            </span>
+                            <span className="text-[10px] text-zinc-400">
+                              {step.effort} effort
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </motion.div>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
+
+        {progress === 100 && (
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="mt-6 p-4 bg-gradient-to-r from-emerald-50 to-teal-50 dark:from-emerald-950/20 dark:to-teal-950/20 rounded-xl border border-emerald-200 dark:border-emerald-800 text-center"
+          >
+            <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300">🎉 Playbook complete! Your brand is built for growth.</p>
+          </motion.div>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── PDF Export ──────────────────────────────────────────────────
+function ExportStrategyButton({ results, brandId }: { results: Record<string, unknown>; brandId: string }) {
+  const [exporting, setExporting] = useState(false);
+  const toast = useToast();
+
+  const handleExport = useCallback(async () => {
+    if (Object.keys(results).length === 0) {
+      toast.warning('Generate at least one strategy analysis first');
+      return;
+    }
+    setExporting(true);
+    try {
+      // Build a printable HTML document and open in new tab
+      const content = Object.entries(results).map(([type, result]) => {
+        const option = strategyOptions.find(o => o.type === type);
+        const resultStr = JSON.stringify(result, null, 2)
+          .replace(/[{}[\]"]/g, '')
+          .replace(/,\n/g, '\n')
+          .trim();
+        return `<h2 style="color:#7c3aed;margin-top:2rem">${option?.label || type}</h2><pre style="white-space:pre-wrap;font-family:inherit;font-size:0.875rem;line-height:1.6;color:#374151">${resultStr}</pre>`;
+      }).join('<hr style="border:1px solid #e5e7eb;margin:1.5rem 0">');
+
+      const html = `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Brand Strategy Report — Mayasura</title>
+  <style>
+    body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; max-width: 800px; margin: 0 auto; padding: 2rem; color: #111827; }
+    h1 { color: #111827; font-size: 1.75rem; margin-bottom: 0.25rem; }
+    .subtitle { color: #6b7280; font-size: 0.875rem; margin-bottom: 2rem; }
+    h2 { font-size: 1.25rem; }
+    @media print { body { max-width: none; padding: 1cm; } }
+  </style>
+</head>
+<body>
+  <h1>Brand Strategy Report</h1>
+  <p class="subtitle">Generated by Mayasura · Brand ID: ${brandId} · ${new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+  ${content}
+</body>
+</html>`;
+
+      const blob = new Blob([html], { type: 'text/html' });
+      const url = URL.createObjectURL(blob);
+      const win = window.open(url, '_blank');
+      if (win) {
+        win.onload = () => {
+          setTimeout(() => {
+            win.print();
+            URL.revokeObjectURL(url);
+          }, 500);
+        };
+      }
+      toast.success('Strategy report opened — use Print → Save as PDF');
+    } catch {
+      toast.error('Failed to generate export');
+    }
+    setExporting(false);
+  }, [results, brandId, toast]);
+
+  return (
+    <Button variant="outline" size="sm" onClick={handleExport} disabled={exporting}>
+      {exporting ? (
+        <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating...</>
+      ) : (
+        <><Download className="h-3.5 w-3.5" /> Export PDF</>
+      )}
+    </Button>
+  );
+}
+
 export default function StrategyPage() {
   const params = useParams();
   const brandId = params.brandId as string;
@@ -297,6 +834,7 @@ export default function StrategyPage() {
   };
 
   const hasResults = Object.keys(results).length > 0;
+  const [activeTab, setActiveTab] = useState<'advisor' | 'calendar' | 'competitors' | 'health' | 'playbook'>('advisor');
 
   const generateHealthReport = async () => {
     setLoadingHealth(true);
@@ -318,6 +856,14 @@ export default function StrategyPage() {
     setLoadingHealth(false);
   };
 
+  const tabs = [
+    { id: 'advisor' as const, label: 'AI Advisor', icon: Sparkles },
+    { id: 'calendar' as const, label: 'Calendar', icon: Calendar },
+    { id: 'competitors' as const, label: 'Competitors', icon: Eye },
+    { id: 'health' as const, label: 'Health', icon: Activity },
+    { id: 'playbook' as const, label: 'Playbook', icon: ListChecks },
+  ];
+
   return (
     <PageTransition>
     <div className="p-4 sm:p-8">
@@ -328,99 +874,233 @@ export default function StrategyPage() {
         ]}
         className="mb-4"
       />
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-6">
         <div>
           <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
             <Sparkles className="h-6 w-6 text-blue-600" />
             AI Strategy Advisor
           </h1>
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Get AI-powered insights and recommendations for your brand</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">AI-powered insights, calendar, growth playbook, and brand health</p>
         </div>
-        <Button
-          variant="brand"
-          size="sm"
-          onClick={generateHealthReport}
-          disabled={loadingHealth}
-        >
-          {loadingHealth ? (
-            <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analyzing...</>
-          ) : (
-            <><Activity className="h-3.5 w-3.5" /> Health Report</>
+        <ExportStrategyButton results={results} brandId={brandId} />
+      </div>
+
+      {/* Tab Navigation */}
+      <div className="flex items-center gap-1 p-1 bg-zinc-100 dark:bg-zinc-800/50 rounded-xl mb-6 overflow-x-auto">
+        {tabs.map((tab) => (
+          <button
+            key={tab.id}
+            onClick={() => setActiveTab(tab.id)}
+            className={`flex items-center gap-1.5 px-3 py-2 rounded-lg text-sm font-medium transition-all whitespace-nowrap flex-shrink-0 ${
+              activeTab === tab.id
+                ? 'bg-white dark:bg-zinc-900 text-zinc-900 dark:text-white shadow-sm'
+                : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-300'
+            }`}
+          >
+            <tab.icon className="h-3.5 w-3.5" />
+            {tab.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab: AI Advisor */}
+      {activeTab === 'advisor' && (
+        <div>
+          {/* Health Report at top */}
+          <div className="flex items-center justify-between mb-4">
+            <p className="text-xs text-zinc-400 dark:text-zinc-500">Generate AI analysis for any aspect of your brand strategy</p>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={generateHealthReport}
+              disabled={loadingHealth}
+            >
+              {loadingHealth ? (
+                <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analyzing...</>
+              ) : (
+                <><Activity className="h-3.5 w-3.5" /> Run Health Report</>
+              )}
+            </Button>
+          </div>
+
+          {loadingHealth && !healthReport && <StrategySkeleton />}
+          {healthReport && <HealthReportCard report={healthReport} />}
+
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
+            {strategyOptions.map((option) => {
+              const hasResult = !!results[option.type];
+              const ts = timestamps[option.type];
+              return (
+                <Card key={option.type} className="hover:shadow-md transition-all">
+                  <CardContent className="p-5">
+                    <div className={`h-11 w-11 rounded-xl flex items-center justify-center mb-3 ${option.color}`}>
+                      <option.icon className="h-5 w-5" />
+                    </div>
+                    <h3 className="font-semibold text-sm mb-1 text-zinc-900 dark:text-white">{option.label}</h3>
+                    <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-2">{option.desc}</p>
+                    {hasResult && ts && (
+                      <p className="text-[10px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1 mb-3">
+                        <Clock className="h-3 w-3" />
+                        Last run: {new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
+                      </p>
+                    )}
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => runStrategy(option.type)}
+                      disabled={loading === option.type}
+                      className="w-full"
+                    >
+                      {loading === option.type ? (
+                        <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analyzing...</>
+                      ) : hasResult ? (
+                        <><RefreshCw className="h-3.5 w-3.5" /> Refresh</>
+                      ) : (
+                        <><Sparkles className="h-3.5 w-3.5" /> Generate</>
+                      )}
+                    </Button>
+                  </CardContent>
+                </Card>
+              );
+            })}
+          </div>
+
+          {/* Loading skeleton while generating */}
+          {loading && !results[loading] && <StrategySkeleton />}
+
+          {/* Loading saved strategies */}
+          {loadingSaved && !hasResults && (
+            <div className="space-y-4">
+              <StrategySkeleton />
+            </div>
           )}
-        </Button>
-      </div>
 
-      {/* Health Report */}
-      {loadingHealth && !healthReport && <StrategySkeleton />}
-      {healthReport && <HealthReportCard report={healthReport} />}
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
-        {strategyOptions.map((option) => {
-          const hasResult = !!results[option.type];
-          const ts = timestamps[option.type];
-          return (
-            <Card key={option.type} className="hover:shadow-md transition-all">
-              <CardContent className="p-5">
-                <div className={`h-11 w-11 rounded-xl flex items-center justify-center mb-3 ${option.color}`}>
-                  <option.icon className="h-5 w-5" />
-                </div>
-                <h3 className="font-semibold text-sm mb-1 text-zinc-900 dark:text-white">{option.label}</h3>
-                <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-2">{option.desc}</p>
-                {hasResult && ts && (
-                  <p className="text-[10px] text-zinc-400 dark:text-zinc-500 flex items-center gap-1 mb-3">
-                    <Clock className="h-3 w-3" />
-                    Last run: {new Date(ts).toLocaleDateString('en-US', { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' })}
-                  </p>
-                )}
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => runStrategy(option.type)}
-                  disabled={loading === option.type}
-                  className="w-full"
-                >
-                  {loading === option.type ? (
-                    <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analyzing...</>
-                  ) : hasResult ? (
-                    <><RefreshCw className="h-3.5 w-3.5" /> Refresh</>
-                  ) : (
-                    <><Sparkles className="h-3.5 w-3.5" /> Generate</>
-                  )}
-                </Button>
-              </CardContent>
-            </Card>
-          );
-        })}
-      </div>
-
-      {/* Loading skeleton while generating */}
-      {loading && !results[loading] && <StrategySkeleton />}
-
-      {/* Loading saved strategies */}
-      {loadingSaved && !hasResults && (
-        <div className="space-y-4">
-          <StrategySkeleton />
+          {/* Results */}
+          <AnimatePresence mode="popLayout">
+            {Object.entries(results).map(([type, result]) => (
+              <motion.div
+                key={type}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                className="mb-6"
+              >
+                <StrategyResult
+                  type={type as StrategyType}
+                  result={result as Record<string, unknown>}
+                  timestamp={timestamps[type]}
+                />
+              </motion.div>
+            ))}
+          </AnimatePresence>
         </div>
       )}
 
-      {/* Results */}
-      <AnimatePresence mode="popLayout">
-        {Object.entries(results).map(([type, result]) => (
-          <motion.div
-            key={type}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            className="mb-6"
-          >
+      {/* Tab: Content Calendar */}
+      {activeTab === 'calendar' && (
+        <div className="space-y-6">
+          <ContentCalendarGrid brandId={brandId} />
+          <Card>
+            <CardHeader className="pb-3">
+              <CardTitle className="text-sm flex items-center gap-2">
+                <BookOpen className="h-4 w-4 text-blue-500" />
+                AI Content Suggestions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <p className="text-xs text-zinc-400 dark:text-zinc-500 mb-4 flex items-center gap-1.5">
+                <Sparkles className="h-3.5 w-3.5 text-violet-400" />
+                Based on your brand industry and voice — click any to add to calendar
+              </p>
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                {[
+                  { type: 'Blog Post', title: '5 ways AI is transforming your industry in 2026', reason: 'Trending topic in your sector' },
+                  { type: 'Social', title: 'Behind-the-scenes: How we make [product]', reason: 'High engagement format' },
+                  { type: 'Email', title: 'Exclusive launch: [Product] is here', reason: 'Drives conversions' },
+                  { type: 'Blog Post', title: 'The definitive guide to [brand expertise]', reason: 'Long-tail SEO opportunity' },
+                  { type: 'Video', title: 'Customer story: [Name]\'s transformation', reason: 'Social proof builder' },
+                  { type: 'Promotion', title: 'Flash sale: 24 hours only', reason: 'Revenue driver' },
+                ].map((suggestion, i) => (
+                  <motion.div
+                    key={i}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: i * 0.06 }}
+                    className="p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-violet-200 dark:hover:border-violet-800 hover:bg-violet-50/50 dark:hover:bg-violet-950/10 cursor-pointer transition-all group"
+                  >
+                    <div className="flex items-center gap-2 mb-1.5">
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${TYPE_COLORS[suggestion.type] || 'bg-zinc-100 text-zinc-600'}`}>
+                        {suggestion.type}
+                      </span>
+                    </div>
+                    <p className="text-sm font-medium text-zinc-900 dark:text-white mb-1">{suggestion.title}</p>
+                    <p className="text-xs text-zinc-400 flex items-center gap-1">
+                      <Zap className="h-3 w-3 text-amber-400" />
+                      {suggestion.reason}
+                    </p>
+                  </motion.div>
+                ))}
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+      )}
+
+      {/* Tab: Competitors */}
+      {activeTab === 'competitors' && (
+        <div className="space-y-6">
+          <CompetitorMentionTracker />
+          {!!results['competitor-analysis'] && (
             <StrategyResult
-              type={type as StrategyType}
-              result={result as Record<string, unknown>}
-              timestamp={timestamps[type]}
+              type="competitor-analysis"
+              result={results['competitor-analysis'] as Record<string, unknown>}
+              timestamp={timestamps['competitor-analysis'] as string | undefined}
             />
-          </motion.div>
-        ))}
-      </AnimatePresence>
+          )}
+          {!results['competitor-analysis'] && (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Users className="h-10 w-10 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
+                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1">No competitor analysis yet</p>
+                <p className="text-xs text-zinc-400 mb-4">Run AI competitor analysis to see your positioning</p>
+                <Button variant="outline" size="sm" onClick={() => { setActiveTab('advisor'); setTimeout(() => runStrategy('competitor-analysis'), 100); }}>
+                  <Sparkles className="h-3.5 w-3.5" /> Generate Analysis
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Tab: Health */}
+      {activeTab === 'health' && (
+        <div className="space-y-6">
+          <BrandHealthMetricsCard brandId={brandId} />
+          {healthReport && <HealthReportCard report={healthReport} />}
+          {!healthReport && (
+            <Card>
+              <CardContent className="p-8 text-center">
+                <Activity className="h-10 w-10 text-zinc-300 dark:text-zinc-600 mx-auto mb-3" />
+                <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-1">No full health report yet</p>
+                <p className="text-xs text-zinc-400 mb-4">Generate a comprehensive AI health report with recommendations</p>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={generateHealthReport}
+                  disabled={loadingHealth}
+                >
+                  {loadingHealth ? <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analyzing...</> : <><Activity className="h-3.5 w-3.5" /> Run Health Report</>}
+                </Button>
+              </CardContent>
+            </Card>
+          )}
+        </div>
+      )}
+
+      {/* Tab: Playbook */}
+      {activeTab === 'playbook' && (
+        <GrowthPlaybook />
+      )}
     </div>
     </PageTransition>
   );
