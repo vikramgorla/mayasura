@@ -16,6 +16,7 @@ interface Props {
 
 export default function StepContent({ data, updateData, onNext, onBack }: Props) {
   const [analyzingVoice, setAnalyzingVoice] = useState(false);
+  const [voiceRateLimit, setVoiceRateLimit] = useState(false);
   const [voiceAnalysis, setVoiceAnalysis] = useState<{
     tone: string;
     personality: string[];
@@ -30,7 +31,7 @@ export default function StepContent({ data, updateData, onNext, onBack }: Props)
   };
 
   const analyzeVoice = async () => {
-    if (!data.description) return;
+    if (!data.description || analyzingVoice || voiceRateLimit) return;
     setAnalyzingVoice(true);
     try {
       const res = await fetch('/api/ai/suggest', {
@@ -41,6 +42,12 @@ export default function StepContent({ data, updateData, onNext, onBack }: Props)
           description: `${data.name}: ${data.description}. Industry: ${data.industry}`,
         }),
       });
+      if (res.status === 429) {
+        setVoiceRateLimit(true);
+        setTimeout(() => setVoiceRateLimit(false), 30000);
+        setAnalyzingVoice(false);
+        return;
+      }
       const result = await res.json();
       if (result.voice) {
         setVoiceAnalysis(result.voice);
@@ -91,10 +98,16 @@ export default function StepContent({ data, updateData, onNext, onBack }: Props)
               variant="ghost"
               size="sm"
               onClick={analyzeVoice}
-              disabled={!data.description || analyzingVoice}
+              disabled={!data.description || analyzingVoice || voiceRateLimit}
               className="text-violet-600 dark:text-violet-400 hover:text-violet-700 dark:hover:text-violet-300"
+              title={voiceRateLimit ? 'Rate limit reached. Please wait 30s.' : undefined}
             >
-              {analyzingVoice ? <Spinner className="h-4" /> : <><Sparkles className="h-3.5 w-3.5" /> AI Analyze</>}
+              {analyzingVoice
+                ? <><Spinner className="h-4 w-4" /> Generating...</>
+                : voiceRateLimit
+                ? '⏳ Rate limited'
+                : <><Sparkles className="h-3.5 w-3.5" /> AI Analyze</>
+              }
             </Button>
           </div>
           <Textarea

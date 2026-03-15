@@ -513,13 +513,35 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-white text-zinc-900">
-        <div className="text-center">
-          <h1 className="text-2xl font-semibold mb-3">Brand not found</h1>
-          <p className="text-zinc-400 mb-6 text-sm">This brand doesn&apos;t exist or hasn&apos;t been launched yet.</p>
-          <Link href="/" className="text-sm font-medium underline underline-offset-4 hover:opacity-70">
-            ← Back to Mayasura
-          </Link>
+      <div className="min-h-screen flex flex-col items-center justify-center bg-white text-zinc-900 px-6">
+        {/* SVG illustration */}
+        <svg className="w-32 h-32 mb-8 opacity-10" viewBox="0 0 120 120" fill="none">
+          <circle cx="60" cy="60" r="56" stroke="#000" strokeWidth="2" />
+          <path d="M40 50 Q60 35 80 50" stroke="#000" strokeWidth="2" strokeLinecap="round" />
+          <circle cx="45" cy="58" r="4" fill="#000" />
+          <circle cx="75" cy="58" r="4" fill="#000" />
+          <path d="M42 78 Q60 68 78 78" stroke="#000" strokeWidth="2" strokeLinecap="round" />
+        </svg>
+        <div className="text-center max-w-sm">
+          <h1 className="text-4xl font-light tracking-tight mb-3 text-zinc-900">404</h1>
+          <h2 className="text-lg font-medium mb-3 text-zinc-700">Brand not found</h2>
+          <p className="text-zinc-400 mb-8 text-sm leading-relaxed">
+            This brand doesn&apos;t exist or hasn&apos;t been launched yet. Check the URL or explore Mayasura.
+          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
+            <Link
+              href="/"
+              className="px-6 py-2.5 text-sm font-medium rounded bg-zinc-900 text-white hover:bg-zinc-700 transition-colors"
+            >
+              ← Back to Mayasura
+            </Link>
+            <button
+              onClick={() => window.history.back()}
+              className="px-6 py-2.5 text-sm font-medium rounded border border-zinc-200 text-zinc-600 hover:bg-zinc-50 transition-colors"
+            >
+              Go Back
+            </button>
+          </div>
         </div>
       </div>
     );
@@ -528,9 +550,26 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
   if (!data) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
-        <div className="animate-pulse flex flex-col items-center gap-3">
-          <div className="h-8 w-8 rounded bg-zinc-100" />
-          <div className="h-3 w-24 rounded bg-zinc-100" />
+        <div className="flex flex-col items-center gap-6">
+          {/* Skeleton nav */}
+          <div className="w-full max-w-6xl px-5 sm:px-8 py-5 flex items-center justify-between fixed top-0 left-0 right-0 bg-white border-b border-zinc-100">
+            <div className="h-5 w-32 rounded-full bg-zinc-100 animate-pulse" />
+            <div className="hidden sm:flex items-center gap-6">
+              {[1,2,3,4].map((i) => <div key={i} className="h-3 w-14 rounded-full bg-zinc-100 animate-pulse" />)}
+            </div>
+          </div>
+          {/* Skeleton hero */}
+          <div className="w-full max-w-3xl mx-auto px-5 sm:px-8 pt-32 space-y-4">
+            <div className="h-3 w-24 rounded-full bg-zinc-100 animate-pulse" />
+            <div className="h-10 w-3/4 rounded bg-zinc-100 animate-pulse" />
+            <div className="h-10 w-1/2 rounded bg-zinc-100 animate-pulse" />
+            <div className="h-4 w-full max-w-md rounded-full bg-zinc-100 animate-pulse mt-6" />
+            <div className="h-4 w-3/4 max-w-sm rounded-full bg-zinc-100 animate-pulse" />
+            <div className="flex gap-3 mt-8">
+              <div className="h-10 w-28 rounded bg-zinc-100 animate-pulse" />
+              <div className="h-10 w-24 rounded bg-zinc-100 animate-pulse" />
+            </div>
+          </div>
         </div>
       </div>
     );
