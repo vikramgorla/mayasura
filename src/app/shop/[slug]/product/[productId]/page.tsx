@@ -5,7 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from '../../layout';
-import { ProductMeta } from '@/components/site/site-meta';
+import { ProductMeta, BreadcrumbMeta } from '@/components/site/site-meta';
 
 // ── Share buttons ─────────────────────────────────────────────────────────────
 function ShareButtons({ url, name, textColor, accentColor }: { url: string; name: string; textColor: string; accentColor: string }) {
@@ -552,6 +552,12 @@ export default function ProductDetailPage() {
           canonicalUrl={productUrl}
           product={{ name: product.name, description: product.description, price: product.price, currency: product.currency, imageUrl: product.image_url }}
         />
+        <BreadcrumbMeta items={[
+          { name: brand.name, url: `${baseUrl}/site/${slug}` },
+          { name: 'Shop', url: `${baseUrl}/shop/${slug}` },
+          ...(product.category ? [{ name: product.category, url: `${baseUrl}/shop/${slug}?category=${encodeURIComponent(product.category)}` }] : []),
+          { name: product.name, url: productUrl },
+        ]} />
 
         {/* Breadcrumb */}
         <motion.nav

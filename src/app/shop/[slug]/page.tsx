@@ -4,6 +4,8 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from './layout';
+import { ShopMeta, BreadcrumbMeta } from '@/components/site/site-meta';
+import { getBaseUrl } from '@/lib/seo';
 
 function getProductBadge(product: { name: string; price?: number | null; created_at?: string }, index: number): { label: string; type: 'new' | 'sale' | 'best' } | null {
   // Simple heuristic: first 2 products = "Best Seller", next 2 = "New", products with low price = "Sale"
@@ -115,8 +117,19 @@ export default function ShopPage() {
     };
   })();
 
+  const baseUrl = getBaseUrl();
+  const canonicalUrl = `${baseUrl}/shop/${slug}`;
+
   return (
     <>
+      <ShopMeta
+        org={{ brandName: brand.name, description: brand.description, url: `${baseUrl}/site/${slug}`, logoUrl: brand.logo_url }}
+        canonicalUrl={canonicalUrl}
+      />
+      <BreadcrumbMeta items={[
+        { name: brand.name, url: `${baseUrl}/site/${slug}` },
+        { name: 'Shop', url: canonicalUrl },
+      ]} />
       {/* Header */}
       <section className="py-16 sm:py-20">
         <div className={`${containerWidth} mx-auto px-5 sm:px-8`}>

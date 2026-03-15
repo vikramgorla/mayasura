@@ -6,6 +6,8 @@ import { motion, AnimatePresence, LayoutGroup, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { useBrandSite, BrandPlaceholder } from '../layout';
 import { BORDER_RADIUS_MAP } from '@/lib/design-settings';
+import { ProductsPageMeta, BreadcrumbMeta } from '@/components/site/site-meta';
+import { getBaseUrl } from '@/lib/seo';
 
 /* ─── Types & Constants ───────────────────────────────────────── */
 type SortKey = 'default' | 'price-low' | 'price-high' | 'newest' | 'name-az';
@@ -397,8 +399,20 @@ export default function ProductsPage() {
       style={{ color: isBold ? ac : `${tc}30` }}>{cat}</span>
   ) : null;
 
+  const baseUrl = getBaseUrl();
+  const canonicalUrl = `${baseUrl}/site/${slug}/products`;
+
   return (
     <>
+      <ProductsPageMeta
+        org={{ brandName: brand.name, description: brand.description, url: `${baseUrl}/site/${slug}`, logoUrl: brand.logo_url }}
+        canonicalUrl={canonicalUrl}
+        products={products.map(p => ({ name: p.name, description: p.description, price: p.price, currency: p.currency, imageUrl: p.image_url }))}
+      />
+      <BreadcrumbMeta items={[
+        { name: brand.name, url: `${baseUrl}/site/${slug}` },
+        { name: 'Products', url: canonicalUrl },
+      ]} />
       {/* Quick View Modal */}
       <AnimatePresence>
         {quickViewProduct && (
