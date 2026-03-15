@@ -128,12 +128,27 @@ export default function ContactPage() {
     if (tid === 'playful') return { ...base, borderColor: eb || `${tc}12`, backgroundColor: '#FFFFFF', borderRadius: '12px', borderWidth: '2px' };
     if (tid === 'classic') return { ...base, borderColor: eb || `${tc}12`, backgroundColor: bgColor, borderRadius: '8px', borderWidth: '1px',
       boxShadow: 'inset 2px 2px 4px rgba(0,0,0,0.03), inset -2px -2px 4px rgba(255,255,255,0.5)' };
+    if (tid === 'startup') return { ...base, borderColor: eb || `${tc}12`, backgroundColor: '#FFFFFF', borderRadius: '12px', borderWidth: '1px' };
+    if (tid === 'portfolio') return { ...base, borderColor: eb || `${tc}08`, backgroundColor: 'transparent', borderWidth: '0 0 1px 0', borderRadius: '0', padding: '0.875rem 0' };
+    if (tid === 'magazine') return { ...base, borderColor: eb || `${tc}15`, backgroundColor: 'transparent', borderWidth: '0 0 1px 0', borderRadius: '0', padding: '0.875rem 0' };
+    if (tid === 'boutique') return { ...base, borderColor: eb || `${tc}10`, backgroundColor: 'transparent', borderWidth: '0 0 1px 0', borderRadius: '0', padding: '1rem 0', letterSpacing: '0.02em' };
+    if (tid === 'tech') return { ...base, borderColor: eb || '#10B98125', backgroundColor: '#0D1520', borderWidth: '1px', borderRadius: '8px', color: '#E2E8F0', fontFamily: "'JetBrains Mono', monospace" };
+    if (tid === 'wellness') return { ...base, borderColor: eb || `${tc}10`, backgroundColor: '#FFFFFF', borderRadius: '16px', borderWidth: '1px' };
+    if (tid === 'restaurant') return { ...base, borderColor: eb || `${tc}12`, backgroundColor: '#FFFFFF', borderRadius: '4px', borderWidth: '1px' };
+    if (tid === 'neon') return { ...base, borderColor: eb || `${ac}25`, backgroundColor: '#0A0A1A', borderWidth: '1px', borderRadius: '0', color: '#F0F0FF' };
+    if (tid === 'organic') return { ...base, borderColor: eb || `${tc}10`, backgroundColor: '#FFFFFF', borderRadius: '16px', borderWidth: '1px' };
+    if (tid === 'artisan') return { ...base, borderColor: eb || `${tc}15`, backgroundColor: 'transparent', borderWidth: '2px', borderRadius: '4px', fontFamily: "'JetBrains Mono', monospace" };
+    if (tid === 'corporate') return { ...base, borderColor: eb || `${tc}12`, backgroundColor: '#FFFFFF', borderRadius: '6px', borderWidth: '1px' };
     return { ...base, borderColor: eb || `${tc}10`, backgroundColor: 'transparent', borderWidth: '0 0 1px 0', borderRadius: '0', padding: '0.875rem 0' };
   };
 
   const labelStyle: React.CSSProperties = {
-    color: `${tc}${isBold ? '55' : '45'}`, fontSize: '0.75rem', fontWeight: isBold ? 700 : 500,
-    letterSpacing: isBold ? '0.1em' : '0.06em', textTransform: 'uppercase',
+    color: `${tc}${isBold || tid === 'tech' || tid === 'neon' ? '55' : '45'}`,
+    fontSize: '0.75rem',
+    fontWeight: isBold || tid === 'artisan' ? 700 : tid === 'tech' ? 600 : 500,
+    letterSpacing: isBold ? '0.1em' : tid === 'boutique' ? '0.12em' : tid === 'tech' || tid === 'artisan' ? '0.08em' : '0.06em',
+    textTransform: 'uppercase',
+    fontFamily: tid === 'tech' || tid === 'artisan' ? "'JetBrains Mono', monospace" : undefined,
   };
 
   const accentBtnText = getTextOnColor(ac);
@@ -143,13 +158,41 @@ export default function ContactPage() {
     ? { backgroundColor: ac, color: accentBtnText, padding: '0.875rem 2.5rem', borderRadius: '9999px', fontWeight: 600, fontSize: '0.875rem', boxShadow: '0 4px 14px rgba(0,0,0,0.1)' }
     : tid === 'classic'
     ? { backgroundColor: ac, color: accentBtnText, padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 500, fontSize: '0.875rem' }
+    : tid === 'startup'
+    ? { backgroundColor: ac, color: accentBtnText, padding: '0.875rem 2.5rem', borderRadius: '9999px', fontWeight: 600, fontSize: '0.875rem', boxShadow: '0 4px 14px rgba(99,102,241,0.25)' }
+    : tid === 'portfolio'
+    ? { backgroundColor: tc, color: bgColor, padding: '0.75rem 2rem', borderRadius: '0', fontWeight: 400, fontSize: '0.8125rem', letterSpacing: '0.03em' }
+    : tid === 'magazine'
+    ? { backgroundColor: tc, color: bgColor, padding: '0.75rem 2rem', borderRadius: '0', fontWeight: 600, fontSize: '0.8125rem' }
+    : tid === 'boutique'
+    ? { backgroundColor: tc, color: bgColor, padding: '0.875rem 2.5rem', borderRadius: '0', fontWeight: 400, fontSize: '0.6875rem', letterSpacing: '0.15em', textTransform: 'uppercase' }
+    : tid === 'tech'
+    ? { backgroundColor: '#10B981', color: '#000000', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 600, fontSize: '0.8125rem', fontFamily: "'JetBrains Mono', monospace" }
+    : tid === 'wellness'
+    ? { backgroundColor: ac, color: accentBtnText, padding: '0.875rem 2.5rem', borderRadius: '9999px', fontWeight: 400, fontSize: '0.8125rem', letterSpacing: '0.03em' }
+    : tid === 'restaurant'
+    ? { backgroundColor: ac, color: accentBtnText, padding: '0.75rem 2rem', borderRadius: '4px', fontWeight: 600, fontSize: '0.875rem' }
+    : tid === 'neon'
+    ? { backgroundColor: ac, color: '#FFFFFF', padding: '0.875rem 2.25rem', borderRadius: '0', fontWeight: 700, letterSpacing: '0.04em', textTransform: 'uppercase', fontSize: '0.8125rem' }
+    : tid === 'organic'
+    ? { backgroundColor: ac, color: accentBtnText, padding: '0.875rem 2.25rem', borderRadius: '24px', fontWeight: 600, fontSize: '0.875rem' }
+    : tid === 'artisan'
+    ? { backgroundColor: tc, color: bgColor, padding: '0.8rem 2.25rem', borderRadius: '4px', fontWeight: 600, fontSize: '0.875rem', letterSpacing: '0.01em' }
+    : tid === 'corporate'
+    ? { backgroundColor: ac, color: accentBtnText, padding: '0.6875rem 1.75rem', borderRadius: '6px', fontWeight: 600, fontSize: '0.875rem' }
     : { backgroundColor: tc, color: bgColor, padding: '0.75rem 2rem', borderRadius: '0', fontWeight: 500, fontSize: '0.8125rem' };
 
   const hours = [{ day: 'Mon – Fri', hours: '9:00 AM – 6:00 PM' }, { day: 'Saturday', hours: '10:00 AM – 4:00 PM' }, { day: 'Sunday', hours: 'Closed' }];
   const socials = ['twitter', 'instagram', 'linkedin', 'facebook'];
-  const sideH3 = `text-xs font-${isBold ? 'bold' : 'semibold'} uppercase tracking-wider mb-4`;
-  const sideH3Style = { color: tc, letterSpacing: isBold ? '0.12em' : '0.06em' };
-  const cardR = isBold ? '0' : tid === 'playful' ? '16px' : tid === 'classic' ? '8px' : dsRadius;
+  const sideH3 = `text-xs font-${isBold || tid === 'artisan' ? 'bold' : 'semibold'} uppercase tracking-wider mb-4`;
+  const sideH3Style: React.CSSProperties = {
+    color: tc,
+    letterSpacing: isBold ? '0.12em' : tid === 'boutique' ? '0.15em' : tid === 'tech' || tid === 'artisan' ? '0.08em' : '0.06em',
+    fontFamily: tid === 'tech' || tid === 'artisan' ? "'JetBrains Mono', monospace" : undefined,
+  };
+  const cardR = isBold || tid === 'neon' || tid === 'boutique' ? '0' : tid === 'playful' ? '16px' : tid === 'classic' ? '8px'
+    : tid === 'wellness' || tid === 'organic' ? '16px' : tid === 'startup' ? '12px' : tid === 'tech' || tid === 'corporate' ? '8px'
+    : tid === 'artisan' || tid === 'restaurant' ? '4px' : dsRadius;
 
   /* ─── Field renderer ────────────────────────────────────────── */
   const Field = ({ name, type = 'text', placeholder, grid }: { name: string; type?: string; placeholder: string; grid?: boolean }) => (
@@ -333,14 +376,77 @@ export default function ContactPage() {
   );
 
   /* ═══════ HERO ═══════ */
+  const heroMaxW = isBold || tid === 'corporate' ? 'max-w-7xl' : tid === 'portfolio' ? 'max-w-5xl' : 'max-w-3xl';
+  const heroCentered = tid === 'playful' || tid === 'classic' || tid === 'startup' || tid === 'wellness' || tid === 'organic' || tid === 'boutique' || tid === 'neon';
   const hero = (
-    <section className="t-hero" style={isBold ? { backgroundColor: '#000', minHeight: 'auto', padding: '5rem 0 3rem' } : {}}>
-      <div className={`${isBold ? 'max-w-7xl' : 'max-w-3xl'} mx-auto px-5 sm:px-8 ${tid === 'playful' || tid === 'classic' ? 'text-center' : ''}`}>
+    <section className="t-hero" style={isBold ? { backgroundColor: '#000', minHeight: 'auto', padding: '5rem 0 3rem' } : tid === 'tech' ? { minHeight: 'auto', padding: '5rem 0 3rem' } : tid === 'neon' ? { minHeight: 'auto', padding: '5rem 0 3rem' } : {}}>
+      <div className={`${heroMaxW} mx-auto px-5 sm:px-8 ${heroCentered ? 'text-center' : ''}`}>
         {tid === 'playful' ? (
           <>
             <div className="t-blob" style={{ width: 250, height: 250, top: '-10%', right: '-5%', backgroundColor: ac, position: 'absolute' }} />
             <span className="t-badge mb-6 inline-flex relative z-10" style={{ backgroundColor: `${ac}15`, color: ac }}>💬 Contact Us</span>
             <h1 className="t-hero-heading mb-4 relative z-10" style={hs}>Say Hello! 👋</h1>
+          </>
+        ) : tid === 'startup' ? (
+          <>
+            <span className="t-badge mb-6 inline-flex" style={{ backgroundColor: `${ac}12`, color: ac, borderRadius: '9999px' }}>Contact</span>
+            <h1 className="t-hero-heading mb-4" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3.2rem)' }}>Get in Touch</h1>
+          </>
+        ) : tid === 'portfolio' ? (
+          <>
+            <h1 className="t-hero-heading mb-2" style={{ ...hs, fontSize: 'clamp(2rem, 6vw, 4rem)', fontWeight: 400 }}>Contact</h1>
+          </>
+        ) : tid === 'magazine' ? (
+          <>
+            <div className="mb-4" style={{ borderBottom: `2px solid ${tc}`, paddingBottom: '0.75rem' }}>
+              <h1 className="t-hero-heading" style={{ ...hs, fontSize: 'clamp(2.5rem, 6vw, 4rem)', fontWeight: 700 }}>Letters to the Editor</h1>
+            </div>
+          </>
+        ) : tid === 'boutique' ? (
+          <>
+            <span className="text-[10px] uppercase tracking-[0.3em] mb-6 block" style={{ color: `${tc}35` }}>◆ Contact ◆</span>
+            <h1 className="t-hero-heading mb-4" style={{ ...hs, fontSize: 'clamp(1.8rem, 4vw, 2.6rem)', fontWeight: 400, letterSpacing: '0.08em', textTransform: 'uppercase' as const }}>Reach Out</h1>
+            <div className="w-12 h-px mx-auto mt-3" style={{ backgroundColor: ac }} />
+          </>
+        ) : tid === 'tech' ? (
+          <>
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-xs font-mono" style={{ color: '#10B981' }}>{'>'}</span>
+              <span className="text-xs font-mono" style={{ color: `${tc}40` }}>~/contact</span>
+            </div>
+            <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Send a Message</h1>
+            <p className="text-xs font-mono" style={{ color: `${tc}35` }}>{`// we'll get back to you`}</p>
+          </>
+        ) : tid === 'wellness' ? (
+          <>
+            <span className="text-xs tracking-[0.15em] mb-6 block" style={{ color: `${tc}35`, fontWeight: 300 }}>Connect With Us</span>
+            <h1 className="t-hero-heading mb-4" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 300, letterSpacing: '0.02em' }}>We&apos;re Here for You</h1>
+          </>
+        ) : tid === 'restaurant' ? (
+          <>
+            <span className="text-xs uppercase tracking-[0.15em] mb-4 block" style={{ color: ac, fontWeight: 600 }}>Reservations & Inquiries</span>
+            <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3.5rem)' }}>Contact Us</h1>
+          </>
+        ) : tid === 'neon' ? (
+          <>
+            <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 6vw, 3.5rem)', fontWeight: 800, textShadow: `0 0 40px ${ac}40` }}>CONTACT</h1>
+          </>
+        ) : tid === 'organic' ? (
+          <>
+            <span className="text-xs tracking-[0.1em] mb-4 block" style={{ color: `${tc}40` }}>🌿 Get in Touch</span>
+            <h1 className="t-hero-heading mb-4" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3rem)', fontWeight: 700 }}>We&apos;d Love to Hear From You</h1>
+          </>
+        ) : tid === 'artisan' ? (
+          <>
+            <div className="inline-block mb-4 px-3 py-1" style={{ border: `2px solid ${tc}15` }}>
+              <span className="text-[10px] font-mono uppercase tracking-[0.15em]" style={{ color: `${tc}50` }}>Contact</span>
+            </div>
+            <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 5vw, 3rem)' }}>Get in Touch</h1>
+          </>
+        ) : tid === 'corporate' ? (
+          <>
+            <span className="text-xs font-semibold uppercase tracking-[0.12em] mb-4 block" style={{ color: ac }}>Contact Us</span>
+            <h1 className="t-hero-heading mb-3" style={{ ...hs, fontSize: 'clamp(2rem, 4.5vw, 3rem)' }}>Let&apos;s Talk Business</h1>
           </>
         ) : (
           <>
@@ -353,26 +459,52 @@ export default function ContactPage() {
             </h1>
           </>
         )}
-        <p className={`t-hero-desc ${tid === 'playful' ? 'mx-auto relative z-10' : ''}`} style={{ color: `${tc}${tid === 'classic' ? '55' : '50'}` }}>
-          {tid === 'editorial' ? 'Drop us a line. We read every message and respond thoughtfully.' :
-           'We\'d love to hear from you. Fill out the form and we\'ll get back to you soon.'}
-        </p>
+        {!['startup', 'portfolio', 'magazine', 'boutique', 'tech', 'neon', 'artisan'].includes(tid) && (
+          <p className={`t-hero-desc ${heroCentered ? 'mx-auto relative z-10' : ''}`} style={{ color: `${tc}${tid === 'classic' ? '55' : '50'}` }}>
+            {tid === 'editorial' ? 'Drop us a line. We read every message and respond thoughtfully.' :
+             tid === 'wellness' ? 'Take a moment, breathe, and reach out whenever you\'re ready.' :
+             tid === 'restaurant' ? 'For reservations, catering, or questions about our menu.' :
+             tid === 'corporate' ? 'Our team is ready to discuss how we can help your business.' :
+             'We\'d love to hear from you. Fill out the form and we\'ll get back to you soon.'}
+          </p>
+        )}
         {isBold && <div className="h-0.5 w-16 mt-2" style={{ backgroundColor: ac }} />}
       </div>
     </section>
   );
 
-  /* ═══════ DIVIDER (editorial) ═══════ */
-  const divider = tid === 'editorial' && (
+  /* ═══════ DIVIDER (editorial/magazine) ═══════ */
+  const divider = (tid === 'editorial' || tid === 'magazine') && (
     <div className="max-w-6xl mx-auto px-5 sm:px-8"><div className="t-divider" style={{ backgroundColor: `${tc}06` }} /></div>
   );
 
   /* ═══════ FORM SECTION ═══════ */
+  const twoColLayout = isBold || tid === 'editorial' || tid === 'corporate' || tid === 'tech' || tid === 'neon' || tid === 'artisan' || tid === 'magazine';
+  const formLayout = tid === 'playful' || tid === 'startup' || tid === 'classic' || tid === 'wellness' || tid === 'organic' || tid === 'restaurant' || tid === 'corporate' ? 'grid' as const : 'stacked' as const;
+
   const formCard = tid === 'playful'
-    ? <div className="md:col-span-3 p-8 sm:p-10" style={{ backgroundColor: '#FFF', borderRadius: '24px', boxShadow: '0 8px 30px rgba(0,0,0,0.06)' }}>{renderForm('grid')}</div>
+    ? <div className="md:col-span-3 p-8 sm:p-10" style={{ backgroundColor: '#FFF', borderRadius: '24px', boxShadow: '0 8px 30px rgba(0,0,0,0.06)' }}>{renderForm(formLayout)}</div>
     : tid === 'classic'
-    ? <div className="md:col-span-3 t-card p-8 sm:p-10" style={{ backgroundColor: bgColor }}>{renderForm('grid')}</div>
-    : <div className={isBold ? '' : 'md:col-span-3'}>{renderForm(isBold || tid === 'editorial' ? 'stacked' : 'stacked')}</div>;
+    ? <div className="md:col-span-3 t-card p-8 sm:p-10" style={{ backgroundColor: bgColor }}>{renderForm(formLayout)}</div>
+    : tid === 'startup'
+    ? <div className="md:col-span-3 p-8 sm:p-10" style={{ backgroundColor: '#FFF', borderRadius: '16px', border: `1px solid ${tc}08`, boxShadow: '0 4px 24px rgba(99,102,241,0.06)' }}>{renderForm(formLayout)}</div>
+    : tid === 'wellness'
+    ? <div className="md:col-span-3 p-8 sm:p-10" style={{ backgroundColor: '#FFF', borderRadius: '20px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>{renderForm(formLayout)}</div>
+    : tid === 'organic'
+    ? <div className="md:col-span-3 p-8 sm:p-10" style={{ backgroundColor: '#FFF', borderRadius: '24px', boxShadow: '0 4px 16px rgba(0,0,0,0.03)' }}>{renderForm(formLayout)}</div>
+    : tid === 'restaurant'
+    ? <div className="md:col-span-3 p-8 sm:p-10" style={{ backgroundColor: '#FFF', borderRadius: '4px', border: `1px solid ${tc}08` }}>{renderForm(formLayout)}</div>
+    : tid === 'tech'
+    ? <div className="p-6 sm:p-8" style={{ backgroundColor: '#0D1520', borderRadius: '8px', border: '1px solid #10B98120' }}>{renderForm('stacked')}</div>
+    : tid === 'neon'
+    ? <div className="p-6 sm:p-8" style={{ backgroundColor: '#0A0A1A', border: `1px solid ${ac}20`, borderRadius: '0' }}>{renderForm('stacked')}</div>
+    : tid === 'artisan'
+    ? <div className="p-6 sm:p-8" style={{ border: `2px solid ${tc}12`, borderRadius: '4px' }}>{renderForm('stacked')}</div>
+    : tid === 'corporate'
+    ? <div className="p-6 sm:p-8" style={{ backgroundColor: '#FFF', borderRadius: '8px', border: `1px solid ${tc}08` }}>{renderForm(formLayout)}</div>
+    : <div className={twoColLayout ? '' : 'md:col-span-3'}>{renderForm(formLayout)}</div>;
+
+  const sectionMaxW = isBold || tid === 'corporate' ? 'max-w-7xl' : tid === 'editorial' || tid === 'magazine' ? 'max-w-6xl' : 'max-w-5xl';
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mayasura.app';
 
@@ -384,11 +516,11 @@ export default function ContactPage() {
       />
       {hero}
       {divider}
-      <section className="t-section" style={isBold ? { backgroundColor: '#000' } : {}}>
-        <div className={`${isBold ? 'max-w-7xl' : tid === 'editorial' ? 'max-w-6xl' : 'max-w-5xl'} mx-auto px-5 sm:px-8`}>
-          <div className={`grid grid-cols-1 ${isBold || tid === 'editorial' ? 'md:grid-cols-2 gap-16' : 'md:grid-cols-5 gap-10 sm:gap-12 md:gap-16'}`}>
+      <section className="t-section" style={isBold ? { backgroundColor: '#000' } : tid === 'tech' ? { backgroundColor: '#0A0F1A' } : tid === 'neon' ? { backgroundColor: '#050510' } : {}}>
+        <div className={`${sectionMaxW} mx-auto px-5 sm:px-8`}>
+          <div className={`grid grid-cols-1 ${twoColLayout ? 'md:grid-cols-2 gap-16' : 'md:grid-cols-5 gap-10 sm:gap-12 md:gap-16'}`}>
             {formCard}
-            <div className={isBold || tid === 'editorial' ? '' : 'md:col-span-2'}>{renderSidebar()}</div>
+            <div className={twoColLayout ? '' : 'md:col-span-2'}>{renderSidebar()}</div>
           </div>
         </div>
       </section>
