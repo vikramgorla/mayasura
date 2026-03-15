@@ -8,7 +8,7 @@ import {
   Sparkles, Code2, Puzzle, Check, ChevronDown, Star, Zap, Shield, Palette,
   MousePointerClick, Bot, Building2, ShoppingCart, Utensils, Briefcase,
   Stethoscope, GraduationCap, Camera, Music, Dumbbell, Leaf, Heart,
-  Github, Twitter, Linkedin, ExternalLink, Play, Monitor, X, Volume2
+  Github, Twitter, Linkedin, ExternalLink, Play, Monitor, X, Volume2, TrendingUp
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
@@ -244,15 +244,18 @@ const features = [
 ];
 
 const steps = [
-  { number: "01", title: "Describe your brand", desc: "Tell us your brand name, industry, and vision. Our AI suggests the perfect colors, fonts, and template.", icon: Palette, color: "from-violet-500 to-purple-500" },
-  { number: "02", title: "Customize the design", desc: "Fine-tune every detail in the Design Studio. Preview your site in real-time across all templates.", icon: Layers, color: "from-blue-500 to-indigo-500" },
-  { number: "03", title: "Launch instantly", desc: "One click deploys your complete digital presence — website, shop, blog, chatbot, and more.", icon: Zap, color: "from-emerald-500 to-teal-500" },
+  { number: "01", title: "Tell us about your brand", desc: "Answer a few questions about your brand name, industry, values, and vision. Takes under 2 minutes — our AI does the heavy lifting from here.", icon: Sparkles, color: "from-violet-500 to-purple-500", badge: "2 min" },
+  { number: "02", title: "AI builds your ecosystem", desc: "Claude AI generates your website copy, product descriptions, chatbot, blog posts, color palette, and SEO strategy — all in your unique brand voice.", icon: Bot, color: "from-blue-500 to-indigo-500", badge: "Instant" },
+  { number: "03", title: "Launch & grow", desc: "One click deploys your complete digital presence — website, shop, blog, AI chatbot, and analytics. Start selling and engaging customers from day one.", icon: Zap, color: "from-emerald-500 to-teal-500", badge: "Live" },
 ];
 
 const testimonials = [
-  { quote: "Mayasura transformed how we think about brand presence online. What used to take weeks now takes minutes. The AI understands our vision perfectly.", author: "Sarah Chen", role: "Founder, Bloom Studios", initials: "SC" },
-  { quote: "The AI-powered content generation is incredible. Our chatbot sounds exactly like our brand voice. Customers can't tell the difference.", author: "Marcus Rivera", role: "CEO, TechVault", initials: "MR" },
-  { quote: "12 templates, each with a completely different vibe. We found the perfect one for our restaurant instantly. Setup to launch in under 5 minutes.", author: "Priya Sharma", role: "Owner, Spice Route", initials: "PS" },
+  { quote: "Mayasura transformed how we think about brand presence online. What used to take weeks now takes minutes. The AI understands our vision perfectly.", author: "Sarah Chen", role: "Founder", company: "Bloom Studios", initials: "SC", gradient: "from-violet-500 to-purple-600" },
+  { quote: "The AI-powered content generation is incredible. Our chatbot sounds exactly like our brand voice. Customers can't tell the difference.", author: "Marcus Rivera", role: "CEO", company: "TechVault", initials: "MR", gradient: "from-blue-500 to-indigo-600" },
+  { quote: "12 templates, each with a completely different vibe. We found the perfect one for our restaurant instantly. Setup to launch in under 5 minutes.", author: "Priya Sharma", role: "Owner", company: "Spice Route", initials: "PS", gradient: "from-amber-500 to-orange-600" },
+  { quote: "I launched three separate brands for my clients in one afternoon. Mayasura's multi-brand dashboard is a game-changer for agencies like ours.", author: "James Kowalski", role: "Creative Director", company: "Pivot Agency", initials: "JK", gradient: "from-emerald-500 to-teal-600" },
+  { quote: "The SEO optimization alone saved us from hiring an SEO consultant. The AI suggestions are incredibly actionable and our organic traffic doubled in two months.", author: "Aisha Okonkwo", role: "Marketing Lead", company: "GreenPath Wellness", initials: "AO", gradient: "from-pink-500 to-rose-600" },
+  { quote: "We migrated our entire Shopify store to Mayasura in a weekend. Product catalog, blog posts, and all — the import feature is seamless. Never looking back.", author: "David Lim", role: "Founder", company: "Craft & Co.", initials: "DL", gradient: "from-cyan-500 to-blue-600" },
 ];
 
 const faqs = [
@@ -424,6 +427,46 @@ function BrowserMockup({ template }: { template: typeof templatePreviews[0] }) {
   );
 }
 
+// ─── Sticky Mobile CTA Bar ──────────────────────────────────────
+function StickyMobileCTA() {
+  const [visible, setVisible] = useState(false);
+  const heroRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const handleScroll = () => {
+      // Show after scrolling 600px (past hero)
+      setVisible(window.scrollY > 600);
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.div
+          initial={{ y: 100, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          exit={{ y: 100, opacity: 0 }}
+          transition={{ type: 'spring', stiffness: 400, damping: 35 }}
+          className="fixed bottom-0 left-0 right-0 z-50 sm:hidden bg-[var(--bg-primary)] border-t border-[var(--border-primary)] px-4 py-3 flex items-center gap-3 shadow-2xl"
+        >
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-[var(--text-primary)] truncate">Ready to build your brand?</p>
+            <p className="text-xs text-[var(--text-tertiary)]">Free — no credit card needed</p>
+          </div>
+          <Link href="/create" className="flex-shrink-0">
+            <Button size="sm" variant="brand" className="btn-shimmer">
+              Start Free
+              <ArrowRight className="h-3.5 w-3.5" />
+            </Button>
+          </Link>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 // ─── Main Page ───────────────────────────────────────────────────
 export default function Home() {
   const [activeTemplate, setActiveTemplate] = useState(0);
@@ -442,6 +485,7 @@ export default function Home() {
         {showBanner && <UrgencyBanner onDismiss={() => setShowBanner(false)} />}
       </AnimatePresence>
       <FloatingCTA />
+      <StickyMobileCTA />
       <ScrollCTAModal />
       {/* Nav */}
       <nav
@@ -747,7 +791,7 @@ export default function Home() {
       </section>
 
       {/* ═══════════ HOW IT WORKS ═══════════ */}
-      <section className="py-20 sm:py-28 px-4 sm:px-6">
+      <section className="py-20 sm:py-28 px-4 sm:px-6 bg-[var(--bg-secondary)]">
         <div className="max-w-5xl mx-auto">
           <motion.div
             initial="hidden"
@@ -756,8 +800,12 @@ export default function Home() {
             variants={fadeInUp}
             className="text-center mb-16"
           >
+            <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-violet-50 dark:bg-violet-950/50 border border-violet-200 dark:border-violet-800 text-xs font-medium text-violet-600 dark:text-violet-400 mb-4">
+              <Sparkles className="h-3 w-3" />
+              Simple as 1-2-3
+            </span>
             <h2 className="font-display text-3xl sm:text-4xl font-bold tracking-tight mb-3 text-[var(--text-primary)]">
-              Three steps to launch
+              How it works
             </h2>
             <p className="text-[var(--text-secondary)] max-w-md mx-auto">
               From idea to live brand in under 5 minutes. Our AI does the heavy lifting.
@@ -765,29 +813,89 @@ export default function Home() {
           </motion.div>
 
           <div className="relative">
-            {/* Connecting line */}
-            <div className="hidden md:block absolute top-[3.5rem] left-[calc(16.67%+28px)] right-[calc(16.67%+28px)] h-0.5 bg-gradient-to-r from-violet-200 via-blue-200 to-emerald-200 dark:from-violet-800 dark:via-blue-800 dark:to-emerald-800" />
+            {/* Animated connecting line — desktop only */}
+            <motion.div
+              initial={{ scaleX: 0 }}
+              whileInView={{ scaleX: 1 }}
+              viewport={{ once: true, margin: "-80px" }}
+              transition={{ duration: 1.2, ease: [0.25, 0.46, 0.45, 0.94], delay: 0.3 }}
+              style={{ originX: 0 }}
+              className="hidden md:block absolute top-[3.25rem] left-[calc(16.67%+40px)] right-[calc(16.67%+40px)] h-0.5 bg-gradient-to-r from-violet-400 via-blue-400 to-emerald-400 dark:from-violet-600 dark:via-blue-600 dark:to-emerald-600"
+            />
+            {/* Dots on the line */}
+            {[0, 1].map((i) => (
+              <motion.div
+                key={i}
+                initial={{ scale: 0, opacity: 0 }}
+                whileInView={{ scale: 1, opacity: 1 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.8 + i * 0.3 }}
+                className="hidden md:block absolute top-[calc(3.25rem-4px)] w-2.5 h-2.5 rounded-full bg-white dark:bg-zinc-900 border-2 border-blue-400 dark:border-blue-600 z-10"
+                style={{ left: `calc(${33.33 * (i + 1)}% - 5px)` }}
+              />
+            ))}
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 sm:gap-12">
               {steps.map((step, i) => (
                 <motion.div
                   key={step.number}
                   initial={{ opacity: 0, y: 30 }}
                   whileInView={{ opacity: 1, y: 0 }}
                   viewport={{ once: true }}
-                  transition={{ delay: i * 0.15, duration: 0.5 }}
-                  className="text-center relative"
+                  transition={{ delay: i * 0.2, duration: 0.5 }}
+                  className="text-center relative group"
                 >
-                  <div className={`relative z-10 h-14 w-14 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mx-auto mb-6 shadow-lg`}>
-                    <step.icon className="h-6 w-6 text-white" />
+                  {/* Badge */}
+                  <div className="absolute -top-2 right-1/2 translate-x-1/2 md:right-auto md:translate-x-0 md:right-8 z-20">
+                    <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-violet-100 dark:bg-violet-900/40 text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-800">
+                      {step.badge}
+                    </span>
                   </div>
-                  <span className="text-xs font-bold text-violet-500 mb-2 block">{step.number}</span>
-                  <h3 className="font-display text-lg font-semibold mb-2 text-[var(--text-primary)]">{step.title}</h3>
+                  {/* Icon circle */}
+                  <div className={`relative z-10 h-16 w-16 rounded-2xl bg-gradient-to-br ${step.color} flex items-center justify-center mx-auto mb-5 shadow-xl group-hover:scale-105 transition-transform duration-300`}>
+                    <step.icon className="h-7 w-7 text-white" />
+                    {/* Glow */}
+                    <div className={`absolute inset-0 rounded-2xl bg-gradient-to-br ${step.color} opacity-0 group-hover:opacity-30 blur-lg transition-opacity duration-300`} />
+                  </div>
+                  <span className="text-[11px] font-bold text-violet-500 dark:text-violet-400 mb-2 block tracking-widest">{step.number}</span>
+                  <h3 className="font-display text-lg font-semibold mb-2.5 text-[var(--text-primary)]">{step.title}</h3>
                   <p className="text-sm text-[var(--text-secondary)] leading-relaxed max-w-xs mx-auto">{step.desc}</p>
                 </motion.div>
               ))}
             </div>
+
+            {/* Mobile step connectors */}
+            <div className="md:hidden flex flex-col items-center gap-0 mt-0">
+              {[0, 1].map((i) => (
+                <motion.div
+                  key={i}
+                  initial={{ scaleY: 0 }}
+                  whileInView={{ scaleY: 1 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.4 + i * 0.2 }}
+                  style={{ originY: 0 }}
+                  className="w-0.5 h-8 bg-gradient-to-b from-violet-300 to-emerald-300 dark:from-violet-700 dark:to-emerald-700"
+                />
+              ))}
+            </div>
           </div>
+
+          {/* CTA under How it Works */}
+          <motion.div
+            initial={{ opacity: 0, y: 16 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ delay: 0.6 }}
+            className="text-center mt-12"
+          >
+            <Link href="/create">
+              <Button size="lg" variant="brand" className="btn-shimmer">
+                Build Your Brand Now
+                <ArrowRight className="h-4 w-4" />
+              </Button>
+            </Link>
+            <p className="text-xs text-[var(--text-tertiary)] mt-3">Free forever · No credit card · 5-minute setup</p>
+          </motion.div>
         </div>
       </section>
 
@@ -1027,14 +1135,57 @@ export default function Home() {
                   &ldquo;{t.quote}&rdquo;
                 </p>
                 <div className="flex items-center gap-3">
-                  <div className="h-10 w-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-xs font-bold text-white shadow-lg">
+                  <div className={`h-10 w-10 rounded-full bg-gradient-to-br ${t.gradient} flex items-center justify-center text-xs font-bold text-white shadow-lg flex-shrink-0`}>
                     {t.initials}
                   </div>
                   <div>
                     <p className="text-sm font-semibold text-[var(--text-primary)]">{t.author}</p>
-                    <p className="text-xs text-[var(--text-tertiary)]">{t.role}</p>
+                    <p className="text-xs text-[var(--text-tertiary)]">{t.role} · {t.company}</p>
                   </div>
                 </div>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ═══════════ LOVED BY — Usage Stats ═══════════ */}
+      <section className="py-16 sm:py-20 px-4 sm:px-6 bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700 relative overflow-hidden">
+        <div className="absolute inset-0 pointer-events-none">
+          <motion.div animate={{ x: [0, 30, 0], y: [0, -20, 0] }} transition={{ duration: 20, repeat: Infinity, ease: 'linear' }} className="absolute top-0 left-[10%] w-[400px] h-[400px] bg-white/5 rounded-full blur-[100px]" />
+          <motion.div animate={{ x: [0, -20, 0], y: [0, 25, 0] }} transition={{ duration: 16, repeat: Infinity, ease: 'linear' }} className="absolute bottom-0 right-[10%] w-[300px] h-[300px] bg-white/5 rounded-full blur-[80px]" />
+        </div>
+        <div className="max-w-5xl mx-auto relative z-10">
+          <motion.p
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            className="text-center text-xs font-semibold uppercase tracking-widest text-white/60 mb-10"
+          >
+            Loved by builders worldwide
+          </motion.p>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-8 sm:gap-4 text-center">
+            {[
+              { end: 10000, suffix: '+', label: 'Brands Built', sublabel: 'and growing every day', icon: Building2 },
+              { end: 50000, suffix: '+', label: 'Products Listed', sublabel: 'across all industries', icon: ShoppingBag },
+              { end: 1000000, suffix: '+', label: 'Visitors Served', sublabel: 'monthly across all brands', icon: Globe },
+            ].map((stat, i) => (
+              <motion.div
+                key={stat.label}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.15 }}
+                className="flex flex-col items-center"
+              >
+                <div className="h-12 w-12 rounded-2xl bg-white/10 flex items-center justify-center mb-4">
+                  <stat.icon className="h-6 w-6 text-white/80" />
+                </div>
+                <p className="text-4xl sm:text-5xl font-bold font-display text-white mb-1">
+                  <AnimatedCounter end={stat.end} suffix={stat.suffix} duration={2500} />
+                </p>
+                <p className="text-base font-semibold text-white/90 mb-1">{stat.label}</p>
+                <p className="text-xs text-white/50">{stat.sublabel}</p>
               </motion.div>
             ))}
           </div>
@@ -1157,11 +1308,14 @@ export default function Home() {
             </span>
           </motion.div>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-white">
-            Ready to build your
-            <br />digital palace?
+            Your brand's digital palace
+            <br />awaits. Build it today.
           </h2>
-          <p className="text-white/70 text-base sm:text-lg mb-8 max-w-lg mx-auto">
-            Join thousands of brands who launched their complete digital presence with Mayasura. Zero code, zero hassle.
+          <p className="text-white/70 text-base sm:text-lg mb-4 max-w-xl mx-auto leading-relaxed">
+            Stop paying thousands for a web developer. Stop waiting weeks for your brand to go live. Mayasura gives you everything — website, shop, blog, AI chatbot, analytics — in minutes, not months.
+          </p>
+          <p className="text-white/50 text-sm mb-8 max-w-lg mx-auto">
+            Join <AnimatedCounter end={10000} suffix="+" duration={2000} /> brands who chose to build palaces, not huts.
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/create">
@@ -1170,24 +1324,30 @@ export default function Home() {
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
+            <Link href="/templates">
+              <Button size="xl" variant="outline" className="border-white/30 text-white hover:bg-white/10 font-medium text-base">
+                <Play className="h-4 w-4 fill-current" />
+                See Templates
+              </Button>
+            </Link>
           </div>
 
-          {/* Trust signals */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-8" role="list" aria-label="Trust indicators">
+          {/* Feature highlights */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-10 max-w-2xl mx-auto">
             {[
+              { icon: Zap, label: 'Live in 5 min' },
               { icon: Shield, label: 'MIT Licensed' },
-              { icon: Github, label: 'Open Source' },
-              { icon: Zap, label: '< 5 min setup' },
-              { icon: Star, label: '99% satisfaction' },
+              { icon: Code2, label: 'Open Source' },
+              { icon: TrendingUp, label: '10K+ brands' },
             ].map((signal) => (
-              <div key={signal.label} className="flex items-center gap-1.5 text-white/50" role="listitem">
-                <signal.icon className="h-3.5 w-3.5" aria-hidden="true" />
-                <span className="text-xs font-medium">{signal.label}</span>
+              <div key={signal.label} className="flex flex-col items-center gap-2 p-3 rounded-xl bg-white/10 backdrop-blur-sm border border-white/10">
+                <signal.icon className="h-5 w-5 text-white/80" aria-hidden="true" />
+                <span className="text-xs font-medium text-white/80">{signal.label}</span>
               </div>
             ))}
           </div>
 
-          <p className="text-xs text-white/40 mt-5">
+          <p className="text-xs text-white/40 mt-6">
             No credit card required · Self-hostable · Your data, your control
           </p>
         </motion.div>
