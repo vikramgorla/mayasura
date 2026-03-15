@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getChatbotFaqs, createChatbotFaq, updateChatbotFaq, deleteChatbotFaq } from '@/lib/db';
+import { getChatbotFaqs, createChatbotFaq, updateChatbotFaq, deleteChatbotFaq, reorderChatbotFaqs } from '@/lib/db';
 import { requireBrandOwner, sanitizeInput, sanitizeObject } from '@/lib/api-auth';
 import { nanoid } from 'nanoid';
 
@@ -70,6 +70,25 @@ export async function PUT(
     return NextResponse.json({ success: true });
   } catch (error) {
     console.error('Error updating FAQ:', error);
+    return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
+  }
+}
+
+export async function PATCH(
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
+) {
+  try {
+    const { id } = await params;
+    const { error } = await requireBrandOwner(id);
+    if (error) return error;
+    const body = await request.json();
+    if (body.reorder && Array.isArray(body.reorder)) {
+      reorderChatbotFaqs(body.reorder);
+    }
+    return NextResponse.json({ success: true });
+  } catch (err) {
+    console.error('Error reordering FAQs:', err);
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 });
   }
 }
