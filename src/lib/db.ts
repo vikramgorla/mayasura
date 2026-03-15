@@ -242,6 +242,21 @@ function initializeDatabase(db: Database.Database) {
       created_at TEXT DEFAULT (datetime('now'))
     );
 
+    -- V3.3: Testimonials
+    CREATE TABLE IF NOT EXISTS testimonials (
+      id TEXT PRIMARY KEY,
+      brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+      author_name TEXT NOT NULL,
+      author_role TEXT,
+      author_company TEXT,
+      quote TEXT NOT NULL,
+      rating INTEGER DEFAULT 5,
+      avatar_url TEXT,
+      featured INTEGER DEFAULT 0,
+      sort_order INTEGER DEFAULT 0,
+      created_at TEXT DEFAULT (datetime('now'))
+    );
+
     CREATE TABLE IF NOT EXISTS brand_strategies (
       id TEXT PRIMARY KEY,
       brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
@@ -251,6 +266,7 @@ function initializeDatabase(db: Database.Database) {
     );
 
     -- Indexes
+    CREATE INDEX IF NOT EXISTS idx_testimonials_brand ON testimonials(brand_id);
     CREATE INDEX IF NOT EXISTS idx_brand_strategies_brand ON brand_strategies(brand_id, type);
     CREATE INDEX IF NOT EXISTS idx_notifications_brand ON notifications(brand_id);
     CREATE INDEX IF NOT EXISTS idx_products_brand ON products(brand_id);
@@ -514,6 +530,7 @@ export function deleteBrandCascade(brandId: string): Record<string, number> {
     counts.brand_settings = db.prepare('DELETE FROM brand_settings WHERE brand_id = ?').run(brandId).changes;
     counts.chatbot_faqs = db.prepare('DELETE FROM chatbot_faqs WHERE brand_id = ?').run(brandId).changes;
     counts.chat_messages = db.prepare('DELETE FROM chat_messages WHERE brand_id = ?').run(brandId).changes;
+    counts.testimonials = db.prepare('DELETE FROM testimonials WHERE brand_id = ?').run(brandId).changes;
 
     // 2. Ticket messages via tickets (nested FK)
     const tickets = db.prepare('SELECT id FROM tickets WHERE brand_id = ?').all(brandId) as Array<{ id: string }>;
@@ -557,7 +574,7 @@ export function getBrandRelatedCounts(brandId: string): Record<string, number> {
     'products', 'content', 'chat_messages', 'tickets', 'activities',
     'orders', 'contact_submissions', 'newsletter_subscribers',
     'brand_settings', 'brand_pages', 'blog_posts', 'chatbot_faqs',
-    'consumer_users', 'page_views',
+    'consumer_users', 'page_views', 'testimonials',
   ];
   const counts: Record<string, number> = {};
   for (const table of tables) {
@@ -594,6 +611,87 @@ export function createProduct(product: {
     category: product.category || null,
     sort_order: product.sort_order || 0,
   });
+}
+
+// ==================== Testimonial operations ====================
+
+export function getTestimonials(brandId: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM testimonials WHERE brand_id = ? ORDER BY sort_order ASC, created_at DESC').all(brandId);
+}
+
+export function getFeaturedTestimonials(brandId: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM testimonials WHERE brand_id = ? AND featured = 1 ORDER BY sort_order ASC').all(brandId);
+}
+
+export function getTestimonialCount(brandId: string): number {
+  const db = getDb();
+  const row = db.prepare('SELECT COUNT(*) as count FROM testimonials WHERE brand_id = ?').get(brandId) as { count: number };
+  return row.count;
+}
+
+export function createTestimonial(testimonial: {
+  id: string;
+  brand_id: string;
+  author_name: string;
+  author_role?: string;
+  author_company?: string;
+  quote: string;
+  rating?: number;
+  avatar_url?: string;
+  featured?: number;
+  sort_order?: number;
+}) {
+  const db = getDb();
+  db.prepare(`
+    INSERT INTO testimonials (id, brand_id, author_name, author_role, author_company, quote, rating, avatar_url, featured, sort_order)
+    VALUES (@id, @brand_id, @author_name, @author_role, @author_company, @quote, @rating, @avatar_url, @featured, @sort_order)
+  `).run({
+    ...testimonial,
+    author_role: testimonial.author_role || null,
+    author_company: testimonial.author_company || null,
+    rating: testimonial.rating ?? 5,
+    avatar_url: testimonial.avatar_url || null,
+    featured: testimonial.featured ?? 0,
+    sort_order: testimonial.sort_order ?? 0,
+  });
+}
+
+const ALLOWED_TESTIMONIAL_FIELDS = new Set([
+  'author_name', 'author_role', 'author_company', 'quote', 'rating',
+  'avatar_url', 'featured', 'sort_order',
+]);
+
+export function updateTestimonial(id: string, updates: Record<string, unknown>) {
+  const db = getDb();
+  const safeUpdates: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    if (ALLOWED_TESTIMONIAL_FIELDS.has(key) && value !== undefined) {
+      safeUpdates[key] = value;
+    }
+  }
+  const fields = Object.keys(safeUpdates)
+    .map(k => `${k} = @${k}`)
+    .join(', ');
+  if (!fields) return;
+  db.prepare(`UPDATE testimonials SET ${fields} WHERE id = @id`).run({ ...safeUpdates, id });
+}
+
+export function deleteTestimonial(id: string) {
+  const db = getDb();
+  return db.prepare('DELETE FROM testimonials WHERE id = ?').run(id);
+}
+
+export function reorderTestimonials(updates: { id: string; sort_order: number }[]) {
+  const db = getDb();
+  const stmt = db.prepare('UPDATE testimonials SET sort_order = @sort_order WHERE id = @id');
+  const transaction = db.transaction(() => {
+    for (const update of updates) {
+      stmt.run(update);
+    }
+  });
+  transaction();
 }
 
 // ─── Brand Strategies ────────────────────────────────────────────
@@ -1384,6 +1482,7 @@ export function getFullBrandExport(brandId: string) {
   const faqs = getChatbotFaqs(brandId);
   const activities = getActivities(brandId, 100);
   const tickets = getTicketsByBrand(brandId);
+  const testimonials = getTestimonials(brandId);
 
   return {
     brand,
@@ -1398,6 +1497,7 @@ export function getFullBrandExport(brandId: string) {
     faqs,
     activities,
     tickets,
+    testimonials,
     exportedAt: new Date().toISOString(),
     version: '3.3',
   };

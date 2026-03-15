@@ -1,9 +1,10 @@
 'use client';
 
 import Link from 'next/link';
-import { motion, useInView } from 'framer-motion';
-import { useRef } from 'react';
+import { motion, useInView, AnimatePresence } from 'framer-motion';
+import { useRef, useState, useEffect } from 'react';
 import { useBrandSite, BrandPlaceholder } from './layout';
+import type { Brand } from '@/lib/types';
 import { LayoutSections } from '@/components/site/section-renderer';
 import { getDefaultLayout } from '@/lib/page-layout';
 import {
@@ -68,11 +69,197 @@ function getHeroAnim(templateId: string) {
   return heroAnimations.minimal;
 }
 
+// ─── Testimonials Carousel ─────────────────────────────────────
+function TestimonialsCarousel({
+  testimonials,
+  brand,
+  template,
+}: {
+  testimonials: Array<{
+    id: string;
+    author_name: string;
+    author_role: string | null;
+    author_company: string | null;
+    quote: string;
+    rating: number;
+    avatar_url: string | null;
+  }>;
+  brand: Brand;
+  template?: { id: string; preview?: { borderRadius: string; typography: { headingWeight: string; headingTracking: string } } };
+}) {
+  const templateId = template?.id || 'minimal';
+  const isDark = templateId === 'bold' || templateId === 'tech';
+  const textColor = isDark ? '#FFFFFF' : brand.primary_color;
+  const accentColor = brand.accent_color || textColor;
+  const tp = template?.preview;
+  const [activeIndex, setActiveIndex] = useState(0);
+  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
+
+  // Auto-play
+  useEffect(() => {
+    if (testimonials.length <= 1) return;
+    intervalRef.current = setInterval(() => {
+      setActiveIndex(i => (i + 1) % testimonials.length);
+    }, 5000);
+    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+  }, [testimonials.length]);
+
+  const pauseAutoPlay = () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+
+  if (testimonials.length === 0) return null;
+
+  const sectionTitle = templateId === 'bold' ? 'WHAT PEOPLE SAY'
+    : templateId === 'playful' ? 'What People Say 💬'
+    : 'What Our Customers Say';
+
+  return (
+    <section className="t-section">
+      <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
+        <ScrollReveal>
+          <div className={`mb-10 ${templateId === 'classic' || templateId === 'playful' ? 'text-center' : ''}`}>
+            <h2
+              className="t-section-heading mb-3"
+              style={{
+                fontFamily: brand.font_heading,
+                fontWeight: tp?.typography.headingWeight || '600',
+                letterSpacing: tp?.typography.headingTracking,
+                color: textColor,
+              }}
+            >
+              {sectionTitle}
+            </h2>
+            {templateId === 'bold' && <div className="h-0.5 w-12 mt-2" style={{ backgroundColor: accentColor }} />}
+          </div>
+        </ScrollReveal>
+
+        {/* Grid for 3 or fewer, Carousel for more */}
+        {testimonials.length <= 3 ? (
+          <div className={`grid grid-cols-1 md:grid-cols-${Math.min(testimonials.length, 3)} gap-6`}>
+            {testimonials.map((t, i) => (
+              <motion.div
+                key={t.id}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1 }}
+                className="p-6 sm:p-8"
+                style={{
+                  backgroundColor: templateId === 'playful' ? ['#FFF7ED', '#EFF6FF', '#F0FDF4'][i % 3]
+                    : isDark ? '#111111' : `${textColor}04`,
+                  borderRadius: templateId === 'playful' ? '20px' : templateId === 'classic' ? '16px' : tp?.borderRadius || '8px',
+                  border: templateId === 'bold' ? `2px solid ${textColor}10` : undefined,
+                  boxShadow: templateId === 'classic' ? '6px 6px 12px rgba(0,0,0,0.04), -6px -6px 12px rgba(255,255,255,0.7)' : undefined,
+                }}
+              >
+                {/* Star Rating */}
+                <div className="flex gap-0.5 mb-4">
+                  {[1, 2, 3, 4, 5].map(s => (
+                    <svg key={s} className={`h-4 w-4 ${s <= t.rating ? 'text-amber-400' : 'text-zinc-200'}`} viewBox="0 0 20 20" fill="currentColor">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  ))}
+                </div>
+
+                <p className="text-sm italic leading-relaxed mb-5" style={{ color: `${textColor}70` }}>
+                  &ldquo;{t.quote}&rdquo;
+                </p>
+
+                <div className="flex items-center gap-3">
+                  <div
+                    className="h-10 w-10 rounded-full flex items-center justify-center text-sm font-bold flex-shrink-0"
+                    style={{
+                      backgroundColor: `${accentColor}15`,
+                      color: accentColor,
+                    }}
+                  >
+                    {t.avatar_url ? (
+                      <img src={t.avatar_url} alt={t.author_name} className="h-10 w-10 rounded-full object-cover" />
+                    ) : (
+                      t.author_name.charAt(0).toUpperCase()
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-medium" style={{ color: textColor }}>
+                      {t.author_name}
+                    </p>
+                    <p className="text-xs" style={{ color: `${textColor}40` }}>
+                      {[t.author_role, t.author_company].filter(Boolean).join(' · ')}
+                    </p>
+                  </div>
+                </div>
+              </motion.div>
+            ))}
+          </div>
+        ) : (
+          /* Carousel for many testimonials */
+          <div className="relative" onMouseEnter={pauseAutoPlay}>
+            <div className="overflow-hidden">
+              <AnimatePresence mode="wait">
+                <motion.div
+                  key={activeIndex}
+                  initial={{ opacity: 0, x: 40 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  exit={{ opacity: 0, x: -40 }}
+                  transition={{ duration: 0.4 }}
+                  className="max-w-2xl mx-auto text-center px-4 py-8"
+                >
+                  <div className="flex justify-center gap-0.5 mb-6">
+                    {[1, 2, 3, 4, 5].map(s => (
+                      <svg key={s} className={`h-5 w-5 ${s <= testimonials[activeIndex].rating ? 'text-amber-400' : 'text-zinc-200'}`} viewBox="0 0 20 20" fill="currentColor">
+                        <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                      </svg>
+                    ))}
+                  </div>
+                  <p className="text-lg italic leading-relaxed mb-6" style={{ color: `${textColor}70`, fontFamily: brand.font_body }}>
+                    &ldquo;{testimonials[activeIndex].quote}&rdquo;
+                  </p>
+                  <div className="flex items-center justify-center gap-3">
+                    <div
+                      className="h-12 w-12 rounded-full flex items-center justify-center text-base font-bold"
+                      style={{ backgroundColor: `${accentColor}15`, color: accentColor }}
+                    >
+                      {testimonials[activeIndex].avatar_url ? (
+                        <img src={testimonials[activeIndex].avatar_url!} alt={testimonials[activeIndex].author_name} className="h-12 w-12 rounded-full object-cover" />
+                      ) : (
+                        testimonials[activeIndex].author_name.charAt(0).toUpperCase()
+                      )}
+                    </div>
+                    <div className="text-left">
+                      <p className="text-sm font-semibold" style={{ color: textColor }}>
+                        {testimonials[activeIndex].author_name}
+                      </p>
+                      <p className="text-xs" style={{ color: `${textColor}40` }}>
+                        {[testimonials[activeIndex].author_role, testimonials[activeIndex].author_company].filter(Boolean).join(' · ')}
+                      </p>
+                    </div>
+                  </div>
+                </motion.div>
+              </AnimatePresence>
+            </div>
+            {/* Dots */}
+            <div className="flex justify-center gap-2 mt-4">
+              {testimonials.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => { pauseAutoPlay(); setActiveIndex(i); }}
+                  className={`h-2 rounded-full transition-all ${i === activeIndex ? 'w-6' : 'w-2'}`}
+                  style={{ backgroundColor: i === activeIndex ? accentColor : `${textColor}15` }}
+                  aria-label={`Go to testimonial ${i + 1}`}
+                />
+              ))}
+            </div>
+          </div>
+        )}
+      </div>
+    </section>
+  );
+}
+
 export default function BrandHomePage() {
   const data = useBrandSite();
   if (!data) return null;
 
-  const { brand, products, blogPosts, websiteTemplate: template, pageLayout, designSettings } = data;
+  const { brand, products, blogPosts, testimonials, websiteTemplate: template, pageLayout, designSettings } = data;
   const slug = brand.slug || brand.id;
   const channels = JSON.parse(brand.channels || '[]') as string[];
   const templateId = template?.id || 'minimal';
@@ -1043,7 +1230,18 @@ export default function BrandHomePage() {
       <Divider />
       {renderBlog()}
       <Divider />
-      {/* Render extra layout sections (testimonials, stats, newsletter, FAQ) */}
+      {/* Real testimonials from DB */}
+      {testimonials && testimonials.length > 0 && (
+        <>
+          <TestimonialsCarousel
+            testimonials={testimonials}
+            brand={brand}
+            template={template ? { id: template.id, preview: template.preview } : undefined}
+          />
+          <Divider />
+        </>
+      )}
+      {/* Render extra layout sections (stats, newsletter, FAQ, etc.) */}
       <LayoutSections
         layout={layout}
         brand={brand}

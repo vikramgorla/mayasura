@@ -169,6 +169,20 @@ export interface ConsumerUser {
   created_at: string;
 }
 
+export interface Testimonial {
+  id: string;
+  brand_id: string;
+  author_name: string;
+  author_role: string | null;
+  author_company: string | null;
+  quote: string;
+  rating: number;
+  avatar_url: string | null;
+  featured: number;
+  sort_order: number;
+  created_at: string;
+}
+
 export interface Notification {
   id: string;
   brand_id: string;

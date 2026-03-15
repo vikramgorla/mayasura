@@ -41,6 +41,17 @@ interface BrandSiteData {
     category: string | null;
     published_at: string;
   }>;
+  testimonials?: Array<{
+    id: string;
+    author_name: string;
+    author_role: string | null;
+    author_company: string | null;
+    quote: string;
+    rating: number;
+    avatar_url: string | null;
+    featured: number;
+    sort_order: number;
+  }>;
   settings?: Record<string, string>;
   websiteTemplate?: WebsiteTemplate;
   pageLayout?: PageLayout;
