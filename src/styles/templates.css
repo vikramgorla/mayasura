@@ -1560,8 +1560,209 @@
   font-size: 0.875rem;
 }
 
-/* Mobile overrides for new templates */
+/* ==================== NEON — Cyberpunk glow, scanlines ==================== */
+@keyframes neon-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.8; }
+}
+
+[data-template="neon"] .t-hero {
+  padding: 6rem 0 4rem;
+  min-height: 80vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  [data-template="neon"] .t-hero {
+    padding: 8rem 0 6rem;
+    min-height: 85vh;
+  }
+}
+
+[data-template="neon"] .t-hero-heading {
+  font-size: clamp(2.5rem, 7vw, 5rem);
+  font-weight: 800;
+  letter-spacing: -0.04em;
+  text-transform: none;
+  line-height: 1;
+}
+
+[data-template="neon"] .t-hero-desc {
+  font-size: 1rem;
+  line-height: 1.65;
+  max-width: 520px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1.5rem;
+}
+
+[data-template="neon"] .t-section-heading {
+  font-size: 1.5rem;
+  font-weight: 800;
+  letter-spacing: -0.03em;
+}
+
+[data-template="neon"] .t-card {
+  padding: 1.5rem;
+  border-radius: 8px;
+  border: 1px solid;
+  transition: box-shadow 0.3s ease;
+}
+[data-template="neon"] .t-card:hover {
+  box-shadow: 0 0 20px rgba(168, 85, 247, 0.15);
+}
+
+[data-template="neon"] .t-btn-primary {
+  padding: 0.875rem 2.25rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 0;
+  animation: neon-pulse 3s ease infinite;
+}
+[data-template="neon"] .t-btn-primary:hover {
+  opacity: 1;
+  transform: translateY(-1px);
+}
+
+[data-template="neon"] .t-btn-secondary {
+  padding: 0.875rem 2.25rem;
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  border-radius: 0;
+  background: transparent;
+}
+
+[data-template="neon"] .t-product-card {
+  border-radius: 8px;
+  overflow: hidden;
+}
+[data-template="neon"] .t-product-card:hover {
+  transform: translateY(-2px);
+}
+
+[data-template="neon"] input,
+[data-template="neon"] textarea {
+  border-radius: 0 !important;
+  border-width: 1px !important;
+}
+
+[data-template="neon"] nav {
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  font-size: 0.8125rem;
+}
+
+[data-template="neon"] footer {
+  border-top-width: 1px !important;
+}
+
+/* ==================== ORGANIC — hand-drawn feel, rounded shapes ==================== */
+[data-template="organic"] .t-hero {
+  padding: 7rem 0 5rem;
+  min-height: 65vh;
+  display: flex;
+  align-items: center;
+  text-align: center;
+}
+@media (min-width: 768px) {
+  [data-template="organic"] .t-hero {
+    padding: 9rem 0 6rem;
+  }
+}
+
+[data-template="organic"] .t-hero-heading {
+  font-size: clamp(2.2rem, 5.5vw, 3.8rem);
+  font-weight: 700;
+  letter-spacing: -0.01em;
+  line-height: 1.12;
+}
+
+[data-template="organic"] .t-hero-desc {
+  font-size: 1.0625rem;
+  line-height: 1.7;
+  max-width: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 1.5rem;
+}
+
+[data-template="organic"] .t-section-heading {
+  font-size: 1.5rem;
+  font-weight: 700;
+  letter-spacing: -0.01em;
+}
+
+[data-template="organic"] .t-card {
+  padding: 2rem;
+  border-radius: 24px;
+  transition: transform 0.3s ease;
+}
+[data-template="organic"] .t-card:hover {
+  transform: translateY(-3px);
+}
+
+[data-template="organic"] .t-btn-primary {
+  padding: 0.875rem 2.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 24px;
+}
+
+[data-template="organic"] .t-btn-secondary {
+  padding: 0.875rem 2.25rem;
+  font-size: 0.875rem;
+  font-weight: 600;
+  border-radius: 24px;
+  background: transparent;
+}
+
+[data-template="organic"] .t-product-card {
+  border-radius: 20px;
+  overflow: hidden;
+}
+[data-template="organic"] .t-product-card:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.04);
+}
+
+[data-template="organic"] input,
+[data-template="organic"] textarea {
+  border-radius: 16px !important;
+}
+
+/* ==================== Enhanced Mobile Overrides ==================== */
 @media (max-width: 480px) {
+  [data-template="startup"] .t-hero {
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+  }
+
+  [data-template="magazine"] .t-hero {
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+  }
+
+  [data-template="neon"] .t-hero {
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+    min-height: 70vh;
+  }
+
+  [data-template="organic"] .t-hero {
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+  }
+
+  [data-template="restaurant"] .t-hero {
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+  }
+
   [data-template="artisan"] .t-hero {
     padding-top: 5rem;
     padding-bottom: 3.5rem;
@@ -1573,4 +1774,30 @@
     padding-bottom: 3rem;
     min-height: 50vh;
   }
+
+  [data-template="tech"] .t-hero {
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+  }
+}
+
+/* ==================== Template-specific section backgrounds ==================== */
+/* Neon: sections have subtle dark gradients */
+[data-template="neon"] .t-section:nth-child(even) {
+  background: linear-gradient(180deg, rgba(168, 85, 247, 0.02) 0%, transparent 100%);
+}
+
+/* Tech: alternating section subtle patterns */
+[data-template="tech"] .t-section:nth-child(even) {
+  background: rgba(16, 185, 129, 0.01);
+}
+
+/* Startup: subtle gradient on even sections */
+[data-template="startup"] .t-section:nth-child(even) {
+  background: linear-gradient(180deg, rgba(99, 102, 241, 0.02) 0%, transparent 100%);
+}
+
+/* Wellness: very soft alternating bg */
+[data-template="wellness"] .t-section:nth-child(even) {
+  background: rgba(91, 138, 91, 0.02);
 }

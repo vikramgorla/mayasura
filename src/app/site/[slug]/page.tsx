@@ -132,25 +132,38 @@ function TestimonialsCarousel({
 
   const sectionTitle = templateId === 'bold' ? 'WHAT PEOPLE SAY'
     : templateId === 'playful' ? 'What People Say 💬'
+    : templateId === 'neon' ? 'WHAT PEOPLE SAY'
+    : templateId === 'tech' ? '> testimonials'
+    : templateId === 'boutique' ? 'CLIENT STORIES'
+    : templateId === 'magazine' ? 'Voices'
+    : templateId === 'restaurant' ? 'Guest Reviews'
+    : templateId === 'artisan' ? 'From Our Community'
+    : templateId === 'corporate' ? 'Client Testimonials'
+    : templateId === 'wellness' ? 'What People Feel'
+    : templateId === 'organic' ? 'Happy Customers'
+    : templateId === 'startup' ? 'Loved by Teams'
+    : templateId === 'portfolio' ? 'Kind Words'
     : 'What Our Customers Say';
 
   return (
     <section className="t-section">
       <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
         <ScrollReveal>
-          <div className={`mb-10 ${templateId === 'classic' || templateId === 'playful' ? 'text-center' : ''}`}>
+          <div className={`mb-10 ${['classic', 'playful', 'boutique', 'wellness', 'organic', 'restaurant', 'startup'].includes(templateId) ? 'text-center' : ''}`}>
             <h2
               className="t-section-heading mb-3"
               style={{
-                fontFamily: brand.font_heading,
+                fontFamily: templateId === 'tech' ? 'JetBrains Mono, monospace' : brand.font_heading,
                 fontWeight: tp?.typography.headingWeight || '600',
                 letterSpacing: tp?.typography.headingTracking,
-                color: textColor,
+                color: isDark ? (templateId === 'neon' ? '#F0F0FF' : '#E2E8F0') : textColor,
               }}
             >
               {sectionTitle}
             </h2>
             {templateId === 'bold' && <div className="h-0.5 w-12 mt-2" style={{ backgroundColor: accentColor }} />}
+            {templateId === 'neon' && <div className="h-0.5 w-12 mt-2 mx-auto" style={{ backgroundColor: accentColor, boxShadow: `0 0 10px ${accentColor}` }} />}
+            {templateId === 'boutique' && <div className="h-px w-8 mt-2 mx-auto" style={{ backgroundColor: accentColor }} />}
           </div>
         </ScrollReveal>
 
@@ -167,10 +180,24 @@ function TestimonialsCarousel({
                 className="p-6 sm:p-8"
                 style={{
                   backgroundColor: templateId === 'playful' ? ['#FFF7ED', '#EFF6FF', '#F0FDF4'][i % 3]
+                    : templateId === 'neon' ? `${accentColor}04`
+                    : templateId === 'tech' ? '#111827'
                     : isDark ? '#111111' : `${textColor}04`,
-                  borderRadius: templateId === 'playful' ? '20px' : templateId === 'classic' ? '16px' : templateId === 'bold' ? '0' : dsRadius,
-                  border: templateId === 'bold' ? `2px solid ${textColor}10` : `1px solid ${ds.borderColor}`,
-                  boxShadow: templateId === 'classic' ? '6px 6px 12px rgba(0,0,0,0.04), -6px -6px 12px rgba(255,255,255,0.7)' : undefined,
+                  borderRadius: templateId === 'playful' ? '20px' : templateId === 'classic' ? '16px' : templateId === 'bold' || templateId === 'neon' ? '0'
+                    : templateId === 'wellness' || templateId === 'organic' ? '20px'
+                    : templateId === 'startup' ? '12px'
+                    : templateId === 'artisan' ? '8px'
+                    : dsRadius,
+                  border: templateId === 'bold' ? `2px solid ${textColor}10`
+                    : templateId === 'neon' ? `1px solid ${accentColor}20`
+                    : templateId === 'tech' ? '1px solid #1E293B'
+                    : templateId === 'artisan' ? `2px solid ${textColor}08`
+                    : templateId === 'boutique' ? 'none'
+                    : `1px solid ${ds.borderColor}`,
+                  boxShadow: templateId === 'classic' ? '6px 6px 12px rgba(0,0,0,0.04), -6px -6px 12px rgba(255,255,255,0.7)'
+                    : templateId === 'neon' ? `0 0 15px ${accentColor}05`
+                    : undefined,
+                  borderBottom: templateId === 'boutique' ? `1px solid ${textColor}08` : undefined,
                 }}
               >
                 {/* Star Rating */}
