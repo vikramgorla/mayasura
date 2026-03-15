@@ -8,6 +8,8 @@
  * Resolves #93
  */
 
+import { getTextOnColor } from '@/lib/color-utils';
+
 // ─── Button Shape ────────────────────────────────────────────────
 export type ButtonShape = 'sharp' | 'soft' | 'rounded' | 'pill';
 
@@ -105,6 +107,7 @@ export function designSettingsToCSSVars(
     '--brand-primary': primaryColor,
     '--brand-secondary': secondaryColor,
     '--brand-accent': accentColor,
+    '--brand-accent-text': getTextOnColor(accentColor),
     '--brand-text': ds.textColor,
     '--brand-muted': ds.mutedColor,
     '--brand-surface': ds.surfaceColor,
@@ -144,7 +147,7 @@ export function getPrimaryButtonStyle(
   };
 
   if (ds.buttonVariant === 'solid') {
-    return { ...base, backgroundColor: accentColor, color: '#FFFFFF', border: 'none' };
+    return { ...base, backgroundColor: accentColor, color: getTextOnColor(accentColor), border: 'none' };
   }
   if (ds.buttonVariant === 'outline') {
     return { ...base, backgroundColor: 'transparent', color: accentColor, border: `1.5px solid ${accentColor}` };

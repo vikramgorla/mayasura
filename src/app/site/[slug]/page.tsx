@@ -13,6 +13,7 @@ import {
   SPACING_MAP,
   BORDER_RADIUS_MAP,
 } from '@/lib/design-settings';
+import { getTextOnColor } from '@/lib/color-utils';
 import { JsonLd } from '@/components/seo/json-ld';
 import { breadcrumbJsonLd, getBaseUrl } from '@/lib/seo';
 import {
@@ -287,6 +288,7 @@ export default function BrandHomePage() {
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : templateId === 'neon' ? '#050510' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
+  const accentBtnText = getTextOnColor(accentColor);
 
   // Design settings — applied from Design Studio
   const ds = designSettings;
@@ -452,7 +454,7 @@ export default function BrandHomePage() {
             <BoldTextReveal delay={0.7}>
               <div className="flex flex-wrap gap-4">
                 {channels.includes('ecommerce') && (
-                  <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
+                  <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: accentBtnText }}>
                     SHOP NOW
                   </Link>
                 )}
@@ -494,7 +496,7 @@ export default function BrandHomePage() {
                 <ElegantFade delay={0.65}>
                   <div className="flex flex-wrap justify-center gap-4 mt-10">
                     {channels.includes('ecommerce') && (
-                      <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
+                      <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: accentBtnText }}>
                         Shop Now
                       </Link>
                     )}
@@ -530,7 +532,7 @@ export default function BrandHomePage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4 mt-10">
               {channels.includes('ecommerce') && (
-                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
                   Get Started
                 </Link>
               )}
@@ -587,7 +589,7 @@ export default function BrandHomePage() {
                 </p>
                 <div className="flex flex-wrap gap-4 mt-10">
                   {channels.includes('ecommerce') && (
-                    <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                    <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
                       Explore
                     </Link>
                   )}
@@ -690,7 +692,7 @@ export default function BrandHomePage() {
             </p>
             <div className="flex flex-wrap justify-center gap-4 mt-12">
               {channels.includes('ecommerce') && (
-                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
                   Explore
                 </Link>
               )}
@@ -722,7 +724,7 @@ export default function BrandHomePage() {
                   {brand.description || `Welcome to ${brand.name}.`}
                 </p>
                 <div className="flex flex-wrap gap-4 mt-10">
-                  <Link href={`/site/${slug}/contact`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#FFFFFF' }}>
+                  <Link href={`/site/${slug}/contact`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
                     Reserve a Table
                   </Link>
                   {channels.includes('ecommerce') && (
@@ -771,7 +773,7 @@ export default function BrandHomePage() {
           <BouncyReveal delay={0.55}>
             <div className="flex flex-wrap justify-center gap-4 mt-10">
               {channels.includes('ecommerce') && (
-                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: accentBtnText }}>
                   Shop Now 🛍️
                 </Link>
               )}

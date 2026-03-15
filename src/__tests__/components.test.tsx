@@ -65,14 +65,21 @@ describe('Card component', () => {
 });
 
 describe('Skeleton components', () => {
-  it('renders skeleton', () => {
+  it('renders skeleton with shimmer by default', () => {
     const { container } = render(<Skeleton className="h-10 w-10" />);
+    expect(container.firstChild).toHaveClass('rounded-lg');
+    expect(container.firstChild).toHaveClass('overflow-hidden');
+  });
+
+  it('renders skeleton with animate-pulse when shimmer is disabled', () => {
+    const { container } = render(<Skeleton shimmer={false} className="h-10 w-10" />);
     expect(container.firstChild).toHaveClass('animate-pulse');
   });
 
   it('renders skeleton card', () => {
     const { container } = render(<SkeletonCard />);
-    expect(container.querySelector('.animate-pulse')).toBeInTheDocument();
+    // SkeletonCard uses Skeleton components with default shimmer
+    expect(container.querySelector('.rounded-lg')).toBeInTheDocument();
   });
 });
 

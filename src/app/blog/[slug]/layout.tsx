@@ -6,11 +6,17 @@ import Link from 'next/link';
 import { Brand } from '@/lib/types';
 import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
 import { buildGoogleFontsUrl } from '@/lib/font-loader';
+import {
+  resolveDesignSettings,
+  designSettingsToCSSVars,
+  type ResolvedDesignSettings,
+} from '@/lib/design-settings';
 
 interface BlogSiteData {
   brand: Brand;
   websiteTemplate?: WebsiteTemplate;
   settings?: Record<string, string>;
+  designSettings: ResolvedDesignSettings;
 }
 
 const BlogSiteContext = createContext<BlogSiteData | null>(null);
@@ -33,7 +39,8 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
       .then((d) => {
         const templateId = d.settings?.website_template || 'minimal';
         const websiteTemplate = getWebsiteTemplate(templateId);
-        setData({ brand: d.brand, websiteTemplate, settings: d.settings });
+        const ds = resolveDesignSettings(d.settings, d.brand.primary_color || '#0f172a');
+        setData({ brand: d.brand, websiteTemplate, settings: d.settings, designSettings: ds });
       })
       .catch(() => setError(true));
   }, [slug]);
@@ -77,12 +84,19 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
     );
   }
 
-  const { brand, websiteTemplate: template } = data;
+  const { brand, websiteTemplate: template, designSettings } = data;
   const templateId = template?.id || 'minimal';
   const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : templateId === 'neon' ? '#050510' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
+
+  const cssVars = designSettingsToCSSVars(
+    designSettings,
+    brand.primary_color || '#0f172a',
+    brand.secondary_color || '#fafafa',
+    brand.accent_color || '#3b82f6',
+  );
 
   // Nav link style per template
   const linkClass = (() => {
@@ -101,7 +115,9 @@ export default function BlogLayout({ children }: { children: React.ReactNode }) 
           backgroundColor: bgColor,
           color: textColor,
           fontFamily: brand.font_body || 'Inter',
-        }}
+          '--accent': accentColor,
+          ...cssVars as React.CSSProperties,
+        } as React.CSSProperties}
       >
         {/* Blog nav */}
         <nav

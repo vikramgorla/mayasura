@@ -26,7 +26,7 @@ describe('StepBasics', () => {
 
   it('renders industry input', () => {
     renderStep();
-    expect(screen.getByPlaceholderText(/Sustainable Fashion/i)).toBeInTheDocument();
+    expect(screen.getByPlaceholderText(/Restaurant, Fashion, SaaS/i)).toBeInTheDocument();
   });
 
   it('renders brand name input', () => {
@@ -60,7 +60,7 @@ describe('StepBasics', () => {
   it('calls updateData when industry changes', async () => {
     const user = userEvent.setup();
     renderStep({ industry: '' });
-    const input = screen.getByPlaceholderText(/Sustainable Fashion/i);
+    const input = screen.getByPlaceholderText(/Restaurant, Fashion, SaaS/i);
     await user.clear(input);
     await user.type(input, 'Fashion');
     // updateData should be called for each keystroke

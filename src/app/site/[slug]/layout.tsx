@@ -23,6 +23,11 @@ import {
   BORDER_RADIUS_MAP,
   type ResolvedDesignSettings,
 } from '@/lib/design-settings';
+import {
+  autoFixColorSystem,
+  validateColorSystem,
+  getTextOnColor,
+} from '@/lib/color-utils';
 
 interface BrandSiteData {
   brand: Brand;
@@ -173,19 +178,20 @@ function BrandNav({ brand, template, designSettings }: { brand: Brand; template?
     return 'text-[13px] font-medium';
   })();
 
-  // Shop button style
+  // Shop button style — uses getTextOnColor for accessible button text
+  const accentBtnText = getTextOnColor(accentColor);
   const shopBtnStyle: React.CSSProperties = (() => {
     if (templateId === 'bold') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '0',
+      backgroundColor: accentColor, color: accentBtnText, borderRadius: '0',
       padding: '0.5rem 1.25rem', fontSize: '0.6875rem', fontWeight: 700,
       letterSpacing: '0.12em', textTransform: 'uppercase',
     };
     if (templateId === 'playful') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '9999px',
+      backgroundColor: accentColor, color: accentBtnText, borderRadius: '9999px',
       padding: '0.5rem 1.5rem', fontSize: '0.8125rem', fontWeight: 600,
     };
     if (templateId === 'classic') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '8px',
+      backgroundColor: accentColor, color: accentBtnText, borderRadius: '8px',
       padding: '0.5rem 1.5rem', fontSize: '0.8125rem', fontWeight: 500,
     };
     return {
@@ -436,7 +442,7 @@ function BrandFooter({ brand, template, designSettings }: { brand: Brand; templa
                   className="px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-80"
                   style={{
                     backgroundColor: isDark ? accentColor : textColor,
-                    color: isDark ? '#FFFFFF' : bgColor,
+                    color: isDark ? getTextOnColor(accentColor) : bgColor,
                     borderRadius: btnBorderRadius,
                     fontWeight: templateId === 'bold' ? 700 : 500,
                     letterSpacing: templateId === 'bold' ? '0.06em' : undefined,
@@ -546,6 +552,27 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
           } catch { /* ignore */ }
         }
         const ds = resolveDesignSettings(d.settings, d.brand.primary_color || '#0f172a');
+
+        // ── Color accessibility safety net ──
+        // Build color system from brand + design settings, auto-fix if needed
+        const rawColors = {
+          primary: d.brand.primary_color || '#0f172a',
+          secondary: d.brand.secondary_color || '#fafafa',
+          accent: d.brand.accent_color || '#3b82f6',
+          text: ds.textColor,
+          muted: ds.mutedColor,
+          surface: ds.surfaceColor,
+          border: ds.borderColor,
+        };
+        const issues = validateColorSystem(rawColors);
+        if (issues.some((i: { type: string }) => i.type === 'error')) {
+          const fixed = autoFixColorSystem(rawColors);
+          ds.textColor = fixed.text;
+          ds.mutedColor = fixed.muted;
+          ds.surfaceColor = fixed.surface;
+          ds.borderColor = fixed.border;
+        }
+
         setData({ ...d, websiteTemplate, pageLayout, designSettings: ds });
       })
       .catch(() => setError(true));

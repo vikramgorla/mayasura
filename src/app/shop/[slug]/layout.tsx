@@ -6,6 +6,11 @@ import Link from 'next/link';
 import { Brand } from '@/lib/types';
 import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
 import { buildGoogleFontsUrl } from '@/lib/font-loader';
+import {
+  resolveDesignSettings,
+  designSettingsToCSSVars,
+  type ResolvedDesignSettings,
+} from '@/lib/design-settings';
 
 interface CartItem {
   productId: string;
@@ -36,6 +41,8 @@ interface ShopContextType {
   cartTotal: number;
   cartCount: number;
   websiteTemplate?: WebsiteTemplate;
+  settings?: Record<string, string>;
+  designSettings: ResolvedDesignSettings;
 }
 
 const ShopContext = createContext<ShopContextType | null>(null);
@@ -56,6 +63,8 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
   const [error, setError] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [websiteTemplate, setWebsiteTemplate] = useState<WebsiteTemplate | undefined>();
+  const [settings, setSettings] = useState<Record<string, string> | undefined>();
+  const [designSettings, setDesignSettings] = useState<ResolvedDesignSettings | null>(null);
 
   // Load cart from localStorage
   useEffect(() => {
@@ -85,6 +94,9 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
         setProducts(d.products || []);
         const templateId = d.settings?.website_template || 'minimal';
         setWebsiteTemplate(getWebsiteTemplate(templateId));
+        setSettings(d.settings);
+        const ds = resolveDesignSettings(d.settings, d.brand.primary_color || '#0f172a');
+        setDesignSettings(ds);
       })
       .catch(() => setError(true));
   }, [slug]);
@@ -148,7 +160,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
     );
   }
 
-  if (!brand) {
+  if (!brand || !designSettings) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="animate-pulse flex flex-col items-center gap-3">
@@ -167,6 +179,13 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
   const bgColor = isDark ? '#000000' : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
 
+  const cssVars = designSettingsToCSSVars(
+    designSettings,
+    brand.primary_color || '#0f172a',
+    brand.secondary_color || '#fafafa',
+    brand.accent_color || '#3b82f6',
+  );
+
   // Nav link style per template
   const linkClass = (() => {
     if (templateId === 'bold') return 'text-[11px] font-bold uppercase tracking-[0.12em]';
@@ -176,7 +195,7 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
   })();
 
   return (
-    <ShopContext.Provider value={{ brand, products, cart, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount, websiteTemplate }}>
+    <ShopContext.Provider value={{ brand, products, cart, addToCart, removeFromCart, updateQuantity, clearCart, cartTotal, cartCount, websiteTemplate, settings, designSettings }}>
       <div
         className="min-h-screen flex flex-col"
         data-template={templateId}
@@ -184,7 +203,9 @@ export default function ShopLayout({ children }: { children: React.ReactNode }) 
           backgroundColor: bgColor,
           color: textColor,
           fontFamily: brand.font_body || 'Inter',
-        }}
+          '--accent': accentColor,
+          ...cssVars as React.CSSProperties,
+        } as React.CSSProperties}
       >
         {/* Shop nav */}
         <nav
