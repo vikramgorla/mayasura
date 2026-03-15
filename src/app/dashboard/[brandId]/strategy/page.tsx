@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Sparkles, Target, Users, Search, Calendar, Shield,
-  ChevronRight, ChevronDown, Loader2, Clock, Save, RefreshCw
+  ChevronRight, ChevronDown, Loader2, Clock, Save, RefreshCw,
+  Activity, Download, Share2
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -60,6 +61,187 @@ function StrategySkeleton() {
   );
 }
 
+// ─── Health Report Types ─────────────────────────────────────────
+interface HealthDimension {
+  score: number;
+  label: string;
+  feedback: string;
+  recommendations: string[];
+}
+
+interface HealthReport {
+  overallScore: number;
+  overallGrade: string;
+  summary: string;
+  dimensions: Record<string, HealthDimension>;
+  topPriorities: string[];
+  strengths: string[];
+  quickWins: string[];
+}
+
+// ─── Radar Chart (CSS-based) ─────────────────────────────────────
+function RadarChart({ dimensions }: { dimensions: Record<string, HealthDimension> }) {
+  const entries = Object.values(dimensions);
+  const count = entries.length;
+  const size = 200;
+  const center = size / 2;
+  const radius = 80;
+
+  const getPoint = (index: number, value: number) => {
+    const angle = (Math.PI * 2 * index) / count - Math.PI / 2;
+    const r = (value / 100) * radius;
+    return { x: center + r * Math.cos(angle), y: center + r * Math.sin(angle) };
+  };
+
+  const dataPoints = entries.map((d, i) => getPoint(i, d.score));
+  const gridPoints100 = entries.map((_, i) => getPoint(i, 100));
+  const gridPoints75 = entries.map((_, i) => getPoint(i, 75));
+  const gridPoints50 = entries.map((_, i) => getPoint(i, 50));
+  const gridPoints25 = entries.map((_, i) => getPoint(i, 25));
+
+  const toPath = (points: { x: number; y: number }[]) =>
+    points.map((p, i) => `${i === 0 ? 'M' : 'L'} ${p.x} ${p.y}`).join(' ') + ' Z';
+
+  return (
+    <div className="flex flex-col items-center">
+      <svg viewBox={`0 0 ${size} ${size}`} className="w-48 h-48 sm:w-56 sm:h-56">
+        {/* Grid lines */}
+        {[gridPoints100, gridPoints75, gridPoints50, gridPoints25].map((pts, i) => (
+          <polygon key={i} points={pts.map(p => `${p.x},${p.y}`).join(' ')} fill="none" stroke="currentColor" className="text-zinc-200 dark:text-zinc-700" strokeWidth="0.5" />
+        ))}
+        {/* Axis lines */}
+        {entries.map((_, i) => {
+          const p = getPoint(i, 100);
+          return <line key={i} x1={center} y1={center} x2={p.x} y2={p.y} stroke="currentColor" className="text-zinc-200 dark:text-zinc-700" strokeWidth="0.5" />;
+        })}
+        {/* Data polygon */}
+        <polygon points={dataPoints.map(p => `${p.x},${p.y}`).join(' ')} fill="rgba(124, 58, 237, 0.15)" stroke="#7C3AED" strokeWidth="2" />
+        {/* Data points */}
+        {dataPoints.map((p, i) => (
+          <circle key={i} cx={p.x} cy={p.y} r="3" fill="#7C3AED" />
+        ))}
+      </svg>
+      {/* Labels */}
+      <div className="flex flex-wrap justify-center gap-3 mt-3">
+        {entries.map((d) => (
+          <div key={d.label} className="flex items-center gap-1.5">
+            <div className="h-2 w-2 rounded-full bg-violet-500" />
+            <span className="text-[10px] text-zinc-500 dark:text-zinc-400">{d.label}: {d.score}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+// ─── Health Report Card ──────────────────────────────────────────
+function HealthReportCard({ report }: { report: HealthReport }) {
+  const gradeColors: Record<string, string> = {
+    'A+': 'text-emerald-500', A: 'text-emerald-500', 'A-': 'text-emerald-500',
+    'B+': 'text-blue-500', B: 'text-blue-500', 'B-': 'text-blue-500',
+    'C+': 'text-amber-500', C: 'text-amber-500', 'C-': 'text-amber-500',
+    D: 'text-red-500', F: 'text-red-500',
+  };
+
+  return (
+    <Card className="mb-8">
+      <CardHeader>
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Activity className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+          Brand Health Report
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        {/* Top row: score + radar */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+          {/* Score */}
+          <div className="text-center py-4">
+            <div className="relative inline-block mb-3">
+              <svg className="w-28 h-28" viewBox="0 0 100 100">
+                <circle cx="50" cy="50" r="40" fill="none" stroke="currentColor" className="text-zinc-100 dark:text-zinc-800" strokeWidth="8" />
+                <circle
+                  cx="50" cy="50" r="40" fill="none"
+                  stroke="currentColor"
+                  className={report.overallScore >= 80 ? 'text-emerald-500' : report.overallScore >= 60 ? 'text-amber-500' : 'text-red-500'}
+                  strokeWidth="8" strokeLinecap="round"
+                  strokeDasharray={`${report.overallScore * 2.51} 251`}
+                  transform="rotate(-90 50 50)"
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center">
+                <span className="text-2xl font-bold text-zinc-900 dark:text-white">{report.overallScore}</span>
+                <span className={`text-sm font-bold ${gradeColors[report.overallGrade] || 'text-zinc-500'}`}>{report.overallGrade}</span>
+              </div>
+            </div>
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">Overall Health Score</p>
+          </div>
+          {/* Radar */}
+          <RadarChart dimensions={report.dimensions} />
+        </div>
+
+        {/* Summary */}
+        <div className="bg-violet-50 dark:bg-violet-950/20 rounded-xl p-4 mb-6">
+          <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">{report.summary}</p>
+        </div>
+
+        {/* Dimension scores */}
+        <div className="space-y-3 mb-6">
+          <h4 className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase">Dimension Scores</h4>
+          {Object.values(report.dimensions).map((dim) => (
+            <div key={dim.label} className="border border-zinc-100 dark:border-zinc-800 rounded-xl p-4">
+              <div className="flex items-center justify-between mb-2">
+                <span className="text-sm font-medium text-zinc-900 dark:text-white">{dim.label}</span>
+                <Badge variant={dim.score >= 80 ? 'default' : dim.score >= 60 ? 'secondary' : 'destructive'}>
+                  {dim.score}%
+                </Badge>
+              </div>
+              <div className="h-1.5 bg-zinc-100 dark:bg-zinc-800 rounded-full mb-2 overflow-hidden">
+                <div
+                  className={`h-full rounded-full transition-all duration-1000 ${dim.score >= 80 ? 'bg-emerald-500' : dim.score >= 60 ? 'bg-amber-500' : 'bg-red-500'}`}
+                  style={{ width: `${dim.score}%` }}
+                />
+              </div>
+              <p className="text-xs text-zinc-500 dark:text-zinc-400 mb-2">{dim.feedback}</p>
+              <ul className="space-y-1">
+                {dim.recommendations.map((rec, i) => (
+                  <li key={i} className="flex items-start gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+                    <ChevronRight className="h-3 w-3 text-violet-500 flex-shrink-0 mt-0.5" />
+                    {rec}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ))}
+        </div>
+
+        {/* Quick wins & priorities */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div className="bg-emerald-50 dark:bg-emerald-950/20 rounded-xl p-4">
+            <h4 className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase mb-2">✅ Strengths</h4>
+            <ul className="space-y-1.5">
+              {report.strengths.map((s, i) => (
+                <li key={i} className="text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2">
+                  <span className="text-emerald-500 mt-0.5">•</span> {s}
+                </li>
+              ))}
+            </ul>
+          </div>
+          <div className="bg-amber-50 dark:bg-amber-950/20 rounded-xl p-4">
+            <h4 className="text-xs font-semibold text-amber-600 dark:text-amber-400 uppercase mb-2">⚡ Quick Wins</h4>
+            <ul className="space-y-1.5">
+              {report.quickWins.map((w, i) => (
+                <li key={i} className="text-xs text-zinc-700 dark:text-zinc-300 flex items-start gap-2">
+                  <span className="text-amber-500 mt-0.5">•</span> {w}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 export default function StrategyPage() {
   const params = useParams();
   const brandId = params.brandId as string;
@@ -68,6 +250,8 @@ export default function StrategyPage() {
   const [results, setResults] = useState<Record<string, unknown>>({});
   const [timestamps, setTimestamps] = useState<Record<string, string>>({});
   const [loadingSaved, setLoadingSaved] = useState(true);
+  const [healthReport, setHealthReport] = useState<HealthReport | null>(null);
+  const [loadingHealth, setLoadingHealth] = useState(false);
 
   // Load saved strategies on mount
   useEffect(() => {
@@ -113,6 +297,26 @@ export default function StrategyPage() {
 
   const hasResults = Object.keys(results).length > 0;
 
+  const generateHealthReport = async () => {
+    setLoadingHealth(true);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/health-report`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (data.error) {
+        toast.error('Health report failed', data.error);
+      } else {
+        setHealthReport(data.report);
+        toast.success('Brand Health Report generated!');
+      }
+    } catch {
+      toast.error('Failed to generate health report');
+    }
+    setLoadingHealth(false);
+  };
+
   return (
     <div className="p-4 sm:p-8">
       <Breadcrumbs
@@ -122,13 +326,31 @@ export default function StrategyPage() {
         ]}
         className="mb-4"
       />
-      <div className="mb-8">
-        <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
-          <Sparkles className="h-6 w-6 text-blue-600" />
-          AI Strategy Advisor
-        </h1>
-        <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Get AI-powered insights and recommendations for your brand</p>
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h1 className="text-2xl font-bold flex items-center gap-2 text-zinc-900 dark:text-white">
+            <Sparkles className="h-6 w-6 text-blue-600" />
+            AI Strategy Advisor
+          </h1>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm mt-1">Get AI-powered insights and recommendations for your brand</p>
+        </div>
+        <Button
+          variant="brand"
+          size="sm"
+          onClick={generateHealthReport}
+          disabled={loadingHealth}
+        >
+          {loadingHealth ? (
+            <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Analyzing...</>
+          ) : (
+            <><Activity className="h-3.5 w-3.5" /> Health Report</>
+          )}
+        </Button>
       </div>
+
+      {/* Health Report */}
+      {loadingHealth && !healthReport && <StrategySkeleton />}
+      {healthReport && <HealthReportCard report={healthReport} />}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 mb-8">
         {strategyOptions.map((option) => {

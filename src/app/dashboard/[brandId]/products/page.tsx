@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { Package, Plus, Sparkles, Trash2, X, Edit, Image, Tag, Box, Search, Save, ShoppingBag, CheckSquare, Square } from 'lucide-react';
+import { Package, Plus, Sparkles, Trash2, X, Edit, Image, Tag, Box, Search, Save, ShoppingBag, CheckSquare, Square, Loader2, Check, ArrowRight, Wand2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Input } from '@/components/ui/input';
@@ -12,6 +12,7 @@ import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { motion, AnimatePresence } from 'framer-motion';
 
 interface Product {
   id: string;
@@ -40,6 +41,14 @@ export default function ProductsPage() {
   const [generating, setGenerating] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [enhancing, setEnhancing] = useState<string | null>(null);
+  const [enhanceResult, setEnhanceResult] = useState<{
+    productId: string;
+    original: string;
+    enhanced: string;
+    seoKeywords: string[];
+    improvements: string[];
+  } | null>(null);
   const toast = useToast();
 
   const loadProducts = () => {
@@ -179,6 +188,54 @@ export default function ProductsPage() {
       toast.error('Generation failed');
     }
     setGenerating(false);
+  };
+
+  const enhanceDescription = async (product: Product) => {
+    setEnhancing(product.id);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/enhance-description`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          productName: product.name,
+          currentDescription: product.description,
+          category: product.category,
+          price: product.price,
+        }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        toast.error('Enhancement failed');
+      } else {
+        setEnhanceResult({
+          productId: product.id,
+          original: product.description || '',
+          enhanced: data.enhanced,
+          seoKeywords: data.seoKeywords || [],
+          improvements: data.improvements || [],
+        });
+        toast.success('Description enhanced!');
+      }
+    } catch {
+      toast.error('Failed to enhance description');
+    }
+    setEnhancing(null);
+  };
+
+  const acceptEnhancement = async () => {
+    if (!enhanceResult) return;
+    try {
+      await fetch(`/api/brands/${brandId}/products?productId=${enhanceResult.productId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ description: enhanceResult.enhanced }),
+      });
+      toast.success('Enhanced description applied!');
+      setEnhanceResult(null);
+      loadProducts();
+    } catch {
+      toast.error('Failed to apply enhancement');
+    }
   };
 
   const filteredProducts = searchQuery
@@ -445,6 +502,19 @@ export default function ProductsPage() {
                     </div>
                     <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed line-clamp-2">{product.description}</p>
                     <div className="flex items-center gap-1 mt-2 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => enhanceDescription(product)}
+                        disabled={enhancing === product.id}
+                        className="h-9 sm:h-7 text-xs text-violet-600 hover:text-violet-700 hover:bg-violet-50 dark:hover:bg-violet-950/30 min-w-[44px]"
+                      >
+                        {enhancing === product.id ? (
+                          <><Loader2 className="h-3 w-3 mr-1 animate-spin" /> Enhancing</>
+                        ) : (
+                          <><Wand2 className="h-3 w-3 mr-1" /> ✨ Enhance</>
+                        )}
+                      </Button>
                       <Button variant="ghost" size="sm" onClick={() => startEdit(product)} className="h-9 sm:h-7 text-xs min-w-[44px]">
                         <Edit className="h-3 w-3 mr-1" /> Edit
                       </Button>
@@ -465,6 +535,91 @@ export default function ProductsPage() {
         </div>
         </div>
       )}
+
+      {/* ═══════ Enhancement Result Modal ═══════ */}
+      <AnimatePresence>
+        {enhanceResult && (
+          <div className="fixed inset-0 z-50">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-black/50 backdrop-blur-sm"
+              onClick={() => setEnhanceResult(null)}
+            />
+            <div className="flex items-start justify-center pt-[10vh] px-4">
+              <motion.div
+                initial={{ opacity: 0, y: 20, scale: 0.95 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                exit={{ opacity: 0, y: 20, scale: 0.95 }}
+                className="relative w-full max-w-2xl bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 max-h-[75vh] overflow-hidden flex flex-col"
+                onClick={(e) => e.stopPropagation()}
+              >
+                <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800">
+                  <h3 className="font-semibold text-sm text-zinc-900 dark:text-white flex items-center gap-2">
+                    <Wand2 className="h-4 w-4 text-violet-600" />
+                    AI-Enhanced Description
+                  </h3>
+                  <button onClick={() => setEnhanceResult(null)} className="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800">
+                    <X className="h-4 w-4 text-zinc-400" />
+                  </button>
+                </div>
+                <div className="flex-1 overflow-y-auto p-5 space-y-4">
+                  {/* Before/After */}
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl border border-red-100 dark:border-red-900/30 bg-red-50/50 dark:bg-red-950/10">
+                      <p className="text-[10px] font-semibold text-red-500 uppercase mb-2">Before</p>
+                      <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                        {enhanceResult.original || 'No description'}
+                      </p>
+                    </div>
+                    <div className="p-4 rounded-xl border border-emerald-100 dark:border-emerald-900/30 bg-emerald-50/50 dark:bg-emerald-950/10">
+                      <p className="text-[10px] font-semibold text-emerald-500 uppercase mb-2">After ✨</p>
+                      <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed">
+                        {enhanceResult.enhanced}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Improvements */}
+                  <div>
+                    <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase mb-2">What Changed</p>
+                    <ul className="space-y-1.5">
+                      {enhanceResult.improvements.map((imp, i) => (
+                        <li key={i} className="flex items-start gap-2 text-xs text-zinc-600 dark:text-zinc-300">
+                          <Check className="h-3 w-3 text-emerald-500 flex-shrink-0 mt-0.5" />
+                          {imp}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* SEO Keywords */}
+                  {enhanceResult.seoKeywords.length > 0 && (
+                    <div>
+                      <p className="text-xs font-semibold text-zinc-500 dark:text-zinc-400 uppercase mb-2">SEO Keywords</p>
+                      <div className="flex flex-wrap gap-1.5">
+                        {enhanceResult.seoKeywords.map((kw, i) => (
+                          <Badge key={i} variant="secondary">{kw}</Badge>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+                <div className="px-5 py-3 border-t border-zinc-100 dark:border-zinc-800 flex items-center gap-2">
+                  <Button variant="outline" size="sm" onClick={() => setEnhanceResult(null)}>
+                    Discard
+                  </Button>
+                  <Button variant="brand" size="sm" onClick={acceptEnhancement} className="ml-auto">
+                    <Check className="h-3.5 w-3.5 mr-1" />
+                    Accept Enhancement
+                  </Button>
+                </div>
+              </motion.div>
+            </div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

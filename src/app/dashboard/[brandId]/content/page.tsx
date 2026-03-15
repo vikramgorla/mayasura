@@ -5,7 +5,8 @@ import { useParams } from 'next/navigation';
 import {
   FileText, Sparkles, Trash2, BookOpen, Share2, Mail, Copy, Eye, X,
   Globe, MessageCircle, Wand2, Edit3, Check, ChevronDown, Clock,
-  LayoutTemplate, CheckSquare, Square, AlertCircle,
+  LayoutTemplate, CheckSquare, Square, AlertCircle, Loader2,
+  Twitter, Instagram, Linkedin, Facebook, Hash, Calendar, Lightbulb,
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -193,6 +194,31 @@ function markdownToHtml(md: string): string {
   return `<p>${html}</p>`;
 }
 
+// ─── Social Post Types ─────────────────────────────────────────
+
+interface SocialPost {
+  platform: string;
+  platformLabel: string;
+  content: string;
+  characterCount: number;
+  hashtags: string[];
+  bestTime: string;
+  tip: string;
+}
+
+interface SocialPostResult {
+  posts: SocialPost[];
+  theme: string;
+  contentCalendarTip: string;
+}
+
+const platformIcons: Record<string, { icon: React.ElementType; color: string; maxChars: number }> = {
+  twitter: { icon: Twitter, color: 'bg-sky-50 dark:bg-sky-900/30 text-sky-500', maxChars: 280 },
+  instagram: { icon: Instagram, color: 'bg-pink-50 dark:bg-pink-900/30 text-pink-500', maxChars: 2200 },
+  linkedin: { icon: Linkedin, color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600', maxChars: 3000 },
+  facebook: { icon: Facebook, color: 'bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600', maxChars: 63206 },
+};
+
 // ─── Component ─────────────────────────────────────────────────
 
 export default function ContentPage() {
@@ -208,6 +234,10 @@ export default function ContentPage() {
   const [editTitle, setEditTitle] = useState('');
   const [showTemplates, setShowTemplates] = useState(false);
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [socialPosts, setSocialPosts] = useState<SocialPostResult | null>(null);
+  const [generatingSocial, setGeneratingSocial] = useState(false);
+  const [socialTopic, setSocialTopic] = useState('');
+  const [showSocialSection, setShowSocialSection] = useState(false);
   const toast = useToast();
 
   const loadContent = useCallback(() => {
@@ -348,6 +378,27 @@ export default function ContentPage() {
     }
   };
 
+  const generateSocialPosts = async () => {
+    setGeneratingSocial(true);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/social-posts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic: socialTopic || undefined }),
+      });
+      const data = await res.json();
+      if (data.error) {
+        toast.error('Social post generation failed');
+      } else {
+        setSocialPosts(data);
+        toast.success('Social media posts generated!');
+      }
+    } catch {
+      toast.error('Failed to generate social posts');
+    }
+    setGeneratingSocial(false);
+  };
+
   const copyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text);
     toast.success('Copied to clipboard');
@@ -457,6 +508,130 @@ export default function ContentPage() {
             ))}
           </div>
         </CardContent>
+      </Card>
+
+      {/* Social Media Post Generator */}
+      <Card className="mb-8">
+        <CardHeader>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-sm flex items-center gap-2">
+              <Share2 className="h-4 w-4 text-purple-600 dark:text-purple-400" />
+              AI Social Media Posts
+            </CardTitle>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => setShowSocialSection(!showSocialSection)}
+            >
+              {showSocialSection ? 'Collapse' : 'Expand'}
+              <ChevronDown className={`h-3.5 w-3.5 transition-transform ${showSocialSection ? 'rotate-180' : ''}`} />
+            </Button>
+          </div>
+        </CardHeader>
+        {showSocialSection && (
+          <CardContent>
+            <div className="flex flex-col sm:flex-row gap-3 mb-4">
+              <input
+                type="text"
+                value={socialTopic}
+                onChange={(e) => setSocialTopic(e.target.value)}
+                placeholder="Topic or theme (optional, e.g., 'product launch', 'holiday sale')"
+                className="flex-1 px-3 py-2 rounded-xl border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none"
+              />
+              <Button
+                variant="brand"
+                size="sm"
+                onClick={generateSocialPosts}
+                disabled={generatingSocial}
+              >
+                {generatingSocial ? (
+                  <><Loader2 className="h-3.5 w-3.5 animate-spin" /> Generating...</>
+                ) : (
+                  <><Sparkles className="h-3.5 w-3.5" /> Generate Posts</>
+                )}
+              </Button>
+            </div>
+
+            {socialPosts && (
+              <motion.div
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+              >
+                {/* Theme banner */}
+                <div className="flex items-center gap-2 mb-4 p-2.5 rounded-lg bg-purple-50 dark:bg-purple-950/20 border border-purple-100 dark:border-purple-900/30">
+                  <Lightbulb className="h-3.5 w-3.5 text-purple-500 flex-shrink-0" />
+                  <span className="text-xs text-purple-700 dark:text-purple-300">{socialPosts.theme}</span>
+                </div>
+
+                {/* Post cards */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {socialPosts.posts.map((post) => {
+                    const platform = platformIcons[post.platform] || platformIcons.twitter;
+                    const PlatformIcon = platform.icon;
+                    return (
+                      <div
+                        key={post.platform}
+                        className="border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden"
+                      >
+                        {/* Platform header */}
+                        <div className={`flex items-center justify-between px-4 py-2.5 ${platform.color}`}>
+                          <div className="flex items-center gap-2">
+                            <PlatformIcon className="h-4 w-4" />
+                            <span className="text-xs font-semibold">{post.platformLabel}</span>
+                          </div>
+                          <span className="text-[10px] opacity-70">
+                            {post.characterCount}/{platform.maxChars}
+                          </span>
+                        </div>
+                        {/* Post content */}
+                        <div className="p-4">
+                          <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap mb-3">
+                            {post.content}
+                          </p>
+                          {/* Hashtags */}
+                          <div className="flex flex-wrap gap-1.5 mb-3">
+                            {post.hashtags.map((tag, i) => (
+                              <span key={i} className="inline-flex items-center gap-0.5 px-2 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-[10px] font-medium text-zinc-500 dark:text-zinc-400">
+                                <Hash className="h-2.5 w-2.5" />
+                                {tag.replace('#', '')}
+                              </span>
+                            ))}
+                          </div>
+                          {/* Meta */}
+                          <div className="flex items-center gap-3 text-[10px] text-zinc-400 mb-3">
+                            <span className="flex items-center gap-1">
+                              <Calendar className="h-3 w-3" />
+                              Best: {post.bestTime}
+                            </span>
+                          </div>
+                          <p className="text-[10px] text-zinc-400 dark:text-zinc-500 italic mb-3">
+                            💡 {post.tip}
+                          </p>
+                          {/* Copy button */}
+                          <Button
+                            variant="outline"
+                            size="sm"
+                            className="w-full"
+                            onClick={() => copyToClipboard(post.content + '\n\n' + post.hashtags.join(' '))}
+                          >
+                            <Copy className="h-3 w-3 mr-1" />
+                            Copy to Clipboard
+                          </Button>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Calendar tip */}
+                <div className="mt-4 flex items-start gap-2 p-3 rounded-lg bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/30">
+                  <Calendar className="h-3.5 w-3.5 text-blue-500 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs text-blue-700 dark:text-blue-300">{socialPosts.contentCalendarTip}</span>
+                </div>
+              </motion.div>
+            )}
+          </CardContent>
+        )}
       </Card>
 
       {/* Filters */}
