@@ -238,6 +238,64 @@ h4, h5, h6 {
   animation: shimmer 1.5s infinite;
 }
 
+/* ==================== Shimmering / Glowing CTA Button ==================== */
+@keyframes shimmer-border {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.btn-shimmer {
+  position: relative;
+  z-index: 0;
+}
+
+.btn-shimmer::before {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #7c3aed,
+    #a78bfa,
+    #c084fc,
+    #7c3aed,
+    #a78bfa
+  );
+  background-size: 300% 100%;
+  animation: shimmer-border 3s ease-in-out infinite;
+  z-index: -1;
+  opacity: 0.8;
+}
+
+.btn-shimmer::after {
+  content: '';
+  position: absolute;
+  inset: -2px;
+  border-radius: inherit;
+  background: linear-gradient(
+    90deg,
+    #7c3aed,
+    #a78bfa,
+    #c084fc,
+    #7c3aed,
+    #a78bfa
+  );
+  background-size: 300% 100%;
+  animation: shimmer-border 3s ease-in-out infinite;
+  z-index: -1;
+  filter: blur(12px);
+  opacity: 0.4;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .btn-shimmer::before,
+  .btn-shimmer::after {
+    animation: none;
+  }
+}
+
 /* ==================== Reduced Motion ==================== */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {

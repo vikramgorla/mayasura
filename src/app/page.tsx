@@ -18,6 +18,8 @@ import { FloatingCTA, ScrollCTAModal } from "@/components/landing";
 const SocialProof = lazy(() => import("@/components/landing/social-proof").then(m => ({ default: m.SocialProof })));
 const LiveDemo = lazy(() => import("@/components/landing/live-demo").then(m => ({ default: m.LiveDemo })));
 const ComparisonTable = lazy(() => import("@/components/landing/comparison-table").then(m => ({ default: m.ComparisonTable })));
+const BeforeAfter = lazy(() => import("@/components/landing/before-after").then(m => ({ default: m.BeforeAfter })));
+const LogoCloud = lazy(() => import("@/components/landing/logo-cloud").then(m => ({ default: m.LogoCloud })));
 
 function SectionSkeleton({ height = 300 }: { height?: number }) {
   return <div className="w-full animate-pulse bg-zinc-50 dark:bg-zinc-900/50 rounded-2xl" style={{ height }} />;
@@ -351,7 +353,7 @@ export default function Home() {
                 className="flex flex-col sm:flex-row items-start gap-3"
               >
                 <Link href="/create" className="w-full sm:w-auto">
-                  <Button size="xl" variant="brand" className="w-full sm:w-auto text-base">
+                  <Button size="xl" variant="brand" className="w-full sm:w-auto text-base btn-shimmer">
                     Start Free
                     <ArrowRight className="h-4 w-4" />
                   </Button>
@@ -402,6 +404,11 @@ export default function Home() {
           </div>
         </div>
       </section>
+
+      {/* ═══════════ LOGO CLOUD — Scrolling Brand Logos ═══════════ */}
+      <Suspense fallback={<SectionSkeleton height={160} />}>
+        <LogoCloud />
+      </Suspense>
 
       {/* ═══════════ SOCIAL PROOF NUMBERS ═══════════ */}
       <Suspense fallback={<SectionSkeleton height={260} />}>
@@ -577,6 +584,11 @@ export default function Home() {
         <ComparisonTable />
       </Suspense>
 
+      {/* ═══════════ BEFORE / AFTER COMPARISON ═══════════ */}
+      <Suspense fallback={<SectionSkeleton height={500} />}>
+        <BeforeAfter />
+      </Suspense>
+
       {/* ═══════════ PRICING ═══════════ */}
       <section id="pricing" className="py-20 sm:py-28 px-4 sm:px-6">
         <div className="max-w-5xl mx-auto">
@@ -600,9 +612,10 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.03, y: -4 }}
               viewport={{ once: true }}
               transition={{ delay: 0 }}
-              className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-6 sm:p-7"
+              className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-6 sm:p-7 cursor-default"
             >
               <h3 className="font-display font-semibold text-lg mb-1 text-[var(--text-primary)]">Free</h3>
               <p className="text-sm text-[var(--text-secondary)] mb-5">Perfect for getting started</p>
@@ -629,9 +642,10 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.04, y: -6 }}
               viewport={{ once: true }}
               transition={{ delay: 0.1 }}
-              className="bg-[var(--bg-surface)] rounded-2xl border-2 border-violet-600 p-6 sm:p-7 relative shadow-xl shadow-violet-500/10 sm:col-span-2 lg:col-span-1"
+              className="bg-[var(--bg-surface)] rounded-2xl border-2 border-violet-600 p-6 sm:p-7 relative shadow-xl shadow-violet-500/10 sm:col-span-2 lg:col-span-1 cursor-default"
             >
               <div className="absolute -top-3 left-1/2 -translate-x-1/2">
                 <span className="px-3 py-1 rounded-full bg-violet-600 text-white text-xs font-medium shadow-lg">
@@ -664,9 +678,10 @@ export default function Home() {
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               whileInView={{ opacity: 1, y: 0 }}
+              whileHover={{ scale: 1.03, y: -4 }}
               viewport={{ once: true }}
               transition={{ delay: 0.2 }}
-              className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-6 sm:p-7"
+              className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-6 sm:p-7 cursor-default"
             >
               <h3 className="font-display font-semibold text-lg mb-1 text-[var(--text-primary)]">Enterprise</h3>
               <p className="text-sm text-[var(--text-secondary)] mb-5">For large organizations</p>
@@ -818,8 +833,19 @@ export default function Home() {
       </section>
 
       {/* ═══════════ FINAL CTA ═══════════ */}
-      <section className="relative py-20 sm:py-28 px-4 sm:px-6 overflow-hidden">
+      <section className="relative py-24 sm:py-32 px-4 sm:px-6 overflow-hidden">
         <div className="absolute inset-0 bg-gradient-to-br from-violet-600 via-purple-600 to-indigo-700" />
+        {/* Animated floating orbs */}
+        <motion.div
+          animate={{ x: [0, 40, 0], y: [0, -30, 0] }}
+          transition={{ duration: 12, repeat: Infinity, ease: 'linear' }}
+          className="absolute top-[10%] left-[15%] w-[300px] h-[300px] bg-white/5 rounded-full blur-[80px]"
+        />
+        <motion.div
+          animate={{ x: [0, -30, 0], y: [0, 25, 0] }}
+          transition={{ duration: 16, repeat: Infinity, ease: 'linear' }}
+          className="absolute bottom-[10%] right-[10%] w-[250px] h-[250px] bg-white/5 rounded-full blur-[60px]"
+        />
         <div className="absolute inset-0 opacity-10">
           <div className="absolute top-0 left-0 w-full h-full" style={{ backgroundImage: 'radial-gradient(circle at 25% 25%, white 1px, transparent 1px), radial-gradient(circle at 75% 75%, white 1px, transparent 1px)', backgroundSize: '60px 60px' }} />
         </div>
@@ -829,6 +855,20 @@ export default function Home() {
           viewport={{ once: true }}
           className="max-w-3xl mx-auto text-center relative z-10"
         >
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true }}
+            className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full border border-white/20 bg-white/10 mb-6"
+          >
+            <span className="relative flex h-2 w-2">
+              <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+              <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400" />
+            </span>
+            <span className="text-xs font-medium text-white/90">
+              <AnimatedCounter end={10000} suffix="+" duration={2500} /> brands already building
+            </span>
+          </motion.div>
           <h2 className="font-display text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 text-white">
             Ready to build your
             <br />digital palace?
@@ -838,14 +878,30 @@ export default function Home() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link href="/create">
-              <Button size="xl" className="bg-white text-violet-700 hover:bg-white/90 font-semibold text-base shadow-xl">
+              <Button size="xl" className="bg-white text-violet-700 hover:bg-white/90 font-semibold text-base shadow-xl btn-shimmer">
                 Create Your Brand — Free
                 <ArrowRight className="h-4 w-4" />
               </Button>
             </Link>
           </div>
-          <p className="text-xs text-white/50 mt-5">
-            Open source · MIT License · Self-hostable · No credit card required
+
+          {/* Trust signals */}
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-8">
+            {[
+              { icon: Shield, label: 'MIT Licensed' },
+              { icon: Github, label: 'Open Source' },
+              { icon: Zap, label: '< 5 min setup' },
+              { icon: Star, label: '99% satisfaction' },
+            ].map((signal) => (
+              <div key={signal.label} className="flex items-center gap-1.5 text-white/50">
+                <signal.icon className="h-3.5 w-3.5" />
+                <span className="text-xs font-medium">{signal.label}</span>
+              </div>
+            ))}
+          </div>
+
+          <p className="text-xs text-white/40 mt-5">
+            No credit card required · Self-hostable · Your data, your control
           </p>
         </motion.div>
       </section>
@@ -956,10 +1012,18 @@ export default function Home() {
           </div>
 
           <div className="border-t border-[var(--border-primary)] pt-8 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <span className="text-xs text-[var(--text-tertiary)]">
-              © {new Date().getFullYear()} Mayasura — The divine architect of digital ecosystems
-            </span>
+            <div className="flex items-center gap-3">
+              <span className="text-xs text-[var(--text-tertiary)]">
+                © {new Date().getFullYear()} Mayasura — The divine architect of digital ecosystems
+              </span>
+              <span className="px-1.5 py-0.5 rounded text-[10px] font-mono font-medium bg-violet-100 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400">
+                v3.3
+              </span>
+            </div>
             <div className="flex items-center gap-4 text-xs text-[var(--text-tertiary)]">
+              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
+                Open Source
+              </span>
               <a href="https://github.com/vikramgorla/mayasura" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
                 <Github className="h-3.5 w-3.5" />
                 Star on GitHub
