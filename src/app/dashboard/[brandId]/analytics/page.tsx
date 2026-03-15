@@ -105,7 +105,7 @@ function RealtimeVisitors({ count }: { count: number }) {
         </AnimatePresence>
         {' '}active now
       </span>
-      <Zap className="h-3.5 w-3.5 text-emerald-500" />
+      <span className="text-[10px] text-emerald-500/60 ml-1">(estimated)</span>
     </div>
   );
 }

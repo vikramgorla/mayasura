@@ -286,6 +286,7 @@ function ContentCalendarGrid({ brandId }: { brandId: string }) {
   // Content calendar uses sample data — persistence requires a content_calendar table (future feature).
   const [posts] = useState<CalendarPost[]>(MOCK_CALENDAR_POSTS);
   const [selected, setSelected] = useState<number | null>(null);
+  const isSampleData = true; // Will be false once we have real calendar persistence
 
   const daysInMonth = new Date(year, month + 1, 0).getDate();
   const firstDay = new Date(year, month, 1).getDay();
