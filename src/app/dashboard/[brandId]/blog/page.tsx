@@ -196,7 +196,7 @@ function PostCard({
                     href={`/blog/${brandSlug}/${post.slug}`}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-600 transition-colors"
+                    className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
                     title="View live"
                   >
                     <ExternalLink className="h-4 w-4" />
@@ -204,14 +204,14 @@ function PostCard({
                 )}
                 <button
                   onClick={() => onTogglePublish(post)}
-                  className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-600 transition-colors"
+                  className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
                   title={post.status === 'published' ? 'Unpublish' : 'Publish'}
                 >
                   {post.status === 'published' ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
                 </button>
                 <button
                   onClick={() => onEdit(post)}
-                  className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-600 transition-colors"
+                  className="p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-700 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
                 >
                   <Edit className="h-4 w-4" />
                 </button>
@@ -229,7 +229,7 @@ function PostCard({
               <div className="mt-2">
                 <button
                   onClick={() => setExpanded(!expanded)}
-                  className="flex items-center gap-1 text-[10px] text-zinc-400 hover:text-zinc-600 transition-colors"
+                  className="flex items-center gap-1 text-[10px] text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
                 >
                   <ChevronDown className={`h-3 w-3 transition-transform ${expanded ? 'rotate-180' : ''}`} />
                   {expanded ? 'Hide preview' : 'Preview content'}
@@ -439,7 +439,7 @@ function AiBlogWriterDrawer({ open, onClose, onInsert, brandId }: AiBlogWriterPr
                 {step !== 'inputs' && (
                   <button
                     onClick={reset}
-                    className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors px-2 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                    className="text-xs text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors px-2 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
                   >
                     Start Over
                   </button>

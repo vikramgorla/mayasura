@@ -366,7 +366,7 @@ function ContentCalendarGrid({ brandId }: { brandId: string }) {
                 <span className={`text-[11px] font-medium block mb-0.5 ${isToday ? 'text-violet-600 dark:text-violet-400' : 'text-zinc-500 dark:text-zinc-400'}`}>{day}</span>
                 <div className="space-y-0.5">
                   {dayPosts.slice(0, 2).map((p, pi) => (
-                    <div key={pi} className={`text-[9px] truncate px-1 rounded ${TYPE_COLORS[p.type] || 'bg-zinc-100 text-zinc-600'}`}>
+                    <div key={pi} className={`text-[9px] truncate px-1 rounded ${TYPE_COLORS[p.type] || 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'}`}>
                       {p.type.slice(0, 3)}
                     </div>
                   ))}
@@ -470,7 +470,7 @@ function CompetitorMentionTracker() {
             >
               <div className="flex items-center gap-2 mb-1.5 flex-wrap">
                 <span className="text-xs font-semibold text-zinc-700 dark:text-zinc-300">{mention.competitor}</span>
-                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${platformBadge[mention.platform] || 'bg-zinc-100 text-zinc-600'}`}>
+                <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${platformBadge[mention.platform] || 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'}`}>
                   {mention.platform}
                 </span>
                 <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${sentimentBadge[mention.sentiment]}`}>
@@ -1029,7 +1029,7 @@ export default function StrategyPage() {
                     className="p-3 rounded-xl border border-zinc-100 dark:border-zinc-800 hover:border-violet-200 dark:hover:border-violet-800 hover:bg-violet-50/50 dark:hover:bg-violet-950/10 cursor-pointer transition-all group"
                   >
                     <div className="flex items-center gap-2 mb-1.5">
-                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${TYPE_COLORS[suggestion.type] || 'bg-zinc-100 text-zinc-600'}`}>
+                      <span className={`px-2 py-0.5 rounded-full text-[10px] font-medium ${TYPE_COLORS[suggestion.type] || 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400'}`}>
                         {suggestion.type}
                       </span>
                     </div>

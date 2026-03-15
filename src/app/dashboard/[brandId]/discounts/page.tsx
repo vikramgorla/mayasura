@@ -272,7 +272,7 @@ export default function DiscountsPage() {
                   <CardHeader className="pb-3">
                     <CardTitle className="text-sm flex items-center justify-between">
                       <span>{editingId ? 'Edit Discount Code' : 'Create New Discount Code'}</span>
-                      <button onClick={resetForm} className="text-zinc-400 hover:text-zinc-600">
+                      <button onClick={resetForm} className="text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300">
                         <X className="h-4 w-4" />
                       </button>
                     </CardTitle>
@@ -513,7 +513,7 @@ export default function DiscountsPage() {
                             </button>
                             <button
                               onClick={() => startEdit(d)}
-                              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-600 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+                              className="p-2 rounded-lg text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
                               title="Edit"
                             >
                               <Edit2 className="h-4 w-4" />

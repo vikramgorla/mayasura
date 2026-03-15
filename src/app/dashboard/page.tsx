@@ -125,7 +125,7 @@ export default function DashboardListPage() {
                           </Badge>
                           <Badge variant="outline">{channels.length} channels</Badge>
                         </div>
-                        <ArrowRight className="h-4 w-4 text-zinc-400 group-hover:text-zinc-600 transition-colors flex-shrink-0" />
+                        <ArrowRight className="h-4 w-4 text-zinc-400 group-hover:text-zinc-600 dark:group-hover:text-zinc-200 transition-colors flex-shrink-0" />
                       </div>
                       {brand.status === 'launched' && brand.slug && (
                         <div className="mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-700 flex gap-3" onClick={(e) => e.stopPropagation()}>

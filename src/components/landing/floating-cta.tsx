@@ -33,7 +33,7 @@ export function FloatingCTA() {
           animate={{ y: 0, opacity: 1 }}
           exit={{ y: 100, opacity: 0 }}
           transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 flex items-center gap-3 px-4 py-2.5 rounded-full bg-zinc-900/95 dark:bg-white/95 backdrop-blur-xl shadow-2xl shadow-black/20 border border-zinc-700/50 dark:border-zinc-300/50"
+          className="fixed bottom-6 left-1/2 -translate-x-1/2 z-50 hidden sm:flex items-center gap-3 px-4 py-2.5 rounded-full bg-zinc-900/95 dark:bg-white/95 backdrop-blur-xl shadow-2xl shadow-black/20 border border-zinc-700/50 dark:border-zinc-300/50"
         >
           <span className="text-sm font-medium text-white dark:text-zinc-900 hidden sm:inline">
             Create Your Brand — Free
