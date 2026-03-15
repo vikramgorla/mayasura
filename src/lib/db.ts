@@ -375,6 +375,31 @@ function runMigrations(db: Database.Database) {
     db.exec("ALTER TABLE newsletter_subscribers ADD COLUMN status TEXT DEFAULT 'active'");
   }
   
+  // Sprint 18: Reviews table
+  const hasTbl = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='reviews'").get();
+  if (!hasTbl) {
+    console.log('[DB] Creating reviews table');
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS reviews (
+        id TEXT PRIMARY KEY,
+        brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+        product_id TEXT NOT NULL,
+        author_name TEXT NOT NULL,
+        author_email TEXT NOT NULL,
+        rating INTEGER NOT NULL CHECK(rating BETWEEN 1 AND 5),
+        title TEXT,
+        body TEXT NOT NULL,
+        verified_purchase INTEGER DEFAULT 0,
+        helpful_count INTEGER DEFAULT 0,
+        status TEXT DEFAULT 'pending' CHECK(status IN ('pending','approved','rejected')),
+        created_at TEXT DEFAULT (datetime('now'))
+      );
+      CREATE INDEX IF NOT EXISTS idx_reviews_brand ON reviews(brand_id);
+      CREATE INDEX IF NOT EXISTS idx_reviews_product ON reviews(brand_id, product_id);
+      CREATE INDEX IF NOT EXISTS idx_reviews_status ON reviews(brand_id, status);
+    `);
+  }
+
   console.log('[DB] Migrations complete');
 }
 
@@ -1501,4 +1526,71 @@ export function getFullBrandExport(brandId: string) {
     exportedAt: new Date().toISOString(),
     version: '3.3',
   };
+}
+
+// ==================== Reviews (Sprint 18) ====================
+
+export interface Review {
+  id: string;
+  brand_id: string;
+  product_id: string;
+  author_name: string;
+  author_email: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  verified_purchase: number;
+  helpful_count: number;
+  status: 'pending' | 'approved' | 'rejected';
+  created_at: string;
+}
+
+export function createReview(review: {
+  id: string;
+  brand_id: string;
+  product_id: string;
+  author_name: string;
+  author_email: string;
+  rating: number;
+  title?: string;
+  body: string;
+}) {
+  const db = getDb();
+  return db.prepare(`
+    INSERT INTO reviews (id, brand_id, product_id, author_name, author_email, rating, title, body)
+    VALUES (@id, @brand_id, @product_id, @author_name, @author_email, @rating, @title, @body)
+  `).run(review);
+}
+
+export function getReviewsByBrand(brandId: string, status?: string): Review[] {
+  const db = getDb();
+  if (status) {
+    return db.prepare('SELECT * FROM reviews WHERE brand_id = ? AND status = ? ORDER BY created_at DESC').all(brandId, status) as Review[];
+  }
+  return db.prepare('SELECT * FROM reviews WHERE brand_id = ? ORDER BY created_at DESC').all(brandId) as Review[];
+}
+
+export function getPublicReviews(brandId: string, productId: string): Review[] {
+  const db = getDb();
+  return db.prepare('SELECT * FROM reviews WHERE brand_id = ? AND product_id = ? AND status = ? ORDER BY created_at DESC').all(brandId, productId, 'approved') as Review[];
+}
+
+export function updateReviewStatus(id: string, status: 'approved' | 'rejected') {
+  const db = getDb();
+  return db.prepare('UPDATE reviews SET status = ? WHERE id = ?').run(status, id);
+}
+
+export function incrementReviewHelpful(id: string) {
+  const db = getDb();
+  return db.prepare('UPDATE reviews SET helpful_count = helpful_count + 1 WHERE id = ?').run(id);
+}
+
+export function getReviewStats(brandId: string, productId: string) {
+  const db = getDb();
+  const rows = db.prepare('SELECT rating, COUNT(*) as count FROM reviews WHERE brand_id = ? AND product_id = ? AND status = ? GROUP BY rating').all(brandId, productId, 'approved') as Array<{ rating: number; count: number }>;
+  const total = rows.reduce((s, r) => s + r.count, 0);
+  const sum = rows.reduce((s, r) => s + r.rating * r.count, 0);
+  const avg = total > 0 ? sum / total : 0;
+  const dist = [5, 4, 3, 2, 1].map(r => ({ rating: r, count: rows.find(x => x.rating === r)?.count ?? 0 }));
+  return { total, avg, distribution: dist };
 }

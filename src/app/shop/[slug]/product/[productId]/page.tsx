@@ -1,12 +1,394 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from '../../layout';
 import { ProductMeta, BreadcrumbMeta } from '@/components/site/site-meta';
+
+// ── Star Input ────────────────────────────────────────────────────────────────
+function StarInput({ value, onChange, color }: { value: number; onChange: (v: number) => void; color: string }) {
+  const [hovered, setHovered] = useState(0);
+  return (
+    <div className="flex items-center gap-1">
+      {[1, 2, 3, 4, 5].map(i => (
+        <button
+          key={i}
+          type="button"
+          onClick={() => onChange(i)}
+          onMouseEnter={() => setHovered(i)}
+          onMouseLeave={() => setHovered(0)}
+          className="transition-transform hover:scale-110"
+        >
+          <svg className="h-7 w-7" viewBox="0 0 24 24" fill={(hovered || value) >= i ? color : 'none'} stroke={color} strokeWidth={1.5}>
+            <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+          </svg>
+        </button>
+      ))}
+    </div>
+  );
+}
+
+// ── Star Display ──────────────────────────────────────────────────────────────
+function StarDisplay({ rating, size = 16, color = '#f59e0b' }: { rating: number; size?: number; color?: string }) {
+  return (
+    <div className="flex items-center gap-0.5">
+      {[1, 2, 3, 4, 5].map(i => (
+        <svg key={i} style={{ width: size, height: size }} viewBox="0 0 24 24" fill={i <= rating ? color : 'none'} stroke={color} strokeWidth={1.5} opacity={i <= rating ? 1 : 0.3}>
+          <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+        </svg>
+      ))}
+    </div>
+  );
+}
+
+// ── Product Reviews Section ───────────────────────────────────────────────────
+interface ReviewData {
+  id: string;
+  author_name: string;
+  rating: number;
+  title: string | null;
+  body: string;
+  verified_purchase: number;
+  helpful_count: number;
+  created_at: string;
+}
+
+interface ReviewStats {
+  total: number;
+  avg: number;
+  distribution: Array<{ rating: number; count: number }>;
+}
+
+function ProductReviews({
+  slug, productId, textColor, accentColor, bgColor, isDark,
+}: {
+  slug: string; productId: string; textColor: string; accentColor: string; bgColor: string; isDark: boolean;
+}) {
+  const [reviews, setReviews] = useState<ReviewData[]>([]);
+  const [stats, setStats] = useState<ReviewStats>({ total: 0, avg: 0, distribution: [] });
+  const [loading, setLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [helpfulVoted, setHelpfulVoted] = useState<Set<string>>(new Set());
+
+  const [form, setForm] = useState({
+    author_name: '',
+    author_email: '',
+    rating: 0,
+    title: '',
+    review_body: '',
+    hp_field: '', // honeypot
+  });
+  const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const loadReviews = useCallback(async () => {
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/public/brand/${slug}/products/${productId}/reviews`);
+      if (res.ok) {
+        const data = await res.json();
+        setReviews(data.reviews || []);
+        setStats(data.stats || { total: 0, avg: 0, distribution: [] });
+      }
+    } catch { /* silent */ }
+    setLoading(false);
+  }, [slug, productId]);
+
+  useEffect(() => { loadReviews(); }, [loadReviews]);
+
+  const validate = () => {
+    const e: Record<string, string> = {};
+    if (!form.author_name.trim()) e.author_name = 'Name is required';
+    if (!form.author_email.trim() || !form.author_email.includes('@')) e.author_email = 'Valid email required';
+    if (!form.rating) e.rating = 'Please select a rating';
+    if (!form.review_body.trim() || form.review_body.trim().length < 5) e.review_body = 'Review must be at least 5 characters';
+    setErrors(e);
+    return Object.keys(e).length === 0;
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!validate()) return;
+    setSubmitting(true);
+    try {
+      const res = await fetch(`/api/public/brand/${slug}/products/${productId}/reviews`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(form),
+      });
+      if (res.ok) {
+        setSubmitted(true);
+        setShowForm(false);
+        setForm({ author_name: '', author_email: '', rating: 0, title: '', review_body: '', hp_field: '' });
+      }
+    } catch { /* silent */ }
+    setSubmitting(false);
+  };
+
+  const handleHelpful = async (reviewId: string) => {
+    if (helpfulVoted.has(reviewId)) return;
+    setHelpfulVoted(prev => new Set([...prev, reviewId]));
+    setReviews(prev => prev.map(r => r.id === reviewId ? { ...r, helpful_count: r.helpful_count + 1 } : r));
+    try {
+      await fetch(`/api/public/brand/${slug}/products/${productId}/reviews`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ reviewId }),
+      });
+    } catch { /* silent */ }
+  };
+
+  function timeAgo(dateStr: string) {
+    const diff = Date.now() - new Date(dateStr).getTime();
+    const days = Math.floor(diff / 86400000);
+    if (days === 0) return 'Today';
+    if (days === 1) return 'Yesterday';
+    if (days < 30) return `${days} days ago`;
+    const months = Math.floor(days / 30);
+    return `${months} month${months !== 1 ? 's' : ''} ago`;
+  }
+
+  const borderColor = `${textColor}10`;
+  const mutedColor = `${textColor}55`;
+
+  return (
+    <motion.section
+      className="mt-16 pt-12 border-t"
+      style={{ borderColor }}
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5 }}
+    >
+      {/* Header */}
+      <div className="flex items-center justify-between mb-8">
+        <div>
+          <h2 className="text-xl font-semibold" style={{ color: textColor }}>
+            Customer Reviews
+          </h2>
+          {stats.total > 0 && (
+            <div className="flex items-center gap-2 mt-1">
+              <StarDisplay rating={Math.round(stats.avg)} color={accentColor} size={16} />
+              <span className="text-sm font-semibold" style={{ color: textColor }}>
+                {stats.avg.toFixed(1)}
+              </span>
+              <span className="text-sm" style={{ color: mutedColor }}>
+                ({stats.total} review{stats.total !== 1 ? 's' : ''})
+              </span>
+            </div>
+          )}
+        </div>
+        {!submitted && (
+          <button
+            onClick={() => setShowForm(!showForm)}
+            className="px-4 py-2 rounded-xl text-sm font-medium transition-all hover:opacity-80"
+            style={{ backgroundColor: accentColor, color: '#fff' }}
+          >
+            {showForm ? 'Cancel' : 'Write a Review'}
+          </button>
+        )}
+      </div>
+
+      {/* Rating Distribution */}
+      {stats.total > 0 && (
+        <div className="mb-8 max-w-xs space-y-1.5">
+          {[5, 4, 3, 2, 1].map(r => {
+            const dist = stats.distribution.find(d => d.rating === r);
+            const count = dist?.count ?? 0;
+            const pct = stats.total > 0 ? (count / stats.total) * 100 : 0;
+            return (
+              <div key={r} className="flex items-center gap-2">
+                <span className="text-xs w-3" style={{ color: mutedColor }}>{r}</span>
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill={accentColor} stroke={accentColor} strokeWidth={1.5} opacity={0.8}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.562.562 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                </svg>
+                <div className="flex-1 h-2 rounded-full overflow-hidden" style={{ backgroundColor: `${textColor}10` }}>
+                  <motion.div
+                    className="h-full rounded-full"
+                    style={{ backgroundColor: accentColor }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${pct}%` }}
+                    transition={{ duration: 0.6 }}
+                  />
+                </div>
+                <span className="text-xs w-5 text-right" style={{ color: mutedColor }}>{count}</span>
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Review Form */}
+      <AnimatePresence>
+        {showForm && (
+          <motion.form
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            onSubmit={handleSubmit}
+            className="mb-8 p-5 rounded-2xl border overflow-hidden"
+            style={{ borderColor, backgroundColor: `${textColor}04` }}
+          >
+            <h3 className="text-base font-semibold mb-4" style={{ color: textColor }}>Your Review</h3>
+            <div className="space-y-4">
+              {/* Honeypot - hidden from real users */}
+              <input
+                type="text"
+                name="hp_field"
+                value={form.hp_field}
+                onChange={e => setForm(f => ({ ...f, hp_field: e.target.value }))}
+                className="hidden"
+                tabIndex={-1}
+                autoComplete="off"
+              />
+
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: mutedColor }}>Rating *</label>
+                <StarInput value={form.rating} onChange={v => setForm(f => ({ ...f, rating: v }))} color={accentColor} />
+                {errors.rating && <p className="text-xs text-red-500 mt-1">{errors.rating}</p>}
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: mutedColor }}>Your Name *</label>
+                  <input
+                    type="text"
+                    value={form.author_name}
+                    onChange={e => setForm(f => ({ ...f, author_name: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl border text-sm bg-transparent focus:outline-none focus:ring-1"
+                    style={{ borderColor, color: textColor, outlineColor: accentColor }}
+                    placeholder="Jane Doe"
+                  />
+                  {errors.author_name && <p className="text-xs text-red-500 mt-1">{errors.author_name}</p>}
+                </div>
+                <div>
+                  <label className="block text-xs font-medium mb-1.5" style={{ color: mutedColor }}>Email *</label>
+                  <input
+                    type="email"
+                    value={form.author_email}
+                    onChange={e => setForm(f => ({ ...f, author_email: e.target.value }))}
+                    className="w-full px-3 py-2 rounded-xl border text-sm bg-transparent focus:outline-none focus:ring-1"
+                    style={{ borderColor, color: textColor, outlineColor: accentColor }}
+                    placeholder="jane@example.com"
+                  />
+                  {errors.author_email && <p className="text-xs text-red-500 mt-1">{errors.author_email}</p>}
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: mutedColor }}>Review Title</label>
+                <input
+                  type="text"
+                  value={form.title}
+                  onChange={e => setForm(f => ({ ...f, title: e.target.value }))}
+                  className="w-full px-3 py-2 rounded-xl border text-sm bg-transparent focus:outline-none focus:ring-1"
+                  style={{ borderColor, color: textColor, outlineColor: accentColor }}
+                  placeholder="Summarize your experience"
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-medium mb-1.5" style={{ color: mutedColor }}>Your Review *</label>
+                <textarea
+                  value={form.review_body}
+                  onChange={e => setForm(f => ({ ...f, review_body: e.target.value }))}
+                  rows={4}
+                  className="w-full px-3 py-2 rounded-xl border text-sm bg-transparent focus:outline-none focus:ring-1 resize-none"
+                  style={{ borderColor, color: textColor, outlineColor: accentColor }}
+                  placeholder="Tell others about your experience..."
+                />
+                {errors.review_body && <p className="text-xs text-red-500 mt-1">{errors.review_body}</p>}
+              </div>
+
+              <button
+                type="submit"
+                disabled={submitting}
+                className="px-5 py-2.5 rounded-xl text-sm font-medium transition-all hover:opacity-80 disabled:opacity-50"
+                style={{ backgroundColor: accentColor, color: '#fff' }}
+              >
+                {submitting ? 'Submitting...' : 'Submit Review'}
+              </button>
+            </div>
+          </motion.form>
+        )}
+      </AnimatePresence>
+
+      {/* Submitted confirmation */}
+      {submitted && (
+        <motion.div
+          initial={{ opacity: 0, scale: 0.95 }}
+          animate={{ opacity: 1, scale: 1 }}
+          className="mb-6 p-4 rounded-xl border"
+          style={{ borderColor: `${accentColor}40`, backgroundColor: `${accentColor}08` }}
+        >
+          <p className="text-sm font-medium" style={{ color: accentColor }}>
+            ✓ Thank you! Your review has been submitted for moderation.
+          </p>
+        </motion.div>
+      )}
+
+      {/* Reviews List */}
+      {loading ? (
+        <div className="py-8 text-center text-sm" style={{ color: mutedColor }}>Loading reviews...</div>
+      ) : reviews.length === 0 ? (
+        <div className="py-10 text-center">
+          <p className="text-sm" style={{ color: mutedColor }}>No reviews yet. Be the first to review this product!</p>
+        </div>
+      ) : (
+        <div className="space-y-6">
+          {reviews.map((review, i) => (
+            <motion.div
+              key={review.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: i * 0.06 }}
+              className="pb-6 border-b last:border-0"
+              style={{ borderColor }}
+            >
+              <div className="flex items-start justify-between gap-4 mb-2">
+                <div>
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-sm font-semibold" style={{ color: textColor }}>{review.author_name}</span>
+                    {review.verified_purchase ? (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full font-medium" style={{ backgroundColor: `${accentColor}15`, color: accentColor }}>
+                        ✓ Verified Purchase
+                      </span>
+                    ) : null}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <StarDisplay rating={review.rating} color={accentColor} size={13} />
+                    <span className="text-xs" style={{ color: mutedColor }}>{timeAgo(review.created_at)}</span>
+                  </div>
+                </div>
+              </div>
+
+              {review.title && (
+                <p className="text-sm font-semibold mb-1.5" style={{ color: textColor }}>{review.title}</p>
+              )}
+              <p className="text-sm leading-relaxed mb-3" style={{ color: mutedColor }}>{review.body}</p>
+
+              <button
+                onClick={() => handleHelpful(review.id)}
+                disabled={helpfulVoted.has(review.id)}
+                className="flex items-center gap-1.5 text-xs transition-opacity hover:opacity-70 disabled:opacity-50"
+                style={{ color: mutedColor }}
+              >
+                <svg className="h-3.5 w-3.5" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M6.633 10.25c.806 0 1.533-.446 2.031-1.08a9.041 9.041 0 012.861-2.4c.723-.384 1.35-.956 1.653-1.715a4.498 4.498 0 00.322-1.672V2.75a.75.75 0 01.75-.75 2.25 2.25 0 012.25 2.25c0 1.152-.26 2.243-.723 3.218-.266.558.107 1.282.725 1.282m0 0h3.126c1.026 0 1.945.694 2.054 1.715.045.422.068.85.068 1.285a11.95 11.95 0 01-2.649 7.521c-.388.482-.987.729-1.605.729H13.48c-.483 0-.964-.078-1.423-.23l-3.114-1.04a4.501 4.501 0 00-1.423-.23H5.904m10.598-9.75H14.25M5.904 18.5c.083.205.173.405.27.602.197.4-.078.898-.523.898h-.908c-.889 0-1.713-.518-1.972-1.368a12 12 0 01-.521-3.507c0-1.553.295-3.036.822-4.385.297-.77.754-1.235 1.234-1.235H9" />
+                </svg>
+                Helpful ({review.helpful_count})
+                {helpfulVoted.has(review.id) && ' · Thanks!'}
+              </button>
+            </motion.div>
+          ))}
+        </div>
+      )}
+    </motion.section>
+  );
+}
 
 // ── Share buttons ─────────────────────────────────────────────────────────────
 function ShareButtons({ url, name, textColor, accentColor }: { url: string; name: string; textColor: string; accentColor: string }) {
@@ -830,6 +1212,16 @@ export default function ProductDetailPage() {
             templateId={templateId}
           />
         </motion.div>
+
+        {/* Product Reviews */}
+        <ProductReviews
+          slug={slug}
+          productId={productId}
+          textColor={textColor}
+          accentColor={accentColor}
+          bgColor={bgColor}
+          isDark={isDark}
+        />
 
         {/* Related Products */}
         {related.length > 0 && (
