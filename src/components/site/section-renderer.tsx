@@ -71,7 +71,7 @@ function TestimonialsSection({ section, brand, template }: { section: PageSectio
               key={i}
               className="p-6 text-center"
               style={{
-                backgroundColor: templateId === 'playful' ? ['#FFF7ED', '#EFF6FF', '#F0FDF4'][i % 3] : `${textColor}04`,
+                backgroundColor: templateId === 'playful' ? ['#FFF7ED', '#EFF6FF', '#F0FDF4'][i % 3] : isDark ? `${textColor}06` : `${textColor}04`,
                 borderRadius: templateId === 'playful' ? '20px' : tp?.borderRadius || '8px',
                 border: templateId === 'bold' ? `2px solid ${textColor}10` : undefined,
               }}
