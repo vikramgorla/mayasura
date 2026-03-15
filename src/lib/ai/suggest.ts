@@ -26,7 +26,7 @@ async function askClaude(prompt: string): Promise<string> {
   });
 
   const block = message.content[0];
-  if (block.type === "text") return block.text;
+  if (block && block.type === "text") return block.text;
   return "";
 }
 

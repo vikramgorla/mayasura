@@ -106,7 +106,7 @@ export function SitePreview({
               fontWeight: preview?.typography.headingWeight || "600",
               fontSize: "18px",
               letterSpacing:
-                preview?.navStyle === "boutique" ? "0.08em" : "-0.02em",
+                preview?.navStyle === "centered" ? "0.08em" : "-0.02em",
               textTransform:
                 preview?.typography.headingCase === "uppercase"
                   ? "uppercase"

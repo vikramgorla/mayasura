@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useCallback, useRef } from "react";
+import { Suspense, useState, useEffect, useCallback, useRef } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { ArrowLeft, ArrowRight, Trash2 } from "lucide-react";
@@ -24,6 +24,20 @@ const DRAFT_KEY = "mayasura-wizard-draft";
 const STEP_KEY = "mayasura-wizard-step";
 
 export default function CreatePage() {
+  return (
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[var(--bg-primary)] flex items-center justify-center">
+          <div className="animate-spin h-8 w-8 border-2 border-[var(--accent)] border-t-transparent rounded-full" />
+        </div>
+      }
+    >
+      <CreateWizard />
+    </Suspense>
+  );
+}
+
+function CreateWizard() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { addToast } = useToast();
