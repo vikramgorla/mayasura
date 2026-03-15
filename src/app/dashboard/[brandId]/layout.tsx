@@ -8,7 +8,7 @@ import {
   LayoutDashboard, Globe, MessageSquare, Package, FileText,
   BarChart3, ArrowLeft, HeadphonesIcon, Sparkles, Menu, X,
   Download, Moon, Sun, Settings, ShoppingBag, Newspaper, Paintbrush,
-  Keyboard, MessageSquareQuote, Share2, Bell, Star,
+  Keyboard, MessageSquareQuote, Share2, Bell, Star, Tag,
 } from 'lucide-react';
 import { PageLoader } from '@/components/ui/loading';
 import { ErrorBoundary } from '@/components/error-boundary';
@@ -32,6 +32,7 @@ const navItems = [
   { href: '/design', icon: Paintbrush, label: 'Design Studio' },
   { href: '/blog', icon: Newspaper, label: 'Blog' },
   { href: '/orders', icon: ShoppingBag, label: 'Orders' },
+  { href: '/discounts', icon: Tag, label: 'Discounts' },
   { href: '/chatbot', icon: MessageSquare, label: 'Chatbot' },
   { href: '/products', icon: Package, label: 'Products' },
   { href: '/content', icon: FileText, label: 'Content' },

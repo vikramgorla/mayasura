@@ -192,6 +192,12 @@ export default function CheckoutPage() {
   const [success, setSuccess] = useState(false);
   const [serverError, setServerError] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
+  // Discount code state
+  const [discountCode, setDiscountCode] = useState('');
+  const [discountExpanded, setDiscountExpanded] = useState(false);
+  const [discountLoading, setDiscountLoading] = useState(false);
+  const [appliedDiscount, setAppliedDiscount] = useState<{ code: string; type: string; value: number; savings: number } | null>(null);
+  const [discountError, setDiscountError] = useState('');
 
   if (!shop) return null;
   const { brand, cart, cartTotal, clearCart, websiteTemplate: template } = shop;
@@ -352,7 +358,43 @@ export default function CheckoutPage() {
   };
 
   const estimatedShipping = cartTotal > 50 ? 0 : 5.99;
-  const estimatedTotal = cartTotal + estimatedShipping;
+  const discountSavings = appliedDiscount?.savings ?? 0;
+  const estimatedTotal = cartTotal + estimatedShipping - discountSavings;
+
+  const applyDiscount = async () => {
+    if (!discountCode.trim()) return;
+    setDiscountLoading(true);
+    setDiscountError('');
+    try {
+      const res = await fetch(`/api/brands/${brand.id}/discounts`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ action: 'validate', code: discountCode.trim(), orderTotal: cartTotal }),
+      });
+      const data = await res.json();
+      if (data.valid && data.discount) {
+        setAppliedDiscount({
+          code: data.discount.code,
+          type: data.discount.type,
+          value: data.discount.value,
+          savings: data.savings,
+        });
+        setDiscountError('');
+      } else {
+        setDiscountError(data.error || 'Invalid discount code');
+        setAppliedDiscount(null);
+      }
+    } catch {
+      setDiscountError('Failed to validate code');
+    }
+    setDiscountLoading(false);
+  };
+
+  const removeDiscount = () => {
+    setAppliedDiscount(null);
+    setDiscountCode('');
+    setDiscountError('');
+  };
 
   const updateField = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((f) => ({ ...f, [field]: e.target.value }));
@@ -724,6 +766,70 @@ export default function CheckoutPage() {
                 ))}
               </div>
 
+              {/* Discount Code Input */}
+              <div className="pt-4 border-t" style={{ borderColor: `${textColor}08` }}>
+                {appliedDiscount ? (
+                  <div className="flex items-center justify-between py-2 px-3 rounded-lg" style={{ backgroundColor: '#22c55e15' }}>
+                    <span className="text-xs font-medium" style={{ color: '#22c55e' }}>
+                      🎉 {appliedDiscount.code} applied
+                    </span>
+                    <button onClick={removeDiscount} className="text-xs underline" style={{ color: `${textColor}50` }}>
+                      Remove
+                    </button>
+                  </div>
+                ) : (
+                  <div>
+                    <button
+                      type="button"
+                      onClick={() => setDiscountExpanded(e => !e)}
+                      className="text-xs flex items-center gap-1 transition-colors"
+                      style={{ color: discountExpanded ? accentColor : `${textColor}50` }}
+                    >
+                      <span>{discountExpanded ? '▾' : '▸'}</span>
+                      Have a discount code?
+                    </button>
+                    <AnimatePresence>
+                      {discountExpanded && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: 'auto' }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="overflow-hidden mt-2"
+                        >
+                          <div className="flex gap-2">
+                            <input
+                              type="text"
+                              value={discountCode}
+                              onChange={(e) => { setDiscountCode(e.target.value.toUpperCase()); setDiscountError(''); }}
+                              onBlur={() => { if (discountCode.trim()) applyDiscount(); }}
+                              placeholder="Enter code"
+                              className="flex-1 px-3 py-2 text-xs rounded-lg border outline-none font-mono uppercase"
+                              style={{
+                                backgroundColor: isDark ? '#1a1a1a' : `${textColor}05`,
+                                borderColor: discountError ? '#ef4444' : `${textColor}15`,
+                                color: textColor,
+                              }}
+                            />
+                            <button
+                              type="button"
+                              onClick={applyDiscount}
+                              disabled={!discountCode.trim() || discountLoading}
+                              className="px-3 py-2 text-xs font-medium rounded-lg transition-opacity disabled:opacity-50"
+                              style={{ backgroundColor: accentColor, color: '#fff' }}
+                            >
+                              {discountLoading ? '...' : 'Apply'}
+                            </button>
+                          </div>
+                          {discountError && (
+                            <p className="text-[11px] mt-1.5 text-red-500">{discountError}</p>
+                          )}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
+                )}
+              </div>
+
               <div className="space-y-2 pt-4 border-t" style={{ borderColor: `${textColor}08` }}>
                 <div className="flex items-center justify-between text-sm">
                   <span style={{ color: `${textColor}50` }}>Subtotal</span>
@@ -735,6 +841,16 @@ export default function CheckoutPage() {
                     {estimatedShipping === 0 ? '🚚 Free' : `${currency} ${estimatedShipping.toFixed(2)}`}
                   </span>
                 </div>
+                {appliedDiscount && (
+                  <div className="flex items-center justify-between text-sm">
+                    <span style={{ color: '#22c55e' }}>
+                      Discount ({appliedDiscount.code})
+                    </span>
+                    <span className="font-medium" style={{ color: '#22c55e' }}>
+                      −{currency} {discountSavings.toFixed(2)}
+                    </span>
+                  </div>
+                )}
               </div>
 
               <div className="pt-4 mt-3 border-t flex items-center justify-between" style={{ borderColor: `${textColor}08` }}>

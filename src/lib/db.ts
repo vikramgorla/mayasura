@@ -400,6 +400,44 @@ function runMigrations(db: Database.Database) {
     `);
   }
 
+  // Sprint 20: Discount codes table
+  const hasDiscountTbl = db.prepare("SELECT name FROM sqlite_master WHERE type='table' AND name='discount_codes'").get();
+  if (!hasDiscountTbl) {
+    console.log('[DB] Creating discount_codes table');
+    db.exec(`
+      CREATE TABLE IF NOT EXISTS discount_codes (
+        id TEXT PRIMARY KEY,
+        brand_id TEXT NOT NULL REFERENCES brands(id) ON DELETE CASCADE,
+        code TEXT NOT NULL,
+        type TEXT NOT NULL DEFAULT 'percentage' CHECK(type IN ('percentage','fixed')),
+        value REAL NOT NULL DEFAULT 0,
+        min_order REAL DEFAULT 0,
+        max_uses INTEGER DEFAULT NULL,
+        used_count INTEGER DEFAULT 0,
+        active INTEGER DEFAULT 1,
+        starts_at TEXT DEFAULT NULL,
+        expires_at TEXT DEFAULT NULL,
+        created_at TEXT DEFAULT (datetime('now'))
+      );
+      CREATE UNIQUE INDEX IF NOT EXISTS idx_discount_codes_brand_code ON discount_codes(brand_id, code);
+      CREATE INDEX IF NOT EXISTS idx_discount_codes_brand ON discount_codes(brand_id);
+    `);
+  }
+
+  // Sprint 20: Chatbot enhancements columns
+  if (!hasColumn(db, 'brands', 'chatbot_greeting')) {
+    console.log('[DB] Adding chatbot_greeting column to brands');
+    db.exec("ALTER TABLE brands ADD COLUMN chatbot_greeting TEXT");
+  }
+  if (!hasColumn(db, 'brands', 'chatbot_color')) {
+    console.log('[DB] Adding chatbot_color column to brands');
+    db.exec("ALTER TABLE brands ADD COLUMN chatbot_color TEXT DEFAULT '#4F46E5'");
+  }
+  if (!hasColumn(db, 'brands', 'chatbot_business_hours')) {
+    console.log('[DB] Adding chatbot_business_hours column to brands');
+    db.exec("ALTER TABLE brands ADD COLUMN chatbot_business_hours TEXT");
+  }
+
   console.log('[DB] Migrations complete');
 }
 
@@ -1345,6 +1383,17 @@ export function deleteChatbotFaq(id: string) {
   return db.prepare('DELETE FROM chatbot_faqs WHERE id = ?').run(id);
 }
 
+export function reorderChatbotFaqs(updates: { id: string; sort_order: number }[]) {
+  const db = getDb();
+  const stmt = db.prepare('UPDATE chatbot_faqs SET sort_order = @sort_order WHERE id = @id');
+  const transaction = db.transaction(() => {
+    for (const update of updates) {
+      stmt.run(update);
+    }
+  });
+  transaction();
+}
+
 // ==================== Page Views operations ====================
 
 export function trackPageView(view: { id: string; brand_id: string; page: string; referrer?: string; user_agent?: string }) {
@@ -1526,6 +1575,100 @@ export function getFullBrandExport(brandId: string) {
     exportedAt: new Date().toISOString(),
     version: '3.3',
   };
+}
+
+// ==================== Discount Codes (Sprint 20) ====================
+
+export interface DiscountCode {
+  id: string;
+  brand_id: string;
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  min_order: number | null;
+  max_uses: number | null;
+  used_count: number;
+  active: number;
+  starts_at: string | null;
+  expires_at: string | null;
+  created_at: string;
+}
+
+export function getDiscountCodes(brandId: string): DiscountCode[] {
+  const db = getDb();
+  return db.prepare('SELECT * FROM discount_codes WHERE brand_id = ? ORDER BY created_at DESC').all(brandId) as DiscountCode[];
+}
+
+export function getDiscountCodeByCode(brandId: string, code: string): DiscountCode | undefined {
+  const db = getDb();
+  return db.prepare('SELECT * FROM discount_codes WHERE brand_id = ? AND code = ?').get(brandId, code.toUpperCase()) as DiscountCode | undefined;
+}
+
+export function createDiscountCode(discount: {
+  id: string;
+  brand_id: string;
+  code: string;
+  type: 'percentage' | 'fixed';
+  value: number;
+  min_order?: number | null;
+  max_uses?: number | null;
+  active?: number;
+  starts_at?: string | null;
+  expires_at?: string | null;
+}) {
+  const db = getDb();
+  return db.prepare(`
+    INSERT INTO discount_codes (id, brand_id, code, type, value, min_order, max_uses, active, starts_at, expires_at)
+    VALUES (@id, @brand_id, @code, @type, @value, @min_order, @max_uses, @active, @starts_at, @expires_at)
+  `).run({
+    ...discount,
+    code: discount.code.toUpperCase(),
+    min_order: discount.min_order ?? null,
+    max_uses: discount.max_uses ?? null,
+    active: discount.active ?? 1,
+    starts_at: discount.starts_at ?? null,
+    expires_at: discount.expires_at ?? null,
+  });
+}
+
+const ALLOWED_DISCOUNT_FIELDS = new Set([
+  'code', 'type', 'value', 'min_order', 'max_uses', 'active', 'starts_at', 'expires_at',
+]);
+
+export function updateDiscountCode(id: string, updates: Record<string, unknown>) {
+  const db = getDb();
+  const safeUpdates: Record<string, unknown> = {};
+  for (const [key, value] of Object.entries(updates)) {
+    if (ALLOWED_DISCOUNT_FIELDS.has(key) && value !== undefined) {
+      safeUpdates[key] = key === 'code' ? String(value).toUpperCase() : value;
+    }
+  }
+  const fields = Object.keys(safeUpdates).map(k => `${k} = @${k}`).join(', ');
+  if (!fields) return;
+  db.prepare(`UPDATE discount_codes SET ${fields} WHERE id = @id`).run({ ...safeUpdates, id });
+}
+
+export function deleteDiscountCode(id: string) {
+  const db = getDb();
+  return db.prepare('DELETE FROM discount_codes WHERE id = ?').run(id);
+}
+
+export function incrementDiscountUsage(id: string) {
+  const db = getDb();
+  return db.prepare('UPDATE discount_codes SET used_count = used_count + 1 WHERE id = ?').run(id);
+}
+
+// Validate a discount code — returns the code if valid, null if not
+export function validateDiscountCode(brandId: string, code: string, orderTotal: number): DiscountCode | null {
+  const discount = getDiscountCodeByCode(brandId, code);
+  if (!discount) return null;
+  if (!discount.active) return null;
+  if (discount.min_order && orderTotal < discount.min_order) return null;
+  if (discount.max_uses !== null && discount.used_count >= discount.max_uses) return null;
+  const now = new Date().toISOString();
+  if (discount.starts_at && now < discount.starts_at) return null;
+  if (discount.expires_at && now > discount.expires_at) return null;
+  return discount;
 }
 
 // ==================== Reviews (Sprint 18) ====================
