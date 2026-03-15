@@ -17,7 +17,7 @@ function getClient(): Anthropic {
 /** @deprecated Use getClient() — kept for backwards compatibility within this file */
 const client = new Proxy({} as Anthropic, {
   get(_target, prop) {
-    return (getClient() as Record<string | symbol, unknown>)[prop];
+    return (getClient() as unknown as Record<string | symbol, unknown>)[prop];
   },
 });
 
