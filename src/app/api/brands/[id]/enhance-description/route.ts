@@ -2,7 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { requireBrandOwner } from '@/lib/api-auth';
 import Anthropic from '@anthropic-ai/sdk';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+let _client: Anthropic | null = null;
+function getClient(): Anthropic {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error('ANTHROPIC_API_KEY is not configured. Add it in Settings → Integrations or set it as an environment variable.');
+  }
+  if (!_client) _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  return _client;
+}
 
 interface BrandRow {
   id: string;
@@ -53,7 +60,7 @@ Return ONLY valid JSON (no markdown, no code blocks):
   "improvements": ["What was improved 1", "What was improved 2", "What was improved 3"]
 }`;
 
-    const message = await client.messages.create({
+    const message = await getClient().messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 1024,
       messages: [{ role: 'user', content: prompt }],
