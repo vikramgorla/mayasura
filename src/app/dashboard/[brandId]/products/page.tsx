@@ -150,6 +150,7 @@ export default function ProductsPage() {
 
     const current = products[idx];
     const swap = products[swapIdx];
+    if (!current || !swap) return;
 
     await Promise.all([
       fetch(`/api/v1/brands/${brandId}/products/${current.id}`, {

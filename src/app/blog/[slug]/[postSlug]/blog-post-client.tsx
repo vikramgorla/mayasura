@@ -101,8 +101,10 @@ function extractHeadings(
   let match;
 
   while ((match = regex.exec(content)) !== null) {
-    const level = match[1].length;
+    const hashes = match[1];
     const text = match[2];
+    if (!hashes || !text) continue;
+    const level = hashes.length;
     const id = text
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")

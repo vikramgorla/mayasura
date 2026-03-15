@@ -71,8 +71,9 @@ export async function POST(request: NextRequest) {
       messages: [{ role: "user", content: prompt }],
     });
 
+    const firstBlock = response.content[0];
     const text =
-      response.content[0].type === "text" ? response.content[0].text : "";
+      firstBlock && firstBlock.type === "text" ? firstBlock.text : "";
 
     if (step === "seo") {
       try {
