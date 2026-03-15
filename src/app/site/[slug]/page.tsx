@@ -1308,18 +1308,35 @@ export default function BrandHomePage() {
 
     const sectionTitle = templateId === 'bold' ? `WHY ${brand.name.toUpperCase()}`
       : templateId === 'playful' ? `Why ${brand.name} 💛`
+      : templateId === 'neon' ? `WHY ${brand.name.toUpperCase()}`
+      : templateId === 'tech' ? `> why-${brand.name.toLowerCase().replace(/\s+/g, '-')}`
+      : templateId === 'boutique' ? `THE ${brand.name.toUpperCase()} DIFFERENCE`
+      : templateId === 'magazine' ? 'Why It Matters'
+      : templateId === 'restaurant' ? 'Our Philosophy'
+      : templateId === 'corporate' ? `Why ${brand.name}`
+      : templateId === 'artisan' ? 'Our Values'
+      : templateId === 'portfolio' ? 'Approach'
+      : templateId === 'wellness' ? 'Our Way'
+      : templateId === 'organic' ? 'Rooted in Nature'
+      : templateId === 'startup' ? `Why ${brand.name}`
       : `Why ${brand.name}`;
 
     return (
       <section className="t-section">
         <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
           <ScrollReveal>
-            <div className={`mb-14 ${templateId === 'classic' || templateId === 'playful' ? 'text-center' : ''}`}>
-              <h2 className="t-section-heading mb-3" style={headingStyle}>
+            <div className={`mb-14 ${['classic', 'playful', 'boutique', 'wellness', 'organic', 'restaurant', 'startup'].includes(templateId) ? 'text-center' : ''}`}>
+              <h2 className="t-section-heading mb-3" style={{
+                ...headingStyle,
+                fontFamily: templateId === 'tech' ? 'JetBrains Mono, monospace' : brand.font_heading,
+                color: isDark ? (templateId === 'neon' ? '#F0F0FF' : '#E2E8F0') : textColor,
+              }}>
                 {sectionTitle}
               </h2>
               {templateId === 'bold' && <div className="h-0.5 w-12 mt-2" style={{ backgroundColor: accentColor }} />}
-              <p className="text-sm mt-3" style={{ color: `${textColor}45` }}>
+              {templateId === 'neon' && <div className="h-0.5 w-12 mt-2 mx-auto" style={{ backgroundColor: accentColor, boxShadow: `0 0 10px ${accentColor}` }} />}
+              {templateId === 'boutique' && <div className="h-px w-8 mt-2 mx-auto" style={{ backgroundColor: accentColor }} />}
+              <p className="text-sm mt-3" style={{ color: isDark ? '#64748B' : `${textColor}45` }}>
                 {brand.brand_voice ? `We believe in ${brand.brand_voice.toLowerCase()}.` : 'What sets us apart.'}
               </p>
             </div>
@@ -1665,39 +1682,80 @@ export default function BrandHomePage() {
       <section className="t-section">
         <div className={`${containerClass} mx-auto px-5 sm:px-8`}>
           <ScrollReveal>
-          <div className={`flex items-end justify-between mb-12 ${templateId === 'classic' || templateId === 'playful' ? '' : ''}`}>
+          <div className={`flex items-end justify-between mb-12 ${templateId === 'classic' || templateId === 'playful' || templateId === 'boutique' || templateId === 'restaurant' ? 'flex-col items-center text-center gap-3' : ''}`}>
             <div>
               <h2 className="t-section-heading mb-2" style={headingStyle}>
-                {templateId === 'bold' ? 'PRODUCTS' : templateId === 'playful' ? 'Our Products ✨' : 'Products'}
+                {templateId === 'bold' ? 'PRODUCTS'
+                  : templateId === 'playful' ? 'Our Products ✨'
+                  : templateId === 'boutique' ? 'THE COLLECTION'
+                  : templateId === 'tech' ? '> products'
+                  : templateId === 'neon' ? 'PRODUCTS'
+                  : templateId === 'restaurant' ? 'Our Menu'
+                  : templateId === 'magazine' ? 'Featured'
+                  : templateId === 'portfolio' ? 'Selected Work'
+                  : templateId === 'artisan' ? 'Our Craft'
+                  : templateId === 'corporate' ? 'Solutions'
+                  : templateId === 'wellness' ? 'Our Offerings'
+                  : templateId === 'organic' ? 'From Our Farm'
+                  : templateId === 'startup' ? 'What We Offer'
+                  : 'Products'}
               </h2>
               {templateId === 'bold' && <div className="h-0.5 w-12 mt-2" style={{ backgroundColor: accentColor }} />}
-              <p className="text-sm mt-2" style={{ color: `${textColor}45` }}>
-                {templateId === 'playful' ? 'Our curated collection 🛍️' : 'Our curated collection'}
+              {templateId === 'boutique' && <div className="h-px w-10 mt-2 mx-auto" style={{ backgroundColor: accentColor }} />}
+              <p className="text-sm mt-2" style={{ color: `${textColor}45`, fontFamily: templateId === 'magazine' ? brand.font_body : undefined }}>
+                {templateId === 'playful' ? 'Our curated collection 🛍️'
+                  : templateId === 'boutique' ? 'Curated with intention'
+                  : templateId === 'restaurant' ? 'Carefully crafted dishes'
+                  : 'Our curated collection'}
               </p>
             </div>
             <Link
               href={`/site/${slug}/products`}
               className="hidden sm:inline-flex text-sm font-medium transition-opacity hover:opacity-60"
               style={{
-                color: templateId === 'bold' ? accentColor : textColor,
+                color: templateId === 'bold' || templateId === 'neon' ? accentColor : textColor,
                 fontWeight: templateId === 'bold' ? 700 : 400,
-                textTransform: templateId === 'bold' ? 'uppercase' : undefined,
-                letterSpacing: templateId === 'bold' ? '0.08em' : undefined,
-                fontSize: templateId === 'bold' ? '0.6875rem' : undefined,
+                textTransform: templateId === 'bold' || templateId === 'boutique' ? 'uppercase' : undefined,
+                letterSpacing: templateId === 'bold' || templateId === 'boutique' ? '0.08em' : undefined,
+                fontSize: templateId === 'bold' ? '0.6875rem' : templateId === 'boutique' ? '0.625rem' : undefined,
+                fontFamily: templateId === 'tech' ? 'JetBrains Mono, monospace' : undefined,
               }}
             >
-              {templateId === 'bold' ? 'VIEW ALL →' : 'View All →'}
+              {templateId === 'bold' ? 'VIEW ALL →' : templateId === 'boutique' ? 'VIEW ALL' : templateId === 'tech' ? '$ view-all' : templateId === 'portfolio' ? 'All Work ↗' : 'View All →'}
             </Link>
           </div>
           </ScrollReveal>
 
+          {/* RESTAURANT — Menu-item style: name ... price */}
+          {templateId === 'restaurant' ? (
+            <div className="max-w-2xl mx-auto space-y-0">
+              {products.slice(0, 6).map((product, i) => (
+                <Link
+                  key={product.id}
+                  href={`/shop/${slug}/product/${product.id}`}
+                  className="group flex items-baseline gap-2 py-4"
+                  style={{ borderBottom: i < Math.min(products.length, 6) - 1 ? `1px solid ${textColor}08` : undefined }}
+                >
+                  <h3 className="text-sm font-medium group-hover:opacity-60 transition-opacity" style={{ fontFamily: brand.font_heading }}>
+                    {product.name}
+                  </h3>
+                  <div className="flex-1 border-b border-dotted mx-2" style={{ borderColor: `${textColor}15`, minWidth: '20px' }} />
+                  {product.price != null && product.price > 0 && (
+                    <span className="text-sm font-medium whitespace-nowrap" style={{ color: textColor }}>
+                      {product.currency || 'USD'} {product.price.toFixed(2)}
+                    </span>
+                  )}
+                </Link>
+              ))}
+            </div>
+          ) : (
           <motion.div
             variants={scrollStagger}
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
-            className={`grid grid-cols-1 sm:grid-cols-2 ${templateId === 'bold' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}
-            style={{ gap: dsSp.cardGap }}
+            className={`grid grid-cols-1 sm:grid-cols-2 ${templateId === 'bold' ? 'lg:grid-cols-4' : templateId === 'portfolio' ? 'lg:grid-cols-3 md:grid-cols-3' : 'lg:grid-cols-3'}`}
+            style={{ gap: templateId === 'portfolio' ? '4px' : dsSp.cardGap }}
           >
             {products.slice(0, templateId === 'bold' ? 4 : 3).map((product) => (
               <motion.div key={product.id} variants={scrollItem}>
@@ -1708,51 +1766,72 @@ export default function BrandHomePage() {
                 style={
                   templateId === 'bold' ? { border: `2px solid ${textColor}10` }
                   : templateId === 'playful' ? { backgroundColor: '#FFFFFF', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }
+                  : templateId === 'portfolio' ? { overflow: 'hidden', position: 'relative' as const }
+                  : templateId === 'neon' ? { backgroundColor: `${accentColor}04`, border: `1px solid ${accentColor}15`, borderRadius: '8px', overflow: 'hidden', boxShadow: `0 0 15px ${accentColor}05` }
+                  : templateId === 'tech' ? { backgroundColor: '#111827', border: '1px solid #1E293B', borderRadius: '8px', overflow: 'hidden' }
+                  : templateId === 'boutique' ? { overflow: 'hidden' }
+                  : templateId === 'artisan' ? { border: `2px solid ${textColor}08`, borderRadius: '8px', overflow: 'hidden' }
+                  : templateId === 'startup' ? { backgroundColor: ds.surfaceColor || '#F8FAFC', borderRadius: '12px', border: `1px solid ${ds.borderColor || `${textColor}08`}`, overflow: 'hidden', boxShadow: '0 4px 16px rgba(0,0,0,0.04)' }
                   : { backgroundColor: isDark ? `${textColor}08` : ds.surfaceColor || '#FFFFFF', borderRadius: dsRadius || '8px', border: `1px solid ${isDark ? `${textColor}18` : ds.borderColor || `${textColor}18`}`, overflow: 'hidden', boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)' }
                 }
               >
                 <div
-                  className="aspect-square mb-0 overflow-hidden flex items-center justify-center"
+                  className={`mb-0 overflow-hidden flex items-center justify-center ${templateId === 'portfolio' ? 'aspect-[4/5]' : 'aspect-square'}`}
                   style={{
                     backgroundColor: isDark ? '#111111' : `${textColor}08`,
-                    borderRadius: templateId === 'playful' || templateId === 'bold' ? '0' : `${imgRadius} ${imgRadius} 0 0`,
+                    borderRadius: templateId === 'playful' || templateId === 'bold' || templateId === 'portfolio' ? '0' : `${imgRadius} ${imgRadius} 0 0`,
                     marginBottom: 0,
+                    position: 'relative' as const,
                   }}
                 >
                   {product.image_url ? (
-                    <img src={product.image_url} alt={product.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" />
+                    <img src={product.image_url} alt={product.name} loading="lazy" className={`w-full h-full object-cover transition-transform ${templateId === 'boutique' ? 'duration-1000 group-hover:scale-105' : 'duration-700 group-hover:scale-110'}`} />
                   ) : (
                     <svg className="w-10 h-10" style={{ color: `${textColor}20` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>
                       <path strokeLinecap="round" strokeLinejoin="round" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
                   )}
+                  {/* Portfolio: hover overlay with name */}
+                  {templateId === 'portfolio' && (
+                    <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-all duration-500 flex items-end p-5">
+                      <span className="text-white text-sm font-medium opacity-0 group-hover:opacity-100 transition-opacity duration-500 translate-y-2 group-hover:translate-y-0">{product.name}</span>
+                    </div>
+                  )}
                 </div>
+                {/* Portfolio: no card container below image */}
+                {templateId !== 'portfolio' && (
                 <div className={templateId === 'playful' || templateId === 'bold' ? 'p-4' : 'p-4'}>
                   {product.category && (
                     <span className="text-[10px] font-medium uppercase tracking-widest mb-1 block" style={{
-                      color: templateId === 'bold' ? accentColor : `${textColor}30`,
+                      color: templateId === 'bold' || templateId === 'neon' ? accentColor : templateId === 'tech' ? accentColor : `${textColor}30`,
                       fontWeight: templateId === 'bold' ? 700 : 500,
+                      fontFamily: templateId === 'tech' ? 'JetBrains Mono, monospace' : undefined,
+                      letterSpacing: templateId === 'boutique' ? '0.15em' : undefined,
                     }}>
                       {product.category}
                     </span>
                   )}
                   <h3 className="text-sm font-medium mb-1 group-hover:opacity-60 transition-opacity" style={{
                     fontFamily: brand.font_heading,
-                    textTransform: templateId === 'bold' ? 'uppercase' : undefined,
-                    fontWeight: templateId === 'minimal' ? 400 : 500,
+                    textTransform: templateId === 'bold' || templateId === 'boutique' ? 'uppercase' : undefined,
+                    fontWeight: templateId === 'minimal' ? 400 : templateId === 'boutique' ? 400 : 500,
+                    letterSpacing: templateId === 'boutique' ? '0.04em' : undefined,
+                    color: isDark ? '#E2E8F0' : undefined,
                   }}>
                     {product.name}
                   </h3>
                   {product.price != null && product.price > 0 && (
-                    <p className="text-sm" style={{ color: `${textColor}50` }}>
+                    <p className="text-sm" style={{ color: isDark ? '#94A3B8' : `${textColor}50` }}>
                       {product.currency || 'USD'} {product.price.toFixed(2)}
                     </p>
                   )}
                 </div>
+                )}
               </Link>
               </motion.div>
             ))}
           </motion.div>
+          )}
 
           <div className="mt-8 text-center sm:hidden">
             <Link href={`/site/${slug}/products`} className="text-sm font-medium" style={{ color: accentColor }}>
@@ -1905,6 +1984,14 @@ export default function BrandHomePage() {
   const renderCTA = () => {
     const ctaTitle = templateId === 'bold' ? 'READY TO GET STARTED?'
       : templateId === 'playful' ? "Ready to get started? 🚀"
+      : templateId === 'neon' ? 'READY TO ENTER?'
+      : templateId === 'tech' ? '$ get-in-touch'
+      : templateId === 'boutique' ? 'EXPERIENCE THE DIFFERENCE'
+      : templateId === 'restaurant' ? 'Join Us for a Meal'
+      : templateId === 'wellness' ? 'Begin Your Journey'
+      : templateId === 'artisan' ? 'Start Your Collection'
+      : templateId === 'corporate' ? 'Let\'s Work Together'
+      : templateId === 'startup' ? 'Ready to Scale?'
       : 'Ready to get started?';
 
     return (
@@ -1914,10 +2001,19 @@ export default function BrandHomePage() {
           <div
             className="py-16 sm:py-20 px-8 sm:px-16 text-center"
             style={{
-              backgroundColor: isDark ? '#111111' : `${textColor}04`,
-              borderRadius: templateId === 'playful' ? '24px' : templateId === 'classic' ? '16px' : '0',
-              border: templateId === 'bold' ? `2px solid ${textColor}10` : undefined,
-              boxShadow: templateId === 'classic' ? '8px 8px 16px rgba(0,0,0,0.04), -8px -8px 16px rgba(255,255,255,0.7)' : undefined,
+              backgroundColor: isDark ? (templateId === 'neon' ? `${accentColor}04` : '#111111') : `${textColor}04`,
+              borderRadius: templateId === 'playful' ? '24px' : templateId === 'classic' ? '16px'
+                : templateId === 'wellness' || templateId === 'organic' ? '20px'
+                : templateId === 'startup' ? '12px' : '0',
+              border: templateId === 'bold' ? `2px solid ${textColor}10`
+                : templateId === 'neon' ? `1px solid ${accentColor}20`
+                : templateId === 'artisan' ? `2px solid ${textColor}08`
+                : templateId === 'tech' ? '1px solid #1E293B'
+                : templateId === 'corporate' ? `1px solid ${ds.borderColor || `${textColor}08`}`
+                : undefined,
+              boxShadow: templateId === 'classic' ? '8px 8px 16px rgba(0,0,0,0.04), -8px -8px 16px rgba(255,255,255,0.7)'
+                : templateId === 'neon' ? `0 0 30px ${accentColor}08`
+                : undefined,
             }}
           >
             <h2 className="text-2xl sm:text-3xl mb-4" style={headingStyle}>
