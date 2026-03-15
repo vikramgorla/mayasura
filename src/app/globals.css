@@ -540,3 +540,206 @@ img {
 .micro-save-loading {
   animation: save-pulse 1s ease-in-out infinite;
 }
+
+/* ==================== Sprint 19: Mobile Responsiveness Utilities ==================== */
+
+/* Ensure minimum 14px body text everywhere */
+body, p, li, td, th, input, textarea, select, button, label, span {
+  font-size: max(14px, 1em);
+}
+/* But allow explicit overrides for tiny badges/labels */
+.text-xs { font-size: 0.75rem; } /* 12px — acceptable for labels */
+.text-\[10px\] { font-size: 10px; }
+.text-\[11px\] { font-size: 11px; }
+
+/* Full-width CTAs on mobile — use w-full class on mobile */
+@media (max-width: 639px) {
+  .mobile-cta-full {
+    width: 100% !important;
+    justify-content: center;
+  }
+}
+
+/* Table mobile: horizontal scroll wrapper */
+.table-mobile-scroll {
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scrollbar-width: thin;
+  width: 100%;
+}
+
+.table-mobile-scroll table {
+  min-width: 600px;
+}
+
+/* Modal mobile: full-screen on xs, constrained on sm+ */
+@media (max-width: 639px) {
+  .modal-mobile-full {
+    inset: 0 !important;
+    border-radius: 0 !important;
+    max-width: 100vw !important;
+    max-height: 100dvh !important;
+  }
+}
+
+/* Consumer site mobile nav touch targets — ensure 44px min */
+@media (max-width: 767px) {
+  [data-template] nav a,
+  [data-template] nav button {
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+  }
+}
+
+/* Prevent horizontal scroll on consumer site pages */
+[data-template] {
+  overflow-x: hidden;
+}
+
+/* Product grid: 1-col on xs, 2-col on sm */
+.product-grid-responsive {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1rem;
+}
+@media (min-width: 480px) {
+  .product-grid-responsive {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (min-width: 768px) {
+  .product-grid-responsive {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1.5rem;
+  }
+}
+@media (min-width: 1024px) {
+  .product-grid-responsive {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Search overlay: full-screen on mobile */
+@media (max-width: 639px) {
+  .search-overlay-panel {
+    position: fixed !important;
+    inset: 0 !important;
+    border-radius: 0 !important;
+    max-width: 100vw !important;
+    padding-top: env(safe-area-inset-top, 0);
+  }
+}
+
+/* Checkout: stack form fields on mobile */
+@media (max-width: 639px) {
+  .checkout-field-group {
+    grid-template-columns: 1fr !important;
+  }
+
+  .checkout-form input,
+  .checkout-form select,
+  .checkout-form textarea {
+    min-height: 48px;
+    font-size: 16px; /* Prevent iOS zoom */
+  }
+}
+
+/* Dashboard: ensure content padding on mobile */
+@media (max-width: 1023px) {
+  .dashboard-content {
+    padding-top: 3.5rem; /* Account for fixed mobile header */
+  }
+}
+
+/* Landing page hero: prevent overflow on small screens */
+@media (max-width: 639px) {
+  .hero-section {
+    padding-left: 1rem;
+    padding-right: 1rem;
+    overflow: hidden;
+  }
+
+  .hero-cta-group {
+    flex-direction: column;
+    width: 100%;
+  }
+
+  .hero-cta-group a,
+  .hero-cta-group button {
+    width: 100%;
+  }
+}
+
+/* Font size floor: ensure body text never goes below 14px */
+@media (max-width: 639px) {
+  .text-sm { font-size: 0.875rem; } /* 14px */
+  p, li, td, th { font-size: 0.875rem; }
+}
+
+/* Ensure all form inputs are large enough on mobile to prevent iOS zoom */
+@media (max-width: 767px) {
+  input[type="text"],
+  input[type="email"],
+  input[type="tel"],
+  input[type="password"],
+  input[type="search"],
+  input[type="number"],
+  input[type="url"],
+  input[type="date"],
+  input[type="datetime-local"],
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}
+
+/* AI Blog Writer drawer: full-width on mobile */
+@media (max-width: 639px) {
+  .ai-writer-drawer {
+    max-width: 100vw !important;
+  }
+}
+
+/* Overflow safe containers */
+.overflow-safe {
+  overflow: hidden;
+  min-width: 0;
+}
+
+/* Consumer site: prevent images from causing overflow */
+[data-template] img {
+  max-width: 100%;
+  height: auto;
+}
+
+/* Touch-friendly interactive elements on consumer site */
+@media (pointer: coarse) {
+  [data-template] button,
+  [data-template] a[href],
+  [data-template] [role="button"] {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+/* Responsive container for artisan/corporate templates */
+@media (max-width: 639px) {
+  [data-template="artisan"] .t-hero-heading,
+  [data-template="corporate"] .t-hero-heading {
+    font-size: clamp(1.75rem, 8vw, 2.5rem) !important;
+  }
+
+  [data-template="artisan"] .t-section,
+  [data-template="corporate"] .t-section {
+    padding-top: 2.5rem;
+    padding-bottom: 2.5rem;
+  }
+}
+
+/* Drawer backdrop on mobile */
+@media (max-width: 639px) {
+  .drawer-overlay {
+    backdrop-filter: blur(4px);
+  }
+}

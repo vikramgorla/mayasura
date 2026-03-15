@@ -334,15 +334,15 @@ export function SearchOverlay({
             onClick={onClose}
           />
 
-          {/* Panel */}
-          <div className="relative flex items-start justify-center pt-[12vh] px-4">
+          {/* Panel — full-screen on mobile, centered modal on sm+ */}
+          <div className="relative flex items-start justify-center sm:pt-[12vh] sm:px-4">
             <motion.div
               initial={{ opacity: 0, scale: 0.94, y: -16 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.94, y: -16 }}
               transition={{ duration: 0.22, ease: [0.25, 0.46, 0.45, 0.94] }}
-              className="w-full max-w-2xl rounded-2xl overflow-hidden shadow-2xl border"
-              style={{ backgroundColor: panelBg, borderColor }}
+              className="w-full sm:max-w-2xl sm:rounded-2xl overflow-hidden shadow-2xl border"
+              style={{ backgroundColor: panelBg, borderColor, maxHeight: '100dvh', overflowY: 'auto' }}
             >
               {/* Search input */}
               <div
