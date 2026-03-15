@@ -2,40 +2,13 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
-import {
-  Headphones,
-  ChevronDown,
-  ChevronUp,
-  Send,
-  Clock,
-  AlertCircle,
-} from "lucide-react";
+import { Headphones, ChevronDown, ChevronUp, Send, Clock } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface TicketMessage {
-  id: string;
-  role: string;
-  content: string;
-  createdAt: string;
-}
-
-interface Ticket {
-  id: string;
-  customerName: string;
-  customerEmail: string;
-  subject: string;
-  category: string | null;
-  priority: string;
-  status: string;
-  messageCount: number;
-  createdAt: string;
-  updatedAt: string;
-}
-
-interface TicketDetail extends Ticket {
-  messages: TicketMessage[];
-}
+interface TicketMessage { id: string; role: string; content: string; createdAt: string }
+interface Ticket { id: string; customerName: string; customerEmail: string; subject: string; category: string | null; priority: string; status: string; messageCount: number; createdAt: string; updatedAt: string }
+interface TicketDetail extends Ticket { messages: TicketMessage[] }
 
 const STATUS_OPTIONS = ["open", "in-progress", "resolved", "closed"];
 const PRIORITY_OPTIONS = ["low", "medium", "high", "urgent"];
@@ -311,9 +284,7 @@ function SupportSkeleton() {
   return (
     <div className="space-y-6 max-w-4xl">
       <Skeleton className="h-8 w-28" />
-      <div className="flex gap-2">
-        {[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-8 w-20 rounded-full" />)}
-      </div>
+      <div className="flex gap-2">{[1, 2, 3, 4, 5].map((i) => <Skeleton key={i} className="h-8 w-20 rounded-full" />)}</div>
       {[1, 2, 3].map((i) => <Skeleton key={i} className="h-16 w-full rounded-lg" />)}
     </div>
   );

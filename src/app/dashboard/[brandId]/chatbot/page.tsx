@@ -2,36 +2,13 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
-import {
-  MessageCircle,
-  Plus,
-  Trash2,
-  GripVertical,
-  Save,
-  ExternalLink,
-  Pencil,
-} from "lucide-react";
+import { MessageCircle, Plus, Trash2, GripVertical, Save, ExternalLink, Pencil } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
 
-interface FAQ {
-  id: string;
-  question: string;
-  answer: string;
-  sortOrder: number;
-}
-
-interface ChatStats {
-  totalSessions: number;
-  totalMessages: number;
-  messagesToday: number;
-  avgPerSession: number;
-}
-
-interface Settings {
-  chatbotGreeting: string | null;
-  chatbotColor: string | null;
-}
+interface FAQ { id: string; question: string; answer: string; sortOrder: number }
+interface ChatStats { totalSessions: number; totalMessages: number; messagesToday: number; avgPerSession: number }
+interface Settings { chatbotGreeting: string | null; chatbotColor: string | null }
 
 const TONES = ["Professional", "Friendly", "Technical"];
 const COLOR_PRESETS = ["#5B21B6", "#2563EB", "#059669", "#DC2626", "#D97706", "#0891B2"];
@@ -138,16 +115,13 @@ export default function ChatbotPage() {
       {/* Stats */}
       {stats && (
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          {[
-            { label: "Total Conversations", value: stats.totalSessions },
-            { label: "Total Messages", value: stats.totalMessages },
-            { label: "Messages Today", value: stats.messagesToday },
-            { label: "Avg per Session", value: stats.avgPerSession },
-          ].map((s) => (
-            <div key={s.label} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-4">
-              <p className="text-xs text-[var(--text-tertiary)]">{s.label}</p>
-              <p className="text-2xl font-semibold text-[var(--text-primary)] mt-1">{s.value}</p>
-            </div>
+          {[{ label: "Conversations", value: stats.totalSessions }, { label: "Messages", value: stats.totalMessages },
+            { label: "Today", value: stats.messagesToday }, { label: "Avg/Session", value: stats.avgPerSession }]
+            .map((s) => (
+              <div key={s.label} className="rounded-xl border border-[var(--border-primary)] bg-[var(--bg-surface)] p-4">
+                <p className="text-xs text-[var(--text-tertiary)]">{s.label}</p>
+                <p className="text-2xl font-semibold text-[var(--text-primary)] mt-1">{s.value}</p>
+              </div>
           ))}
         </div>
       )}
@@ -304,11 +278,8 @@ function ChatbotSkeleton() {
   return (
     <div className="space-y-8 max-w-4xl">
       <Skeleton className="h-8 w-32" />
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-        {[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 rounded-xl" />)}
-      </div>
-      <Skeleton className="h-64 rounded-xl" />
-      <Skeleton className="h-48 rounded-xl" />
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">{[1, 2, 3, 4].map((i) => <Skeleton key={i} className="h-20 rounded-xl" />)}</div>
+      <Skeleton className="h-64 rounded-xl" /><Skeleton className="h-48 rounded-xl" />
     </div>
   );
 }

@@ -255,12 +255,7 @@ function MessageBubble({ message, accentColor, brandInitial }: {
 function WelcomeScreen({ brand, accentColor }: { brand: Brand; accentColor: string }) {
   return (
     <div className="flex flex-col items-center justify-center py-12 text-center">
-      <div
-        className="h-16 w-16 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4"
-        style={{ backgroundColor: accentColor }}
-      >
-        {brand.name.charAt(0)}
-      </div>
+      <div className="h-16 w-16 rounded-full flex items-center justify-center text-white text-2xl font-bold mb-4" style={{ backgroundColor: accentColor }}>{brand.name.charAt(0)}</div>
       <h2 className="text-lg font-semibold text-zinc-800">{brand.name}</h2>
       {brand.tagline && <p className="text-sm text-zinc-500 mt-1">{brand.tagline}</p>}
       <p className="text-xs text-zinc-400 mt-3">Ask me anything about {brand.name}</p>
@@ -291,19 +286,10 @@ function ChatSkeleton() {
     <div className="min-h-screen flex flex-col bg-[#FAFAF9]">
       <div className="border-b border-zinc-200 bg-white px-4 py-3 flex items-center gap-3">
         <Skeleton className="h-10 w-10 rounded-full" />
-        <div>
-          <Skeleton className="h-4 w-32" />
-          <Skeleton className="h-3 w-48 mt-1" />
-        </div>
+        <div><Skeleton className="h-4 w-32" /><Skeleton className="h-3 w-48 mt-1" /></div>
       </div>
-      <div className="flex-1 p-4 space-y-4">
-        <div className="flex justify-center py-12">
-          <Skeleton className="h-16 w-16 rounded-full" />
-        </div>
-      </div>
-      <div className="border-t border-zinc-200 bg-white p-3">
-        <Skeleton className="h-10 w-full rounded-full" />
-      </div>
+      <div className="flex-1 p-4"><div className="flex justify-center py-12"><Skeleton className="h-16 w-16 rounded-full" /></div></div>
+      <div className="border-t border-zinc-200 bg-white p-3"><Skeleton className="h-10 w-full rounded-full" /></div>
     </div>
   );
 }
