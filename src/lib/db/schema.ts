@@ -1,4 +1,5 @@
 import { sqliteTable, text, integer, real, index, uniqueIndex } from "drizzle-orm/sqlite-core";
+import { sql } from "drizzle-orm";
 
 // ============================================
 // 1. Users
@@ -10,7 +11,7 @@ export const users = sqliteTable("users", {
   passwordHash: text("password_hash").notNull(),
   avatarUrl: text("avatar_url"),
   tokenVersion: integer("token_version").notNull().default(0),
-  createdAt: text("created_at").notNull().default("(datetime('now'))"),
+  createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
 });
 
 // ============================================
@@ -41,8 +42,8 @@ export const brands = sqliteTable(
       .references(() => users.id, { onDelete: "cascade" }),
     chatbotGreeting: text("chatbot_greeting"),
     chatbotColor: text("chatbot_color"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
-    updatedAt: text("updated_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+    updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("brands_user_id_idx").on(table.userId),
@@ -69,7 +70,7 @@ export const products = sqliteTable(
     sortOrder: integer("sort_order").notNull().default(0),
     status: text("status").notNull().default("active"),
     stockCount: integer("stock_count"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("products_brand_id_idx").on(table.brandId),
@@ -94,7 +95,7 @@ export const orders = sqliteTable(
     total: real("total").notNull(),
     currency: text("currency").notNull().default("USD"),
     status: text("status").notNull().default("pending"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("orders_brand_id_idx").on(table.brandId),
@@ -140,7 +141,7 @@ export const blogPosts = sqliteTable(
     tags: text("tags"), // JSON array
     status: text("status").notNull().default("draft"),
     publishedAt: text("published_at"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     uniqueIndex("blog_posts_brand_slug_idx").on(table.brandId, table.slug),
@@ -163,7 +164,7 @@ export const content = sqliteTable(
     body: text("body"),
     metadata: text("metadata"), // JSON
     status: text("status").notNull().default("draft"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("content_brand_type_idx").on(table.brandId, table.type),
@@ -183,7 +184,7 @@ export const chatMessages = sqliteTable(
     role: text("role").notNull(), // "user" | "assistant"
     content: text("content").notNull(),
     sessionId: text("session_id").notNull(),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("chat_messages_session_idx").on(table.brandId, table.sessionId),
@@ -207,8 +208,8 @@ export const tickets = sqliteTable(
     priority: text("priority").notNull().default("medium"),
     status: text("status").notNull().default("open"),
     satisfactionRating: integer("satisfaction_rating"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
-    updatedAt: text("updated_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+    updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("tickets_brand_status_idx").on(table.brandId, table.status),
@@ -227,7 +228,7 @@ export const ticketMessages = sqliteTable(
       .references(() => tickets.id, { onDelete: "cascade" }),
     role: text("role").notNull(), // "customer" | "agent"
     content: text("content").notNull(),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("ticket_messages_ticket_id_idx").on(table.ticketId),
@@ -247,7 +248,7 @@ export const activities = sqliteTable(
     type: text("type").notNull(),
     description: text("description").notNull(),
     metadata: text("metadata"), // JSON
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("activities_brand_id_idx").on(table.brandId),
@@ -269,7 +270,7 @@ export const contactSubmissions = sqliteTable(
     subject: text("subject"),
     message: text("message").notNull(),
     status: text("status").notNull().default("new"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("contact_submissions_brand_id_idx").on(table.brandId),
@@ -289,7 +290,7 @@ export const newsletterSubscribers = sqliteTable(
     email: text("email").notNull(),
     name: text("name"),
     status: text("status").notNull().default("active"),
-    subscribedAt: text("subscribed_at").notNull().default("(datetime('now'))"),
+    subscribedAt: text("subscribed_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     uniqueIndex("newsletter_brand_email_idx").on(table.brandId, table.email),
@@ -308,7 +309,7 @@ export const brandSettings = sqliteTable(
       .references(() => brands.id, { onDelete: "cascade" }),
     key: text("key").notNull(),
     value: text("value"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     uniqueIndex("brand_settings_brand_key_idx").on(table.brandId, table.key),
@@ -332,7 +333,7 @@ export const brandPages = sqliteTable(
       .notNull()
       .default(false),
     sortOrder: integer("sort_order").notNull().default(0),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     uniqueIndex("brand_pages_brand_slug_idx").on(table.brandId, table.slug),
@@ -371,7 +372,7 @@ export const consumerUsers = sqliteTable(
     email: text("email").notNull(),
     name: text("name"),
     passwordHash: text("password_hash").notNull(),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     uniqueIndex("consumer_users_brand_email_idx").on(table.brandId, table.email),
@@ -391,7 +392,7 @@ export const pageViews = sqliteTable(
     page: text("page").notNull(),
     referrer: text("referrer"),
     userAgent: text("user_agent"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("page_views_brand_id_idx").on(table.brandId),
@@ -414,7 +415,7 @@ export const notifications = sqliteTable(
     message: text("message").notNull(),
     isRead: integer("is_read", { mode: "boolean" }).notNull().default(false),
     metadata: text("metadata"), // JSON
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("notifications_brand_id_idx").on(table.brandId),
@@ -440,7 +441,7 @@ export const testimonials = sqliteTable(
     avatarUrl: text("avatar_url"),
     featured: integer("featured", { mode: "boolean" }).notNull().default(false),
     sortOrder: integer("sort_order").notNull().default(0),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("testimonials_brand_id_idx").on(table.brandId),
@@ -459,7 +460,7 @@ export const brandStrategies = sqliteTable(
       .references(() => brands.id, { onDelete: "cascade" }),
     type: text("type").notNull(),
     result: text("result"), // JSON
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("brand_strategies_brand_id_idx").on(table.brandId),
@@ -489,7 +490,7 @@ export const reviews = sqliteTable(
       .default(false),
     helpfulCount: integer("helpful_count").notNull().default(0),
     status: text("status").notNull().default("pending"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("reviews_brand_id_idx").on(table.brandId),
@@ -517,7 +518,7 @@ export const discountCodes = sqliteTable(
     active: integer("active", { mode: "boolean" }).notNull().default(true),
     startsAt: text("starts_at"),
     expiresAt: text("expires_at"),
-    createdAt: text("created_at").notNull().default("(datetime('now'))"),
+    createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     uniqueIndex("discount_codes_brand_code_idx").on(table.brandId, table.code),
