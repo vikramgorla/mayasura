@@ -3,7 +3,7 @@ import { eq } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { z } from "zod";
 import { db } from "@/lib/db/client";
-import { brands, contactSubmissions } from "@/lib/db/schema";
+import { brands, contactSubmissions, tickets, ticketMessages } from "@/lib/db/schema";
 import { created, error } from "@/lib/api/response";
 
 const contactSchema = z.object({
@@ -41,14 +41,40 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
     const { name, email, subject, message: msg } = parsed.data;
 
+    const submissionId = nanoid();
     db.insert(contactSubmissions)
       .values({
-        id: nanoid(),
+        id: submissionId,
         brandId: brand.id,
         name,
         email,
         subject: subject || null,
         message: msg,
+      })
+      .run();
+
+    // Auto-create support ticket from contact form submission
+    const ticketId = nanoid();
+    const ticketSubject = subject || `Contact form: ${name}`;
+
+    db.insert(tickets)
+      .values({
+        id: ticketId,
+        brandId: brand.id,
+        customerName: name,
+        customerEmail: email,
+        subject: ticketSubject,
+        priority: "medium",
+        status: "open",
+      })
+      .run();
+
+    db.insert(ticketMessages)
+      .values({
+        id: nanoid(),
+        ticketId,
+        role: "customer",
+        content: msg,
       })
       .run();
 
