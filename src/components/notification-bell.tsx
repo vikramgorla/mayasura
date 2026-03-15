@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion';
 import { Bell, Check, CheckCheck, ShoppingBag, Mail, HeadphonesIcon, AlertTriangle, X } from 'lucide-react';
 
 interface Notification {
@@ -44,17 +44,28 @@ export function NotificationBell({ brandId }: NotificationBellProps) {
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const prevUnreadRef = useRef(0);
+  const bellControls = useAnimation();
 
   const fetchNotifications = useCallback(async () => {
     try {
       const res = await fetch(`/api/brands/${brandId}/notifications`);
       if (res.ok) {
         const data = await res.json();
+        const newCount: number = data.unreadCount || 0;
         setNotifications(data.notifications || []);
-        setUnreadCount(data.unreadCount || 0);
+        setUnreadCount(newCount);
+        // Bounce bell when new notifications arrive
+        if (newCount > prevUnreadRef.current) {
+          bellControls.start({
+            rotate: [0, -15, 15, -10, 10, -5, 5, 0],
+            transition: { duration: 0.6, ease: 'easeInOut' },
+          });
+        }
+        prevUnreadRef.current = newCount;
       }
     } catch { /* ignore */ }
-  }, [brandId]);
+  }, [brandId, bellControls]);
 
   useEffect(() => {
     fetchNotifications();
@@ -106,7 +117,9 @@ export function NotificationBell({ brandId }: NotificationBellProps) {
         className="relative p-2 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
         aria-label={`Notifications${unreadCount > 0 ? ` (${unreadCount} unread)` : ''}`}
       >
-        <Bell className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+        <motion.div animate={bellControls} style={{ originX: '50%', originY: '0%' }}>
+          <Bell className="h-5 w-5 text-zinc-500 dark:text-zinc-400" />
+        </motion.div>
         <AnimatePresence>
           {unreadCount > 0 && (
             <motion.span

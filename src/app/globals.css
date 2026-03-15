@@ -469,3 +469,74 @@ img {
   --transition-slow: 300ms cubic-bezier(0.4, 0, 0.2, 1);
   --transition-spring: 400ms cubic-bezier(0.34, 1.56, 0.64, 1);
 }
+
+/* ==================== Sprint 17: Premium Micro-Interactions ==================== */
+
+/* Table row hover: smooth highlight transition */
+.micro-table tr {
+  transition: background-color 150ms ease-out;
+}
+.micro-table tr:hover td {
+  background-color: color-mix(in srgb, var(--bg-surface) 60%, var(--bg-hover, rgba(0,0,0,0.025)));
+}
+.dark .micro-table tr:hover td {
+  background-color: rgba(255,255,255,0.025);
+}
+
+/* Form field focus ring expands outward */
+.micro-input:focus {
+  outline: none;
+  box-shadow: 0 0 0 2px color-mix(in srgb, var(--accent, #6366F1) 40%, transparent),
+              0 0 0 0px var(--accent, #6366F1);
+  animation: focus-ring-expand 200ms ease-out forwards;
+}
+@keyframes focus-ring-expand {
+  from {
+    box-shadow: 0 0 0 0px color-mix(in srgb, var(--accent, #6366F1) 40%, transparent);
+  }
+  to {
+    box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent, #6366F1) 30%, transparent);
+  }
+}
+
+/* Card spring hover */
+.micro-card {
+  transition: transform 200ms cubic-bezier(0.34, 1.56, 0.64, 1),
+              box-shadow 200ms ease-out,
+              translate 200ms ease-out;
+  will-change: transform;
+}
+.micro-card:hover {
+  transform: scale(1.01) translateY(-2px);
+  box-shadow: 0 8px 30px -8px rgba(0,0,0,0.12);
+}
+
+/* Animated delete: item shrinks and fades */
+.micro-delete-exit {
+  transition: opacity 300ms ease-out, transform 300ms ease-out, max-height 350ms ease-out;
+  overflow: hidden;
+}
+.micro-delete-exit.removing {
+  opacity: 0;
+  transform: scaleY(0.8);
+  max-height: 0 !important;
+}
+
+/* Number change flash */
+@keyframes number-change {
+  0% { color: inherit; }
+  30% { color: var(--accent, #6366F1); }
+  100% { color: inherit; }
+}
+.micro-number-change {
+  animation: number-change 600ms ease-out;
+}
+
+/* Save button pulse while loading */
+@keyframes save-pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.7; }
+}
+.micro-save-loading {
+  animation: save-pulse 1s ease-in-out infinite;
+}
