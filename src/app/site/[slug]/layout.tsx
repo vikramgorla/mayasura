@@ -613,13 +613,14 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
           backgroundColor: data.brand.secondary_color || '#fafafa',
           color: data.brand.primary_color || '#0f172a',
           fontFamily: data.brand.font_body || 'Inter',
+          '--accent': data.brand.accent_color || '#6366F1',
           ...designSettingsToCSSVars(
             data.designSettings,
             data.brand.primary_color || '#0f172a',
             data.brand.secondary_color || '#fafafa',
             data.brand.accent_color || '#3b82f6',
           ) as React.CSSProperties,
-        }}
+        } as React.CSSProperties}
       >
         <a
           href="#main-content"

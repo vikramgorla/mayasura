@@ -331,7 +331,7 @@ function RevenueChart({ data }: { data: DashboardData }) {
                   fontSize: '12px',
                   color: '#e2e8f0',
                 }}
-                formatter={(val: number) => [val, 'Views']}
+                formatter={(val) => [val, 'Views']}
               />
               <Area
                 type="monotone"

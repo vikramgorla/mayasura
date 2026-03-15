@@ -900,15 +900,15 @@ export default function Home() {
           </div>
 
           {/* Trust signals */}
-          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-8">
+          <div className="flex flex-wrap items-center justify-center gap-4 sm:gap-6 mt-8" role="list" aria-label="Trust indicators">
             {[
               { icon: Shield, label: 'MIT Licensed' },
               { icon: Github, label: 'Open Source' },
               { icon: Zap, label: '< 5 min setup' },
               { icon: Star, label: '99% satisfaction' },
             ].map((signal) => (
-              <div key={signal.label} className="flex items-center gap-1.5 text-white/50">
-                <signal.icon className="h-3.5 w-3.5" />
+              <div key={signal.label} className="flex items-center gap-1.5 text-white/50" role="listitem">
+                <signal.icon className="h-3.5 w-3.5" aria-hidden="true" />
                 <span className="text-xs font-medium">{signal.label}</span>
               </div>
             ))}
@@ -1038,8 +1038,8 @@ export default function Home() {
               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full border border-emerald-200 dark:border-emerald-800 bg-emerald-50 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400 text-[10px] font-medium">
                 Open Source
               </span>
-              <a href="https://github.com/vikramgorla/mayasura" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-1">
-                <Github className="h-3.5 w-3.5" />
+              <a href="https://github.com/vikramgorla/mayasura" target="_blank" rel="noopener noreferrer" className="hover:text-[var(--text-primary)] transition-colors flex items-center gap-1" aria-label="Star Mayasura on GitHub (opens in new tab)">
+                <Github className="h-3.5 w-3.5" aria-hidden="true" />
                 Star on GitHub
               </a>
             </div>
