@@ -60,10 +60,12 @@ export function LineChart({
   const polylinePoints = points.map((p) => `${p.x},${p.y}`).join(" ");
 
   // Area polygon (fills under the line)
+  const firstPoint = points[0]!;
+  const lastPoint = points[points.length - 1]!;
   const areaPoints = [
-    `${points[0].x},${padding.top + innerHeight}`,
+    `${firstPoint.x},${padding.top + innerHeight}`,
     ...points.map((p) => `${p.x},${p.y}`),
-    `${points[points.length - 1].x},${padding.top + innerHeight}`,
+    `${lastPoint.x},${padding.top + innerHeight}`,
   ].join(" ");
 
   // Y-axis grid lines (5 lines)
@@ -82,7 +84,7 @@ export function LineChart({
       const mouseX = ((e.clientX - rect.left) / rect.width) * viewBoxWidth;
 
       // Find closest point
-      let closest = points[0];
+      let closest = points[0]!;
       let closestDist = Math.abs(mouseX - closest.x);
       for (const p of points) {
         const dist = Math.abs(mouseX - p.x);

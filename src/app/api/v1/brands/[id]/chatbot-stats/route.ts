@@ -29,7 +29,7 @@ export async function GET(_request: NextRequest, { params }: RouteParams) {
       .get();
 
     // Messages today
-    const today = new Date().toISOString().split("T")[0];
+    const today = new Date().toISOString().split("T")[0]!;
     const messagesTodayResult = db
       .select({ count: sql<number>`COUNT(*)` })
       .from(chatMessages)

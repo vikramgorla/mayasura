@@ -159,7 +159,7 @@ export default function AnalyticsPage() {
                       <div
                         className="h-full rounded-full"
                         style={{
-                          width: `${(p.count / data.byPage[0].count) * 100}%`,
+                          width: `${(p.count / (data.byPage[0]?.count || 1)) * 100}%`,
                           backgroundColor: "var(--accent)",
                         }}
                       />

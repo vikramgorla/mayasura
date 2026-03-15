@@ -20,7 +20,7 @@ function detectDevice(ua: string | null): "desktop" | "mobile" | "tablet" {
 function dateNDaysAgo(days: number): string {
   const d = new Date();
   d.setDate(d.getDate() - days);
-  return d.toISOString().split("T")[0];
+  return d.toISOString().split("T")[0]!;
 }
 
 export async function GET(request: NextRequest, { params }: RouteParams) {
