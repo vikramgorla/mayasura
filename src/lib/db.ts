@@ -333,6 +333,12 @@ function runMigrations(db: Database.Database) {
     console.log('[DB] Adding custom_css column to brands');
     db.exec("ALTER TABLE brands ADD COLUMN custom_css TEXT");
   }
+
+  // V6: Add subject column to contact_submissions
+  if (!hasColumn(db, 'contact_submissions', 'subject')) {
+    console.log('[DB] Adding subject column to contact_submissions');
+    db.exec("ALTER TABLE contact_submissions ADD COLUMN subject TEXT");
+  }
   
   console.log('[DB] Migrations complete');
 }
@@ -574,6 +580,16 @@ export function createProduct(product: {
 export function getProductsByBrand(brandId: string) {
   const db = getDb();
   return db.prepare('SELECT * FROM products WHERE brand_id = ? ORDER BY sort_order ASC, created_at DESC').all(brandId);
+}
+
+export function getProductById(productId: string) {
+  const db = getDb();
+  return db.prepare('SELECT * FROM products WHERE id = ?').get(productId);
+}
+
+export function getAllPublishedBrands() {
+  const db = getDb();
+  return db.prepare("SELECT * FROM brands WHERE status = 'launched' ORDER BY created_at DESC").all();
 }
 
 const ALLOWED_PRODUCT_FIELDS = new Set([
@@ -1014,13 +1030,14 @@ export function createContactSubmission(sub: {
   brand_id: string;
   name: string;
   email: string;
+  subject?: string;
   message: string;
 }) {
   const db = getDb();
   db.prepare(`
-    INSERT INTO contact_submissions (id, brand_id, name, email, message)
-    VALUES (@id, @brand_id, @name, @email, @message)
-  `).run(sub);
+    INSERT INTO contact_submissions (id, brand_id, name, email, subject, message)
+    VALUES (@id, @brand_id, @name, @email, @subject, @message)
+  `).run({ ...sub, subject: sub.subject || null });
 }
 
 export function getContactSubmissions(brandId: string) {

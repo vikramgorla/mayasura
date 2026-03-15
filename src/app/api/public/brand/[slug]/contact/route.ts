@@ -16,7 +16,7 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { name, email, message } = body;
+    const { name, email, subject, message } = body;
 
     if (!name || !email || !message) {
       return NextResponse.json({ error: 'Name, email, and message are required' }, { status: 400 });
@@ -27,6 +27,7 @@ export async function POST(
       brand_id: brand.id,
       name,
       email,
+      subject: subject || undefined,
       message,
     });
 

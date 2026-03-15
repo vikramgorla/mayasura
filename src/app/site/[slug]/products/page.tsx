@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence, LayoutGroup } from 'framer-motion';
 import { useBrandSite, BrandPlaceholder } from '../layout';
 import { BORDER_RADIUS_MAP } from '@/lib/design-settings';
+import { ProductsPageMeta } from '@/components/site/site-meta';
 
 /* ─── Sort options ────────────────────────────────────────────── */
 type SortKey = 'default' | 'price-low' | 'price-high' | 'newest' | 'name-az';
@@ -160,8 +161,15 @@ export default function ProductsPage() {
     transition: 'background-color 0.15s',
   });
 
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mayasura.app';
+
   return (
     <>
+      <ProductsPageMeta
+        org={{ brandName: brand.name, description: brand.description, url: `${baseUrl}/site/${slug}`, logoUrl: brand.logo_url }}
+        canonicalUrl={`${baseUrl}/site/${slug}/products`}
+        products={products.map(p => ({ name: p.name, description: p.description, price: p.price, currency: p.currency, imageUrl: p.image_url }))}
+      />
       {/* ═══════ HEADER ═══════ */}
       <section className="t-hero" style={templateId === 'bold' ? { minHeight: 'auto', padding: '5rem 0 3rem' } : {}}>
         <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>

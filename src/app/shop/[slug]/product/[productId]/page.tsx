@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useShop } from '../../layout';
+import { ProductMeta } from '@/components/site/site-meta';
 
 export default function ProductDetailPage() {
   const shop = useShop();
@@ -99,8 +100,15 @@ export default function ProductDetailPage() {
     borderWidth: templateId === 'bold' ? '2px' : '1px',
   };
 
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mayasura.app';
+
   return (
     <div className={`${containerWidth} mx-auto px-5 sm:px-8 py-12 sm:py-16`}>
+      <ProductMeta
+        org={{ brandName: brand.name, description: brand.description, url: `${baseUrl}/shop/${slug}`, logoUrl: brand.logo_url }}
+        canonicalUrl={`${baseUrl}/shop/${slug}/product/${product.id}`}
+        product={{ name: product.name, description: product.description, price: product.price, currency: product.currency, imageUrl: product.image_url }}
+      />
       {/* Breadcrumb navigation */}
       <motion.nav
         className="mb-8 flex items-center gap-2 text-sm"

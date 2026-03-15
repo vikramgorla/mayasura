@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion } from 'framer-motion';
 import { useBlogSite } from '../layout';
 import { BlogPost } from '@/lib/types';
+import { BlogPostMeta } from '@/components/site/site-meta';
 
 function readingTime(content: string | null): string {
   if (!content) return '1 min read';
@@ -203,8 +204,20 @@ export default function BlogPostPage() {
 
   const containerWidth = templateId === 'bold' ? 'max-w-4xl' : 'max-w-3xl';
 
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mayasura.app';
+
   return (
     <div className={`${hasTOC ? 'max-w-6xl' : containerWidth} mx-auto px-5 sm:px-8 py-12 sm:py-16`}>
+      <BlogPostMeta
+        org={{ brandName: brand.name, description: brand.description, url: `${baseUrl}/blog/${slug}`, logoUrl: brand.logo_url }}
+        canonicalUrl={`${baseUrl}/blog/${slug}/${post.slug}`}
+        article={{
+          title: post.title,
+          description: post.excerpt,
+          publishedAt: post.published_at || post.created_at,
+          imageUrl: null,
+        }}
+      />
       <div className={hasTOC ? 'grid grid-cols-1 lg:grid-cols-[1fr_220px] gap-12' : ''}>
         <article>
           {/* Back link */}
