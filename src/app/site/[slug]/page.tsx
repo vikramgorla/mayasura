@@ -931,8 +931,8 @@ export default function BrandHomePage() {
                   style={{
                     backgroundColor: isDark ? `${textColor}04` : ds.surfaceColor || '#FFFFFF',
                     borderRadius: tp?.borderRadius || dsRadius || '8px',
-                    border: `1px solid ${isDark ? `${textColor}10` : ds.borderColor || `${textColor}08`}`,
-                    boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)',
+                    border: `1px solid ${isDark ? `${textColor}15` : ds.borderColor || `${textColor}12`}`,
+                    boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)',
                     textAlign: templateId === 'wellness' || templateId === 'organic' || templateId === 'startup' ? 'center' as const : undefined,
                   }}
                 >
@@ -1012,7 +1012,7 @@ export default function BrandHomePage() {
                 style={
                   templateId === 'bold' ? { border: `2px solid ${textColor}10` }
                   : templateId === 'playful' ? { backgroundColor: '#FFFFFF', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }
-                  : { backgroundColor: isDark ? `${textColor}04` : ds.surfaceColor || '#FFFFFF', borderRadius: dsRadius || '8px', border: `1px solid ${isDark ? `${textColor}08` : ds.borderColor || `${textColor}06`}`, overflow: 'hidden' }
+                  : { backgroundColor: isDark ? `${textColor}08` : ds.surfaceColor || '#FFFFFF', borderRadius: dsRadius || '8px', border: `1px solid ${isDark ? `${textColor}15` : ds.borderColor || `${textColor}12`}`, overflow: 'hidden', boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)' }
                 }
               >
                 <div

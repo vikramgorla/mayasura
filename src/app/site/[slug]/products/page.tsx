@@ -217,7 +217,7 @@ function QuickViewModal({ product, onClose, tc, ac, bgColor, tid, isBold, brand 
                 <div
                   className="aspect-square overflow-hidden flex items-center justify-center"
                   style={{
-                    backgroundColor: isBold ? '#111' : `${tc}04`,
+                    backgroundColor: isBold ? '#111' : `${tc}06`,
                     borderRadius: isBold ? '0' : tid === 'playful' ? '16px' : '8px',
                   }}
                 >
@@ -531,9 +531,9 @@ export default function ProductsPage() {
                       <ScrollRevealCard key={p.id} delay={idx * 0.04}>
                         <motion.div layout exit={{ opacity: 0, scale: 0.95 }} transition={{ duration: 0.25 }}>
                           <div className="group flex items-center gap-5 p-4 transition-colors"
-                            style={{ backgroundColor: isDark ? '#FFFFFF04' : `${tc}02`, borderRadius: cardRadius, border: `1px solid ${isBold ? `${tc}08` : `${tc}04`}` }}>
+                            style={{ backgroundColor: isDark ? '#FFFFFF06' : `${tc}03`, borderRadius: cardRadius, border: `1px solid ${isBold ? `${tc}12` : `${tc}10`}` }}>
                             <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden flex items-center justify-center"
-                              style={{ backgroundColor: isDark ? '#111' : `${tc}04`, borderRadius: tid === 'playful' ? '12px' : tid === 'classic' ? '6px' : isBold ? '0' : dsRadius }}>
+                              style={{ backgroundColor: isDark ? '#111' : `${tc}06`, borderRadius: tid === 'playful' ? '12px' : tid === 'classic' ? '6px' : isBold ? '0' : dsRadius }}>
                               {p.image_url ? <img src={p.image_url} alt={p.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <BoxIcon color={tc} />}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -575,7 +575,7 @@ export default function ProductsPage() {
                                 ? { backgroundColor: '#FFF', borderRadius: cardRadius, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }
                                 : isBold
                                 ? { border: `2px solid ${tc}12`, borderRadius: cardRadius }
-                                : { backgroundColor: isDark ? '#FFFFFF06' : '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid ${isDark ? `${tc}10` : `${tc}08`}`, boxShadow: isDark ? 'none' : '0 1px 3px rgba(0,0,0,0.04)' }
+                                : { backgroundColor: isDark ? '#FFFFFF08' : '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid ${isDark ? `${tc}15` : `${tc}12`}`, boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)' }
                             }
                           >
                             {/* Image wrapper */}
