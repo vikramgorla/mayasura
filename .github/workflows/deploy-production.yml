@@ -34,10 +34,12 @@ jobs:
     needs: ci
     environment: production
     steps:
-      - uses: actions/checkout@v4
-      - name: Install Railway CLI
-        run: npm install -g @railway/cli
-      - name: Deploy
-        run: railway up --service mayasura-web --environment production --detach
+      - name: Trigger Railway deploy
+        run: |
+          curl -s -X POST https://backboard.railway.com/graphql/v2 \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $RAILWAY_TOKEN" \
+            -d '{"query": "mutation { serviceInstanceRedeploy(serviceId: \"6ee14f05-ce67-4619-9720-f4022d7a84c8\", environmentId: \"431f14f4-f5a8-485c-a767-6833bcefd95d\") }"}' \
+            | jq -e '.data.serviceInstanceRedeploy == true'
         env:
           RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
