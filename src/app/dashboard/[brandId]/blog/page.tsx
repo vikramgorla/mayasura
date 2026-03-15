@@ -1,13 +1,14 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Plus, FileText, Edit, Trash2, Eye, EyeOff, Sparkles, X,
   Image, Tag, Calendar, Code, Newspaper, Search, Clock,
   BarChart2, Globe, CheckCircle2, AlarmClock, FileEdit,
-  ExternalLink, ChevronDown,
+  ExternalLink, ChevronDown, PenLine, ListOrdered, RefreshCw,
+  ChevronUp, ArrowDownToLine, Target, Hash, BarChart3,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
@@ -258,6 +259,513 @@ function PostCard({
   );
 }
 
+/* ─── AI Blog Writer Drawer ────────────────────────────────── */
+type BlogTone = 'informative' | 'casual' | 'persuasive' | 'professional';
+
+interface AiBlogWriterProps {
+  open: boolean;
+  onClose: () => void;
+  onInsert: (content: string) => void;
+  brandId: string;
+}
+
+function AiBlogWriterDrawer({ open, onClose, onInsert, brandId }: AiBlogWriterProps) {
+  const [topic, setTopic] = useState('');
+  const [keyword, setKeyword] = useState('');
+  const [tone, setTone] = useState<BlogTone>('informative');
+  const [wordCount, setWordCount] = useState(800);
+  const [step, setStep] = useState<'inputs' | 'outline' | 'article' | 'seo'>('inputs');
+  const [outline, setOutline] = useState<string[]>([]);
+  const [articleTitle, setArticleTitle] = useState('');
+  const [article, setArticle] = useState('');
+  const [seo, setSeo] = useState<{ metaTitle: string; metaDescription: string; focusKeyword: string; keywordDensitySuggestion: string } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [loadingMsg, setLoadingMsg] = useState('');
+  const [improvingIdx, setImprovingIdx] = useState<number | null>(null);
+  const toast = useToast();
+  const drawerRef = useRef<HTMLDivElement>(null);
+
+  const reset = () => {
+    setStep('inputs');
+    setOutline([]);
+    setArticleTitle('');
+    setArticle('');
+    setSeo(null);
+    setLoading(false);
+  };
+
+  const generateOutline = async () => {
+    if (!topic.trim()) { toast.error('Enter a topic first'); return; }
+    setLoading(true);
+    setLoadingMsg('Generating outline...');
+    try {
+      const res = await fetch('/api/ai/blog-writer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'outline', topic, keyword, tone, wordCount }),
+      });
+      const data = await res.json();
+      if (data.outline) {
+        setArticleTitle(data.outline.title);
+        setOutline(data.outline.sections);
+        setStep('outline');
+      } else {
+        toast.error('Failed to generate outline');
+      }
+    } catch {
+      toast.error('Failed to generate outline');
+    }
+    setLoading(false);
+  };
+
+  const generateArticle = async () => {
+    setLoading(true);
+    setLoadingMsg('Writing full article...');
+    try {
+      const res = await fetch('/api/ai/blog-writer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'article', topic, keyword, tone, wordCount, outline }),
+      });
+      const data = await res.json();
+      if (data.content) {
+        setArticle(data.content);
+        setStep('article');
+      } else {
+        toast.error('Failed to generate article');
+      }
+    } catch {
+      toast.error('Failed to generate article');
+    }
+    setLoading(false);
+  };
+
+  const improveSection = async (idx: number) => {
+    // Split article into sections by ##
+    const sections = article.split(/(?=^## )/m);
+    if (!sections[idx]) return;
+    setImprovingIdx(idx);
+    try {
+      const res = await fetch('/api/ai/blog-writer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          mode: 'improve',
+          sectionContent: sections[idx],
+          sectionTitle: outline[idx] || '',
+          tone,
+          keyword,
+        }),
+      });
+      const data = await res.json();
+      if (data.improved) {
+        sections[idx] = data.improved;
+        setArticle(sections.join('\n\n'));
+        toast.success('Section improved!');
+      }
+    } catch {
+      toast.error('Failed to improve section');
+    }
+    setImprovingIdx(null);
+  };
+
+  const generateSeo = async () => {
+    setLoading(true);
+    setLoadingMsg('Generating SEO suggestions...');
+    try {
+      const res = await fetch('/api/ai/blog-writer', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ mode: 'seo', topic, keyword, sectionContent: article.slice(0, 600) }),
+      });
+      const data = await res.json();
+      if (data.seo) {
+        setSeo(data.seo);
+        setStep('seo');
+      }
+    } catch {
+      toast.error('Failed to generate SEO data');
+    }
+    setLoading(false);
+  };
+
+  const handleInsert = () => {
+    if (!article) return;
+    onInsert(article);
+    onClose();
+    toast.success('Content inserted into editor!');
+  };
+
+  const articleSections = article ? article.split(/(?=^## )/m) : [];
+
+  return (
+    <AnimatePresence>
+      {open && (
+        <>
+          {/* Backdrop */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="fixed inset-0 z-40 bg-black/30 backdrop-blur-sm"
+            onClick={onClose}
+          />
+          {/* Drawer */}
+          <motion.div
+            ref={drawerRef}
+            initial={{ x: '100%', opacity: 0 }}
+            animate={{ x: 0, opacity: 1 }}
+            exit={{ x: '100%', opacity: 0 }}
+            transition={{ type: 'spring', damping: 30, stiffness: 300 }}
+            className="fixed right-0 top-0 bottom-0 z-50 w-full max-w-[520px] bg-white dark:bg-zinc-900 shadow-2xl flex flex-col overflow-hidden border-l border-zinc-200 dark:border-zinc-800"
+          >
+            {/* Header */}
+            <div className="flex items-center justify-between px-5 py-4 border-b border-zinc-100 dark:border-zinc-800 flex-shrink-0">
+              <div className="flex items-center gap-2">
+                <div className="h-8 w-8 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center">
+                  <PenLine className="h-4 w-4 text-violet-600 dark:text-violet-400" />
+                </div>
+                <div>
+                  <h2 className="font-semibold text-sm text-zinc-900 dark:text-white">AI Blog Writer</h2>
+                  <p className="text-[10px] text-zinc-400">
+                    {step === 'inputs' && 'Set up your article'}
+                    {step === 'outline' && 'Edit your outline'}
+                    {step === 'article' && 'Review & improve'}
+                    {step === 'seo' && 'SEO suggestions'}
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                {step !== 'inputs' && (
+                  <button
+                    onClick={reset}
+                    className="text-xs text-zinc-400 hover:text-zinc-600 transition-colors px-2 py-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800"
+                  >
+                    Start Over
+                  </button>
+                )}
+                <button
+                  onClick={onClose}
+                  className="p-1.5 rounded-lg hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
+                >
+                  <X className="h-4 w-4 text-zinc-500" />
+                </button>
+              </div>
+            </div>
+
+            {/* Progress steps */}
+            <div className="flex items-center px-5 py-2.5 border-b border-zinc-100 dark:border-zinc-800 gap-1 flex-shrink-0">
+              {(['inputs', 'outline', 'article', 'seo'] as const).map((s, i) => (
+                <div key={s} className="flex items-center gap-1 flex-1">
+                  <div className={`h-1.5 flex-1 rounded-full transition-colors ${
+                    step === s ? 'bg-violet-500' :
+                    ['inputs', 'outline', 'article', 'seo'].indexOf(step) > i ? 'bg-violet-300' :
+                    'bg-zinc-200 dark:bg-zinc-700'
+                  }`} />
+                </div>
+              ))}
+            </div>
+
+            {/* Scrollable content */}
+            <div className="flex-1 overflow-y-auto">
+              {/* Step 1: Inputs */}
+              {step === 'inputs' && (
+                <div className="p-5 space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
+                      Topic *
+                    </label>
+                    <input
+                      type="text"
+                      value={topic}
+                      onChange={e => setTopic(e.target.value)}
+                      placeholder="e.g. 10 ways to improve your morning routine"
+                      className="w-full px-3 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 transition-all placeholder:text-zinc-400"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
+                      <Hash className="h-3 w-3 inline mr-1" />
+                      Target Keyword
+                    </label>
+                    <input
+                      type="text"
+                      value={keyword}
+                      onChange={e => setKeyword(e.target.value)}
+                      placeholder="e.g. morning routine tips"
+                      className="w-full px-3 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 transition-all placeholder:text-zinc-400"
+                    />
+                    <p className="text-[10px] text-zinc-400 mt-1">AI will naturally incorporate this keyword for SEO</p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">Tone</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(['informative', 'casual', 'persuasive', 'professional'] as BlogTone[]).map(t => (
+                        <button
+                          key={t}
+                          onClick={() => setTone(t)}
+                          className={`px-3 py-2 rounded-lg text-sm font-medium border transition-all capitalize ${
+                            tone === t
+                              ? 'bg-violet-50 dark:bg-violet-900/30 border-violet-300 dark:border-violet-700 text-violet-700 dark:text-violet-300'
+                              : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400 hover:border-zinc-300 dark:hover:border-zinc-600'
+                          }`}
+                        >
+                          {t}
+                        </button>
+                      ))}
+                    </div>
+                    <p className="text-[10px] text-zinc-400 mt-1.5">
+                      {tone === 'informative' && 'Educational, clear, factual — great for how-to guides'}
+                      {tone === 'casual' && 'Friendly, conversational — great for lifestyle content'}
+                      {tone === 'persuasive' && 'Compelling, action-oriented — great for marketing'}
+                      {tone === 'professional' && 'Authoritative, formal — great for B2B and thought leadership'}
+                    </p>
+                  </div>
+
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">
+                      Target Word Count: <span className="text-violet-600">{wordCount}</span>
+                    </label>
+                    <input
+                      type="range"
+                      min={300}
+                      max={2000}
+                      step={100}
+                      value={wordCount}
+                      onChange={e => setWordCount(Number(e.target.value))}
+                      className="w-full accent-violet-600"
+                    />
+                    <div className="flex justify-between text-[10px] text-zinc-400 mt-1">
+                      <span>300</span>
+                      <span>Short read</span>
+                      <span>Long-form</span>
+                      <span>2000</span>
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 2: Outline */}
+              {step === 'outline' && (
+                <div className="p-5 space-y-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">Title</label>
+                    <input
+                      type="text"
+                      value={articleTitle}
+                      onChange={e => setArticleTitle(e.target.value)}
+                      className="w-full px-3 py-2.5 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm font-medium outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 transition-all"
+                    />
+                  </div>
+
+                  <div>
+                    <div className="flex items-center justify-between mb-2">
+                      <label className="text-xs font-semibold text-zinc-600 dark:text-zinc-400 flex items-center gap-1">
+                        <ListOrdered className="h-3 w-3" /> Sections (drag to reorder, edit inline)
+                      </label>
+                      <button
+                        onClick={() => setOutline(o => [...o, 'New section heading'])}
+                        className="text-[10px] text-violet-600 hover:text-violet-700 flex items-center gap-0.5 font-medium"
+                      >
+                        <Plus className="h-3 w-3" /> Add
+                      </button>
+                    </div>
+                    <div className="space-y-2">
+                      {outline.map((section, i) => (
+                        <div key={i} className="flex items-center gap-2 group">
+                          <span className="text-[10px] text-zinc-400 w-4 flex-shrink-0 text-right">{i + 1}</span>
+                          <input
+                            type="text"
+                            value={section}
+                            onChange={e => {
+                              const next = [...outline];
+                              next[i] = e.target.value;
+                              setOutline(next);
+                            }}
+                            className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/30 focus:border-violet-400 transition-all"
+                          />
+                          <div className="flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => {
+                                if (i === 0) return;
+                                const next = [...outline];
+                                [next[i - 1], next[i]] = [next[i], next[i - 1]];
+                                setOutline(next);
+                              }}
+                              disabled={i === 0}
+                              className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 disabled:opacity-20"
+                            >
+                              <ChevronUp className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={() => {
+                                if (i === outline.length - 1) return;
+                                const next = [...outline];
+                                [next[i], next[i + 1]] = [next[i + 1], next[i]];
+                                setOutline(next);
+                              }}
+                              disabled={i === outline.length - 1}
+                              className="p-1 rounded hover:bg-zinc-100 dark:hover:bg-zinc-800 text-zinc-400 disabled:opacity-20"
+                            >
+                              <ChevronDown className="h-3 w-3" />
+                            </button>
+                            <button
+                              onClick={() => setOutline(o => o.filter((_, j) => j !== i))}
+                              className="p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 text-zinc-400 hover:text-red-500"
+                            >
+                              <X className="h-3 w-3" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {/* Step 3: Article */}
+              {step === 'article' && (
+                <div className="p-5 space-y-4">
+                  <div className="text-xs text-zinc-500 dark:text-zinc-400 flex items-center gap-2">
+                    <BarChart3 className="h-3.5 w-3.5" />
+                    {article.split(/\s+/).length} words · {articleSections.length} sections
+                  </div>
+
+                  {/* Per-section improve buttons */}
+                  <div className="space-y-3">
+                    {articleSections.map((section, i) => {
+                      const firstLine = section.split('\n')[0].replace(/^#+\s*/, '');
+                      return (
+                        <div key={i} className="rounded-lg border border-zinc-200 dark:border-zinc-700 overflow-hidden">
+                          <div className="flex items-center justify-between px-3 py-2 bg-zinc-50 dark:bg-zinc-800/50">
+                            <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300 truncate flex-1 mr-2">
+                              {firstLine || `Section ${i + 1}`}
+                            </span>
+                            <button
+                              onClick={() => improveSection(i)}
+                              disabled={improvingIdx === i}
+                              className="flex items-center gap-1 text-[10px] text-violet-600 hover:text-violet-700 font-medium flex-shrink-0 px-2 py-1 rounded hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors disabled:opacity-50"
+                            >
+                              {improvingIdx === i ? (
+                                <RefreshCw className="h-3 w-3 animate-spin" />
+                              ) : (
+                                <Sparkles className="h-3 w-3" />
+                              )}
+                              {improvingIdx === i ? 'Improving...' : 'Improve'}
+                            </button>
+                          </div>
+                          <div className="px-3 py-2 text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">
+                            {section.replace(/^#+[^\n]*\n/, '').slice(0, 120)}...
+                          </div>
+                        </div>
+                      );
+                    })}
+                  </div>
+
+                  {/* Full article preview */}
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1.5">Full Article (Markdown)</label>
+                    <textarea
+                      value={article}
+                      onChange={e => setArticle(e.target.value)}
+                      rows={12}
+                      className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-xs font-mono outline-none resize-none focus:ring-2 focus:ring-violet-500/30 transition-all"
+                    />
+                  </div>
+                </div>
+              )}
+
+              {/* Step 4: SEO */}
+              {step === 'seo' && seo && (
+                <div className="p-5 space-y-4">
+                  <div className="p-4 rounded-xl bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                    <p className="text-xs font-semibold text-emerald-700 dark:text-emerald-400 mb-3 flex items-center gap-1">
+                      <Target className="h-3.5 w-3.5" /> SEO Recommendations
+                    </p>
+                    <div className="space-y-3">
+                      <div>
+                        <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium mb-1">Meta Title ({seo.metaTitle.length}/60)</p>
+                        <p className="text-sm font-medium text-zinc-900 dark:text-white">{seo.metaTitle}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium mb-1">Meta Description ({seo.metaDescription.length}/160)</p>
+                        <p className="text-xs text-zinc-600 dark:text-zinc-400">{seo.metaDescription}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium mb-1">Focus Keyword</p>
+                        <p className="text-sm font-semibold text-violet-600 dark:text-violet-400">{seo.focusKeyword}</p>
+                      </div>
+                      <div>
+                        <p className="text-[10px] text-emerald-600 dark:text-emerald-500 font-medium mb-1">Keyword Usage</p>
+                        <p className="text-xs text-zinc-600 dark:text-zinc-400">{seo.keywordDensitySuggestion}</p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Footer actions */}
+            <div className="flex-shrink-0 border-t border-zinc-100 dark:border-zinc-800 px-5 py-4">
+              {loading ? (
+                <div className="flex items-center justify-center gap-2 py-2">
+                  <RefreshCw className="h-4 w-4 animate-spin text-violet-600" />
+                  <span className="text-sm text-zinc-500">{loadingMsg}</span>
+                </div>
+              ) : (
+                <div className="flex gap-2">
+                  {step === 'inputs' && (
+                    <Button onClick={generateOutline} className="flex-1" disabled={!topic.trim()}>
+                      <ListOrdered className="h-4 w-4" />
+                      Generate Outline
+                    </Button>
+                  )}
+                  {step === 'outline' && (
+                    <>
+                      <Button variant="outline" onClick={() => setStep('inputs')} className="flex-shrink-0">
+                        Back
+                      </Button>
+                      <Button onClick={generateArticle} className="flex-1" disabled={outline.length === 0}>
+                        <Sparkles className="h-4 w-4" />
+                        Write Full Article
+                      </Button>
+                    </>
+                  )}
+                  {step === 'article' && (
+                    <>
+                      <Button variant="outline" onClick={generateSeo} className="flex-shrink-0">
+                        <Target className="h-4 w-4" />
+                        SEO
+                      </Button>
+                      <Button onClick={handleInsert} className="flex-1">
+                        <ArrowDownToLine className="h-4 w-4" />
+                        Insert into Editor
+                      </Button>
+                    </>
+                  )}
+                  {step === 'seo' && (
+                    <>
+                      <Button variant="outline" onClick={() => setStep('article')} className="flex-shrink-0">
+                        Back
+                      </Button>
+                      <Button onClick={handleInsert} className="flex-1">
+                        <ArrowDownToLine className="h-4 w-4" />
+                        Insert into Editor
+                      </Button>
+                    </>
+                  )}
+                </div>
+              )}
+            </div>
+          </motion.div>
+        </>
+      )}
+    </AnimatePresence>
+  );
+}
+
 /* ─── Main Page ─────────────────────────────────────────────── */
 export default function BlogManagementPage() {
   const params = useParams();
@@ -278,6 +786,7 @@ export default function BlogManagementPage() {
   const [saving, setSaving] = useState(false);
   const [generating, setGenerating] = useState(false);
   const [tagInput, setTagInput] = useState('');
+  const [aiWriterOpen, setAiWriterOpen] = useState(false);
   const toast = useToast();
 
   const loadData = () => {
@@ -494,17 +1003,26 @@ export default function BlogManagementPage() {
               {counts.scheduled > 0 && ` · ${counts.scheduled} scheduled`}
             </p>
           </div>
-          <Button
-            onClick={() => {
-              setCreating(true);
-              setEditing(null);
-              setPreviewMode(false);
-              setShowSeoPreview(false);
-              setForm({ title: '', content: '', excerpt: '', category: '', status: 'draft', tags: '', scheduledDate: '', imageUrl: '', seoTitle: '', seoDesc: '' });
-            }}
-          >
-            <Plus className="h-4 w-4 mr-1" /> New Post
-          </Button>
+          <div className="flex items-center gap-2">
+            <Button
+              variant="outline"
+              onClick={() => setAiWriterOpen(true)}
+              className="hidden sm:flex"
+            >
+              <PenLine className="h-4 w-4 mr-1" /> AI Writer
+            </Button>
+            <Button
+              onClick={() => {
+                setCreating(true);
+                setEditing(null);
+                setPreviewMode(false);
+                setShowSeoPreview(false);
+                setForm({ title: '', content: '', excerpt: '', category: '', status: 'draft', tags: '', scheduledDate: '', imageUrl: '', seoTitle: '', seoDesc: '' });
+              }}
+            >
+              <Plus className="h-4 w-4 mr-1" /> New Post
+            </Button>
+          </div>
         </div>
 
         {/* Editor */}
@@ -845,6 +1363,33 @@ export default function BlogManagementPage() {
         )}
       </motion.div>
     </div>
+
+    {/* AI Blog Writer Drawer */}
+    <AiBlogWriterDrawer
+      open={aiWriterOpen}
+      onClose={() => setAiWriterOpen(false)}
+      onInsert={(content) => {
+        // Insert generated content into the editor
+        const lines = content.split('\n');
+        const titleLine = lines.find(l => l.startsWith('# '));
+        const title = titleLine ? titleLine.replace(/^#\s+/, '') : '';
+        const body = titleLine ? lines.filter(l => l !== titleLine).join('\n').trim() : content;
+        const excerpt = body.replace(/^#+[^\n]*\n/, '').replace(/\*\*/g, '').slice(0, 200).trim();
+
+        setCreating(true);
+        setEditing(null);
+        setPreviewMode(false);
+        setShowSeoPreview(false);
+        setForm(f => ({
+          ...f,
+          title: title || f.title,
+          content: body,
+          excerpt: excerpt,
+          status: 'draft',
+        }));
+      }}
+      brandId={brandId}
+    />
     </PageTransition>
   );
 }
