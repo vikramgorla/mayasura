@@ -183,56 +183,127 @@ export default function ContactPage() {
     </form>
   );
 
-  const renderSidebar = () => (
-    <div className="space-y-10">
-      {/* Map placeholder */}
-      <div>
-        <h3 className={sideH3} style={sideH3Style}>{tLabel(tid, 'Find Us', 'FIND US', 'Find Us')}</h3>
-        <div className="w-full overflow-hidden flex items-center justify-center"
-          style={{ aspectRatio: '16/10', backgroundColor: isDark ? '#111111' : `${tc}04`, borderRadius: cardR, border: isBold ? `2px solid ${tc}10` : undefined }}>
-          <div className="flex flex-col items-center gap-2 opacity-40">
-            <Icon d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z|M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0" color={tc} />
-            <span className="text-xs" style={{ color: `${tc}40` }}>Map location</span>
+  const renderSidebar = () => {
+    // Contact method cards with hover animations
+    const contactMethods = [
+      {
+        icon: 'M3 8l7.89 5.26a2 2 0 0 0 2.22 0L21 8M5 19h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2z',
+        label: 'Email Us',
+        value: `hello@${brand.name.toLowerCase().replace(/\s+/g, '')}.com`,
+        sublabel: 'We reply within 24 hours',
+        color: '#6366F1',
+      },
+      {
+        icon: 'M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07A19.5 19.5 0 0 1 4.15 12a19.79 19.79 0 0 1-3-8.59A2 2 0 0 1 3.08 2h3a2 2 0 0 1 2 1.72c.127.96.361 1.903.7 2.81a2 2 0 0 1-.45 2.11L7.91 9.91a16 16 0 0 0 6.18 6.18l1.27-1.27a2 2 0 0 1 2.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0 1 22 16.92z',
+        label: 'Call Us',
+        value: '+1 (555) 000-0000',
+        sublabel: 'Mon–Fri, 9am–6pm',
+        color: '#10B981',
+      },
+    ];
+
+    return (
+      <div className="space-y-8">
+        {/* Contact method hover cards */}
+        <div>
+          <h3 className={sideH3} style={sideH3Style}>{tLabel(tid, 'Get in Touch', 'GET IN TOUCH', 'Get in Touch')}</h3>
+          <div className="space-y-3">
+            {contactMethods.map((method, i) => (
+              <motion.div
+                key={method.label}
+                initial={{ opacity: 0, x: -10 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: i * 0.1, duration: 0.4 }}
+                className="group flex items-start gap-4 p-4 rounded-lg cursor-default transition-all"
+                style={{
+                  backgroundColor: isDark ? '#FFFFFF04' : `${tc}03`,
+                  border: `1px solid ${isDark ? '#FFFFFF08' : `${tc}06`}`,
+                  borderRadius: cardR,
+                }}
+                whileHover={{
+                  backgroundColor: isDark ? '#FFFFFF08' : `${method.color}08`,
+                  borderColor: `${method.color}30`,
+                  y: -2,
+                }}
+              >
+                <div
+                  className="flex-shrink-0 w-10 h-10 flex items-center justify-center rounded-lg"
+                  style={{ backgroundColor: `${method.color}12`, color: method.color }}
+                >
+                  <svg width={18} height={18} viewBox="0 0 24 24" fill="none" stroke={method.color} strokeWidth={1.5} strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                    <path d={method.icon} />
+                  </svg>
+                </div>
+                <div>
+                  <p className="text-xs font-semibold uppercase tracking-wider mb-0.5" style={{ color: `${tc}50` }}>{method.label}</p>
+                  <p className="text-sm font-medium" style={{ color: tc }}>{method.value}</p>
+                  <p className="text-xs mt-0.5" style={{ color: `${tc}40` }}>{method.sublabel}</p>
+                </div>
+              </motion.div>
+            ))}
           </div>
         </div>
-      </div>
-      {/* Business hours */}
-      <div>
-        <h3 className={sideH3} style={sideH3Style}>{tLabel(tid, 'Business Hours', 'BUSINESS HOURS', 'Business Hours')}</h3>
-        <div className="space-y-2.5">
-          {hours.map(h => (
-            <div key={h.day} className="flex items-center justify-between text-sm gap-4">
-              <span className="flex items-center gap-2" style={{ color: `${tc}55` }}>
-                <Icon d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20|M12 6v6l4 2" color={`${tc}30`} />
-                {h.day}
-              </span>
-              <span style={{ color: h.hours === 'Closed' ? `${tc}30` : `${tc}70`, fontWeight: isBold ? 600 : 400 }}>{h.hours}</span>
+
+        {/* Map placeholder */}
+        <div>
+          <h3 className={sideH3} style={sideH3Style}>{tLabel(tid, 'Find Us', 'FIND US', 'Find Us')}</h3>
+          <div className="w-full overflow-hidden flex items-center justify-center"
+            style={{ aspectRatio: '16/10', backgroundColor: isDark ? '#111111' : `${tc}04`, borderRadius: cardR, border: isBold ? `2px solid ${tc}10` : undefined }}>
+            <div className="flex flex-col items-center gap-2 opacity-40">
+              <Icon d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z|M12 10m-3 0a3 3 0 1 0 6 0a3 3 0 1 0-6 0" color={tc} />
+              <span className="text-xs" style={{ color: `${tc}40` }}>Map location</span>
             </div>
-          ))}
+          </div>
+        </div>
+
+        {/* Business hours */}
+        <div>
+          <h3 className={sideH3} style={sideH3Style}>{tLabel(tid, 'Business Hours', 'BUSINESS HOURS', 'Business Hours')}</h3>
+          <div className="space-y-2.5">
+            {hours.map(h => (
+              <div key={h.day} className="flex items-center justify-between text-sm gap-4">
+                <span className="flex items-center gap-2" style={{ color: `${tc}55` }}>
+                  <Icon d="M12 2a10 10 0 1 0 0 20a10 10 0 1 0 0-20|M12 6v6l4 2" color={`${tc}30`} />
+                  {h.day}
+                </span>
+                <span style={{ color: h.hours === 'Closed' ? `${tc}30` : `${tc}70`, fontWeight: isBold ? 600 : 400 }}>{h.hours}</span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Social */}
+        <div>
+          <h3 className={sideH3} style={sideH3Style}>{tLabel(tid, 'Follow Us', 'FOLLOW US', 'Follow Us')}</h3>
+          <div className="flex gap-3">
+            {socials.map(s => (
+              <motion.button
+                key={s}
+                className="w-10 h-10 flex items-center justify-center transition-all"
+                style={{ backgroundColor: isDark ? '#FFFFFF08' : `${tc}06`, borderRadius: isBold ? '0' : tid === 'playful' ? '12px' : '8px',
+                  border: isBold ? `1px solid ${tc}12` : undefined }}
+                aria-label={`Follow on ${s}`}
+                title={`Follow on ${s}`}
+                whileHover={{ scale: 1.1, backgroundColor: `${ac}15` }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <SocialIcon type={s} color={`${tc}50`} />
+              </motion.button>
+            ))}
+          </div>
+        </div>
+
+        {/* Chat link */}
+        <div>
+          <h3 className={sideH3} style={sideH3Style}>{tLabel(tid, 'Quick Chat', 'QUICK CHAT', 'Quick Chat')}</h3>
+          <Link href={`/chat/${slug}`} className="text-sm font-medium transition-opacity hover:opacity-60" style={{ color: ac }}>
+            {tLabel(tid, 'Chat with us →', 'CHAT WITH US →', 'Talk to our AI assistant 🤖')}
+          </Link>
         </div>
       </div>
-      {/* Social */}
-      <div>
-        <h3 className={sideH3} style={sideH3Style}>{tLabel(tid, 'Follow Us', 'FOLLOW US', 'Follow Us')}</h3>
-        <div className="flex gap-3">
-          {socials.map(s => (
-            <button key={s} className="w-10 h-10 flex items-center justify-center transition-opacity hover:opacity-60"
-              style={{ backgroundColor: isDark ? '#FFFFFF08' : `${tc}06`, borderRadius: isBold ? '0' : tid === 'playful' ? '12px' : '8px',
-                border: isBold ? `1px solid ${tc}12` : undefined }} aria-label={s} title={s}>
-              <SocialIcon type={s} color={`${tc}50`} />
-            </button>
-          ))}
-        </div>
-      </div>
-      {/* Chat link */}
-      <div>
-        <h3 className={sideH3} style={sideH3Style}>{tLabel(tid, 'Quick Chat', 'QUICK CHAT', 'Quick Chat')}</h3>
-        <Link href={`/chat/${slug}`} className="text-sm font-medium transition-opacity hover:opacity-60" style={{ color: ac }}>
-          {tLabel(tid, 'Chat with us →', 'CHAT WITH US →', 'Talk to our AI assistant 🤖')}
-        </Link>
-      </div>
-    </div>
-  );
+    );
+  };
 
   /* ═══════ SUCCESS ═══════ */
   if (sent) return (
