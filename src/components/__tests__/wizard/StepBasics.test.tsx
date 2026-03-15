@@ -58,15 +58,12 @@ describe('StepBasics', () => {
   });
 
   it('calls updateData when industry changes', async () => {
-    const user = userEvent.setup();
     renderStep({ industry: '' });
     const input = screen.getByPlaceholderText(/Restaurant, Fashion, SaaS/i);
-    await user.click(input);
-    await user.type(input, 'Fashion');
-    // updateData should be called for each keystroke
-    expect(mockUpdateData).toHaveBeenCalled();
-    const lastCall = mockUpdateData.mock.calls[mockUpdateData.mock.calls.length - 1][0];
-    expect(lastCall).toHaveProperty('industry');
+    // Use fireEvent since the autocomplete combobox input uses onChange directly
+    const { fireEvent } = await import('@testing-library/react');
+    fireEvent.change(input, { target: { value: 'Fashion' } });
+    expect(mockUpdateData).toHaveBeenCalledWith({ industry: 'Fashion' });
   });
 
   it('calls updateData when brand name changes', async () => {
