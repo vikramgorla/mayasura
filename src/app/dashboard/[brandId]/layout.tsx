@@ -2,7 +2,7 @@
 
 import { useEffect, useState, lazy, Suspense } from 'react';
 import Link from 'next/link';
-import { usePathname, useParams } from 'next/navigation';
+import { usePathname, useParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   LayoutDashboard, Globe, MessageSquare, Package, FileText,
@@ -54,6 +54,23 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
   const toast = useToast();
   const shortcuts = useKeyboardShortcutsModal();
   const whatsNew = useWhatsNew();
+  const router = useRouter();
+
+  // Prefetch critical routes after initial render
+  useEffect(() => {
+    if (!brandId) return;
+    const criticalRoutes = [
+      `/dashboard/${brandId}/products`,
+      `/dashboard/${brandId}/orders`,
+      `/dashboard/${brandId}/settings`,
+    ];
+    const timer = setTimeout(() => {
+      criticalRoutes.forEach((route) => {
+        try { router.prefetch(route); } catch { /* best-effort */ }
+      });
+    }, 2000);
+    return () => clearTimeout(timer);
+  }, [brandId, router]);
 
   useEffect(() => {
     fetch(`/api/brands/${brandId}`)

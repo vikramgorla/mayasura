@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from '../../layout';
 import { ProductMeta, BreadcrumbMeta } from '@/components/site/site-meta';
@@ -134,12 +135,9 @@ function ImageGallery({
       >
         <AnimatePresence mode="wait">
           {images.length > 0 ? (
-            <motion.img
+            <motion.div
               key={activeImage}
-              src={images[activeImage]}
-              alt={productName}
-              loading="eager"
-              className="w-full h-full object-cover"
+              className="w-full h-full"
               initial={{ opacity: 0, scale: 1.04 }}
               animate={{
                 opacity: 1,
@@ -148,7 +146,16 @@ function ImageGallery({
               }}
               exit={{ opacity: 0, scale: 0.97 }}
               transition={{ duration: 0.35 }}
-            />
+            >
+              <Image
+                src={images[activeImage]}
+                alt={productName}
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+                priority
+              />
+            </motion.div>
           ) : (
             <motion.div
               key="placeholder"
@@ -184,7 +191,7 @@ function ImageGallery({
             <motion.button
               key={i}
               onClick={() => setActiveImage(i)}
-              className="h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0 overflow-hidden transition-all"
+              className="h-16 w-16 sm:h-20 sm:w-20 flex-shrink-0 overflow-hidden transition-all relative"
               style={{
                 borderRadius: templateId === 'playful' ? '12px' : templateId === 'classic' ? '8px' : '0',
                 border: `${i === activeImage ? '2' : '1'}px solid ${i === activeImage ? accentColor : `${textColor}10`}`,
@@ -193,7 +200,15 @@ function ImageGallery({
               whileHover={{ opacity: 0.85, scale: 1.04 }}
               whileTap={{ scale: 0.92 }}
             >
-              <img src={img} alt={`${productName} view ${i + 1}`} className="w-full h-full object-cover" />
+              <Image
+                src={img}
+                alt={`${productName} view ${i + 1}`}
+                fill
+                sizes="80px"
+                className="object-cover"
+                loading="lazy"
+                decoding="async"
+              />
             </motion.button>
           ))}
         </div>
@@ -388,10 +403,18 @@ function StickyAddToCartBar({
               {/* Product thumb */}
               {product.image_url && (
                 <div
-                  className="h-12 w-12 flex-shrink-0 overflow-hidden rounded"
+                  className="h-12 w-12 flex-shrink-0 overflow-hidden rounded relative"
                   style={{ backgroundColor: isDark ? '#222' : `${textColor}06` }}
                 >
-                  <img src={product.image_url} alt="" className="h-full w-full object-cover" />
+                  <Image
+                    src={product.image_url}
+                    alt=""
+                    fill
+                    sizes="48px"
+                    className="object-cover"
+                    loading="lazy"
+                    decoding="async"
+                  />
                 </div>
               )}
               <div className="flex-1 min-w-0">
@@ -849,11 +872,14 @@ export default function ProductDetailPage() {
                       }}
                     >
                       {p.image_url ? (
-                        <img
+                        <Image
                           src={p.image_url}
                           alt={p.name}
+                          fill
+                          sizes="(max-width: 640px) 160px, 200px"
+                          className="object-cover transition-transform duration-500 group-hover:scale-110"
                           loading="lazy"
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                          decoding="async"
                         />
                       ) : (
                         <svg className="w-8 h-8" style={{ color: `${textColor}08` }} fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1}>

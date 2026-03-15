@@ -2,10 +2,12 @@
 
 import { useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from './layout';
 import { ShopMeta, BreadcrumbMeta } from '@/components/site/site-meta';
 import { getBaseUrl } from '@/lib/seo';
+import { usePrefetch } from '@/lib/use-prefetch';
 
 function getProductBadge(product: { name: string; price?: number | null; created_at?: string }, index: number): { label: string; type: 'new' | 'sale' | 'best' } | null {
   // Simple heuristic: first 2 products = "Best Seller", next 2 = "New", products with low price = "Sale"
@@ -18,6 +20,12 @@ function getProductBadge(product: { name: string; price?: number | null; created
 export default function ShopPage() {
   const shop = useShop();
   const [filter, setFilter] = useState<string>('all');
+
+  // Prefetch the first 4 product detail pages for instant navigation
+  const prefetchRoutes = shop
+    ? shop.products.slice(0, 4).map((p) => `/shop/${shop.brand.slug || shop.brand.id}/product/${p.id}`)
+    : [];
+  usePrefetch(prefetchRoutes);
 
   if (!shop) return null;
   const { brand, products, addToCart, websiteTemplate: template } = shop;
@@ -313,10 +321,14 @@ export default function ShopPage() {
                           )}
 
                           {product.image_url ? (
-                            <img
+                            <Image
                               src={product.image_url}
                               alt={product.name}
-                              className="w-full h-full object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                              fill
+                              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
+                              className="object-cover transition-transform duration-700 ease-out group-hover:scale-110"
+                              loading="lazy"
+                              decoding="async"
                             />
                           ) : (
                             <div className="w-full h-full flex items-center justify-center">
