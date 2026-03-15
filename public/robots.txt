@@ -1,0 +1,17 @@
+# Mayasura — robots.txt
+# https://mayasura.app
+
+User-agent: *
+Allow: /
+
+# Disallow admin/dashboard pages
+Disallow: /dashboard/
+Disallow: /api/
+Disallow: /auth/
+
+# Allow public API routes that serve content
+Allow: /api/sitemap
+Allow: /api/public/
+
+# Sitemap
+Sitemap: /api/sitemap

@@ -11,9 +11,8 @@ import {
   SPACING_MAP,
   BORDER_RADIUS_MAP,
 } from '@/lib/design-settings';
-import { SeoHead } from '@/components/seo/seo-head';
 import { JsonLd } from '@/components/seo/json-ld';
-import { getBaseUrl, organizationJsonLd, breadcrumbJsonLd } from '@/lib/seo';
+import { breadcrumbJsonLd, getBaseUrl } from '@/lib/seo';
 
 // ─── Template-specific animation variants ────────────────────────
 import type { Variants } from 'framer-motion';
@@ -936,14 +935,6 @@ export default function BrandHomePage() {
 
   return (
     <>
-      <SeoHead
-        title={`${brand.name} — ${brand.tagline || brand.description || 'Welcome'}`}
-        description={brand.description || brand.tagline || `Welcome to ${brand.name}`}
-        canonicalUrl={canonicalUrl}
-        ogImage={brand.logo_url}
-        siteName={brand.name}
-      />
-      <JsonLd data={organizationJsonLd(brand)} />
       <JsonLd data={breadcrumbJsonLd([
         { name: 'Home', url: canonicalUrl },
       ])} />
