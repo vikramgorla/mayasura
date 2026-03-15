@@ -90,12 +90,17 @@ export const orders = sqliteTable(
       .references(() => brands.id, { onDelete: "cascade" }),
     customerEmail: text("customer_email").notNull(),
     customerName: text("customer_name").notNull(),
+    customerPhone: text("customer_phone"),
     shippingAddress: text("shipping_address"),
     items: text("items"), // JSON
+    subtotal: real("subtotal").notNull(),
+    discountCode: text("discount_code"),
+    discountAmount: real("discount_amount").default(0),
     total: real("total").notNull(),
     currency: text("currency").notNull().default("USD"),
     status: text("status").notNull().default("pending"),
     createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+    updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     index("orders_brand_id_idx").on(table.brandId),
@@ -139,9 +144,12 @@ export const blogPosts = sqliteTable(
     excerpt: text("excerpt"),
     category: text("category"),
     tags: text("tags"), // JSON array
+    seoTitle: text("seo_title"),
+    seoDescription: text("seo_description"),
     status: text("status").notNull().default("draft"),
     publishedAt: text("published_at"),
     createdAt: text("created_at").notNull().default(sql`(datetime('now'))`),
+    updatedAt: text("updated_at").notNull().default(sql`(datetime('now'))`),
   },
   (table) => [
     uniqueIndex("blog_posts_brand_slug_idx").on(table.brandId, table.slug),

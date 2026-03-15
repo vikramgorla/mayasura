@@ -1,0 +1,11 @@
+export { LandingNav } from "./nav";
+export { Hero } from "./hero";
+export { StatsBar } from "./stats-bar";
+export { Features } from "./features";
+export { HowItWorks } from "./how-it-works";
+export { TemplateShowcase } from "./template-showcase";
+export { DeploySection } from "./deploy-section";
+export { BuiltForBrands } from "./built-for-brands";
+export { FAQ } from "./faq";
+export { FinalCTA } from "./final-cta";
+export { Footer } from "./footer";
