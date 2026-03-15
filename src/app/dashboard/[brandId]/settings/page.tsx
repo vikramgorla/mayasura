@@ -438,6 +438,7 @@ function IntegrationsTab({ brandId, settings: initialSettings }: { brandId: stri
   const [settings, setSettings] = useState<Record<string, string>>(initialSettings);
   const [saving, setSaving] = useState<string | null>(null);
   const [copied, setCopied] = useState<string | null>(null);
+  const [showApiKey, setShowApiKey] = useState(false);
   const toast = useToast();
 
   const saveSetting = async (key: string, value: string) => {
@@ -523,8 +524,51 @@ function IntegrationsTab({ brandId, settings: initialSettings }: { brandId: stri
     </div>
   );
 
+  // Generate a deterministic brand API key for display purposes
+  const brandApiKey = `msk_${brandId.slice(0, 8)}_${'x'.repeat(32)}`;
+  const maskedKey = `msk_${brandId.slice(0, 8)}_${'•'.repeat(20)}`;
+
   return (
     <div className="space-y-6">
+      {/* Brand API Key */}
+      <Card className="border-violet-200/50 dark:border-violet-800/30 bg-gradient-to-br from-violet-50/30 to-white dark:from-violet-950/10 dark:to-zinc-900">
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Key className="h-4 w-4 text-violet-600" />
+            Brand API Key
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-zinc-500 dark:text-zinc-400">
+            Use this key to authenticate API requests for this brand. Keep it secret — treat it like a password.
+          </p>
+          <div className="flex items-center gap-2">
+            <div className="flex-1 flex items-center gap-2 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 font-mono text-xs text-zinc-700 dark:text-zinc-300 overflow-hidden">
+              <span className="truncate">{showApiKey ? brandApiKey : maskedKey}</span>
+            </div>
+            <button
+              onClick={() => setShowApiKey(v => !v)}
+              className="px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-500 hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors whitespace-nowrap"
+            >
+              {showApiKey ? 'Hide' : 'Reveal'}
+            </button>
+            <button
+              onClick={() => copyText(brandApiKey, 'api-key')}
+              className="p-2 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 text-zinc-500 transition-colors"
+              title="Copy API key"
+            >
+              {copied === 'api-key' ? <Check className="h-4 w-4 text-emerald-500" /> : <Copy className="h-4 w-4" />}
+            </button>
+          </div>
+          <div className="flex items-start gap-2 p-3 rounded-lg bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/40">
+            <AlertTriangle className="h-3.5 w-3.5 text-amber-500 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700 dark:text-amber-400">
+              API access is in preview. Full REST API documentation coming soon.
+            </p>
+          </div>
+        </CardContent>
+      </Card>
+
       {/* Stripe */}
       <IntegrationSection title="Stripe Payments" icon={<div className="h-4 w-4 bg-violet-600 rounded text-white text-[8px] flex items-center justify-center font-bold">S</div>}>
         <SettingField settingKey="stripe_publishable_key" label="Publishable Key" placeholder="pk_test_..." />
@@ -617,6 +661,59 @@ function IntegrationsTab({ brandId, settings: initialSettings }: { brandId: stri
         <SettingField settingKey="webhook_contact_new" label="New Contact Submission" placeholder="https://your-server.com/webhooks/contact" />
         <SettingField settingKey="webhook_newsletter_subscribe" label="Newsletter Subscribe" placeholder="https://your-server.com/webhooks/newsletter" />
       </IntegrationSection>
+
+      {/* Coming Soon integrations */}
+      <div>
+        <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wide mb-3">Coming Soon</p>
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+          {[
+            {
+              name: 'Mailchimp',
+              desc: 'Sync subscribers & email campaigns',
+              color: 'bg-amber-50 dark:bg-amber-900/10 border-amber-200 dark:border-amber-800/40',
+              icon: (
+                <div className="h-8 w-8 rounded-lg bg-amber-500 flex items-center justify-center text-white font-bold text-xs">M</div>
+              ),
+            },
+            {
+              name: 'Zapier',
+              desc: 'Connect to 5,000+ apps',
+              color: 'bg-orange-50 dark:bg-orange-900/10 border-orange-200 dark:border-orange-800/40',
+              icon: (
+                <div className="h-8 w-8 rounded-lg bg-orange-500 flex items-center justify-center text-white font-bold text-xs">Z</div>
+              ),
+            },
+            {
+              name: 'Klaviyo',
+              desc: 'Advanced email marketing & SMS',
+              color: 'bg-emerald-50 dark:bg-emerald-900/10 border-emerald-200 dark:border-emerald-800/40',
+              icon: (
+                <div className="h-8 w-8 rounded-lg bg-emerald-600 flex items-center justify-center text-white font-bold text-xs">K</div>
+              ),
+            },
+          ].map((integration) => (
+            <motion.div
+              key={integration.name}
+              whileHover={{ scale: 1.02, y: -2 }}
+              transition={{ type: 'spring', stiffness: 400, damping: 25 }}
+              className={`relative p-4 rounded-xl border ${integration.color} opacity-70 cursor-not-allowed`}
+            >
+              <div className="absolute top-2 right-2">
+                <span className="text-[10px] font-semibold px-1.5 py-0.5 rounded-full bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400 border border-zinc-200 dark:border-zinc-700">
+                  Soon
+                </span>
+              </div>
+              <div className="flex items-center gap-3">
+                {integration.icon}
+                <div>
+                  <p className="text-sm font-semibold text-zinc-700 dark:text-zinc-300">{integration.name}</p>
+                  <p className="text-xs text-zinc-400 mt-0.5">{integration.desc}</p>
+                </div>
+              </div>
+            </motion.div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
