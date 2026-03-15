@@ -321,9 +321,15 @@ h4, h5, h6 {
   }
 }
 
-/* Smooth scrolling globally */
+/* Smooth scrolling globally — respect reduced motion preference */
 html {
   scroll-behavior: smooth;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
 }
 
 /* Fix horizontal overflow at small viewports */

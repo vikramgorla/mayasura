@@ -137,6 +137,7 @@ export default function OrdersPage() {
             icon={ShoppingBag}
             title="No orders yet"
             description="Share your store to start receiving orders"
+            illustration="orders"
             action={brand?.slug ? {
               label: 'View Store',
               href: `/shop/${brand.slug}`,
