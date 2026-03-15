@@ -8,6 +8,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
+import { AnimatedCounter, ScrollReveal } from '@/components/site/hero-animations';
 import type { Brand } from '@/lib/types';
 import type { WebsiteTemplate } from '@/lib/website-templates';
 import type {
@@ -38,7 +39,7 @@ interface SectionProps {
   blogPosts?: Array<{ id: string; title: string; slug: string; excerpt: string | null; category: string | null; published_at: string }>;
 }
 
-// ─── Testimonials Section ────────────────────────────────────────
+// ─── Testimonials Section (scroll-triggered) ────────────────────
 function TestimonialsSection({ section, brand, template }: { section: PageSection } & SectionProps) {
   const config = section.config as TestimonialsConfig;
   const templateId = template?.id || 'minimal';
@@ -51,17 +52,19 @@ function TestimonialsSection({ section, brand, template }: { section: PageSectio
   return (
     <section className="t-section">
       <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
-        <h2
-          className="t-section-heading mb-8 text-center"
-          style={{
-            fontFamily: brand.font_heading,
-            fontWeight: tp?.typography.headingWeight || '600',
-            letterSpacing: tp?.typography.headingTracking,
-            color: textColor,
-          }}
-        >
-          {templateId === 'bold' ? 'TESTIMONIALS' : templateId === 'playful' ? 'What People Say 💬' : 'What People Say'}
-        </h2>
+        <ScrollReveal>
+          <h2
+            className="t-section-heading mb-8 text-center"
+            style={{
+              fontFamily: brand.font_heading,
+              fontWeight: tp?.typography.headingWeight || '600',
+              letterSpacing: tp?.typography.headingTracking,
+              color: textColor,
+            }}
+          >
+            {templateId === 'bold' ? 'TESTIMONIALS' : templateId === 'playful' ? 'What People Say 💬' : 'What People Say'}
+          </h2>
+        </ScrollReveal>
         <div className={`grid grid-cols-1 md:grid-cols-${Math.min(config.items.length, 3)} gap-6 max-w-4xl mx-auto`}>
           {config.items.map((item, i) => (
             <div
@@ -92,7 +95,7 @@ function TestimonialsSection({ section, brand, template }: { section: PageSectio
   );
 }
 
-// ─── Stats Section ───────────────────────────────────────────────
+// ─── Stats Section (animated counters) ───────────────────────────
 function StatsSection({ section, brand, template }: { section: PageSection } & SectionProps) {
   const config = section.config as StatsConfig;
   const templateId = template?.id || 'minimal';
@@ -101,28 +104,51 @@ function StatsSection({ section, brand, template }: { section: PageSection } & S
   const accentColor = brand.accent_color || textColor;
   const tp = template?.preview;
 
+  // Try to parse numeric values for animated counters
+  const parseStatNumber = (numStr: string): { value: number; prefix: string; suffix: string } | null => {
+    const match = numStr.match(/^([^0-9]*)(\d[\d,.]*)([^0-9]*)$/);
+    if (!match) return null;
+    const value = parseFloat(match[2].replace(/,/g, ''));
+    if (isNaN(value)) return null;
+    return { value, prefix: match[1], suffix: match[3] };
+  };
+
   return (
     <section className="t-section">
       <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
-        <div className={`grid grid-cols-2 md:grid-cols-${Math.min(config.items.length, 4)} gap-8 text-center`}>
-          {config.items.map((item, i) => (
-            <div key={i}>
-              <p
-                className="text-3xl sm:text-4xl font-bold mb-1"
-                style={{
-                  fontFamily: brand.font_heading,
-                  color: accentColor,
-                  fontWeight: tp?.typography.headingWeight || '700',
-                }}
-              >
-                {item.number}
-              </p>
-              <p className="text-sm" style={{ color: `${textColor}50` }}>
-                {item.label}
-              </p>
-            </div>
-          ))}
-        </div>
+        <ScrollReveal>
+          <div className={`grid grid-cols-2 md:grid-cols-${Math.min(config.items.length, 4)} gap-8 text-center`}>
+            {config.items.map((item, i) => {
+              const parsed = parseStatNumber(item.number);
+              return (
+                <div key={i}>
+                  <p
+                    className="text-3xl sm:text-4xl font-bold mb-1"
+                    style={{
+                      fontFamily: brand.font_heading,
+                      color: accentColor,
+                      fontWeight: tp?.typography.headingWeight || '700',
+                    }}
+                  >
+                    {parsed ? (
+                      <AnimatedCounter
+                        end={parsed.value}
+                        prefix={parsed.prefix}
+                        suffix={parsed.suffix}
+                        duration={1800}
+                      />
+                    ) : (
+                      item.number
+                    )}
+                  </p>
+                  <p className="text-sm" style={{ color: `${textColor}50` }}>
+                    {item.label}
+                  </p>
+                </div>
+              );
+            })}
+          </div>
+        </ScrollReveal>
       </div>
     </section>
   );

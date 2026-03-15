@@ -1,7 +1,8 @@
 'use client';
 
 import Link from 'next/link';
-import { motion } from 'framer-motion';
+import { motion, useInView } from 'framer-motion';
+import { useRef } from 'react';
 import { useBrandSite, BrandPlaceholder } from './layout';
 import { LayoutSections } from '@/components/site/section-renderer';
 import { getDefaultLayout } from '@/lib/page-layout';
@@ -13,41 +14,53 @@ import {
 } from '@/lib/design-settings';
 import { JsonLd } from '@/components/seo/json-ld';
 import { breadcrumbJsonLd, getBaseUrl } from '@/lib/seo';
+import {
+  Typewriter,
+  ParallaxImage,
+  FloatingOrbs,
+  ScrollReveal,
+  BoldTextReveal,
+  BouncyReveal,
+  ConfettiParticles,
+  ElegantFade,
+  SubtleScaleFade,
+  SlideFromSide,
+} from '@/components/site/hero-animations';
 
 // ─── Template-specific animation variants ────────────────────────
 import type { Variants } from 'framer-motion';
 
 const heroAnimations: Record<string, { container: Variants; item: Variants }> = {
   minimal: {
-    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.1 } } },
-    item: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.8 } } },
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.15, delayChildren: 0.2 } } },
+    item: { hidden: { opacity: 0, scale: 0.97 }, show: { opacity: 1, scale: 1, transition: { duration: 1, ease: [0.25, 0.1, 0.25, 1] } } },
   },
   bold: {
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.08, delayChildren: 0.05 } } },
-    item: { hidden: { opacity: 0, y: 60 }, show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.33, 1, 0.68, 1] as const } } },
+    item: { hidden: { opacity: 0, y: 80 }, show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.33, 1, 0.68, 1] as const } } },
   },
   editorial: {
-    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } } },
-    item: { hidden: { opacity: 0, x: -20 }, show: { opacity: 1, x: 0, transition: { duration: 0.6 } } },
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.15 } } },
+    item: { hidden: { opacity: 0, x: -30 }, show: { opacity: 1, x: 0, transition: { duration: 0.7, ease: [0.25, 0.46, 0.45, 0.94] } } },
   },
   playful: {
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.1, delayChildren: 0.1 } } },
-    item: { hidden: { opacity: 0, y: 20, scale: 0.95 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.5, type: 'spring', stiffness: 200, damping: 20 } } },
+    item: { hidden: { opacity: 0, y: 30, scale: 0.9 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.6, type: 'spring', stiffness: 150, damping: 15 } } },
   },
   classic: {
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.12, delayChildren: 0.15 } } },
-    item: { hidden: { opacity: 0, y: 10 }, show: { opacity: 1, y: 0, transition: { duration: 0.7 } } },
+    item: { hidden: { opacity: 0, y: 15 }, show: { opacity: 1, y: 0, transition: { duration: 0.9, ease: [0.25, 0.1, 0.25, 1] } } },
   },
 };
 
 const scrollStagger: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { staggerChildren: 0.1 } },
+  visible: { opacity: 1, transition: { staggerChildren: 0.12 } },
 };
 
 const scrollItem: Variants = {
-  hidden: { opacity: 0, y: 20 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
+  hidden: { opacity: 0, y: 24 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.46, 0.45, 0.94] } },
 };
 
 function getHeroAnim(templateId: string) {
@@ -89,11 +102,12 @@ export default function BrandHomePage() {
   const renderHero = () => {
     const anim = getHeroAnim(templateId);
 
-    // MINIMAL — Massive whitespace, light-weight typography
+    // MINIMAL — Massive whitespace, light-weight typography, subtle scale-fade + floating orb
     if (templateId === 'minimal') {
       return (
-        <section className="t-hero">
-          <div className="max-w-6xl mx-auto px-5 sm:px-8">
+        <section className="t-hero relative">
+          <FloatingOrbs color1={textColor} templateId="minimal" />
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 relative z-10">
             <motion.div className="max-w-3xl" variants={anim.container} initial="hidden" animate="show">
               {brand.industry && (
                 <motion.span variants={anim.item} className="text-xs font-normal uppercase tracking-[0.2em] mb-8 block" style={{ color: `${textColor}25` }}>
@@ -122,65 +136,116 @@ export default function BrandHomePage() {
       );
     }
 
-    // EDITORIAL — Split layout with image
+    // EDITORIAL — Split layout with typewriter heading, parallax image, floating orbs
     if (templateId === 'editorial') {
       return (
-        <section className="t-hero">
-          <div className="max-w-6xl mx-auto px-5 sm:px-8">
+        <section className="t-hero relative">
+          <FloatingOrbs color1={textColor} templateId="editorial" />
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 relative z-10">
             <div className="t-hero-split">
-              <div>
-                {brand.industry && (
-                  <span className="text-xs font-medium uppercase tracking-[0.15em] mb-6 block" style={{ color: accentColor }}>
-                    {brand.industry}
-                  </span>
-                )}
-                <h1 className="t-hero-heading mb-6" style={headingStyle}>
-                  {brand.tagline || brand.name}
-                </h1>
-                <p className="t-hero-desc" style={{ color: `${textColor}50` }}>
-                  {brand.description || `Welcome to ${brand.name}.`}
-                </p>
-                <div className="flex flex-wrap gap-4 mt-10">
-                  {channels.includes('ecommerce') && (
-                    <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: textColor, color: bgColor }}>
-                      Shop Now
-                    </Link>
+              <SlideFromSide side="left" delay={0.1}>
+                <div>
+                  {brand.industry && (
+                    <motion.span
+                      initial={{ opacity: 0, x: -10 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ duration: 0.5, delay: 0.2 }}
+                      className="text-xs font-medium uppercase tracking-[0.15em] mb-6 block"
+                      style={{ color: accentColor }}
+                    >
+                      {brand.industry}
+                    </motion.span>
                   )}
-                  <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
-                    Our Story
-                  </Link>
+                  <h1 className="t-hero-heading mb-6" style={headingStyle}>
+                    <Typewriter
+                      text={brand.tagline || brand.name}
+                      speed={35}
+                      delay={400}
+                      style={headingStyle}
+                    />
+                  </h1>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ duration: 0.6, delay: 1.5 }}
+                    className="t-hero-desc"
+                    style={{ color: `${textColor}50` }}
+                  >
+                    {brand.description || `Welcome to ${brand.name}.`}
+                  </motion.p>
+                  <motion.div
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.5, delay: 1.8 }}
+                    className="flex flex-wrap gap-4 mt-10"
+                  >
+                    {channels.includes('ecommerce') && (
+                      <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: textColor, color: bgColor }}>
+                        Shop Now
+                      </Link>
+                    )}
+                    <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
+                      Our Story
+                    </Link>
+                  </motion.div>
                 </div>
-              </div>
-              <div className="t-hero-image flex items-center justify-center" style={{ backgroundColor: `${textColor}04` }}>
-                {brand.logo_url ? (
-                  <img src={brand.logo_url} alt={brand.name} className="max-w-[60%] max-h-[60%] object-contain" />
-                ) : (
-                  <BrandPlaceholder color={textColor} className="w-full h-full" variant="hero" />
-                )}
-              </div>
+              </SlideFromSide>
+              <SlideFromSide side="right" delay={0.3}>
+                <ParallaxImage
+                  className="t-hero-image flex items-center justify-center"
+                  style={{ backgroundColor: `${textColor}04` }}
+                  speed={0.15}
+                >
+                  {brand.logo_url ? (
+                    <img src={brand.logo_url} alt={brand.name} className="max-w-[60%] max-h-[60%] object-contain relative z-10" />
+                  ) : (
+                    <BrandPlaceholder color={textColor} className="w-full h-full relative z-10" variant="hero" />
+                  )}
+                </ParallaxImage>
+              </SlideFromSide>
             </div>
           </div>
         </section>
       );
     }
 
-    // BOLD — Massive viewport-filling heading with dramatic slide-up
+    // BOLD — Massive viewport-filling heading with dramatic slide-up + text reveal
     if (templateId === 'bold') {
       return (
-        <section className="t-hero" style={{ backgroundColor: '#000000' }}>
+        <section className="t-hero relative overflow-hidden" style={{ backgroundColor: '#000000' }}>
+          {/* Dramatic gradient accent line at top */}
+          <motion.div
+            className="absolute top-0 left-0 right-0 h-[2px]"
+            style={{ background: `linear-gradient(90deg, transparent, ${accentColor}, transparent)` }}
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1.2, ease: [0.33, 1, 0.68, 1] }}
+          />
           <div className="max-w-7xl mx-auto px-5 sm:px-8">
-            <motion.div variants={anim.container} initial="hidden" animate="show">
-              <motion.span variants={anim.item} className="inline-block text-xs font-bold uppercase tracking-[0.2em] mb-8" style={{ color: accentColor }}>
+            <BoldTextReveal delay={0.1}>
+              <span className="inline-block text-xs font-bold uppercase tracking-[0.2em] mb-8" style={{ color: accentColor }}>
                 — {brand.industry || brand.name}
-              </motion.span>
-              <motion.h1 variants={anim.item} className="t-hero-heading mb-8" style={{ ...headingStyle, color: '#FFFFFF' }}>
+              </span>
+            </BoldTextReveal>
+            <BoldTextReveal delay={0.25}>
+              <h1 className="t-hero-heading mb-8" style={{ ...headingStyle, color: '#FFFFFF' }}>
                 {(brand.tagline || brand.name).toUpperCase()}
-              </motion.h1>
-              <motion.p variants={anim.item} className="t-hero-desc" style={{ color: '#FFFFFF60' }}>
+              </h1>
+            </BoldTextReveal>
+            <BoldTextReveal delay={0.45}>
+              <p className="t-hero-desc" style={{ color: '#FFFFFF60' }}>
                 {brand.description || `Welcome to ${brand.name}.`}
-              </motion.p>
-              <motion.div variants={anim.item} className="h-0.5 w-16 mt-4 mb-10" style={{ backgroundColor: accentColor }} />
-              <motion.div variants={anim.item} className="flex flex-wrap gap-4">
+              </p>
+            </BoldTextReveal>
+            <motion.div
+              className="h-0.5 w-16 mt-4 mb-10"
+              style={{ backgroundColor: accentColor }}
+              initial={{ scaleX: 0, originX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.6, ease: [0.33, 1, 0.68, 1] }}
+            />
+            <BoldTextReveal delay={0.7}>
+              <div className="flex flex-wrap gap-4">
                 {channels.includes('ecommerce') && (
                   <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
                     SHOP NOW
@@ -189,50 +254,62 @@ export default function BrandHomePage() {
                 <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={{ ...secondaryBtnStyle, borderColor: '#FFFFFF20', color: '#FFFFFF' }}>
                   LEARN MORE
                 </Link>
-              </motion.div>
-            </motion.div>
+              </div>
+            </BoldTextReveal>
           </div>
         </section>
       );
     }
 
-    // CLASSIC — Centered with neumorphic container
+    // CLASSIC — Centered with neumorphic container, elegant fade entrance + floating orb
     if (templateId === 'classic') {
       return (
-        <section className="t-hero">
-          <div className="max-w-3xl mx-auto px-5 sm:px-8 text-center">
-            <div className="t-hero-container" style={{ backgroundColor: bgColor }}>
-              {brand.industry && (
-                <span className="inline-block text-xs font-medium uppercase tracking-[0.12em] mb-6" style={{ color: accentColor }}>
-                  {brand.industry}
-                </span>
-              )}
-              <h1 className="t-hero-heading mb-6" style={headingStyle}>
-                {brand.tagline || brand.name}
-              </h1>
-              <p className="t-hero-desc" style={{ color: `${textColor}55` }}>
-                {brand.description || `Welcome to ${brand.name}.`}
-              </p>
-              <div className="flex flex-wrap justify-center gap-4 mt-10">
-                {channels.includes('ecommerce') && (
-                  <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
-                    Shop Now
-                  </Link>
+        <section className="t-hero relative">
+          <FloatingOrbs color1={accentColor} templateId="classic" />
+          <div className="max-w-3xl mx-auto px-5 sm:px-8 text-center relative z-10">
+            <ElegantFade delay={0.1}>
+              <div className="t-hero-container" style={{ backgroundColor: bgColor }}>
+                {brand.industry && (
+                  <ElegantFade delay={0.2}>
+                    <span className="inline-block text-xs font-medium uppercase tracking-[0.12em] mb-6" style={{ color: accentColor }}>
+                      {brand.industry}
+                    </span>
+                  </ElegantFade>
                 )}
-                <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
-                  Learn More
-                </Link>
+                <ElegantFade delay={0.35}>
+                  <h1 className="t-hero-heading mb-6" style={headingStyle}>
+                    {brand.tagline || brand.name}
+                  </h1>
+                </ElegantFade>
+                <ElegantFade delay={0.5}>
+                  <p className="t-hero-desc" style={{ color: `${textColor}55` }}>
+                    {brand.description || `Welcome to ${brand.name}.`}
+                  </p>
+                </ElegantFade>
+                <ElegantFade delay={0.65}>
+                  <div className="flex flex-wrap justify-center gap-4 mt-10">
+                    {channels.includes('ecommerce') && (
+                      <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
+                        Shop Now
+                      </Link>
+                    )}
+                    <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
+                      Learn More
+                    </Link>
+                  </div>
+                </ElegantFade>
               </div>
-            </div>
+            </ElegantFade>
           </div>
         </section>
       );
     }
 
-    // STARTUP — Gradient pill style, centered
+    // STARTUP — Gradient pill style, centered, with floating orbs
     if (templateId === 'startup') {
       return (
         <section className="t-hero relative overflow-hidden">
+          <FloatingOrbs color1={accentColor} templateId="startup" />
           <div className="absolute inset-0 opacity-[0.03]" style={{ background: `radial-gradient(ellipse at 30% 50%, ${accentColor}, transparent 70%), radial-gradient(ellipse at 70% 50%, #818CF8, transparent 70%)` }} />
           <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center relative z-10">
             {brand.industry && (
@@ -261,10 +338,11 @@ export default function BrandHomePage() {
       );
     }
 
-    // PORTFOLIO — Full-bleed, left-aligned minimal
+    // PORTFOLIO — Full-bleed, left-aligned minimal, with floating orb
     if (templateId === 'portfolio') {
       return (
-        <section className="t-hero">
+        <section className="t-hero relative">
+          <FloatingOrbs color1={textColor} templateId="portfolio" />
           <div className="max-w-6xl mx-auto px-5 sm:px-8">
             <div className="max-w-2xl">
               <h1 className="t-hero-heading mb-8" style={{ ...headingStyle, fontWeight: 400 }}>
@@ -287,10 +365,11 @@ export default function BrandHomePage() {
       );
     }
 
-    // MAGAZINE — Split with serif focus
+    // MAGAZINE — Split with serif focus, with floating orb
     if (templateId === 'magazine') {
       return (
-        <section className="t-hero">
+        <section className="t-hero relative">
+          <FloatingOrbs color1={textColor} templateId="magazine" />
           <div className="max-w-6xl mx-auto px-5 sm:px-8">
             <div className="t-hero-split">
               <div>
@@ -325,10 +404,11 @@ export default function BrandHomePage() {
       );
     }
 
-    // BOUTIQUE — Luxury, centered, spacious
+    // BOUTIQUE — Luxury, centered, spacious, with subtle floating orb
     if (templateId === 'boutique') {
       return (
-        <section className="t-hero">
+        <section className="t-hero relative">
+          <FloatingOrbs color1={accentColor} templateId="boutique" />
           <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center">
             {brand.industry && (
               <span className="inline-block text-[10px] font-medium uppercase tracking-[0.2em] mb-8" style={{ color: accentColor }}>
@@ -386,10 +466,11 @@ export default function BrandHomePage() {
       );
     }
 
-    // WELLNESS — Zen, centered, breathing room
+    // WELLNESS — Zen, centered, breathing room, with subtle floating orb
     if (templateId === 'wellness') {
       return (
-        <section className="t-hero">
+        <section className="t-hero relative">
+          <FloatingOrbs color1={accentColor} templateId="wellness" />
           <div className="max-w-3xl mx-auto px-5 sm:px-8 text-center">
             {brand.industry && (
               <span className="inline-block text-xs font-light tracking-[0.15em] mb-8" style={{ color: accentColor }}>
@@ -459,39 +540,47 @@ export default function BrandHomePage() {
       );
     }
 
-    // PLAYFUL — Rounded, friendly, with blob decorations (default fallback)
+    // PLAYFUL — Bouncy entrance + confetti particles + floating orbs (default fallback)
     return (
-      <section className="t-hero relative">
-        <div className="t-blob" style={{ width: 300, height: 300, top: '-15%', right: '-10%', backgroundColor: accentColor }} />
-        <div className="t-blob" style={{ width: 200, height: 200, bottom: '-10%', left: '-5%', backgroundColor: textColor }} />
+      <section className="t-hero relative overflow-hidden">
+        <FloatingOrbs color1={accentColor} color2={textColor} templateId="playful" />
+        <ConfettiParticles color={accentColor} />
         <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center relative z-10">
           {brand.industry && (
-            <span className="t-badge mb-6 inline-flex" style={{ backgroundColor: `${accentColor}15`, color: accentColor }}>
-              ✨ {brand.industry}
-            </span>
+            <BouncyReveal delay={0.1}>
+              <span className="t-badge mb-6 inline-flex" style={{ backgroundColor: `${accentColor}15`, color: accentColor }}>
+                ✨ {brand.industry}
+              </span>
+            </BouncyReveal>
           )}
-          <h1 className="t-hero-heading mb-6" style={headingStyle}>
-            {brand.tagline || brand.name} 🚀
-          </h1>
-          <p className="t-hero-desc mx-auto" style={{ color: `${textColor}50` }}>
-            {brand.description || `Welcome to ${brand.name}. We're here to serve you.`}
-          </p>
-          <div className="flex flex-wrap justify-center gap-4 mt-10">
-            {channels.includes('ecommerce') && (
-              <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
-                Shop Now 🛍️
+          <BouncyReveal delay={0.25}>
+            <h1 className="t-hero-heading mb-6" style={headingStyle}>
+              {brand.tagline || brand.name} 🚀
+            </h1>
+          </BouncyReveal>
+          <BouncyReveal delay={0.4}>
+            <p className="t-hero-desc mx-auto" style={{ color: `${textColor}50` }}>
+              {brand.description || `Welcome to ${brand.name}. We're here to serve you.`}
+            </p>
+          </BouncyReveal>
+          <BouncyReveal delay={0.55}>
+            <div className="flex flex-wrap justify-center gap-4 mt-10">
+              {channels.includes('ecommerce') && (
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ ...primaryBtnStyle, backgroundColor: accentColor, color: '#FFFFFF' }}>
+                  Shop Now 🛍️
+                </Link>
+              )}
+              <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
+                Learn More
               </Link>
-            )}
-            <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={secondaryBtnStyle}>
-              Learn More
-            </Link>
-          </div>
+            </div>
+          </BouncyReveal>
         </div>
       </section>
     );
   };
 
-  // ===== FEATURES SECTION =====
+  // ===== FEATURES SECTION (scroll-triggered) =====
   const renderFeatures = () => {
     const features = [
       { title: 'Quality First', desc: 'Every product and service is crafted with meticulous attention to detail and unwavering quality standards.', icon: '✦', emoji: '💎' },
@@ -506,15 +595,17 @@ export default function BrandHomePage() {
     return (
       <section className="t-section">
         <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
-          <div className={`mb-14 ${templateId === 'classic' || templateId === 'playful' ? 'text-center' : ''}`}>
-            <h2 className="t-section-heading mb-3" style={headingStyle}>
-              {sectionTitle}
-            </h2>
-            {templateId === 'bold' && <div className="h-0.5 w-12 mt-2" style={{ backgroundColor: accentColor }} />}
-            <p className="text-sm mt-3" style={{ color: `${textColor}45` }}>
-              {brand.brand_voice ? `We believe in ${brand.brand_voice.toLowerCase()}.` : 'What sets us apart.'}
-            </p>
-          </div>
+          <ScrollReveal>
+            <div className={`mb-14 ${templateId === 'classic' || templateId === 'playful' ? 'text-center' : ''}`}>
+              <h2 className="t-section-heading mb-3" style={headingStyle}>
+                {sectionTitle}
+              </h2>
+              {templateId === 'bold' && <div className="h-0.5 w-12 mt-2" style={{ backgroundColor: accentColor }} />}
+              <p className="text-sm mt-3" style={{ color: `${textColor}45` }}>
+                {brand.brand_voice ? `We believe in ${brand.brand_voice.toLowerCase()}.` : 'What sets us apart.'}
+              </p>
+            </div>
+          </ScrollReveal>
 
           {/* MINIMAL — gap-px grid */}
           {templateId === 'minimal' && (
@@ -627,6 +718,7 @@ export default function BrandHomePage() {
     return (
       <section className="t-section">
         <div className={`${containerClass} mx-auto px-5 sm:px-8`}>
+          <ScrollReveal>
           <div className={`flex items-end justify-between mb-12 ${templateId === 'classic' || templateId === 'playful' ? '' : ''}`}>
             <div>
               <h2 className="t-section-heading mb-2" style={headingStyle}>
@@ -651,6 +743,7 @@ export default function BrandHomePage() {
               {templateId === 'bold' ? 'VIEW ALL →' : 'View All →'}
             </Link>
           </div>
+          </ScrollReveal>
 
           <motion.div
             variants={scrollStagger}
@@ -732,6 +825,7 @@ export default function BrandHomePage() {
     return (
       <section className="t-section">
         <div className={`${containerClass} mx-auto px-5 sm:px-8`}>
+          <ScrollReveal>
           <div className="flex items-end justify-between mb-12">
             <div>
               <h2 className="t-section-heading mb-2" style={headingStyle}>
@@ -756,6 +850,7 @@ export default function BrandHomePage() {
               {templateId === 'bold' ? 'ALL POSTS →' : 'All Posts →'}
             </Link>
           </div>
+          </ScrollReveal>
 
           {/* EDITORIAL — Magazine-style: featured + side */}
           {templateId === 'editorial' && blogPosts.length > 1 ? (
@@ -859,7 +954,7 @@ export default function BrandHomePage() {
     );
   };
 
-  // ===== CTA SECTION =====
+  // ===== CTA SECTION (scroll-triggered) =====
   const renderCTA = () => {
     const ctaTitle = templateId === 'bold' ? 'READY TO GET STARTED?'
       : templateId === 'playful' ? "Ready to get started? 🚀"
@@ -868,6 +963,7 @@ export default function BrandHomePage() {
     return (
       <section className="t-section">
         <div className={`${templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
+          <ScrollReveal>
           <div
             className="py-16 sm:py-20 px-8 sm:px-16 text-center"
             style={{
@@ -913,6 +1009,7 @@ export default function BrandHomePage() {
               )}
             </div>
           </div>
+          </ScrollReveal>
         </div>
       </section>
     );
