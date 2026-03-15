@@ -6,6 +6,7 @@ import { motion, AnimatePresence, LayoutGroup, useInView } from 'framer-motion';
 import { useRef } from 'react';
 import { useBrandSite, BrandPlaceholder } from '../layout';
 import { BORDER_RADIUS_MAP } from '@/lib/design-settings';
+import { getTextOnColor } from '@/lib/color-utils';
 import { ProductsPageMeta, BreadcrumbMeta } from '@/components/site/site-meta';
 import { getBaseUrl } from '@/lib/seo';
 
@@ -95,7 +96,7 @@ function AddToCartButton({ product, ac, tc, bgColor, tid, isBold }: {
       className="flex items-center justify-center gap-1.5 px-3 py-2 text-xs font-medium transition-all"
       style={{
         backgroundColor: state === 'added' ? '#10B981' : ac,
-        color: '#FFFFFF',
+        color: state === 'added' ? '#FFFFFF' : getTextOnColor(ac),
         borderRadius: btnRadius,
         minWidth: '36px',
         fontWeight: isBold ? 700 : 500,
@@ -272,7 +273,7 @@ function QuickViewModal({ product, onClose, tc, ac, bgColor, tid, isBold, brand 
                       className="flex items-center justify-center gap-2 py-3 text-sm font-medium transition-all"
                       style={{
                         backgroundColor: cartState === 'added' ? '#10B981' : ac,
-                        color: '#FFFFFF',
+                        color: cartState === 'added' ? '#FFFFFF' : getTextOnColor(ac),
                         borderRadius: btnRadius,
                         fontWeight: isBold ? 700 : 500,
                         letterSpacing: isBold ? '0.08em' : undefined,

@@ -1193,7 +1193,7 @@ export default function BrandHomePage() {
                 <Link href={`/shop/${slug}`} className="t-btn-primary" style={{
                   ...primaryBtnStyle,
                   backgroundColor: isDark ? accentColor : textColor,
-                  color: isDark ? '#FFFFFF' : bgColor,
+                  color: isDark ? accentBtnText : bgColor,
                 }}>
                   {templateId === 'bold' ? 'VISIT SHOP' : templateId === 'playful' ? 'Visit Shop 🛍️' : 'Visit Shop'}
                 </Link>

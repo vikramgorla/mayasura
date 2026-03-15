@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBrandSite } from '../layout';
 import { getPrimaryButtonStyle, BORDER_RADIUS_MAP } from '@/lib/design-settings';
+import { getTextOnColor } from '@/lib/color-utils';
 import { ContactPageMeta } from '@/components/site/site-meta';
 
 /* ─── Validation ──────────────────────────────────────────────── */
@@ -135,12 +136,13 @@ export default function ContactPage() {
     letterSpacing: isBold ? '0.1em' : '0.06em', textTransform: 'uppercase',
   };
 
+  const accentBtnText = getTextOnColor(ac);
   const submitStyle: React.CSSProperties = isBold
-    ? { backgroundColor: ac, color: '#FFF', padding: '0.875rem 2.5rem', borderRadius: '0', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '0.75rem' }
+    ? { backgroundColor: ac, color: accentBtnText, padding: '0.875rem 2.5rem', borderRadius: '0', fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase', fontSize: '0.75rem' }
     : tid === 'playful'
-    ? { backgroundColor: ac, color: '#FFF', padding: '0.875rem 2.5rem', borderRadius: '9999px', fontWeight: 600, fontSize: '0.875rem', boxShadow: '0 4px 14px rgba(0,0,0,0.1)' }
+    ? { backgroundColor: ac, color: accentBtnText, padding: '0.875rem 2.5rem', borderRadius: '9999px', fontWeight: 600, fontSize: '0.875rem', boxShadow: '0 4px 14px rgba(0,0,0,0.1)' }
     : tid === 'classic'
-    ? { backgroundColor: ac, color: '#FFF', padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 500, fontSize: '0.875rem' }
+    ? { backgroundColor: ac, color: accentBtnText, padding: '0.75rem 2rem', borderRadius: '8px', fontWeight: 500, fontSize: '0.875rem' }
     : { backgroundColor: tc, color: bgColor, padding: '0.75rem 2rem', borderRadius: '0', fontWeight: 500, fontSize: '0.8125rem' };
 
   const hours = [{ day: 'Mon – Fri', hours: '9:00 AM – 6:00 PM' }, { day: 'Saturday', hours: '10:00 AM – 4:00 PM' }, { day: 'Sunday', hours: 'Closed' }];

@@ -200,7 +200,7 @@ function OrderModal({
                       >
                         {t.completed && <span className="text-white text-[10px] font-bold">✓</span>}
                       </motion.div>
-                      <span className="text-[9px] mt-1 text-center" style={{ color: t.completed ? '#374151' : '#9CA3AF', fontWeight: t.active ? 700 : 400 }}>
+                      <span className={`text-[9px] mt-1 text-center ${t.completed ? 'text-zinc-700 dark:text-zinc-200' : 'text-zinc-400 dark:text-zinc-500'}`} style={{ fontWeight: t.active ? 700 : 400 }}>
                         {t.label}
                       </span>
                     </div>

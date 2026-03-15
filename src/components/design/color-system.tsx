@@ -4,6 +4,7 @@ import { useState, useRef, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, Pipette, RotateCcw } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { getTextOnColor, validateColorSystem, type ContrastIssue } from '@/lib/color-utils';
 
 // ─── Types ───────────────────────────────────────────────────────
 export interface ColorSystem {

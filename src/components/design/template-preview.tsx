@@ -5,6 +5,7 @@ import { motion } from 'framer-motion';
 import { Check, Monitor, Tablet, Smartphone } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { type WebsiteTemplate } from '@/lib/website-templates';
+import { getTextOnColor } from '@/lib/color-utils';
 
 // ─── Mini Website Preview ────────────────────────────────────────
 // A realistic mini website preview showing nav, hero, cards, footer
@@ -63,7 +64,7 @@ function MiniWebsitePreview({
             className="text-[5px] px-1 py-0.5 font-medium"
             style={{
               backgroundColor: accentColor,
-              color: '#FFFFFF',
+              color: getTextOnColor(accentColor),
               borderRadius: template.id === 'playful' ? '9999px' : template.id === 'bold' ? '0' : tp.borderRadius,
             }}
           >
@@ -277,7 +278,7 @@ function getButtonStyle(
     lineHeight: 1.2,
   };
   if (variant === 'solid') {
-    return { ...base, backgroundColor: accentColor, color: '#FFFFFF', border: 'none' };
+    return { ...base, backgroundColor: accentColor, color: getTextOnColor(accentColor), border: 'none' };
   }
   if (variant === 'outline') {
     return { ...base, backgroundColor: 'transparent', color: accentColor, border: `1.5px solid ${accentColor}` };

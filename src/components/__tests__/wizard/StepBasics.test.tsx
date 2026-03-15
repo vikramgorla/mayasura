@@ -61,7 +61,7 @@ describe('StepBasics', () => {
     const user = userEvent.setup();
     renderStep({ industry: '' });
     const input = screen.getByPlaceholderText(/Restaurant, Fashion, SaaS/i);
-    await user.clear(input);
+    await user.click(input);
     await user.type(input, 'Fashion');
     // updateData should be called for each keystroke
     expect(mockUpdateData).toHaveBeenCalled();
