@@ -14,6 +14,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { EmptyState } from '@/components/ui/empty-state';
 import { Sparkline } from '@/components/ui/sparkline';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { PageTransition } from '@/components/ui/page-transition';
 
 /* ─── Types ─────────────────────────────────────────────────── */
 interface AnalyticsData {
@@ -816,6 +817,7 @@ export default function AnalyticsPage() {
     : [];
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8">
       <Breadcrumbs
         items={[
@@ -1119,6 +1121,7 @@ export default function AnalyticsPage() {
         <SubscribersList brandId={brandId} subscriberCount={data?.subscriberCount || 0} />
       </motion.div>
     </div>
+    </PageTransition>
   );
 }
 

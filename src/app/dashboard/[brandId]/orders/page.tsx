@@ -13,6 +13,7 @@ import { EmptyState } from '@/components/ui/empty-state';
 import { useToast } from '@/components/ui/toast';
 import { Order, Brand } from '@/lib/types';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { PageTransition } from '@/components/ui/page-transition';
 import { Sparkline } from '@/components/ui/sparkline';
 
 // ── AnimatedCounter ──────────────────────────────────────────────────────────
@@ -460,6 +461,7 @@ export default function OrdersPage() {
   ];
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8 max-w-[1400px] mx-auto">
       {/* Order detail modal */}
       <AnimatePresence>
@@ -731,5 +733,6 @@ export default function OrdersPage() {
         )}
       </motion.div>
     </div>
+    </PageTransition>
   );
 }

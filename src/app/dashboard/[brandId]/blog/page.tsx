@@ -16,6 +16,7 @@ import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
 import { BlogPost, Brand } from '@/lib/types';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { PageTransition } from '@/components/ui/page-transition';
 
 /* ─── Helpers ───────────────────────────────────────────────── */
 function readingTime(content: string): string {
@@ -471,6 +472,7 @@ export default function BlogManagementPage() {
   ];
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8">
       <Breadcrumbs
         items={[
@@ -843,5 +845,6 @@ export default function BlogManagementPage() {
         )}
       </motion.div>
     </div>
+    </PageTransition>
   );
 }

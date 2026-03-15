@@ -13,6 +13,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useToast } from '@/components/ui/toast';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { PageTransition } from '@/components/ui/page-transition';
 
 type StrategyType = 'brand-strategy' | 'competitor-analysis' | 'seo-suggestions' | 'content-calendar' | 'brand-consistency';
 
@@ -318,6 +319,7 @@ export default function StrategyPage() {
   };
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8">
       <Breadcrumbs
         items={[
@@ -420,6 +422,7 @@ export default function StrategyPage() {
         ))}
       </AnimatePresence>
     </div>
+    </PageTransition>
   );
 }
 

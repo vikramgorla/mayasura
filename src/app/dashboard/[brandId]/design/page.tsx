@@ -31,6 +31,7 @@ import {
   type BorderRadiusPreset,
 } from '@/components/design/style-controls';
 import { TemplatePreviewCard, TemplateDetailPreview } from '@/components/design/template-preview';
+import { PageTransition } from '@/components/ui/page-transition';
 
 // ─── Font Pairing Suggestions ────────────────────────────────────
 const FONT_PAIRINGS: Record<string, string[]> = {
@@ -540,6 +541,7 @@ export default function DesignStudioPage() {
   }
 
   return (
+    <PageTransition>
     <div className="flex flex-col h-[calc(100vh-3.5rem)]">
       {/* Template Switch Confirmation Modal */}
       <AnimatePresence>
@@ -945,5 +947,6 @@ export default function DesignStudioPage() {
         </div>
       </div>
     </div>
+    </PageTransition>
   );
 }

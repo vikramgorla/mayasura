@@ -15,6 +15,7 @@ import { Button } from '@/components/ui/button';
 import { Spinner } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { PageTransition } from '@/components/ui/page-transition';
 import { Brand } from '@/lib/types';
 import { LayoutEditor } from '@/components/design/layout-editor';
 import {
@@ -410,6 +411,7 @@ export default function WebsitePage() {
   const scoreColor = (s: number) => s >= 90 ? '#22c55e' : s >= 50 ? '#f59e0b' : '#ef4444';
 
   return (
+    <PageTransition>
     <div className="flex flex-col h-[calc(100vh-3.5rem)]">
       {/* Top bar */}
       <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 px-4 sm:px-6 py-3 border-b border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900 shrink-0">
@@ -749,6 +751,7 @@ export default function WebsitePage() {
         </AnimatePresence>
       </div>
     </div>
+    </PageTransition>
   );
 }
 

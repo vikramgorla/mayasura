@@ -16,6 +16,7 @@ import { Spinner } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PageTransition } from '@/components/ui/page-transition';
 
 // ─── Types ─────────────────────────────────────────────────────
 
@@ -450,6 +451,7 @@ export default function ContentPage() {
   // ─── Render ────────────────────────────────────────────
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8">
       <Breadcrumbs
         items={[
@@ -1030,5 +1032,6 @@ export default function ContentPage() {
         )}
       </AnimatePresence>
     </div>
+    </PageTransition>
   );
 }

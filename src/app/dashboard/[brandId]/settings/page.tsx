@@ -17,6 +17,7 @@ import { useToast } from '@/components/ui/toast';
 import { Brand, INDUSTRY_CATEGORIES, TONE_OPTIONS } from '@/lib/types';
 import { WEBSITE_TEMPLATES } from '@/lib/website-templates';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { PageTransition } from '@/components/ui/page-transition';
 
 // ─── General Tab ─────────────────────────────────────────────────
 function GeneralTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<string, unknown>) => Promise<boolean> }) {
@@ -1455,6 +1456,7 @@ export default function SettingsPage() {
   ];
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8">
       <Breadcrumbs
         items={[
@@ -1531,5 +1533,6 @@ export default function SettingsPage() {
         </AnimatePresence>
       </motion.div>
     </div>
+    </PageTransition>
   );
 }

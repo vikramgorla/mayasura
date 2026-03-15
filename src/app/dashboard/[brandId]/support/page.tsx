@@ -18,6 +18,7 @@ import { Select } from '@/components/ui/select';
 import { Spinner } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { PageTransition } from '@/components/ui/page-transition';
 
 interface Ticket {
   id: string;
@@ -157,6 +158,7 @@ export default function SupportPage() {
   };
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8">
       <Breadcrumbs
         items={[
@@ -379,5 +381,6 @@ export default function SupportPage() {
         )}
       </div>
     </div>
+    </PageTransition>
   );
 }

@@ -15,6 +15,7 @@ import { LoadingDots } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
 import { Brand, ChatbotFaq } from '@/lib/types';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { PageTransition } from '@/components/ui/page-transition';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -161,6 +162,7 @@ export default function ChatbotPage() {
   ];
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8">
       <Breadcrumbs
         items={[
@@ -512,5 +514,6 @@ export default function ChatbotPage() {
         )}
       </motion.div>
     </div>
+    </PageTransition>
   );
 }

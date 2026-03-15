@@ -13,6 +13,7 @@ import { Spinner } from '@/components/ui/loading';
 import { useToast } from '@/components/ui/toast';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
+import { PageTransition } from '@/components/ui/page-transition';
 
 interface Product {
   id: string;
@@ -243,6 +244,7 @@ export default function ProductsPage() {
     : products;
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8">
       <Breadcrumbs
         items={[
@@ -621,5 +623,6 @@ export default function ProductsPage() {
         )}
       </AnimatePresence>
     </div>
+    </PageTransition>
   );
 }
