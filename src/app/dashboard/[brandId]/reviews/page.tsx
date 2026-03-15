@@ -163,7 +163,7 @@ export default function ReviewsPage() {
           </div>
 
           {/* Stats Row */}
-          <div className="grid grid-cols-4 gap-3 mb-6">
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-6">
             {tabs.map(tab => (
               <button
                 key={tab.key}

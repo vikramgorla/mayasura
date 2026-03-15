@@ -338,7 +338,7 @@ export default function ChatbotPage() {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-4 mb-6">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
           {[
             { label: 'Total Sessions', value: chatStats.totalSessions, icon: MessageSquare },
             { label: 'Total Messages', value: chatStats.totalMessages, icon: MessageCircle },

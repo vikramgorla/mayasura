@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from '../../layout';
 import { ProductMeta, BreadcrumbMeta } from '@/components/site/site-meta';
 import { getTextOnColor } from '@/lib/color-utils';
+import { BORDER_RADIUS_MAP as BORDER_RADIUS_MAP_IMPORT } from '@/lib/design-settings';
 
 // ── Star Input ────────────────────────────────────────────────────────────────
 function StarInput({ value, onChange, color }: { value: number; onChange: (v: number) => void; color: string }) {
@@ -869,7 +870,8 @@ export default function ProductDetailPage() {
   };
 
   const containerWidth = templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl';
-  const borderRadius = templateId === 'playful' ? '24px' : templateId === 'classic' ? '12px' : '0';
+  const dsRadius = shop?.designSettings ? BORDER_RADIUS_MAP_IMPORT[shop.designSettings.borderRadius] : '8px';
+  const borderRadius = templateId === 'playful' ? '24px' : templateId === 'classic' ? '12px' : templateId === 'bold' ? '0' : dsRadius;
 
   const product = products.find((p) => p.id === productId);
 

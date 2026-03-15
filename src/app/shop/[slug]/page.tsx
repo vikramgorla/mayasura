@@ -8,6 +8,7 @@ import { useShop } from './layout';
 import { ShopMeta, BreadcrumbMeta } from '@/components/site/site-meta';
 import { getBaseUrl } from '@/lib/seo';
 import { usePrefetch } from '@/lib/use-prefetch';
+import { BORDER_RADIUS_MAP } from '@/lib/design-settings';
 import { getTextOnColor } from '@/lib/color-utils';
 
 function getProductBadge(product: { name: string; price?: number | null; created_at?: string }, index: number): { label: string; type: 'new' | 'sale' | 'best' } | null {
@@ -29,7 +30,7 @@ export default function ShopPage() {
   usePrefetch(prefetchRoutes);
 
   if (!shop) return null;
-  const { brand, products, addToCart, websiteTemplate: template } = shop;
+  const { brand, products, addToCart, websiteTemplate: template, designSettings } = shop;
   const slug = brand.slug || brand.id;
   const templateId = template?.id || 'minimal';
   const tp = template?.preview;
@@ -38,6 +39,8 @@ export default function ShopPage() {
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const bgColor = isDark ? '#000000' : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
+  const dsRadius = designSettings ? BORDER_RADIUS_MAP[designSettings.borderRadius] : '8px';
+  const dsBorderColor = designSettings?.borderColor || '#e2e8f0';
 
   const headingStyle: React.CSSProperties = {
     fontFamily: brand.font_heading,
@@ -63,7 +66,7 @@ export default function ShopPage() {
     return {
       backgroundColor: c.bg,
       color: c.text,
-      borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : '6px',
+      borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : dsRadius,
       fontSize: '0.625rem',
       fontWeight: 700,
       letterSpacing: '0.05em',
@@ -304,7 +307,7 @@ export default function ShopPage() {
                           ? { backgroundColor: '#FFFFFF', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }
                           : templateId === 'classic'
                           ? { borderRadius: '10px', overflow: 'hidden', boxShadow: '6px 6px 12px rgba(0,0,0,0.04), -6px -6px 12px rgba(255,255,255,0.7)' }
-                          : {}
+                          : { borderRadius: dsRadius, border: `1px solid ${dsBorderColor}`, overflow: 'hidden' }
                       }
                     >
                       <Link href={`/shop/${slug}/product/${product.id}`}>
