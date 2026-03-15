@@ -64,7 +64,7 @@ export default function AboutPage() {
   const tc = isDark ? '#FFFFFF' : brand.primary_color;
   const ac = brand.accent_color || tc;
   const dsRadius = BORDER_RADIUS_MAP[designSettings.borderRadius];
-  const maxW = tid === 'bold' ? 'max-w-7xl' : 'max-w-6xl';
+  const maxW = tid === 'bold' || tid === 'corporate' ? 'max-w-7xl' : tid === 'portfolio' ? 'max-w-7xl' : 'max-w-6xl';
   const cardVariant = tid === 'playful' ? scaleIn : tid === 'bold' ? slideIn : fadeUp;
 
   const hs: React.CSSProperties = {
@@ -75,7 +75,9 @@ export default function AboutPage() {
     color: tc,
   };
 
-  const cardRadius = tid === 'playful' ? '24px' : tid === 'classic' ? '12px' : tid === 'bold' ? '0' : dsRadius;
+  const cardRadius = tid === 'playful' ? '24px' : tid === 'classic' ? '12px' : tid === 'bold' || tid === 'neon' || tid === 'boutique' ? '0'
+    : tid === 'wellness' ? '20px' : tid === 'organic' ? '24px' : tid === 'startup' ? '16px' : tid === 'tech' || tid === 'corporate' ? '8px'
+    : tid === 'artisan' || tid === 'restaurant' ? '4px' : dsRadius;
 
   const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mayasura.app';
 
@@ -88,7 +90,7 @@ export default function AboutPage() {
       {/* ═══════ HERO ═══════ */}
       <ParallaxHero brand={brand} tid={tid} hs={hs} tc={tc} ac={ac} bgColor={bgColor} isDark={isDark} />
 
-      {(tid === 'minimal' || tid === 'editorial') && (
+      {(tid === 'minimal' || tid === 'editorial' || tid === 'magazine') && (
         <div className={`${maxW} mx-auto px-5 sm:px-8`}><div className="t-divider" style={{ backgroundColor: `${tc}06` }} /></div>
       )}
 
@@ -98,9 +100,9 @@ export default function AboutPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-16 items-start">
             <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} variants={stagger}>
               <motion.h2 variants={fadeUp} className="t-section-heading mb-6" style={hs}>
-                {tLabel(tid, 'Our Story', 'OUR STORY', 'Our Story 📖')}
+                {tid === 'bold' ? 'OUR STORY' : tid === 'playful' ? 'Our Story 📖' : tid === 'tech' ? '> Our Story' : tid === 'boutique' ? 'Our Heritage' : tid === 'magazine' ? 'The Story' : tid === 'artisan' ? 'The Craft' : tid === 'restaurant' ? 'Our Kitchen Story' : tid === 'wellness' ? 'Our Journey' : 'Our Story'}
               </motion.h2>
-              {tid === 'bold' && <motion.div variants={fadeUp} className="h-0.5 w-12 mb-6" style={{ backgroundColor: ac }} />}
+              {(tid === 'bold' || tid === 'boutique') && <motion.div variants={fadeUp} className="h-0.5 w-12 mb-6" style={{ backgroundColor: ac }} />}
               <motion.div variants={fadeUp} className="space-y-5 text-[15px] leading-relaxed" style={{ color: `${tc}60` }}>
                 <p>{brand.description || `${brand.name} was founded with a clear purpose: to deliver exceptional quality and build lasting relationships with our community.`}</p>
                 <p>We believe in transparency, innovation, and an unwavering commitment to excellence in everything we do.</p>
@@ -109,7 +111,7 @@ export default function AboutPage() {
             </motion.div>
             <motion.div initial={{ opacity: 0, scale: 0.95 }} whileInView={{ opacity: 1, scale: 1 }} viewport={{ once: true }} transition={{ duration: 0.6 }}
               className="flex items-center justify-center overflow-hidden"
-              style={{ aspectRatio: tid === 'editorial' ? '4/5' : '4/3', backgroundColor: isDark ? '#111111' : `${tc}04`, borderRadius: cardRadius, border: tid === 'bold' ? `2px solid ${tc}10` : undefined }}>
+              style={{ aspectRatio: tid === 'editorial' || tid === 'boutique' || tid === 'portfolio' ? '4/5' : '4/3', backgroundColor: isDark || tid === 'tech' || tid === 'neon' ? '#111111' : `${tc}04`, borderRadius: cardRadius, border: tid === 'bold' || tid === 'artisan' ? `2px solid ${tc}10` : tid === 'tech' ? '1px solid #10B98120' : tid === 'neon' ? `1px solid ${ac}20` : undefined }}>
               {brand.logo_url ? <img src={brand.logo_url} alt={brand.name} className="max-w-[50%] max-h-[50%] object-contain" /> : <BrandPlaceholder color={isDark ? '#FFFFFF' : tc} className="w-full h-full" variant="about" />}
             </motion.div>
           </div>
@@ -121,10 +123,12 @@ export default function AboutPage() {
         <div className={`${maxW} mx-auto px-5 sm:px-8`}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} variants={stagger}
             className={`${tid === 'classic' || tid === 'playful' ? 'text-center' : ''} mb-12`}>
-            <motion.h2 variants={fadeUp} className="t-section-heading" style={hs}>{tLabel(tid, 'What We Stand For', 'WHAT WE STAND FOR', 'Our Values 💛')}</motion.h2>
-            {tid === 'bold' && <motion.div variants={fadeUp} className="h-0.5 w-12 mt-2" style={{ backgroundColor: ac }} />}
+            <motion.h2 variants={fadeUp} className="t-section-heading" style={hs}>
+              {tid === 'bold' ? 'WHAT WE STAND FOR' : tid === 'playful' ? 'Our Values 💛' : tid === 'tech' ? '> Core Values' : tid === 'boutique' ? 'Our Philosophy' : tid === 'magazine' ? 'Core Principles' : tid === 'artisan' ? 'Our Values' : tid === 'wellness' ? 'What Guides Us' : 'What We Stand For'}
+            </motion.h2>
+            {(tid === 'bold' || tid === 'boutique') && <motion.div variants={fadeUp} className="h-0.5 w-12 mt-2" style={{ backgroundColor: ac }} />}
             <motion.p variants={fadeUp} className="text-sm mt-3 max-w-lg" style={{ color: `${tc}45` }}>
-              {tLabel(tid, 'The principles that guide everything we do.', 'The principles that guide everything we do.', 'The principles that guide everything we do ✨')}
+              {tid === 'playful' ? 'The principles that guide everything we do ✨' : tid === 'tech' ? '// the principles guiding our work' : 'The principles that guide everything we do.'}
             </motion.p>
           </motion.div>
 
@@ -142,24 +146,46 @@ export default function AboutPage() {
                   </div>
                 </motion.div>
               );
+              /* Per-template value card styling */
+              const cardBg = tid === 'minimal' ? bgColor : tid === 'playful' ? pastels[i % pastels.length] : tid === 'classic' ? bgColor
+                : tid === 'tech' || tid === 'neon' ? `${tc}06` : tid === 'startup' ? '#FFFFFF' : tid === 'wellness' || tid === 'organic' ? '#FFFFFF'
+                : tid === 'artisan' ? 'transparent' : `${tc}03`;
+              const cR = tid === 'startup' ? '16px' : tid === 'wellness' ? '20px' : tid === 'organic' ? '24px' : tid === 'tech' ? '8px'
+                : tid === 'corporate' ? '8px' : tid === 'artisan' || tid === 'restaurant' ? '4px' : tid === 'neon' || tid === 'boutique' ? '0'
+                : !['minimal', 'bold', 'classic', 'playful'].includes(tid) ? dsRadius : undefined;
+              const cBorder = tid === 'bold' ? `${tc}15` : tid === 'tech' ? '#10B98120' : tid === 'neon' ? `${ac}15` : tid === 'artisan' ? `${tc}12`
+                : tid === 'startup' || tid === 'corporate' ? `${tc}08` : undefined;
+              const centerCard = tid === 'playful' || tid === 'classic' || tid === 'startup' || tid === 'wellness' || tid === 'organic' || tid === 'boutique';
+
               return (
                 <motion.div key={v.title} variants={cardVariant}
-                  className={`${tid === 'minimal' ? 'p-8 sm:p-10' : 't-card'} ${tid === 'playful' ? 'text-center cursor-default' : tid === 'classic' ? 'text-center' : ''} ${tid === 'playful' || tid === 'bold' ? 'transition-transform hover:translate-y-[-2px]' : ''}`}
+                  className={`${tid === 'minimal' ? 'p-8 sm:p-10' : 't-card'} ${centerCard ? 'text-center' : ''} ${tid === 'playful' ? 'cursor-default' : ''} ${['playful', 'bold', 'startup', 'wellness', 'organic'].includes(tid) ? 'transition-transform hover:translate-y-[-2px]' : ''}`}
                   style={{
-                    backgroundColor: tid === 'minimal' ? bgColor : tid === 'playful' ? pastels[i % pastels.length] : tid === 'classic' ? bgColor : `${tc}03`,
-                    borderRadius: !['minimal', 'bold', 'classic', 'playful'].includes(tid) ? dsRadius : undefined,
-                    borderColor: tid === 'bold' ? `${tc}15` : undefined,
+                    backgroundColor: cardBg,
+                    borderRadius: cR,
+                    borderColor: cBorder,
+                    border: tid === 'artisan' ? `2px solid ${tc}12` : tid === 'startup' || tid === 'corporate' ? `1px solid ${tc}08` : tid === 'tech' ? '1px solid #10B98120' : tid === 'neon' ? `1px solid ${ac}15` : undefined,
+                    boxShadow: tid === 'startup' ? '0 4px 16px rgba(99,102,241,0.06)' : tid === 'wellness' || tid === 'organic' ? '0 2px 12px rgba(0,0,0,0.03)' : undefined,
                   }}
                   {...(tid === 'playful' ? { whileHover: { y: -6, transition: { duration: 0.2 } } } : {})}>
                   {tid === 'bold' ? <span className="text-2xl mb-3 block" style={{ color: ac }}>{v.icon}</span> :
                    tid === 'playful' ? <span className="text-3xl mb-3 block">{v.icon}</span> :
-                   tid === 'classic' ? (
-                    <div className="w-12 h-12 rounded-lg mx-auto flex items-center justify-center mb-4" style={{ backgroundColor: `${ac}12` }}>
+                   tid === 'classic' || tid === 'startup' || tid === 'wellness' || tid === 'organic' ? (
+                    <div className="w-12 h-12 rounded-lg mx-auto flex items-center justify-center mb-4" style={{ backgroundColor: `${ac}12`, borderRadius: tid === 'wellness' || tid === 'organic' ? '50%' : tid === 'startup' ? '12px' : undefined }}>
                       <ValueIcon type={v.svg} color={ac} />
                     </div>
+                   ) : tid === 'tech' ? (
+                    <div className="mb-3"><span className="font-mono text-emerald-400 text-lg">{`{${i}}`}</span></div>
+                   ) : tid === 'neon' ? (
+                    <span className="text-2xl mb-3 block" style={{ filter: `drop-shadow(0 0 8px ${ac})` }}>{v.icon}</span>
+                   ) : tid === 'artisan' ? (
+                    <div className="mb-3 inline-block px-2 py-0.5 text-xs font-mono uppercase" style={{ border: `1px solid ${tc}15`, color: `${tc}40` }}>{String(i + 1).padStart(2, '0')}</div>
+                   ) : tid === 'boutique' ? (
+                    <span className="text-lg mb-3 block" style={{ color: ac }}>{v.icon}</span>
                    ) : <div className={`mb-${tid === 'minimal' ? '4' : '3'} opacity-${tid === 'minimal' ? '40' : '50'}`}><ValueIcon type={v.svg} color={tid === 'minimal' ? tc : ac} /></div>}
-                  <h3 className={`text-sm font-${tid === 'bold' ? 'bold uppercase tracking-wider' : tid === 'minimal' ? 'medium' : 'semibold'} mb-2`} style={{ fontFamily: brand.font_heading, fontWeight: tid === 'minimal' ? 400 : undefined }}>{v.title}</h3>
-                  <p className="text-sm" style={{ color: `${tc}${tid === 'playful' ? '50' : tid === 'minimal' ? '35' : '45'}` }}>{v.desc}</p>
+                  <h3 className={`text-sm mb-2 ${tid === 'bold' || tid === 'artisan' ? 'font-bold uppercase tracking-wider' : tid === 'minimal' || tid === 'portfolio' || tid === 'wellness' ? 'font-medium' : tid === 'boutique' ? 'font-medium uppercase tracking-wide text-xs' : tid === 'tech' ? 'font-mono font-semibold' : 'font-semibold'}`}
+                    style={{ fontFamily: tid === 'tech' || tid === 'artisan' ? "'JetBrains Mono', monospace" : brand.font_heading, fontWeight: tid === 'minimal' || tid === 'portfolio' ? 400 : undefined }}>{v.title}</h3>
+                  <p className="text-sm" style={{ color: tid === 'tech' ? '#64748B' : `${tc}${tid === 'playful' ? '50' : tid === 'minimal' ? '35' : '45'}` }}>{v.desc}</p>
                 </motion.div>
               );
             })}
@@ -172,8 +198,10 @@ export default function AboutPage() {
         <div className={`${maxW} mx-auto px-5 sm:px-8`}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} variants={stagger}
             className={`${tid === 'classic' || tid === 'playful' ? 'text-center' : ''} mb-12`}>
-            <motion.h2 variants={fadeUp} className="t-section-heading" style={hs}>{tLabel(tid, 'Our Journey', 'OUR JOURNEY', 'Our Journey 🗺️')}</motion.h2>
-            {tid === 'bold' && <motion.div variants={fadeUp} className="h-0.5 w-12 mt-2" style={{ backgroundColor: ac }} />}
+            <motion.h2 variants={fadeUp} className="t-section-heading" style={hs}>
+              {tid === 'bold' ? 'OUR JOURNEY' : tid === 'playful' ? 'Our Journey 🗺️' : tid === 'tech' ? '> Timeline' : tid === 'boutique' ? 'Milestones' : tid === 'magazine' ? 'Timeline' : tid === 'artisan' ? 'The Journey' : 'Our Journey'}
+            </motion.h2>
+            {(tid === 'bold' || tid === 'boutique') && <motion.div variants={fadeUp} className="h-0.5 w-12 mt-2" style={{ backgroundColor: ac }} />}
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-40px' }} variants={stagger} className="relative">
             {/* Desktop center line */}
@@ -223,10 +251,12 @@ export default function AboutPage() {
         <div className={`${maxW} mx-auto px-5 sm:px-8`}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-60px' }} variants={stagger}
             className={`${tid === 'classic' || tid === 'playful' ? 'text-center' : ''} mb-12`}>
-            <motion.h2 variants={fadeUp} className="t-section-heading" style={hs}>{tLabel(tid, 'The Team', 'THE TEAM', 'Meet the Team 👋')}</motion.h2>
-            {tid === 'bold' && <motion.div variants={fadeUp} className="h-0.5 w-12 mt-2" style={{ backgroundColor: ac }} />}
+            <motion.h2 variants={fadeUp} className="t-section-heading" style={hs}>
+              {tid === 'bold' ? 'THE TEAM' : tid === 'playful' ? 'Meet the Team 👋' : tid === 'tech' ? '> Contributors' : tid === 'boutique' ? 'Our Artisans' : tid === 'restaurant' ? 'Our Chefs' : 'The Team'}
+            </motion.h2>
+            {(tid === 'bold' || tid === 'boutique') && <motion.div variants={fadeUp} className="h-0.5 w-12 mt-2" style={{ backgroundColor: ac }} />}
             <motion.p variants={fadeUp} className="text-sm mt-3" style={{ color: `${tc}45` }}>
-              {tLabel(tid, 'The people behind the brand.', 'The people behind the brand.', 'The people who make the magic happen ✨')}
+              {tid === 'playful' ? 'The people who make the magic happen ✨' : tid === 'tech' ? '// the humans behind the code' : 'The people behind the brand.'}
             </motion.p>
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
@@ -258,10 +288,12 @@ export default function AboutPage() {
                     style={{
                       width: tid === 'bold' ? 80 : 88,
                       height: tid === 'bold' ? 80 : 88,
-                      borderRadius: tid === 'bold' ? '0' : tid === 'playful' ? '24px' : '50%',
-                      backgroundColor: isDark ? '#111111' : `${tc}06`,
-                      border: tid === 'bold'
+                      borderRadius: tid === 'bold' || tid === 'neon' ? '0' : tid === 'playful' ? '24px' : tid === 'artisan' ? '4px' : tid === 'tech' ? '8px' : '50%',
+                      backgroundColor: isDark || tid === 'tech' || tid === 'neon' ? '#111111' : `${tc}06`,
+                      border: tid === 'bold' || tid === 'artisan'
                         ? `2px solid ${tc}12`
+                        : tid === 'tech' ? '1px solid #10B98120'
+                        : tid === 'neon' ? `1px solid ${ac}20`
                         : `2px solid transparent`,
                       backgroundClip: 'padding-box',
                     }}
@@ -319,19 +351,19 @@ export default function AboutPage() {
         <div className={`${tid === 'bold' ? 'max-w-7xl' : 'max-w-3xl'} mx-auto px-5 sm:px-8 text-center`}>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}>
             <motion.h2 variants={fadeUp} className="text-2xl font-semibold tracking-tight mb-4" style={hs}>
-              {tLabel(tid, "Let's Connect", "LET'S CONNECT", "Let's Connect! 🤝")}
+              {tid === 'bold' ? "LET'S CONNECT" : tid === 'playful' ? "Let's Connect! 🤝" : tid === 'tech' ? '> Get in Touch' : tid === 'boutique' ? 'Begin Your Journey' : tid === 'restaurant' ? 'Make a Reservation' : "Let's Connect"}
             </motion.h2>
             <motion.p variants={fadeUp} className="text-sm mb-10 max-w-md mx-auto" style={{ color: `${tc}45` }}>
               Whether you have questions, ideas, or just want to say hello — we&apos;d love to hear from you.
             </motion.p>
             <motion.div variants={fadeUp} className="flex flex-wrap justify-center gap-4">
               <Link href={`/site/${slug}/contact`} className="t-btn-primary"
-                style={{ ...getPrimaryButtonStyle(designSettings, ac), backgroundColor: isDark ? ac : tc, color: isDark ? '#FFFFFF' : bgColor }}>
-                {tLabel(tid, 'Get in Touch', 'GET IN TOUCH', 'Get in Touch 💬')}
+                style={{ ...getPrimaryButtonStyle(designSettings, ac), backgroundColor: isDark || tid === 'tech' || tid === 'neon' ? ac : tc, color: isDark || tid === 'tech' || tid === 'neon' ? '#FFFFFF' : bgColor }}>
+                {tid === 'bold' ? 'GET IN TOUCH' : tid === 'playful' ? 'Get in Touch 💬' : tid === 'restaurant' ? 'Reserve a Table' : tid === 'tech' ? 'Open Terminal →' : tid === 'boutique' ? 'CONTACT' : 'Get in Touch'}
               </Link>
               <Link href={`/shop/${slug}`} className="t-btn-secondary"
-                style={{ ...getSecondaryButtonStyle(designSettings, tc), borderColor: `${tc}${isDark ? '25' : '15'}`, color: tc }}>
-                {tLabel(tid, 'Browse Shop', 'BROWSE SHOP', 'Browse Shop 🛍️')}
+                style={{ ...getSecondaryButtonStyle(designSettings, tc), borderColor: `${tc}${isDark || tid === 'tech' || tid === 'neon' ? '25' : '15'}`, color: tc }}>
+                {tid === 'bold' ? 'BROWSE SHOP' : tid === 'playful' ? 'Browse Shop 🛍️' : tid === 'restaurant' ? 'View Menu' : 'Browse Shop'}
               </Link>
             </motion.div>
           </motion.div>
@@ -351,10 +383,37 @@ function ParallaxHero({ brand, tid, hs, tc, ac, bgColor, isDark }: {
   const opacity = useTransform(scrollYProgress, [0, 0.8], [1, 0]);
   const desc = brand.description || `${brand.name} was founded with a simple yet powerful mission: to deliver exceptional quality and value.`;
   const tagline = brand.tagline || (tid === 'bold' ? `THE STORY BEHIND ${brand.name.toUpperCase()}` : `The story behind ${brand.name}`);
+  const heroCentered = tid === 'playful' || tid === 'classic' || tid === 'startup' || tid === 'wellness' || tid === 'organic' || tid === 'boutique' || tid === 'neon';
+  const heroMaxW = tid === 'bold' || tid === 'corporate' ? 'max-w-7xl' : tid === 'portfolio' ? 'max-w-5xl' : 'max-w-3xl';
 
   const badge = tid === 'playful' ? (
     <span className="t-badge mb-6 inline-flex" style={{ backgroundColor: `${ac}15`, color: ac }}>✨ About Us</span>
-  ) : (
+  ) : tid === 'startup' ? (
+    <span className="t-badge mb-6 inline-flex" style={{ backgroundColor: `${ac}12`, color: ac, borderRadius: '9999px' }}>About</span>
+  ) : tid === 'tech' ? (
+    <div className="flex items-center gap-3 mb-4">
+      <span className="text-xs font-mono" style={{ color: '#10B981' }}>{'>'}</span>
+      <span className="text-xs font-mono" style={{ color: `${tc}40` }}>~/about</span>
+    </div>
+  ) : tid === 'boutique' ? (
+    <span className="text-[10px] uppercase tracking-[0.3em] mb-6 block" style={{ color: `${tc}35` }}>◆ About ◆</span>
+  ) : tid === 'magazine' ? (
+    <div className="mb-4" style={{ borderBottom: `2px solid ${tc}`, paddingBottom: '0.5rem', display: 'inline-block' }}>
+      <span className="text-xs font-semibold uppercase tracking-wider" style={{ color: tc }}>About</span>
+    </div>
+  ) : tid === 'neon' ? null : tid === 'organic' ? (
+    <span className="text-xs tracking-[0.1em] mb-4 block" style={{ color: `${tc}40` }}>🌿 About Us</span>
+  ) : tid === 'artisan' ? (
+    <div className="inline-block mb-4 px-3 py-1" style={{ border: `2px solid ${tc}15` }}>
+      <span className="text-[10px] font-mono uppercase tracking-[0.15em]" style={{ color: `${tc}50` }}>About</span>
+    </div>
+  ) : tid === 'corporate' ? (
+    <span className="text-xs font-semibold uppercase tracking-[0.12em] mb-4 block" style={{ color: ac }}>About Us</span>
+  ) : tid === 'restaurant' ? (
+    <span className="text-xs uppercase tracking-[0.15em] mb-4 block" style={{ color: ac, fontWeight: 600 }}>Our Story</span>
+  ) : tid === 'wellness' ? (
+    <span className="text-xs tracking-[0.15em] mb-6 block" style={{ color: `${tc}35`, fontWeight: 300 }}>About Us</span>
+  ) : tid === 'portfolio' ? null : (
     <span className={`text-xs font-${tid === 'bold' ? 'bold' : 'medium'} uppercase tracking-[0.2em] mb-6 block`}
       style={{ color: tid === 'editorial' || tid === 'bold' ? ac : tid === 'classic' ? ac : `${tc}30` }}>
       {tid === 'bold' ? '— ABOUT' : 'About' + (tid === 'classic' ? ' Us' : '')}
@@ -364,14 +423,20 @@ function ParallaxHero({ brand, tid, hs, tc, ac, bgColor, isDark }: {
   return (
     <section ref={ref} className="t-hero relative overflow-hidden">
       <motion.div style={{ y, opacity }} className={tid === 'playful' ? 'relative z-10' : undefined}>
-        <div className={`${tid === 'bold' ? 'max-w-7xl' : 'max-w-3xl'} mx-auto px-5 sm:px-8 ${tid === 'playful' || tid === 'classic' ? 'text-center' : ''}`}>
+        <div className={`${heroMaxW} mx-auto px-5 sm:px-8 ${heroCentered ? 'text-center' : ''}`}>
           {badge}
-          <h1 className="t-hero-heading mb-8" style={tid === 'playful' ? hs : { ...hs, ...(tid === 'bold' ? {} : {}) }}>
+          <h1 className="t-hero-heading mb-8" style={
+            tid === 'boutique' ? { ...hs, fontWeight: 400, letterSpacing: '0.08em', textTransform: 'uppercase' as const } :
+            tid === 'wellness' ? { ...hs, fontWeight: 300, letterSpacing: '0.02em' } :
+            tid === 'neon' ? { ...hs, fontWeight: 800, textShadow: `0 0 40px ${ac}40` } :
+            tid === 'portfolio' ? { ...hs, fontWeight: 400 } :
+            hs
+          }>
             {tid === 'playful' ? `${tagline} 💫` : tagline}
           </h1>
-          <p className={`t-hero-desc ${tid === 'playful' || tid === 'classic' ? 'mx-auto' : ''}`}
+          <p className={`t-hero-desc ${heroCentered ? 'mx-auto' : ''}`}
             style={{ color: `${tc}${tid === 'bold' ? '60' : tid === 'classic' ? '55' : '50'}` }}>{desc}</p>
-          {tid === 'bold' && <div className="h-0.5 w-16 mt-6" style={{ backgroundColor: ac }} />}
+          {(tid === 'bold' || tid === 'boutique') && <div className="h-0.5 w-16 mt-6" style={{ backgroundColor: ac }} />}
         </div>
       </motion.div>
     </section>
