@@ -21,6 +21,7 @@ import { Brand } from '@/lib/types';
 import { useToast } from '@/components/ui/toast';
 import { OnboardingChecklist } from '@/components/onboarding-checklist';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
+import { PageTransition } from '@/components/ui/page-transition';
 
 interface DashboardData {
   brand: Brand;
@@ -495,14 +496,46 @@ export default function BrandDashboardPage() {
   const showOnboarding = completedItems < onboardingItems.length;
 
   const quickActions = [
-    { icon: Plus, label: 'Add Product', href: `/dashboard/${brandId}/products`, color: 'bg-amber-50 dark:bg-amber-900/30 text-amber-600' },
-    { icon: Newspaper, label: 'Write Blog Post', href: `/dashboard/${brandId}/blog`, color: 'bg-purple-50 dark:bg-purple-900/30 text-purple-600' },
-    { icon: BarChart3, label: 'Check Analytics', href: `/dashboard/${brandId}/analytics`, color: 'bg-blue-50 dark:bg-blue-900/30 text-blue-600' },
-    { icon: Paintbrush, label: 'Design Studio', href: `/dashboard/${brandId}/design`, color: 'bg-pink-50 dark:bg-pink-900/30 text-pink-600' },
-    { icon: Globe, label: 'View Website', href: data.brand.slug ? `/site/${data.brand.slug}` : '#', color: 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600', external: true },
+    {
+      icon: Plus,
+      label: 'Add Product',
+      desc: 'Grow your catalog',
+      href: `/dashboard/${brandId}/products`,
+      iconBg: 'bg-amber-100 dark:bg-amber-900/40',
+      iconColor: 'text-amber-600 dark:text-amber-400',
+      hoverBg: 'hover:border-amber-200 dark:hover:border-amber-800/60 hover:bg-amber-50/50 dark:hover:bg-amber-900/10',
+    },
+    {
+      icon: Newspaper,
+      label: 'Write Blog Post',
+      desc: 'Boost your SEO',
+      href: `/dashboard/${brandId}/blog`,
+      iconBg: 'bg-purple-100 dark:bg-purple-900/40',
+      iconColor: 'text-purple-600 dark:text-purple-400',
+      hoverBg: 'hover:border-purple-200 dark:hover:border-purple-800/60 hover:bg-purple-50/50 dark:hover:bg-purple-900/10',
+    },
+    {
+      icon: BarChart3,
+      label: 'Check Analytics',
+      desc: 'See what\'s working',
+      href: `/dashboard/${brandId}/analytics`,
+      iconBg: 'bg-blue-100 dark:bg-blue-900/40',
+      iconColor: 'text-blue-600 dark:text-blue-400',
+      hoverBg: 'hover:border-blue-200 dark:hover:border-blue-800/60 hover:bg-blue-50/50 dark:hover:bg-blue-900/10',
+    },
+    {
+      icon: Sparkles,
+      label: 'AI Strategy',
+      desc: 'Brand intelligence',
+      href: `/dashboard/${brandId}/strategy`,
+      iconBg: 'bg-violet-100 dark:bg-violet-900/40',
+      iconColor: 'text-violet-600 dark:text-violet-400',
+      hoverBg: 'hover:border-violet-200 dark:hover:border-violet-800/60 hover:bg-violet-50/50 dark:hover:bg-violet-900/10',
+    },
   ];
 
   return (
+    <PageTransition>
     <div className="p-4 sm:p-8 max-w-7xl mx-auto">
       <Breadcrumbs
         items={[
@@ -621,102 +654,78 @@ export default function BrandDashboardPage() {
           </Card>
         </motion.div>
 
-        {/* Getting Started / Quick Actions */}
+        {/* Quick Actions 2x2 Grid */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.25 }}
           className="lg:col-span-2"
         >
-          {showOnboarding ? (
-            <Card className="h-full">
-              <CardHeader>
-                <div className="flex items-center justify-between">
-                  <CardTitle className="text-sm flex items-center gap-2">
-                    <CheckCircle className="h-4 w-4 text-emerald-600" />
-                    Getting Started
-                  </CardTitle>
-                  <span className="text-xs text-zinc-400">{completedItems}/{onboardingItems.length} complete</span>
-                </div>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                  {onboardingItems.map((item, i) => (
-                    <motion.div
-                      key={item.label}
-                      initial={{ opacity: 0, x: -10 }}
-                      animate={{ opacity: 1, x: 0 }}
-                      transition={{ delay: 0.3 + i * 0.03 }}
+          <Card className="h-full">
+            <CardHeader>
+              <CardTitle className="text-sm flex items-center gap-2">
+                <Zap className="h-4 w-4 text-amber-500" />
+                Quick Actions
+              </CardTitle>
+            </CardHeader>
+            <CardContent>
+              <div className="grid grid-cols-2 gap-3">
+                {quickActions.map((action, i) => (
+                  <motion.div
+                    key={action.label}
+                    initial={{ opacity: 0, scale: 0.92, y: 8 }}
+                    animate={{ opacity: 1, scale: 1, y: 0 }}
+                    transition={{ delay: 0.3 + i * 0.06, type: 'spring', stiffness: 340, damping: 25 }}
+                    whileHover={{ y: -3, scale: 1.02 }}
+                    whileTap={{ scale: 0.97 }}
+                  >
+                    <Link
+                      href={action.href}
+                      className={`flex flex-col gap-3 p-5 rounded-2xl border border-zinc-100 dark:border-zinc-800 transition-all duration-200 group ${action.hoverBg}`}
                     >
-                      {item.link && !item.done ? (
-                        <Link href={item.link} className="flex items-center gap-3 p-2.5 rounded-lg hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors group">
-                          <Circle className="h-4 w-4 text-zinc-300 flex-shrink-0 group-hover:text-violet-400 transition-colors" />
-                          <span className="text-sm text-zinc-700 dark:text-zinc-300 group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
-                            {item.label}
-                          </span>
-                          <ArrowRight className="h-3 w-3 text-zinc-300 ml-auto opacity-0 group-hover:opacity-100 transition-opacity" />
-                        </Link>
-                      ) : (
-                        <div className="flex items-center gap-3 p-2.5 rounded-lg">
-                          <motion.div
-                            initial={item.done ? { scale: 0 } : undefined}
-                            animate={item.done ? { scale: 1 } : undefined}
-                            transition={{ type: 'spring', stiffness: 400, damping: 15 }}
-                          >
-                            {item.done ? (
-                              <CheckCircle className="h-4 w-4 text-emerald-500 flex-shrink-0" />
-                            ) : (
-                              <Circle className="h-4 w-4 text-zinc-300 flex-shrink-0" />
-                            )}
-                          </motion.div>
-                          <span className={`text-sm ${item.done ? 'text-zinc-400 line-through' : 'text-zinc-700 dark:text-zinc-300'}`}>
-                            {item.label}
-                          </span>
-                        </div>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          ) : (
-            <Card className="h-full">
-              <CardHeader>
-                <CardTitle className="text-sm flex items-center gap-2">
-                  <Zap className="h-4 w-4 text-amber-500" />
-                  Quick Actions
-                </CardTitle>
-              </CardHeader>
-              <CardContent>
-                <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
-                  {quickActions.map((action, i) => (
-                    <motion.div
-                      key={action.label}
-                      initial={{ opacity: 0, scale: 0.9 }}
-                      animate={{ opacity: 1, scale: 1 }}
-                      transition={{ delay: 0.3 + i * 0.03 }}
-                    >
-                      {action.external ? (
-                        <a href={action.href} target="_blank" rel="noopener noreferrer" className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors group">
-                          <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform`}>
-                            <action.icon className="h-5 w-5" />
-                          </div>
-                          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 text-center">{action.label}</span>
-                        </a>
-                      ) : (
-                        <Link href={action.href} className="flex flex-col items-center gap-2 p-4 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors group">
-                          <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${action.color} group-hover:scale-110 transition-transform`}>
-                            <action.icon className="h-5 w-5" />
-                          </div>
-                          <span className="text-xs font-medium text-zinc-600 dark:text-zinc-400 text-center">{action.label}</span>
-                        </Link>
-                      )}
-                    </motion.div>
-                  ))}
-                </div>
-              </CardContent>
-            </Card>
-          )}
+                      <div className={`h-12 w-12 rounded-xl flex items-center justify-center ${action.iconBg} group-hover:scale-110 transition-transform duration-200`}>
+                        <action.icon className={`h-6 w-6 ${action.iconColor}`} />
+                      </div>
+                      <div>
+                        <p className="text-sm font-semibold text-zinc-900 dark:text-white group-hover:text-violet-700 dark:group-hover:text-violet-300 transition-colors">
+                          {action.label}
+                        </p>
+                        <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">{action.desc}</p>
+                      </div>
+                      <ArrowRight className="h-4 w-4 text-zinc-300 group-hover:text-violet-500 group-hover:translate-x-1 transition-all duration-200 mt-auto" />
+                    </Link>
+                  </motion.div>
+                ))}
+              </div>
+
+              {/* Getting started mini-list when onboarding incomplete */}
+              {showOnboarding && (
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.6 }}
+                  className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800"
+                >
+                  <p className="text-xs font-medium text-zinc-400 mb-2 flex items-center gap-1.5">
+                    <CheckCircle className="h-3.5 w-3.5 text-emerald-500" />
+                    {completedItems}/{onboardingItems.length} setup steps complete
+                  </p>
+                  <div className="flex flex-wrap gap-2">
+                    {onboardingItems.filter(i => !i.done && i.link).slice(0, 2).map(item => (
+                      <Link
+                        key={item.label}
+                        href={item.link}
+                        className="inline-flex items-center gap-1.5 text-xs px-2.5 py-1.5 rounded-lg bg-zinc-50 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-colors border border-zinc-100 dark:border-zinc-700"
+                      >
+                        <Circle className="h-2.5 w-2.5" />
+                        {item.label}
+                      </Link>
+                    ))}
+                  </div>
+                </motion.div>
+              )}
+            </CardContent>
+          </Card>
         </motion.div>
       </div>
 
@@ -778,33 +787,54 @@ export default function BrandDashboardPage() {
           <Card>
             <CardContent className="p-4">
               {data.recentActivity.length === 0 ? (
-                <div className="py-8 text-center text-sm text-zinc-400">
-                  No activity yet. Start building your brand!
-                </div>
+                <motion.div
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ delay: 0.5 }}
+                  className="py-8 text-center"
+                >
+                  <div className="h-10 w-10 rounded-full bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-3">
+                    <Activity className="h-5 w-5 text-zinc-300 dark:text-zinc-600" />
+                  </div>
+                  <p className="text-sm text-zinc-400">No activity yet.</p>
+                  <p className="text-xs text-zinc-300 dark:text-zinc-600 mt-1">Start building your brand to see events here.</p>
+                </motion.div>
               ) : (
-                <div className="space-y-1">
-                  {data.recentActivity.map((activity, i) => {
-                    const iconInfo = activityIcons[activity.type] || { emoji: '📋', color: 'bg-zinc-100 dark:bg-zinc-800' };
-                    return (
-                      <motion.div
-                        key={activity.id}
-                        initial={{ opacity: 0, x: 10 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ delay: 0.4 + i * 0.03 }}
-                        className="flex items-start gap-3 py-2.5 border-b border-zinc-50 dark:border-zinc-800/50 last:border-0"
-                      >
-                        <div className={`h-8 w-8 rounded-lg flex items-center justify-center text-sm flex-shrink-0 ${iconInfo.color}`}>
-                          {iconInfo.emoji}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="text-sm text-zinc-700 dark:text-zinc-300 truncate">{activity.description}</p>
-                          <p className="text-[10px] text-zinc-300 dark:text-zinc-600 mt-0.5">
-                            {timeAgo(activity.created_at)}
-                          </p>
-                        </div>
-                      </motion.div>
-                    );
-                  })}
+                <div className="relative">
+                  {/* Timeline line */}
+                  <div className="absolute left-[15px] top-2 bottom-2 w-px bg-zinc-100 dark:bg-zinc-800/80" />
+                  <div className="space-y-0">
+                    {data.recentActivity.map((activity, i) => {
+                      const iconInfo = activityIcons[activity.type] || { emoji: '📋', color: 'bg-zinc-100 dark:bg-zinc-800' };
+                      return (
+                        <motion.div
+                          key={activity.id}
+                          initial={{ opacity: 0, x: 16 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{
+                            delay: 0.38 + i * 0.05,
+                            type: 'spring',
+                            stiffness: 300,
+                            damping: 28,
+                          }}
+                          className="relative flex items-start gap-3 py-2.5 pl-1 group"
+                        >
+                          {/* Timeline dot / icon */}
+                          <div className={`relative z-10 h-8 w-8 rounded-xl flex items-center justify-center text-sm flex-shrink-0 ${iconInfo.color} ring-2 ring-white dark:ring-zinc-900 shadow-sm`}>
+                            {iconInfo.emoji}
+                          </div>
+                          <div className="flex-1 min-w-0 pt-0.5">
+                            <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-snug group-hover:text-zinc-900 dark:group-hover:text-white transition-colors">
+                              {activity.description}
+                            </p>
+                            <p className="text-[10px] text-zinc-300 dark:text-zinc-600 mt-0.5 tabular-nums">
+                              {timeAgo(activity.created_at)}
+                            </p>
+                          </div>
+                        </motion.div>
+                      );
+                    })}
+                  </div>
                 </div>
               )}
             </CardContent>
@@ -863,5 +893,6 @@ export default function BrandDashboardPage() {
         </Card>
       </motion.div>
     </div>
+    </PageTransition>
   );
 }

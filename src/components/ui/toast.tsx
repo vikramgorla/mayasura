@@ -79,10 +79,10 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               <motion.div
                 key={t.id}
                 layout
-                initial={{ opacity: 0, y: -12, scale: 0.96 }}
-                animate={{ opacity: 1, y: 0, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.96, x: 40 }}
-                transition={{ type: 'spring', damping: 25, stiffness: 350 }}
+                initial={{ opacity: 0, x: 64, scale: 0.95 }}
+                animate={{ opacity: 1, x: 0, scale: 1 }}
+                exit={{ opacity: 0, x: 80, scale: 0.9 }}
+                transition={{ type: 'spring', damping: 22, stiffness: 380, mass: 0.8 }}
                 className={cn(
                   'pointer-events-auto flex items-start gap-3 rounded-xl border p-4 shadow-xl backdrop-blur-md',
                   styles[t.type]
