@@ -3,6 +3,7 @@
 import { useEffect, useState, createContext, useContext } from 'react';
 import { useParams } from 'next/navigation';
 import Link from 'next/link';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Brand } from '@/lib/types';
 import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
 import { buildGoogleFontsUrl } from '@/lib/font-loader';
@@ -250,28 +251,36 @@ function BrandNav({ brand, template, designSettings }: { brand: Brand; template?
         </div>
       </div>
 
-      {/* Mobile menu */}
-      {menuOpen && (
-        <div
-          className="md:hidden border-t px-5 py-5 space-y-4"
-          style={{
-            borderColor: `${textColor}08`,
-            backgroundColor: bgColor,
-          }}
-        >
-          {[...navLinks, { href: `/shop/${slug}`, label: 'Shop' }].map((link) => (
-            <Link
-              key={link.href}
-              href={link.href}
-              onClick={() => setMenuOpen(false)}
-              className={`block ${linkClass}`}
-              style={{ color: `${textColor}88` }}
-            >
-              {templateId === 'bold' ? link.label.toUpperCase() : link.label}
-            </Link>
-          ))}
-        </div>
-      )}
+      {/* Mobile menu — animated slide-down */}
+      <AnimatePresence>
+        {menuOpen && (
+          <motion.div
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            transition={{ duration: 0.25, ease: [0.25, 0.46, 0.45, 0.94] }}
+            className="md:hidden border-t overflow-hidden"
+            style={{
+              borderColor: `${textColor}08`,
+              backgroundColor: bgColor,
+            }}
+          >
+            <div className="px-5 py-5 space-y-1">
+              {[...navLinks, { href: `/shop/${slug}`, label: 'Shop' }].map((link) => (
+                <Link
+                  key={link.href}
+                  href={link.href}
+                  onClick={() => setMenuOpen(false)}
+                  className={`block ${linkClass} py-3 transition-opacity hover:opacity-100`}
+                  style={{ color: `${textColor}88` }}
+                >
+                  {templateId === 'bold' ? link.label.toUpperCase() : link.label}
+                </Link>
+              ))}
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </nav>
   );
 }

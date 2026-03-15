@@ -665,6 +665,53 @@
   border-top: none !important;
 }
 
+/* ==================== Mobile Responsiveness Overrides ==================== */
+/* Ensure hero sections don't overflow on small screens */
+@media (max-width: 480px) {
+  .t-hero {
+    padding-left: 1.25rem !important;
+    padding-right: 1.25rem !important;
+  }
+
+  [data-template="minimal"] .t-hero {
+    padding-top: 5rem;
+    padding-bottom: 4rem;
+    min-height: 60vh;
+  }
+
+  [data-template="bold"] .t-hero {
+    padding-top: 5rem;
+    padding-bottom: 3rem;
+    min-height: 70vh;
+  }
+
+  [data-template="boutique"] .t-hero,
+  [data-template="wellness"] .t-hero {
+    padding-top: 6rem;
+    padding-bottom: 4rem;
+  }
+
+  [data-template="portfolio"] .t-hero {
+    min-height: 70vh;
+  }
+
+  /* Ensure buttons stack cleanly on very small mobile */
+  .t-btn-primary,
+  .t-btn-secondary {
+    min-height: 44px; /* WCAG tap target */
+  }
+}
+
+/* Ensure hero buttons have good spacing and tap targets on mobile */
+@media (max-width: 640px) {
+  .t-btn-primary,
+  .t-btn-secondary {
+    min-height: 44px;
+    padding-left: 1.25rem;
+    padding-right: 1.25rem;
+  }
+}
+
 /* ==================== Scroll Animations (Intersection Observer friendly) ==================== */
 .t-animate {
   opacity: 0;
