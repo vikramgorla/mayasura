@@ -211,9 +211,10 @@ function AnnouncementBanner({ brandId }: { brandId: string }) {
             </Link>
             <button
               onClick={dismiss}
+              aria-label="Dismiss announcement"
               className="h-5 w-5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-800 flex items-center justify-center text-violet-400 transition-colors"
             >
-              <X className="h-3 w-3" />
+              <X className="h-3 w-3" aria-hidden="true" />
             </button>
           </div>
         </div>
