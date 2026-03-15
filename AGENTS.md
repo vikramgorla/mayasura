@@ -19,6 +19,23 @@ This workspace is for designing and building **Mayasura** — an open-source fra
 - Document architectural decisions with rationale
 - Keep research separate from decisions
 
+## Git Identity — CRITICAL
+
+**Always run `source ~/.openclaw/scripts/github-apps/setup-agent-git.sh mayasura` before any git/gh operation in every session.**
+
+- All commits are authored as `Agent Mayasura 🏗️ <268343911+agent-mayasura[bot]@users.noreply.github.com>`
+- Never use Vik's personal credentials for commits or PRs
+- Push via HTTPS (GIT_ASKPASS handles auth after sourcing setup script)
+- Sub-agents MUST also source the setup script before committing
+
+### Sub-agent commit template:
+```bash
+source ~/.openclaw/scripts/github-apps/setup-agent-git.sh mayasura
+git add <files>
+git commit -m "feat: your commit title"
+git push origin <branch>
+```
+
 ## Development Style (NON-NEGOTIABLE)
 
 1. **GitHub Issue first** — Create a GitHub issue BEFORE starting any feature, fix, or change. Every single change needs a tracked issue with proper labels.

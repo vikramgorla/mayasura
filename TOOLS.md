@@ -40,9 +40,26 @@ curl -s -X POST https://backboard.railway.com/graphql/v2 \
   -d '{"query": "..."}'
 ```
 
-### GitHub
+### GitHub Identity (Agent Mayasura GitHub App)
+
+**Always use your GitHub App identity for all git/GitHub operations.**
+
+```bash
+source ~/.openclaw/scripts/github-apps/setup-agent-git.sh mayasura
+```
+
+This configures git author/committer + `GH_TOKEN` for ~1 hour.
+
+- **Git name:** `Agent Mayasura 🏗️`
+- **Git email:** `268343911+agent-mayasura[bot]@users.noreply.github.com`
+- **GitHub displays as:** `agent-mayasura[bot]`
+
+#### Pushing (HTTPS with app token)
+After sourcing the setup script, just use `git push origin <branch>` — GIT_ASKPASS handles auth automatically.
 
 - **Repo:** `vikramgorla/mayasura` (private)
+- **1Password:** `agent-mayasura.github-app` (vault: openclaw) — fields: `app_id`, `private key`
+- **Installation ID:** `116529102` (on vikramgorla account, repo: mayasura)
 
 ---
 
