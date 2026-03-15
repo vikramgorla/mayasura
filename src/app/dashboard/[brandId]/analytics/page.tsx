@@ -483,7 +483,117 @@ export default function AnalyticsPage() {
             </motion.div>
           ))}
         </div>
+
+        {/* Subscribers Section */}
+        <SubscribersList brandId={brandId} subscriberCount={data?.subscriberCount || 0} />
       </motion.div>
     </div>
+  );
+}
+
+// ─── Subscribers List Component ──────────────────────────────────
+function SubscribersList({ brandId, subscriberCount }: { brandId: string; subscriberCount: number }) {
+  const [subscribers, setSubscribers] = useState<Array<{
+    id: string;
+    email: string;
+    name?: string;
+    status?: string;
+    subscribed_at: string;
+  }>>([]);
+  const [expanded, setExpanded] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const loadSubscribers = async () => {
+    if (subscribers.length > 0) {
+      setExpanded(!expanded);
+      return;
+    }
+    setLoading(true);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/subscribers`);
+      const data = await res.json();
+      setSubscribers(data.subscribers || []);
+      setExpanded(true);
+    } catch {
+      // silent
+    }
+    setLoading(false);
+  };
+
+  const exportCSV = () => {
+    window.open(`/api/brands/${brandId}/subscribers?format=csv`, '_blank');
+  };
+
+  return (
+    <Card>
+      <CardHeader>
+        <div className="flex items-center justify-between">
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Mail className="h-4 w-4 text-violet-600" />
+            Newsletter Subscribers ({subscriberCount})
+          </CardTitle>
+          <div className="flex items-center gap-2">
+            {subscriberCount > 0 && (
+              <button
+                onClick={exportCSV}
+                className="text-[11px] font-medium px-2.5 py-1 rounded-md bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+              >
+                Export CSV
+              </button>
+            )}
+            <button
+              onClick={loadSubscribers}
+              disabled={loading}
+              className="text-[11px] font-medium px-2.5 py-1 rounded-md bg-violet-50 dark:bg-violet-900/30 text-violet-600 dark:text-violet-400 hover:bg-violet-100 dark:hover:bg-violet-900/50 transition-colors"
+            >
+              {loading ? 'Loading...' : expanded ? 'Collapse' : 'View All'}
+            </button>
+          </div>
+        </div>
+      </CardHeader>
+      {expanded && (
+        <CardContent>
+          {subscribers.length === 0 ? (
+            <div className="py-8 text-center text-sm text-zinc-400">
+              No subscribers yet. Add a newsletter signup form to your consumer site.
+            </div>
+          ) : (
+            <div className="space-y-0 divide-y divide-zinc-100 dark:divide-zinc-800">
+              {subscribers.map(sub => (
+                <div key={sub.id} className="flex items-center justify-between py-2.5">
+                  <div className="flex items-center gap-3 min-w-0">
+                    <div className="w-7 h-7 rounded-full bg-violet-50 dark:bg-violet-900/30 flex items-center justify-center text-[10px] font-bold text-violet-600 shrink-0">
+                      {(sub.name || sub.email)[0].toUpperCase()}
+                    </div>
+                    <div className="min-w-0">
+                      {sub.name && (
+                        <span className="text-xs font-medium text-zinc-900 dark:text-white block truncate">
+                          {sub.name}
+                        </span>
+                      )}
+                      <span className="text-xs text-zinc-500 dark:text-zinc-400 block truncate">
+                        {sub.email}
+                      </span>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`text-[10px] font-medium px-1.5 py-0.5 rounded-full ${
+                      sub.status === 'unsubscribed'
+                        ? 'bg-red-50 dark:bg-red-900/30 text-red-600'
+                        : 'bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600'
+                    }`}>
+                      {sub.status || 'active'}
+                    </span>
+                    <span className="text-[10px] text-zinc-400">
+                      {new Date(sub.subscribed_at).toLocaleDateString()}
+                    </span>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+        </CardContent>
+      )}
+    </Card>
   );
 }

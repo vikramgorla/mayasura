@@ -9,7 +9,7 @@ import {
   ArrowRight, ShoppingBag, Sparkles, Plus, CheckCircle,
   Circle, HeadphonesIcon, TrendingUp, Clock, Eye,
   Users, DollarSign, Paintbrush, Newspaper, Zap,
-  ArrowUpRight, ArrowDownRight, Settings
+  ArrowUpRight, ArrowDownRight, Settings, Mail,
 } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -263,10 +263,12 @@ export default function BrandDashboardPage() {
   const prevConversionRate = data.analytics?.prevConversionRate || 0;
   const sparkData = data.analytics?.pageViews?.byDay?.map((d: { count: number }) => d.count) || [0, 0, 0, 0, 0];
 
+  const subscriberCount = (data.analytics as Record<string, unknown>)?.subscriberCount as number || 0;
+
   const statsCards = [
     { label: 'Page Views', value: pageViews, prev: prevPageViews, icon: Eye, color: 'text-blue-600', bg: 'bg-blue-50 dark:bg-blue-900/30', sparkColor: '#2563EB', prefix: '' },
     { label: 'Unique Visitors', value: uniqueVisitors, prev: prevUniqueVisitors, icon: Users, color: 'text-emerald-600', bg: 'bg-emerald-50 dark:bg-emerald-900/30', sparkColor: '#059669', prefix: '' },
-    { label: 'Conversion Rate', value: conversionRate, prev: prevConversionRate, icon: TrendingUp, color: 'text-amber-600', bg: 'bg-amber-50 dark:bg-amber-900/30', sparkColor: '#D97706', prefix: '', suffix: '%' },
+    { label: 'Subscribers', value: subscriberCount, prev: 0, icon: Mail, color: 'text-violet-600', bg: 'bg-violet-50 dark:bg-violet-900/30', sparkColor: '#7C3AED', prefix: '' },
     { label: 'Revenue', value: revenue, prev: prevRevenue, icon: DollarSign, color: 'text-purple-600', bg: 'bg-purple-50 dark:bg-purple-900/30', sparkColor: '#7C3AED', prefix: '$' },
   ];
 
