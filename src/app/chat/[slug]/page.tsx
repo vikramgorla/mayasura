@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Brand } from '@/lib/types';
 import { getWebsiteTemplate, type WebsiteTemplate } from '@/lib/website-templates';
 import { buildGoogleFontsUrl } from '@/lib/font-loader';
+import { resolveDesignSettings, designSettingsToCSSVars, type ResolvedDesignSettings } from '@/lib/design-settings';
 
 interface Message {
   role: 'user' | 'assistant';
@@ -58,6 +59,7 @@ export default function ChatPage() {
   const slug = params.slug as string;
   const [brand, setBrand] = useState<Brand | null>(null);
   const [template, setTemplate] = useState<WebsiteTemplate | undefined>();
+  const [designSettings, setDesignSettings] = useState<ResolvedDesignSettings | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
   const [sending, setSending] = useState(false);
@@ -76,6 +78,7 @@ export default function ChatPage() {
         setBrand(d.brand);
         const templateId = d.settings?.website_template || 'minimal';
         setTemplate(getWebsiteTemplate(templateId));
+        setDesignSettings(resolveDesignSettings(d.settings, d.brand.primary_color || '#0f172a'));
       })
       .catch(() => setError(true));
   }, [slug]);
@@ -187,7 +190,14 @@ export default function ChatPage() {
         backgroundColor: bgColor,
         color: textColor,
         fontFamily: brand.font_body || 'Inter',
-      }}
+        '--accent': accentColor,
+        ...(designSettings ? designSettingsToCSSVars(
+          designSettings,
+          brand.primary_color || '#0f172a',
+          brand.secondary_color || '#fafafa',
+          brand.accent_color || '#3b82f6',
+        ) as React.CSSProperties : {}),
+      } as React.CSSProperties}
     >
       {/* Header */}
       <header

@@ -960,7 +960,8 @@ export default function BrandHomePage() {
             initial="hidden"
             whileInView="visible"
             viewport={{ once: true, margin: "-60px" }}
-            className={`grid grid-cols-1 sm:grid-cols-2 ${templateId === 'bold' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'} gap-6`}
+            className={`grid grid-cols-1 sm:grid-cols-2 ${templateId === 'bold' ? 'lg:grid-cols-4' : 'lg:grid-cols-3'}`}
+            style={{ gap: dsSp.cardGap }}
           >
             {products.slice(0, templateId === 'bold' ? 4 : 3).map((product) => (
               <motion.div key={product.id} variants={scrollItem}>
