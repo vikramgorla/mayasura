@@ -22,6 +22,8 @@ import { useToast } from '@/components/ui/toast';
 import { OnboardingChecklist } from '@/components/onboarding-checklist';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { PageTransition } from '@/components/ui/page-transition';
+import { BrandScoreCard } from '@/components/brand-score';
+import { HelpTooltip } from '@/components/help-tooltip';
 
 interface DashboardData {
   brand: Brand;
@@ -446,7 +448,7 @@ export default function BrandDashboardPage() {
       // Sort by date and take latest 10
       activities.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
 
-      setData({
+      const newData = {
         brand: brandData.brand,
         productCount: products.length,
         contentCount: contentData.content?.length || 0,
@@ -454,9 +456,31 @@ export default function BrandDashboardPage() {
         ticketStats: ticketData.stats || { total: 0, open: 0, resolved: 0, satisfaction: null },
         analytics: analyticsData,
         recentActivity: activities.slice(0, 10),
-      });
+      };
+      setData(newData);
+
+      // Motivational micro-copy — show encouraging toasts on milestones
+      try {
+        const seenKey = `mayasura-milestones-${brandId}`;
+        const seen = JSON.parse(localStorage.getItem(seenKey) || '{}');
+        const milestones: Array<{ key: string; check: boolean; title: string; msg: string }> = [
+          { key: 'first_product', check: products.length === 1, title: "Your shop is coming to life! 🛍️", msg: "You added your first product. Keep going!" },
+          { key: 'three_products', check: products.length >= 3, title: "Product catalog growing! 📦", msg: "Brands with 3+ products see 5x more engagement." },
+          { key: 'first_blog', check: posts.length === 1, title: "Content is king 👑", msg: "Your first blog post is live. Great for SEO!" },
+          { key: 'launched', check: brandData.brand.status === 'launched', title: "You're live! 🚀", msg: "Your brand is out in the world. Amazing!" },
+          { key: 'first_view', check: (analyticsData?.pageViews?.total || 0) > 0, title: "First visitor! 👀", msg: "Someone is checking out your brand." },
+        ];
+        for (const m of milestones) {
+          if (m.check && !seen[m.key]) {
+            seen[m.key] = true;
+            setTimeout(() => toast.success(m.title, m.msg), 1500);
+            break; // Only show one per load
+          }
+        }
+        localStorage.setItem(seenKey, JSON.stringify(seen));
+      } catch { /* localStorage may not be available */ }
     });
-  }, [brandId]);
+  }, [brandId]); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (!data) return <DashboardSkeleton />;
 
@@ -578,6 +602,10 @@ export default function BrandDashboardPage() {
       />
 
       {/* Quick Stats Cards */}
+      <div className="flex items-center gap-2 mb-3">
+        <h2 className="text-sm font-medium text-zinc-400">Key Metrics</h2>
+        <HelpTooltip text="These metrics update in real-time. Track page views, visitors, subscribers, and revenue." side="right" />
+      </div>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 mb-8">
         {statsCards.map((stat, i) => (
           <motion.div
@@ -608,50 +636,13 @@ export default function BrandDashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
-        {/* Brand Health Score */}
+        {/* Brand Score */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.2 }}
         >
-          <Card className="h-full">
-            <CardHeader>
-              <CardTitle className="text-sm flex items-center gap-2">
-                <TrendingUp className="h-4 w-4 text-blue-600" />
-                Brand Health Score
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="flex items-center gap-6">
-                <div className="relative">
-                  <CircularProgress value={healthScore} size={100} strokeWidth={8} color={healthColor} />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <span className="text-2xl font-bold text-zinc-900 dark:text-white">
-                        <AnimatedCounter value={healthScore} />
-                      </span>
-                      <span className="text-sm text-zinc-400">%</span>
-                    </div>
-                  </div>
-                </div>
-                <div className="flex-1">
-                  <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                    {healthScore >= 80 ? '🎉 Excellent!' : healthScore >= 60 ? '👍 Good progress' : healthScore >= 40 ? '💪 Getting there' : '🚀 Let\'s get started'}
-                  </p>
-                  {recommendations.length > 0 && (
-                    <div className="space-y-1.5">
-                      {recommendations.map((rec, i) => (
-                        <div key={i} className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
-                          <Zap className="h-3 w-3 text-amber-500 flex-shrink-0" />
-                          {rec}
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </CardContent>
-          </Card>
+          <BrandScoreCard brandId={brandId} />
         </motion.div>
 
         {/* Quick Actions 2x2 Grid */}
@@ -666,6 +657,7 @@ export default function BrandDashboardPage() {
               <CardTitle className="text-sm flex items-center gap-2">
                 <Zap className="h-4 w-4 text-amber-500" />
                 Quick Actions
+                <HelpTooltip text="Shortcuts to common tasks. Building a brand is faster with these one-click actions." side="bottom" />
               </CardTitle>
             </CardHeader>
             <CardContent>
