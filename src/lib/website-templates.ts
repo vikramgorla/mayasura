@@ -376,6 +376,54 @@ export const WEBSITE_TEMPLATES: WebsiteTemplate[] = [
       accentUsage: 'moderate',
     },
   },
+  {
+    id: 'artisan',
+    name: 'Artisan',
+    description: 'Warm, handcrafted aesthetic with generous spacing and serif typography. Breathes authenticity and craft.',
+    bestFor: ['bakery', 'craftspeople', 'artisan', 'food', 'handmade', 'ceramics', 'woodwork', 'jewelry', 'vintage'],
+    fonts: {
+      heading: 'Playfair Display',
+      body: 'Source Sans Pro',
+      headingWeight: '700',
+    },
+    colors: {
+      light: { text: '#2D2A26', background: '#FAF7F2', accent: '#C4704A', surface: '#FFFFFF', muted: '#7A6F64', border: '#E8DDD3' },
+      dark: { text: '#F0EAE2', background: '#1E1A16', accent: '#D4845C', surface: '#2A2420', muted: '#9A8F84', border: '#3A3028' },
+    },
+    preview: {
+      heroStyle: 'split',
+      cardStyle: 'elevated',
+      navStyle: 'classic',
+      typography: { headingWeight: '700', headingTracking: '-0.02em', headingCase: 'normal', bodySize: '16px' },
+      spacing: 'generous',
+      borderRadius: '8px',
+      accentUsage: 'moderate',
+    },
+  },
+  {
+    id: 'corporate',
+    name: 'Corporate',
+    description: 'Clean, professional, and trustworthy. Dense layout that means business. Perfect for B2B and consulting.',
+    bestFor: ['consulting', 'b2b', 'professional services', 'finance', 'legal', 'enterprise', 'hr', 'accounting'],
+    fonts: {
+      heading: 'Inter',
+      body: 'Inter',
+      headingWeight: '600',
+    },
+    colors: {
+      light: { text: '#1E293B', background: '#FFFFFF', accent: '#2563EB', surface: '#F8FAFC', muted: '#64748B', border: '#E2E8F0' },
+      dark: { text: '#E2E8F0', background: '#0F172A', accent: '#3B82F6', surface: '#1E293B', muted: '#94A3B8', border: '#334155' },
+    },
+    preview: {
+      heroStyle: 'left-aligned',
+      cardStyle: 'bordered',
+      navStyle: 'spread',
+      typography: { headingWeight: '600', headingTracking: '-0.02em', headingCase: 'normal', bodySize: '15px' },
+      spacing: 'compact',
+      borderRadius: '6px',
+      accentUsage: 'moderate',
+    },
+  },
 ];
 
 export function getWebsiteTemplate(id: string): WebsiteTemplate | undefined {

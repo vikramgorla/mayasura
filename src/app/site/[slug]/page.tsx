@@ -60,6 +60,16 @@ const heroAnimations: Record<string, { container: Variants; item: Variants }> = 
     container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.14, delayChildren: 0.2 } } },
     item: { hidden: { opacity: 0, y: 20, scale: 0.96 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] } } },
   },
+  // Artisan: gentle parallax fade — warm, unhurried reveal
+  artisan: {
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.16, delayChildren: 0.25 } } },
+    item: { hidden: { opacity: 0, y: 14, scale: 1.02 }, show: { opacity: 1, y: 0, scale: 1, transition: { duration: 1.1, ease: [0.25, 0.1, 0.25, 1] } } },
+  },
+  // Corporate: clean slide up — confident, no-nonsense
+  corporate: {
+    container: { hidden: { opacity: 0 }, show: { opacity: 1, transition: { staggerChildren: 0.09, delayChildren: 0.1 } } },
+    item: { hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0, transition: { duration: 0.65, ease: [0.33, 1, 0.68, 1] as const } } },
+  },
 };
 
 const scrollStagger: Variants = {
