@@ -1,10 +1,12 @@
 'use client';
 
-import { ArrowLeft, Rocket } from 'lucide-react';
+import { useState } from 'react';
+import { ArrowLeft, Rocket, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Spinner } from '@/components/ui/loading';
 import { BrandData, AVAILABLE_CHANNELS } from '@/lib/types';
+import SitePreview, { DeviceToggle } from '@/components/site-preview';
 
 interface Props {
   data: BrandData;
@@ -15,6 +17,7 @@ interface Props {
 
 export default function StepReview({ data, onBack, onLaunch, isLaunching }: Props) {
   const selectedChannels = AVAILABLE_CHANNELS.filter(c => data.channels.includes(c.id));
+  const [viewMode, setViewMode] = useState<'desktop' | 'tablet' | 'mobile'>('desktop');
 
   return (
     <div className="animate-fade-in">
@@ -24,6 +27,34 @@ export default function StepReview({ data, onBack, onLaunch, isLaunching }: Prop
       </div>
 
       <div className="space-y-6">
+        {/* Site Preview */}
+        <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
+          <div className="px-4 py-3 border-b border-zinc-100 dark:border-zinc-800 flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Eye className="h-4 w-4 text-violet-500" />
+              <span className="text-sm font-semibold text-zinc-900 dark:text-white">Website Preview</span>
+            </div>
+            <DeviceToggle viewMode={viewMode} onViewModeChange={setViewMode} />
+          </div>
+          <div className="p-4 bg-zinc-50 dark:bg-zinc-950">
+            <SitePreview
+              brandName={data.name}
+              tagline={data.tagline}
+              templateId="minimal"
+              primaryColor={data.primaryColor}
+              secondaryColor={data.secondaryColor}
+              accentColor={data.accentColor}
+              fontHeading={data.fontHeading}
+              fontBody={data.fontBody}
+              products={data.products}
+              viewMode={viewMode}
+            />
+            <p className="text-[11px] text-zinc-400 text-center mt-3">
+              This is a preview of your site. You can customize the template and design further after launch.
+            </p>
+          </div>
+        </div>
+
         {/* Brand Overview */}
         <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl overflow-hidden">
           <div className="p-6" style={{ backgroundColor: data.primaryColor }}>
