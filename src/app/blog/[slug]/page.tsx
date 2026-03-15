@@ -6,6 +6,7 @@ import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useBlogSite } from './layout';
 import { BlogPost } from '@/lib/types';
+import { BlogIndexMeta, BreadcrumbMeta } from '@/components/site/site-meta';
 import { Search, Clock, Share2, ChevronDown, X } from 'lucide-react';
 
 /* ─── Helpers ───────────────────────────────────────────────── */
@@ -354,8 +355,20 @@ export default function BlogListingPage() {
     textTransform: 'uppercase',
   };
 
+  const baseUrl = typeof window !== 'undefined' ? window.location.origin : 'https://mayasura.app';
+  const canonicalUrl = `${baseUrl}/blog/${slug}`;
+
   return (
     <div className={`${containerWidth} mx-auto px-5 sm:px-8 py-16 sm:py-24`}>
+      <BlogIndexMeta
+        org={{ brandName: brand.name, description: brand.description, url: canonicalUrl, logoUrl: brand.logo_url }}
+        canonicalUrl={canonicalUrl}
+        postCount={allPosts.length}
+      />
+      <BreadcrumbMeta items={[
+        { name: brand.name, url: `${baseUrl}/site/${slug}` },
+        { name: 'Blog', url: canonicalUrl },
+      ]} />
       {/* Header */}
       <div className="mb-12">
         {templateId === 'playful' ? (

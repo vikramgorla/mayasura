@@ -7,7 +7,8 @@ import {
   Settings, Palette, Globe, Plug, AlertTriangle, Save, Loader2,
   Check, Copy, ExternalLink, Eye, Trash2, MessageSquare,
   ShoppingBag, FileText, Mail, Share2, ChevronRight,
-  Newspaper, Download, Upload, Clock, Key, RefreshCw
+  Newspaper, Download, Upload, Clock, Key, RefreshCw, Bell,
+  Webhook,
 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -1076,6 +1077,235 @@ function APIKeysTab({ brandId }: { brandId: string }) {
   );
 }
 
+// ─── Notifications Tab ───────────────────────────────────────────
+function NotificationsTab({ brandId, settings: initialSettings }: { brandId: string; settings: Record<string, string> }) {
+  const [settings, setSettings] = useState<Record<string, string>>(initialSettings);
+  const [saving, setSaving] = useState<string | null>(null);
+  const [savedKey, setSavedKey] = useState<string | null>(null);
+  const toast = useToast();
+
+  const saveSetting = async (key: string, value: string) => {
+    setSaving(key);
+    try {
+      const res = await fetch(`/api/brands/${brandId}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value }),
+      });
+      if (res.ok) {
+        setSettings(s => ({ ...s, [key]: value }));
+        setSavedKey(key);
+        setTimeout(() => setSavedKey(null), 2000);
+      } else {
+        toast.error('Failed to save');
+      }
+    } catch {
+      toast.error('Failed to save');
+    }
+    setSaving(null);
+  };
+
+  const toggleNotification = async (key: string) => {
+    const current = settings[key] === 'true';
+    const next = (!current).toString();
+    setSettings(s => ({ ...s, [key]: next }));
+    await saveSetting(key, next);
+  };
+
+  const NotifToggle = ({ settingKey, label, description }: { settingKey: string; label: string; description: string }) => {
+    const isOn = settings[settingKey] !== 'false'; // Default to on
+    return (
+      <div className="flex items-center justify-between p-4 rounded-xl border border-zinc-200 dark:border-zinc-700 hover:border-zinc-300 dark:hover:border-zinc-600 transition-colors">
+        <div className="flex-1 min-w-0 mr-4">
+          <p className="text-sm font-medium text-zinc-900 dark:text-white">{label}</p>
+          <p className="text-xs text-zinc-400 mt-0.5">{description}</p>
+        </div>
+        <div className="flex items-center gap-2 flex-shrink-0">
+          {savedKey === settingKey && (
+            <motion.span
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0 }}
+              className="text-xs text-emerald-600 dark:text-emerald-400 font-medium"
+            >
+              Saved ✓
+            </motion.span>
+          )}
+          <button
+            onClick={() => toggleNotification(settingKey)}
+            disabled={saving === settingKey}
+            className={`relative w-11 h-6 rounded-full transition-colors ${isOn ? 'bg-violet-600' : 'bg-zinc-200 dark:bg-zinc-700'}`}
+          >
+            <motion.div
+              className="absolute top-0.5 left-0.5 h-5 w-5 rounded-full bg-white shadow-sm"
+              animate={{ x: isOn ? 20 : 0 }}
+              transition={{ type: 'spring', stiffness: 500, damping: 30 }}
+            />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+  const WebhookField = ({ settingKey, label, placeholder }: { settingKey: string; label: string; placeholder: string }) => (
+    <div>
+      <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">{label}</label>
+      <div className="flex gap-2">
+        <input
+          type="url"
+          value={settings[settingKey] || ''}
+          onChange={e => setSettings(s => ({ ...s, [settingKey]: e.target.value }))}
+          className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+          placeholder={placeholder}
+        />
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() => saveSetting(settingKey, settings[settingKey] || '')}
+          disabled={saving === settingKey}
+          className="flex-shrink-0"
+        >
+          {saving === settingKey ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : savedKey === settingKey ? (
+            <Check className="h-4 w-4 text-emerald-500" />
+          ) : (
+            'Save'
+          )}
+        </Button>
+      </div>
+    </div>
+  );
+
+  return (
+    <div className="space-y-6">
+      {/* Email notifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Mail className="h-4 w-4 text-rose-500" />
+            Email Notifications
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-3">
+          <p className="text-xs text-zinc-400 mb-1">Choose which events trigger email notifications to you.</p>
+          <NotifToggle
+            settingKey="notif_email_new_order"
+            label="New Order"
+            description="Get notified when a customer places an order"
+          />
+          <NotifToggle
+            settingKey="notif_email_new_contact"
+            label="New Contact Submission"
+            description="Get notified when someone fills in your contact form"
+          />
+          <NotifToggle
+            settingKey="notif_email_new_subscriber"
+            label="New Newsletter Subscriber"
+            description="Get notified when someone subscribes to your list"
+          />
+          <NotifToggle
+            settingKey="notif_email_new_ticket"
+            label="New Support Ticket"
+            description="Get notified when a support ticket is opened"
+          />
+          <NotifToggle
+            settingKey="notif_email_chatbot_lead"
+            label="Chatbot Lead Captured"
+            description="Get notified when the chatbot captures a lead"
+          />
+          <NotifToggle
+            settingKey="notif_email_weekly_digest"
+            label="Weekly Digest"
+            description="A weekly summary of your brand's performance"
+          />
+        </CardContent>
+      </Card>
+
+      {/* Notification email */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Bell className="h-4 w-4 text-amber-500" />
+            Notification Destination
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium mb-1.5 text-zinc-600 dark:text-zinc-300">Notification Email</label>
+            <div className="flex gap-2">
+              <input
+                type="email"
+                value={settings['notif_email_address'] || ''}
+                onChange={e => setSettings(s => ({ ...s, notif_email_address: e.target.value }))}
+                className="flex-1 px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                placeholder="you@example.com"
+              />
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => saveSetting('notif_email_address', settings['notif_email_address'] || '')}
+                disabled={saving === 'notif_email_address'}
+              >
+                {saving === 'notif_email_address' ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : savedKey === 'notif_email_address' ? (
+                  <Check className="h-4 w-4 text-emerald-500" />
+                ) : (
+                  'Save'
+                )}
+              </Button>
+            </div>
+            <p className="text-xs text-zinc-400 mt-1">Notifications will be sent to this address (defaults to your account email)</p>
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Webhook notifications */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Webhook className="h-4 w-4 text-zinc-500 dark:text-zinc-400" />
+            Webhook Notifications
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          <div className="p-3 rounded-lg bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 mb-2">
+            <p className="text-xs text-zinc-500 dark:text-zinc-400">
+              POST requests are sent to your URL when events occur. Must be HTTPS. Payload is JSON with event type and data.
+            </p>
+          </div>
+          <WebhookField
+            settingKey="webhook_order_created"
+            label="Order Created"
+            placeholder="https://your-server.com/webhooks/order"
+          />
+          <WebhookField
+            settingKey="webhook_contact_new"
+            label="New Contact Submission"
+            placeholder="https://your-server.com/webhooks/contact"
+          />
+          <WebhookField
+            settingKey="webhook_newsletter_subscribe"
+            label="Newsletter Subscribe"
+            placeholder="https://your-server.com/webhooks/newsletter"
+          />
+          <WebhookField
+            settingKey="webhook_ticket_created"
+            label="Ticket Created"
+            placeholder="https://your-server.com/webhooks/ticket"
+          />
+          <WebhookField
+            settingKey="webhook_chatbot_lead"
+            label="Chatbot Lead Captured"
+            placeholder="https://your-server.com/webhooks/lead"
+          />
+        </CardContent>
+      </Card>
+    </div>
+  );
+}
+
 // ─── Main Settings Page ──────────────────────────────────────────
 export default function SettingsPage() {
   const params = useParams();
@@ -1119,6 +1349,7 @@ export default function SettingsPage() {
     { id: 'general', label: 'General', icon: Settings },
     { id: 'design', label: 'Design', icon: Palette },
     { id: 'channels', label: 'Channels', icon: Globe },
+    { id: 'notifications', label: 'Notifications', icon: Bell },
     { id: 'integrations', label: 'Integrations', icon: Plug },
     { id: 'data', label: 'Data', icon: Download },
     { id: 'activity', label: 'Activity Log', icon: Clock },
@@ -1193,6 +1424,7 @@ export default function SettingsPage() {
             {activeTab === 'general' && <GeneralTab brand={brand} onSave={saveBrand} />}
             {activeTab === 'design' && <DesignTab brand={brand} onSave={saveBrand} />}
             {activeTab === 'channels' && <ChannelsTab brand={brand} onSave={saveBrand} />}
+            {activeTab === 'notifications' && <NotificationsTab brandId={brandId} settings={settings} />}
             {activeTab === 'integrations' && <IntegrationsTab brandId={brandId} settings={settings} />}
             {activeTab === 'data' && <DataTab brandId={brandId} brand={brand} />}
             {activeTab === 'activity' && <ActivityLogTab brandId={brandId} />}

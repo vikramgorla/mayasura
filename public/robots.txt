@@ -4,7 +4,7 @@
 User-agent: *
 Allow: /
 
-# Disallow admin/dashboard pages
+# Disallow admin/dashboard pages (noindex also set via meta tags)
 Disallow: /dashboard/
 Disallow: /api/
 Disallow: /auth/
@@ -14,4 +14,7 @@ Allow: /api/sitemap
 Allow: /api/public/
 
 # Sitemap
-Sitemap: /api/sitemap
+Sitemap: https://mayasura.app/api/sitemap
+
+# Rate limiting for crawlers
+Crawl-delay: 1

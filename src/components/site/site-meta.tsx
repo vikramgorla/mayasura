@@ -341,3 +341,132 @@ export function SitemapHint({ sitemapUrl }: { sitemapUrl: string }) {
   }, [sitemapUrl]);
   return null;
 }
+
+/* ─── BreadcrumbList JSON-LD ─────────────────────────────────── */
+export interface BreadcrumbItem {
+  name: string;
+  url: string;
+}
+
+export function BreadcrumbMeta({ items }: { items: BreadcrumbItem[] }) {
+  useEffect(() => {
+    if (!items || items.length === 0) return;
+    setJsonLd('breadcrumb', {
+      '@context': 'https://schema.org',
+      '@type': 'BreadcrumbList',
+      itemListElement: items.map((item, i) => ({
+        '@type': 'ListItem',
+        position: i + 1,
+        name: item.name,
+        item: item.url,
+      })),
+    });
+  }, [items]);
+  return null;
+}
+
+/* ─── Dashboard noindex — inject robots noindex for dashboard pages */
+export function DashboardNoIndex() {
+  useEffect(() => {
+    setMeta('robots', 'noindex, nofollow');
+    // Also set meta name="googlebot" for extra coverage
+    setMeta('googlebot', 'noindex, nofollow');
+  }, []);
+  return null;
+}
+
+/* ─── WebSite + SearchAction schema for brand consumer sites ──── */
+export function WebSiteMeta({
+  org, canonicalUrl,
+}: {
+  org: OrgData;
+  canonicalUrl: string;
+}) {
+  useEffect(() => {
+    setJsonLd('website', {
+      '@context': 'https://schema.org',
+      '@type': 'WebSite',
+      name: org.brandName,
+      url: org.url || canonicalUrl,
+      description: org.description || undefined,
+      potentialAction: {
+        '@type': 'SearchAction',
+        target: {
+          '@type': 'EntryPoint',
+          urlTemplate: `${org.url || canonicalUrl}/search?q={search_term_string}`,
+        },
+        'query-input': 'required name=search_term_string',
+      },
+    });
+  }, [org, canonicalUrl]);
+  return null;
+}
+
+/* ─── Blog index page meta ───────────────────────────────────── */
+export function BlogIndexMeta({
+  org, canonicalUrl, postCount,
+}: {
+  org: OrgData;
+  canonicalUrl: string;
+  postCount: number;
+}) {
+  useEffect(() => {
+    const title = `Blog | ${org.brandName}`;
+    const description = `Read the latest posts from ${org.brandName}. ${postCount} article${postCount !== 1 ? 's' : ''} covering insights, stories, and updates.`.slice(0, 160);
+
+    document.title = title;
+    setMeta('description', description);
+    setMeta('robots', 'index, follow');
+    setMeta('og:title', title, true);
+    setMeta('og:description', description, true);
+    setMeta('og:url', canonicalUrl, true);
+    setMeta('og:type', 'website', true);
+    if (org.logoUrl) setMeta('og:image', org.logoUrl, true);
+    setMeta('twitter:card', 'summary_large_image');
+    setMeta('twitter:title', title);
+    setMeta('twitter:description', description);
+    setLink('canonical', canonicalUrl);
+
+    // Blog JSON-LD
+    setJsonLd('blog', {
+      '@context': 'https://schema.org',
+      '@type': 'Blog',
+      name: `${org.brandName} Blog`,
+      description: description,
+      url: canonicalUrl,
+      publisher: {
+        '@type': 'Organization',
+        name: org.brandName,
+        logo: org.logoUrl ? { '@type': 'ImageObject', url: org.logoUrl } : undefined,
+      },
+    });
+  }, [org, canonicalUrl, postCount]);
+  return null;
+}
+
+/* ─── Shop page meta ─────────────────────────────────────────── */
+export function ShopMeta({
+  org, canonicalUrl,
+}: {
+  org: OrgData;
+  canonicalUrl: string;
+}) {
+  useEffect(() => {
+    const title = `Shop | ${org.brandName}`;
+    const description = `Shop ${org.brandName}'s collection. ${org.description || 'Premium products delivered to your door.'}`.slice(0, 160);
+
+    document.title = title;
+    setMeta('description', description);
+    setMeta('robots', 'index, follow');
+    setMeta('og:title', title, true);
+    setMeta('og:description', description, true);
+    setMeta('og:url', canonicalUrl, true);
+    setMeta('og:type', 'website', true);
+    if (org.logoUrl) setMeta('og:image', org.logoUrl, true);
+    setMeta('twitter:card', 'summary_large_image');
+    setMeta('twitter:title', title);
+    setMeta('twitter:description', description);
+    setLink('canonical', canonicalUrl);
+  }, [org, canonicalUrl]);
+  return null;
+}

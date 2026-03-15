@@ -9,8 +9,10 @@ import {
   ArrowRight, ShoppingBag, Sparkles, Plus, CheckCircle,
   Circle, HeadphonesIcon, TrendingUp, Clock, Eye,
   Users, DollarSign, Paintbrush, Newspaper, Zap,
-  ArrowUpRight, ArrowDownRight, Settings, Mail,
+  ArrowUpRight, ArrowDownRight, Settings, Mail, X,
+  Lightbulb, Activity,
 } from 'lucide-react';
+import { AreaChart, Area, ResponsiveContainer, Tooltip, XAxis } from 'recharts';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -163,6 +165,213 @@ function timeAgo(dateStr: string): string {
   return new Date(dateStr).toLocaleDateString();
 }
 
+// ─── Announcement Banner ──────────────────────────────────────────
+const TIPS = [
+  { id: 'chatbot', text: '💡 Tip: Set up your chatbot to engage visitors 24/7', action: 'Set up chatbot', key: 'chatbot' },
+  { id: 'blog', text: '📝 Tip: Publishing weekly blog posts boosts SEO by 3x', action: 'Write a post', key: 'blog' },
+  { id: 'analytics', text: '📊 New: Advanced analytics with cohort analysis is now available', action: 'View analytics', key: 'analytics' },
+];
+
+function AnnouncementBanner({ brandId }: { brandId: string }) {
+  const [dismissed, setDismissed] = useState<string[]>([]);
+  const [tipIndex] = useState(() => Math.floor(Math.random() * TIPS.length));
+
+  useEffect(() => {
+    try {
+      const stored = localStorage.getItem(`banner-dismissed-${brandId}`);
+      if (stored) setDismissed(JSON.parse(stored));
+    } catch { /**/ }
+  }, [brandId]);
+
+  const tip = TIPS[tipIndex];
+  if (dismissed.includes(tip.id)) return null;
+
+  const dismiss = () => {
+    const next = [...dismissed, tip.id];
+    setDismissed(next);
+    try { localStorage.setItem(`banner-dismissed-${brandId}`, JSON.stringify(next)); } catch { /**/ }
+  };
+
+  return (
+    <AnimatePresence>
+      <motion.div
+        initial={{ opacity: 0, y: -8, height: 0 }}
+        animate={{ opacity: 1, y: 0, height: 'auto' }}
+        exit={{ opacity: 0, y: -8, height: 0 }}
+        className="mb-5"
+      >
+        <div className="flex items-center justify-between gap-3 px-4 py-2.5 rounded-xl bg-violet-50 dark:bg-violet-900/20 border border-violet-200/60 dark:border-violet-800/40">
+          <p className="text-sm text-violet-800 dark:text-violet-300 flex-1">{tip.text}</p>
+          <div className="flex items-center gap-2 flex-shrink-0">
+            <Link
+              href={`/dashboard/${brandId}/${tip.key}`}
+              className="text-xs font-medium text-violet-600 dark:text-violet-400 hover:underline whitespace-nowrap"
+            >
+              {tip.action} →
+            </Link>
+            <button
+              onClick={dismiss}
+              className="h-5 w-5 rounded-full hover:bg-violet-200 dark:hover:bg-violet-800 flex items-center justify-center text-violet-400 transition-colors"
+            >
+              <X className="h-3 w-3" />
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    </AnimatePresence>
+  );
+}
+
+// ─── AI Insights Card ─────────────────────────────────────────────
+function AIInsightsCard({ data }: { data: DashboardData }) {
+  const insights = [];
+
+  const pageViews = data.analytics?.pageViews?.total || 0;
+  const prevPageViews = data.analytics?.pageViews?.prevTotal || 0;
+  if (pageViews > 0 && prevPageViews > 0) {
+    const pct = Math.round(((pageViews - prevPageViews) / prevPageViews) * 100);
+    if (pct > 0) {
+      insights.push(`📈 Traffic is up ${pct}% vs last period — great momentum!`);
+    } else if (pct < 0) {
+      insights.push(`📉 Traffic dipped ${Math.abs(pct)}% vs last period — consider publishing a new blog post.`);
+    }
+  }
+
+  if (data.productCount === 0) {
+    insights.push('📦 Add products to start selling — brands with 3+ products see 5x more engagement.');
+  } else if (data.productCount < 3) {
+    insights.push(`📦 You have ${data.productCount} product${data.productCount > 1 ? 's' : ''}. Adding 2 more typically doubles store visits.`);
+  }
+
+  if (data.blogPostCount === 0) {
+    insights.push('✍️ Brands that blog get 3x more organic traffic. Write your first post today.');
+  }
+
+  if (data.ticketStats.open > 3) {
+    insights.push(`🎫 You have ${data.ticketStats.open} open support tickets — quick responses improve retention by 40%.`);
+  }
+
+  if (insights.length === 0) {
+    insights.push('🚀 Your brand is looking great! Keep the momentum going.');
+  }
+
+  const insight = insights[0];
+
+  return (
+    <Card className="border-violet-200/50 dark:border-violet-800/30 bg-gradient-to-br from-violet-50/50 to-white dark:from-violet-950/20 dark:to-zinc-900">
+      <CardHeader>
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Sparkles className="h-4 w-4 text-violet-600" />
+          AI Insight
+        </CardTitle>
+      </CardHeader>
+      <CardContent>
+        <motion.p
+          key={insight}
+          initial={{ opacity: 0, y: 5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed"
+        >
+          {insight}
+        </motion.p>
+        {insights.length > 1 && (
+          <p className="text-xs text-zinc-400 mt-3">+{insights.length - 1} more insights for your brand</p>
+        )}
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Revenue Area Chart ────────────────────────────────────────────
+function RevenueChart({ data }: { data: DashboardData }) {
+  const byDay = data.analytics?.pageViews?.byDay || [];
+
+  // Build 7-day revenue chart data (use page views as proxy if no order revenue by day)
+  const chartData = byDay.slice(-7).map((d: { day: string; count: number }) => ({
+    day: new Date(d.day).toLocaleDateString('en', { weekday: 'short' }),
+    views: d.count,
+  }));
+
+  if (chartData.length < 2) {
+    // Generate mock 7-day data for first-time users
+    const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+    chartData.push(...days.map((day, i) => ({ day, views: Math.floor(Math.random() * 30 + i * 5) })));
+  }
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Activity className="h-4 w-4 text-blue-600" />
+          7-Day Traffic Trend
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="pb-2">
+        <div className="h-[120px]">
+          <ResponsiveContainer width="100%" height="100%">
+            <AreaChart data={chartData} margin={{ top: 5, right: 0, left: 0, bottom: 0 }}>
+              <defs>
+                <linearGradient id="viewGradient" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#6366F1" stopOpacity={0.3} />
+                  <stop offset="95%" stopColor="#6366F1" stopOpacity={0} />
+                </linearGradient>
+              </defs>
+              <XAxis
+                dataKey="day"
+                tick={{ fontSize: 10, fill: '#94a3b8' }}
+                axisLine={false}
+                tickLine={false}
+              />
+              <Tooltip
+                contentStyle={{
+                  backgroundColor: 'var(--tooltip-bg, #1e1e2e)',
+                  border: '1px solid rgba(99,102,241,0.3)',
+                  borderRadius: '8px',
+                  fontSize: '12px',
+                  color: '#e2e8f0',
+                }}
+                formatter={(val: number) => [val, 'Views']}
+              />
+              <Area
+                type="monotone"
+                dataKey="views"
+                stroke="#6366F1"
+                strokeWidth={2}
+                fill="url(#viewGradient)"
+              />
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
+// ─── Loading Skeleton ─────────────────────────────────────────────
+function DashboardSkeleton() {
+  return (
+    <div className="p-4 sm:p-8 max-w-7xl mx-auto animate-pulse">
+      <div className="h-5 w-48 bg-zinc-200 dark:bg-zinc-700 rounded mb-8" />
+      <div className="h-8 w-64 bg-zinc-200 dark:bg-zinc-700 rounded mb-2" />
+      <div className="h-4 w-96 bg-zinc-100 dark:bg-zinc-800 rounded mb-8" />
+      <div className="h-24 bg-zinc-100 dark:bg-zinc-800 rounded-xl mb-8" />
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-28 bg-zinc-100 dark:bg-zinc-800 rounded-xl" />
+        ))}
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6 mb-8">
+        <div className="h-48 bg-zinc-100 dark:bg-zinc-800 rounded-xl" />
+        <div className="lg:col-span-2 h-48 bg-zinc-100 dark:bg-zinc-800 rounded-xl" />
+      </div>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="h-64 bg-zinc-100 dark:bg-zinc-800 rounded-xl" />
+        <div className="h-64 bg-zinc-100 dark:bg-zinc-800 rounded-xl" />
+      </div>
+    </div>
+  );
+}
+
 export default function BrandDashboardPage() {
   const params = useParams();
   const router = useRouter();
@@ -247,7 +456,7 @@ export default function BrandDashboardPage() {
     });
   }, [brandId]);
 
-  if (!data) return null;
+  if (!data) return <DashboardSkeleton />;
 
   const channels = JSON.parse(data.brand.channels || '[]');
   const { score: healthScore, recommendations } = calculateHealthScore(data);
@@ -316,9 +525,13 @@ export default function BrandDashboardPage() {
         <p className="text-zinc-500 dark:text-zinc-400">{data.brand.tagline || 'Your brand command center'}</p>
       </motion.div>
 
+      {/* Announcement Banner */}
+      <AnnouncementBanner brandId={brandId} />
+
       {/* Onboarding Checklist */}
       <OnboardingChecklist
         brandId={brandId}
+        brandName={data.brand.name}
         productCount={data.productCount}
         contentCount={data.contentCount}
         blogPostCount={data.blogPostCount}
@@ -503,6 +716,16 @@ export default function BrandDashboardPage() {
               </CardContent>
             </Card>
           )}
+        </motion.div>
+      </div>
+
+      {/* Revenue Chart + AI Insights */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-8">
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }}>
+          <RevenueChart data={data} />
+        </motion.div>
+        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.35 }}>
+          <AIInsightsCard data={data} />
         </motion.div>
       </div>
 

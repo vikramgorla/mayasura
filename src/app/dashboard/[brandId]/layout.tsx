@@ -13,6 +13,7 @@ import {
 import { PageLoader } from '@/components/ui/loading';
 import { ErrorBoundary } from '@/components/error-boundary';
 import { Brand } from '@/lib/types';
+import { DashboardNoIndex } from '@/components/site/site-meta';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/components/theme-provider';
 import { NotificationBell } from '@/components/notification-bell';
@@ -95,6 +96,7 @@ export default function BrandDashboardLayout({ children }: { children: React.Rea
 
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-[#09090B] flex">
+      <DashboardNoIndex />
       <a href="#dashboard-content" className="skip-to-content">Skip to content</a>
       <Suspense fallback={null}>
         <CommandPalette brandId={brandId} />

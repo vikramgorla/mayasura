@@ -6,7 +6,7 @@ import Link from 'next/link';
 import { motion, useScroll, useSpring, AnimatePresence } from 'framer-motion';
 import { useBlogSite } from '../layout';
 import { BlogPost } from '@/lib/types';
-import { BlogPostMeta } from '@/components/site/site-meta';
+import { BlogPostMeta, BreadcrumbMeta } from '@/components/site/site-meta';
 import { Clock, ArrowLeft, Share2, ChevronLeft, ChevronRight, BookOpen, Tag } from 'lucide-react';
 
 /* ─── Helpers ───────────────────────────────────────────────── */
@@ -361,6 +361,12 @@ export default function BlogPostPage() {
             imageUrl: null,
           }}
         />
+        <BreadcrumbMeta items={[
+          { name: brand.name, url: `${baseUrl}/site/${slug}` },
+          { name: 'Blog', url: `${baseUrl}/blog/${slug}` },
+          ...(post.category ? [{ name: post.category, url: `${baseUrl}/blog/${slug}` }] : []),
+          { name: post.title, url: `${baseUrl}/blog/${slug}/${post.slug}` },
+        ]} />
 
         <div className={hasTOC ? 'grid grid-cols-1 lg:grid-cols-[1fr_240px] gap-16' : ''}>
           <article ref={articleRef}>

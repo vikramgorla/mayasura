@@ -14,24 +14,24 @@ const scaleIn = { hidden: { opacity: 0, scale: 0.92 }, visible: { opacity: 1, sc
 const slideIn = { hidden: { opacity: 0, x: -20 }, visible: { opacity: 1, x: 0, transition: { duration: 0.4 } } };
 
 const VALUES = [
-  { title: 'Innovation', desc: 'Constantly evolving to stay ahead', icon: '💡', svg: 'M9 18h6M10 22h4M12 2a7 7 0 0 1 4 12.7V17H8v-2.3A7 7 0 0 1 12 2z' },
-  { title: 'Precision', desc: 'Every detail matters in what we do', icon: '🎯', svg: 'circle' },
-  { title: 'Sustainability', desc: 'Building for the future responsibly', icon: '🌱', svg: 'M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66L7 18M17 8a14 14 0 0 0-10 6M17 8c2-2 4-3.1 6-4' },
-  { title: 'Community', desc: 'People at the heart of everything', icon: '🤝', svg: 'users' },
+  { title: 'Innovation', desc: 'Constantly evolving to stay ahead', icon: '💡', svg: 'M9 18h6M10 22h4M12 2a7 7 0 0 1 4 12.7V17H8v-2.3A7 7 0 0 1 12 2z', gradient: 'from-violet-500 to-purple-600' },
+  { title: 'Precision', desc: 'Every detail matters in what we do', icon: '🎯', svg: 'circle', gradient: 'from-blue-500 to-cyan-600' },
+  { title: 'Sustainability', desc: 'Building for the future responsibly', icon: '🌱', svg: 'M17 8C8 10 5.9 16.17 3.82 21.34l1.89.66L7 18M17 8a14 14 0 0 0-10 6M17 8c2-2 4-3.1 6-4', gradient: 'from-emerald-500 to-teal-600' },
+  { title: 'Community', desc: 'People at the heart of everything', icon: '🤝', svg: 'users', gradient: 'from-amber-500 to-orange-600' },
 ];
 
 const MILESTONES = [
-  { year: 'Founded', title: 'The Beginning', desc: 'Started with a mission to make a difference' },
-  { year: 'Growth', title: 'Expanding Reach', desc: 'Grew to serve customers worldwide' },
-  { year: 'Innovation', title: 'Breaking New Ground', desc: 'Launched breakthrough products and services' },
-  { year: 'Today', title: 'Building the Future', desc: 'Continuing to push boundaries every day' },
+  { year: 'Founded', title: 'The Beginning', desc: 'Started with a mission to make a difference', icon: '🌱' },
+  { year: 'Growth', title: 'Expanding Reach', desc: 'Grew to serve customers worldwide', icon: '🚀' },
+  { year: 'Innovation', title: 'Breaking New Ground', desc: 'Launched breakthrough products and services', icon: '💡' },
+  { year: 'Today', title: 'Building the Future', desc: 'Continuing to push boundaries every day', icon: '🏆' },
 ];
 
 const TEAM = [
-  { name: 'Founder', role: 'CEO & Visionary', initial: 'F' },
-  { name: 'Lead Designer', role: 'Creative Director', initial: 'D' },
-  { name: 'Head of Product', role: 'Product Lead', initial: 'P' },
-  { name: 'Community Lead', role: 'People & Culture', initial: 'C' },
+  { name: 'Founder', role: 'CEO & Visionary', initial: 'F', color: '#6366F1' },
+  { name: 'Lead Designer', role: 'Creative Director', initial: 'D', color: '#EC4899' },
+  { name: 'Head of Product', role: 'Product Lead', initial: 'P', color: '#F59E0B' },
+  { name: 'Community Lead', role: 'People & Culture', initial: 'C', color: '#10B981' },
 ];
 
 /* ─── Value icon SVG ─────────────────────────────────────────── */
@@ -176,16 +176,38 @@ export default function AboutPage() {
             {tid === 'bold' && <motion.div variants={fadeUp} className="h-0.5 w-12 mt-2" style={{ backgroundColor: ac }} />}
           </motion.div>
           <motion.div initial="hidden" whileInView="visible" viewport={{ once: true, margin: '-40px' }} variants={stagger} className="relative">
+            {/* Desktop center line */}
             <div className="hidden md:block absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2" style={{ backgroundColor: `${tc}08` }} />
-            <div className="space-y-8 md:space-y-0">
+            {/* Mobile left line */}
+            <div className="md:hidden absolute left-4 top-0 bottom-0 w-px" style={{ backgroundColor: `${tc}08` }} />
+            <div className="space-y-10 md:space-y-0">
               {MILESTONES.map((m, i) => (
-                <motion.div key={m.year} variants={cardVariant} className={`relative md:grid md:grid-cols-2 md:gap-12 ${i > 0 ? 'md:mt-12' : ''}`}>
-                  <div className="hidden md:block absolute left-1/2 top-6 w-3 h-3 -translate-x-1/2 rounded-full z-10"
+                <motion.div key={m.year} variants={cardVariant} className={`relative md:grid md:grid-cols-2 md:gap-12 ${i > 0 ? 'md:mt-14' : ''}`}>
+                  {/* Desktop dot with pulse */}
+                  <div className="hidden md:block absolute left-1/2 top-5 -translate-x-1/2 z-10">
+                    <motion.div
+                      initial={{ scale: 0 }}
+                      whileInView={{ scale: 1 }}
+                      viewport={{ once: true }}
+                      transition={{ type: 'spring', stiffness: 300, damping: 20, delay: i * 0.1 }}
+                      className="relative flex items-center justify-center"
+                      style={{ width: 36, height: 36 }}
+                    >
+                      <div className="absolute inset-0 rounded-full animate-pulse" style={{ backgroundColor: `${ac}20` }} />
+                      <div className="relative w-7 h-7 rounded-full flex items-center justify-center text-sm"
+                        style={{ backgroundColor: isDark ? '#111' : bgColor, border: `2px solid ${ac}` }}>
+                        <span>{m.icon}</span>
+                      </div>
+                    </motion.div>
+                  </div>
+                  {/* Mobile dot */}
+                  <div className="md:hidden absolute left-4 top-1.5 w-3 h-3 -translate-x-1/2 rounded-full z-10"
                     style={{ backgroundColor: ac, boxShadow: `0 0 0 4px ${bgColor}, 0 0 0 5px ${tc}10` }} />
-                  <div className={i % 2 === 0 ? 'md:text-right md:pr-12' : 'md:col-start-2 md:pl-12'}>
+                  {/* Content */}
+                  <div className={`pl-10 md:pl-0 ${i % 2 === 0 ? 'md:text-right md:pr-12' : 'md:col-start-2 md:pl-12'}`}>
                     <span className={`text-xs font-${tid === 'bold' ? 'bold' : 'medium'} uppercase tracking-wider mb-2 block`}
                       style={{ color: ac, letterSpacing: tid === 'bold' ? '0.12em' : '0.06em' }}>{m.year}</span>
-                    <h3 className="text-lg font-semibold mb-2" style={{ fontFamily: brand.font_heading, textTransform: tid === 'bold' ? 'uppercase' : undefined }}>{m.title}</h3>
+                    <h3 className="text-base sm:text-lg font-semibold mb-2" style={{ fontFamily: brand.font_heading, textTransform: tid === 'bold' ? 'uppercase' : undefined }}>{m.title}</h3>
                     <p className="text-sm" style={{ color: `${tc}45` }}>{m.desc}</p>
                   </div>
                   {i % 2 !== 0 && <div className="hidden md:block" />}
@@ -207,18 +229,84 @@ export default function AboutPage() {
               {tLabel(tid, 'The people behind the brand.', 'The people behind the brand.', 'The people who make the magic happen ✨')}
             </motion.p>
           </motion.div>
-          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger} className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
-            {TEAM.map((member) => (
-              <motion.div key={member.name} variants={cardVariant} className="text-center">
-                <div className="mx-auto mb-4 flex items-center justify-center"
-                  style={{ width: tid === 'bold' ? 80 : 88, height: tid === 'bold' ? 80 : 88,
-                    borderRadius: tid === 'bold' ? '0' : tid === 'playful' ? '24px' : '50%',
-                    backgroundColor: isDark ? '#111111' : `${tc}06`,
-                    border: tid === 'bold' ? `2px solid ${tc}12` : undefined }}>
-                  <span className="text-lg font-semibold" style={{ color: `${tc}20`, fontFamily: brand.font_heading }}>{member.initial}</span>
+          <motion.div initial="hidden" whileInView="visible" viewport={{ once: true }} variants={stagger}
+            className="grid grid-cols-2 sm:grid-cols-4 gap-6 sm:gap-8">
+            {TEAM.map((member, i) => (
+              <motion.div
+                key={member.name}
+                variants={cardVariant}
+                className="text-center group cursor-default"
+                whileHover={{ y: tid === 'bold' ? 0 : -6 }}
+                transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
+              >
+                {/* Avatar with gradient ring on hover */}
+                <div className="relative mx-auto mb-4 inline-flex">
+                  {/* Glowing ring */}
+                  {tid !== 'bold' && (
+                    <motion.div
+                      className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      style={{
+                        background: `radial-gradient(circle, ${member.color}30, transparent 70%)`,
+                        filter: 'blur(8px)',
+                        transform: 'scale(1.3)',
+                        borderRadius: tid === 'playful' ? '24px' : '50%',
+                      }}
+                    />
+                  )}
+                  <motion.div
+                    className="relative flex items-center justify-center overflow-hidden"
+                    style={{
+                      width: tid === 'bold' ? 80 : 88,
+                      height: tid === 'bold' ? 80 : 88,
+                      borderRadius: tid === 'bold' ? '0' : tid === 'playful' ? '24px' : '50%',
+                      backgroundColor: isDark ? '#111111' : `${tc}06`,
+                      border: tid === 'bold'
+                        ? `2px solid ${tc}12`
+                        : `2px solid transparent`,
+                      backgroundClip: 'padding-box',
+                    }}
+                    whileHover={tid !== 'bold' ? {
+                      borderColor: member.color,
+                      boxShadow: `0 0 0 3px ${member.color}20`,
+                    } : {}}
+                    transition={{ duration: 0.2 }}
+                  >
+                    <span
+                      className="text-xl font-bold transition-all duration-300"
+                      style={{
+                        color: isDark ? `${tc}25` : `${tc}20`,
+                        fontFamily: brand.font_heading,
+                      }}
+                    >
+                      {member.initial}
+                    </span>
+                    {/* Hover color overlay */}
+                    <motion.div
+                      className="absolute inset-0 flex items-center justify-center"
+                      initial={{ opacity: 0 }}
+                      whileHover={{ opacity: 1 }}
+                      transition={{ duration: 0.2 }}
+                      style={{
+                        background: `linear-gradient(135deg, ${member.color}18, ${member.color}30)`,
+                        borderRadius: 'inherit',
+                      }}
+                    >
+                      <span className="text-xl font-bold" style={{ color: member.color, fontFamily: brand.font_heading }}>
+                        {member.initial}
+                      </span>
+                    </motion.div>
+                  </motion.div>
                 </div>
-                <h3 className="text-sm font-medium mb-0.5" style={{ fontFamily: brand.font_heading, textTransform: tid === 'bold' ? 'uppercase' : undefined,
-                  letterSpacing: tid === 'bold' ? '0.04em' : undefined, fontWeight: tid === 'minimal' ? 400 : 500 }}>{member.name}</h3>
+                <h3 className="text-sm font-medium mb-0.5 transition-colors duration-200 group-hover:opacity-80"
+                  style={{
+                    fontFamily: brand.font_heading,
+                    textTransform: tid === 'bold' ? 'uppercase' : undefined,
+                    letterSpacing: tid === 'bold' ? '0.04em' : undefined,
+                    fontWeight: tid === 'minimal' ? 400 : 500,
+                    color: tc,
+                  }}>
+                  {member.name}
+                </h3>
                 <p className="text-xs" style={{ color: `${tc}35` }}>{member.role}</p>
               </motion.div>
             ))}

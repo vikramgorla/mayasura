@@ -137,12 +137,16 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
       <button
         onClick={() => setIsOpen(!isOpen)}
         className="w-full flex items-center justify-between py-5 text-left group min-h-[44px]"
+        aria-expanded={isOpen}
+        aria-controls={`faq-answer-${index}`}
+        id={`faq-question-${index}`}
       >
         <span className="font-medium text-[15px] text-[var(--text-primary)] group-hover:text-violet-600 transition-colors pr-4">{q}</span>
         <motion.div
           animate={{ rotate: isOpen ? 180 : 0 }}
           transition={{ duration: 0.3, ease: [0.25, 0.46, 0.45, 0.94] }}
           className={`flex-shrink-0 h-6 w-6 rounded-full flex items-center justify-center transition-colors ${isOpen ? 'bg-violet-100 dark:bg-violet-900/30' : 'bg-zinc-100 dark:bg-zinc-800'}`}
+          aria-hidden="true"
         >
           <ChevronDown className={`h-3.5 w-3.5 transition-colors ${isOpen ? 'text-violet-600 dark:text-violet-400' : 'text-[var(--text-tertiary)]'}`} />
         </motion.div>
@@ -150,6 +154,9 @@ function FaqItem({ q, a, index }: { q: string; a: string; index: number }) {
       <AnimatePresence>
         {isOpen && (
           <motion.div
+            id={`faq-answer-${index}`}
+            role="region"
+            aria-labelledby={`faq-question-${index}`}
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
             exit={{ height: 0, opacity: 0 }}
@@ -196,7 +203,7 @@ function BrowserMockup({ template }: { template: typeof templatePreviews[0] }) {
     >
       {/* Browser chrome */}
       <div className="bg-zinc-100 dark:bg-zinc-900 px-4 py-3 flex items-center gap-2 border-b border-zinc-200 dark:border-zinc-800">
-        <div className="flex gap-1.5">
+        <div className="flex gap-1.5" aria-hidden="true">
           <div className="h-3 w-3 rounded-full bg-red-400" />
           <div className="h-3 w-3 rounded-full bg-yellow-400" />
           <div className="h-3 w-3 rounded-full bg-green-400" />
@@ -256,14 +263,20 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
+      <a
+        href="#main-content"
+        className="sr-only focus:not-sr-only focus:absolute focus:z-[9999] focus:top-2 focus:left-2 focus:px-4 focus:py-2 focus:bg-violet-600 focus:text-white focus:rounded-lg focus:shadow-lg focus:text-sm focus:font-medium"
+      >
+        Skip to content
+      </a>
       <FloatingCTA />
       <ScrollCTAModal />
       {/* Nav */}
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)]/80 backdrop-blur-xl border-b border-[var(--border-primary)]">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[var(--bg-primary)]/80 backdrop-blur-xl border-b border-[var(--border-primary)]" role="navigation" aria-label="Main navigation">
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-md bg-violet-700 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">M</span>
+          <Link href="/" className="flex items-center gap-2" aria-label="Mayasura home">
+            <div className="h-7 w-7 rounded-md bg-violet-700 flex items-center justify-center" aria-hidden="true">
+              <span className="text-white text-xs font-bold" aria-hidden="true">M</span>
             </div>
             <span className="font-display font-semibold text-base tracking-tight hidden sm:inline text-[var(--text-primary)]">
               Mayasura
@@ -288,7 +301,7 @@ export default function Home() {
       </nav>
 
       {/* ═══════════ HERO ═══════════ */}
-      <section className="relative pt-28 sm:pt-36 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden">
+      <section id="main-content" className="relative pt-28 sm:pt-36 pb-16 sm:pb-24 px-4 sm:px-6 overflow-hidden" aria-label="Hero">
         {/* Animated gradient mesh background */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <motion.div
@@ -721,19 +734,20 @@ export default function Home() {
               Hear from the founders and creators who built their brands with Mayasura.
             </p>
           </motion.div>
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6" role="list" aria-label="Customer testimonials">
             {testimonials.map((t, i) => (
               <motion.div
                 key={i}
+                role="listitem"
                 initial={{ opacity: 0, y: 24 }}
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ delay: i * 0.1, duration: 0.5 }}
                 className="bg-[var(--bg-surface)] rounded-2xl border border-[var(--border-primary)] p-6 sm:p-7 hover:shadow-lg transition-shadow duration-300"
               >
-                <div className="flex gap-0.5 mb-5">
+                <div className="flex gap-0.5 mb-5" aria-label="5 out of 5 stars" role="img">
                   {Array.from({ length: 5 }).map((_, j) => (
-                    <Star key={j} className="h-4 w-4 fill-amber-400 text-amber-400" />
+                    <Star key={j} className="h-4 w-4 fill-amber-400 text-amber-400" aria-hidden="true" />
                   ))}
                 </div>
                 <p className="text-sm text-[var(--text-secondary)] leading-relaxed mb-6">
@@ -922,14 +936,14 @@ export default function Home() {
                 The divine architect of digital ecosystems. Build palaces, not huts.
               </p>
               <div className="flex items-center gap-3">
-                <a href="https://github.com/vikramgorla/mayasura" target="_blank" rel="noopener noreferrer" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">
-                  <Github className="h-4 w-4" />
+                <a href="https://github.com/vikramgorla/mayasura" target="_blank" rel="noopener noreferrer" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors" aria-label="Mayasura on GitHub (opens in new tab)">
+                  <Github className="h-4 w-4" aria-hidden="true" />
                 </a>
-                <a href="#" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">
-                  <Twitter className="h-4 w-4" />
+                <a href="#" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors" aria-label="Mayasura on Twitter">
+                  <Twitter className="h-4 w-4" aria-hidden="true" />
                 </a>
-                <a href="#" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors">
-                  <Linkedin className="h-4 w-4" />
+                <a href="#" className="text-[var(--text-tertiary)] hover:text-[var(--text-primary)] transition-colors" aria-label="Mayasura on LinkedIn">
+                  <Linkedin className="h-4 w-4" aria-hidden="true" />
                 </a>
               </div>
             </div>
