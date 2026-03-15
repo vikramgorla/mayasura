@@ -372,7 +372,7 @@ export default function OrdersPage() {
     return active.length > 0 ? Math.round((delivered / active.length) * 100) : 0;
   }, [orders]);
 
-  // Build sparkline data (last 7 days revenue mock from orders)
+  // Build sparkline data (last 7 days revenue from real orders)
   const sparklineData = useMemo(() => {
     const days = 7;
     const now = Date.now();

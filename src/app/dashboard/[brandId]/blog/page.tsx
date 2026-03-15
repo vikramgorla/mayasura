@@ -182,10 +182,12 @@ function PostCard({
                       {readingTime(post.content)}
                     </span>
                   )}
-                  <span className="flex items-center gap-1">
-                    <BarChart2 className="h-3 w-3" />
-                    {Math.floor(Math.random() * 500)} views
-                  </span>
+                  {post.status === 'published' && (
+                    <span className="flex items-center gap-1 text-zinc-300 dark:text-zinc-600" title="Blog analytics coming soon">
+                      <BarChart2 className="h-3 w-3" />
+                      —
+                    </span>
+                  )}
                 </div>
               </div>
 
