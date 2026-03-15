@@ -1250,10 +1250,32 @@ function DangerZoneTab({ brand, brandId }: { brand: Brand; brandId: string }) {
   );
 }
 
-// ─── Data Tab (Import/Export) ─────────────────────────────────────
+// ─── Data Tab (Import/Export/Clone) ──────────────────────────────
+interface ImportResult {
+  success?: boolean;
+  error?: string;
+  brandId?: string;
+  brandName?: string;
+  imported?: {
+    products: number;
+    content: number;
+    blogPosts: number;
+    pages: number;
+    faqs: number;
+    settings: number;
+  };
+  warnings?: string[];
+}
+
 function DataTab({ brandId, brand }: { brandId: string; brand: Brand }) {
   const [importing, setImporting] = useState(false);
+  const [importProgress, setImportProgress] = useState(0);
+  const [importStep, setImportStep] = useState('');
+  const [importResult, setImportResult] = useState<ImportResult | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [cloning, setCloning] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
+  const router = useRouter();
   const toast = useToast();
 
   const handleExport = async () => {
@@ -1274,34 +1296,109 @@ function DataTab({ brandId, brand }: { brandId: string; brand: Brand }) {
     setExporting(false);
   };
 
+  const validateImportData = (data: Record<string, unknown>): string[] => {
+    const errors: string[] = [];
+    if (!data.version) errors.push('Missing version field — file may not be a Mayasura export');
+    if (!data.brand) errors.push('Missing brand data');
+    if (data.brand && typeof data.brand === 'object') {
+      const b = data.brand as Record<string, unknown>;
+      if (!b.name) errors.push('Brand name is required');
+    }
+    if (data.products && !Array.isArray(data.products)) errors.push('products must be an array');
+    if (data.blogPosts && !Array.isArray(data.blogPosts)) errors.push('blogPosts must be an array');
+    return errors;
+  };
+
   const handleImport = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     setImporting(true);
+    setImportProgress(0);
+    setImportStep('Reading file...');
+    setImportResult(null);
+    setValidationErrors([]);
+
     try {
+      // Step 1: Parse file
+      setImportProgress(15);
       const text = await file.text();
-      const data = JSON.parse(text);
-      const res = await fetch(`/api/brands/new/export`, {
+      let data: Record<string, unknown>;
+      try {
+        data = JSON.parse(text);
+      } catch {
+        setValidationErrors(['Invalid JSON file — please check the file format']);
+        setImporting(false);
+        return;
+      }
+
+      // Step 2: Validate
+      setImportProgress(30);
+      setImportStep('Validating data...');
+      await new Promise(r => setTimeout(r, 300));
+      const errors = validateImportData(data);
+      if (errors.length > 0) {
+        setValidationErrors(errors);
+        setImporting(false);
+        return;
+      }
+
+      // Step 3: Import
+      setImportProgress(50);
+      setImportStep('Creating brand...');
+      await new Promise(r => setTimeout(r, 200));
+
+      const res = await fetch('/api/brands/import', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(data),
       });
-      const result = await res.json();
-      if (res.ok) {
-        toast.success('Import successful!', `Created brand with ${result.imported?.products || 0} products, ${result.imported?.blogPosts || 0} blog posts`);
+
+      setImportProgress(85);
+      setImportStep('Finalizing...');
+      await new Promise(r => setTimeout(r, 200));
+
+      const result: ImportResult = await res.json();
+      setImportProgress(100);
+
+      if (res.ok && result.success) {
+        setImportResult(result);
+        toast.success('Import successful!', `Created "${result.brandName}" with ${result.imported?.products || 0} products`);
       } else {
+        setValidationErrors([result.error || 'Import failed']);
         toast.error(result.error || 'Import failed');
       }
     } catch {
-      toast.error('Invalid JSON file');
+      setValidationErrors(['Unexpected error — please try again']);
+      toast.error('Import failed');
     }
+
     setImporting(false);
+    setImportStep('');
     // Reset file input
     e.target.value = '';
   };
 
+  const handleClone = async () => {
+    setCloning(true);
+    try {
+      const res = await fetch(`/api/brands/import?clone=${brandId}`, { method: 'PUT' });
+      const result = await res.json();
+      if (res.ok && result.success) {
+        toast.success('Brand cloned!', `Created "${result.brandName}"`);
+        setTimeout(() => router.push(`/dashboard/${result.brandId}`), 1500);
+      } else {
+        toast.error(result.error || 'Clone failed');
+      }
+    } catch {
+      toast.error('Clone failed');
+    }
+    setCloning(false);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Export */}
       <Card>
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
@@ -1312,15 +1409,30 @@ function DataTab({ brandId, brand }: { brandId: string; brand: Brand }) {
         <CardContent>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
             Download a complete backup of all your brand data — products, content, blog posts, 
-            orders, contacts, settings, and more.
+            orders, contacts, settings, SEO config, and more.
           </p>
+          <div className="flex flex-wrap gap-3 mb-4">
+            {[
+              { label: 'Products', icon: '📦' },
+              { label: 'Blog Posts', icon: '📝' },
+              { label: 'Settings', icon: '⚙️' },
+              { label: 'Pages', icon: '📄' },
+              { label: 'FAQs', icon: '💬' },
+              { label: 'Content', icon: '✍️' },
+            ].map(item => (
+              <span key={item.label} className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 text-xs text-zinc-600 dark:text-zinc-400">
+                {item.icon} {item.label}
+              </span>
+            ))}
+          </div>
           <Button onClick={handleExport} disabled={exporting}>
             {exporting ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Download className="h-4 w-4 mr-2" />}
-            Export All Data (JSON)
+            {exporting ? 'Exporting...' : 'Export All Data (JSON)'}
           </Button>
         </CardContent>
       </Card>
 
+      {/* Import */}
       <Card>
         <CardHeader>
           <CardTitle className="text-sm flex items-center gap-2">
@@ -1330,12 +1442,83 @@ function DataTab({ brandId, brand }: { brandId: string; brand: Brand }) {
         </CardHeader>
         <CardContent>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
-            Upload a previously exported JSON file to create a new brand with all its data.
-            This creates a new brand — it won&apos;t overwrite existing data.
+            Upload a previously exported Mayasura JSON file to create a new brand with all its data.
+            This always creates a new brand — it will not overwrite existing data.
           </p>
-          <label className="inline-flex items-center gap-2 px-4 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 hover:bg-zinc-50 dark:hover:bg-zinc-800 cursor-pointer transition-colors">
+
+          {/* Validation errors */}
+          {validationErrors.length > 0 && (
+            <div className="mb-4 p-3 bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-800 rounded-xl">
+              <p className="text-xs font-semibold text-red-600 dark:text-red-400 mb-2 flex items-center gap-1.5">
+                <AlertTriangle className="h-3.5 w-3.5" />
+                Import validation failed
+              </p>
+              <ul className="space-y-1">
+                {validationErrors.map((err, i) => (
+                  <li key={i} className="text-xs text-red-500 dark:text-red-400 flex items-start gap-1.5">
+                    <span className="mt-0.5">•</span> {err}
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
+
+          {/* Progress bar */}
+          {importing && (
+            <div className="mb-4">
+              <div className="flex items-center justify-between mb-1.5">
+                <span className="text-xs text-zinc-500 dark:text-zinc-400">{importStep}</span>
+                <span className="text-xs font-medium text-violet-600 dark:text-violet-400">{importProgress}%</span>
+              </div>
+              <div className="h-2 bg-zinc-100 dark:bg-zinc-800 rounded-full overflow-hidden">
+                <motion.div
+                  animate={{ width: `${importProgress}%` }}
+                  transition={{ duration: 0.4, ease: 'easeOut' }}
+                  className="h-full bg-gradient-to-r from-violet-500 to-indigo-500 rounded-full"
+                />
+              </div>
+            </div>
+          )}
+
+          {/* Success result */}
+          {importResult?.success && (
+            <div className="mb-4 p-4 bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-800 rounded-xl">
+              <p className="text-sm font-semibold text-emerald-700 dark:text-emerald-300 mb-2">✅ Import complete!</p>
+              <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-3">
+                Created brand <strong>&ldquo;{importResult.brandName}&rdquo;</strong>
+              </p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {[
+                  ['Products', importResult.imported?.products],
+                  ['Content', importResult.imported?.content],
+                  ['Blog Posts', importResult.imported?.blogPosts],
+                  ['Pages', importResult.imported?.pages],
+                  ['FAQs', importResult.imported?.faqs],
+                ].map(([label, count]) => (
+                  <span key={label as string} className="px-2 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-900/40 text-emerald-700 dark:text-emerald-300 text-xs font-medium">
+                    {count} {label}
+                  </span>
+                ))}
+              </div>
+              {importResult.warnings && importResult.warnings.length > 0 && (
+                <p className="text-xs text-amber-600 dark:text-amber-400">{importResult.warnings.length} items skipped (see console)</p>
+              )}
+              {importResult.brandId && (
+                <Button size="sm" variant="outline" onClick={() => router.push(`/dashboard/${importResult.brandId}`)}>
+                  <ExternalLink className="h-3.5 w-3.5" />
+                  Open Imported Brand
+                </Button>
+              )}
+            </div>
+          )}
+
+          <label className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-xl border cursor-pointer transition-colors ${
+            importing
+              ? 'border-zinc-200 dark:border-zinc-700 text-zinc-400 cursor-not-allowed'
+              : 'border-emerald-200 dark:border-emerald-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/20 text-emerald-700 dark:text-emerald-300'
+          }`}>
             {importing ? <Loader2 className="h-4 w-4 animate-spin" /> : <Upload className="h-4 w-4" />}
-            <span className="text-sm font-medium">{importing ? 'Importing...' : 'Choose JSON File'}</span>
+            <span className="text-sm font-medium">{importing ? importStep || 'Importing...' : 'Choose JSON File to Import'}</span>
             <input
               type="file"
               accept=".json"
@@ -1344,6 +1527,37 @@ function DataTab({ brandId, brand }: { brandId: string; brand: Brand }) {
               disabled={importing}
             />
           </label>
+        </CardContent>
+      </Card>
+
+      {/* Clone Brand */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm flex items-center gap-2">
+            <Copy className="h-4 w-4 text-violet-600" />
+            Clone This Brand
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-4">
+            Create a complete duplicate of <strong>{brand.name}</strong> as a new brand in draft state.
+            All products, blog posts, settings, and configurations will be copied.
+          </p>
+          <div className="flex items-start gap-3 p-3 bg-amber-50 dark:bg-amber-950/20 border border-amber-200 dark:border-amber-800 rounded-xl mb-4">
+            <AlertTriangle className="h-4 w-4 text-amber-500 flex-shrink-0 mt-0.5" />
+            <p className="text-xs text-amber-700 dark:text-amber-300">
+              The clone will be created as a draft with a modified name and slug. 
+              Orders, contacts, and subscriber lists are not cloned.
+            </p>
+          </div>
+          <Button
+            variant="outline"
+            onClick={handleClone}
+            disabled={cloning}
+          >
+            {cloning ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
+            {cloning ? 'Cloning...' : `Clone "${brand.name}"`}
+          </Button>
         </CardContent>
       </Card>
     </div>
