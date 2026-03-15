@@ -825,7 +825,7 @@ export default function BrandHomePage() {
               whileInView="visible"
               viewport={{ once: true, margin: "-80px" }}
               className="grid grid-cols-1 md:grid-cols-3 gap-px"
-              style={{ backgroundColor: `${textColor}06` }}
+              style={{ backgroundColor: `${textColor}08` }}
             >
               {features.map(f => (
                 <motion.div key={f.title} variants={scrollItem} className="p-8 sm:p-10" style={{ backgroundColor: bgColor }}>
@@ -931,8 +931,8 @@ export default function BrandHomePage() {
                   style={{
                     backgroundColor: isDark ? `${textColor}04` : ds.surfaceColor || '#FFFFFF',
                     borderRadius: tp?.borderRadius || dsRadius || '8px',
-                    border: `1px solid ${isDark ? `${textColor}15` : ds.borderColor || `${textColor}12`}`,
-                    boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)',
+                    border: `1px solid ${isDark ? `${textColor}18` : ds.borderColor || `${textColor}18`}`,
+                    boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)',
                     textAlign: templateId === 'wellness' || templateId === 'organic' || templateId === 'startup' ? 'center' as const : undefined,
                   }}
                 >
@@ -1012,13 +1012,13 @@ export default function BrandHomePage() {
                 style={
                   templateId === 'bold' ? { border: `2px solid ${textColor}10` }
                   : templateId === 'playful' ? { backgroundColor: '#FFFFFF', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }
-                  : { backgroundColor: isDark ? `${textColor}08` : ds.surfaceColor || '#FFFFFF', borderRadius: dsRadius || '8px', border: `1px solid ${isDark ? `${textColor}15` : ds.borderColor || `${textColor}12`}`, overflow: 'hidden', boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)' }
+                  : { backgroundColor: isDark ? `${textColor}08` : ds.surfaceColor || '#FFFFFF', borderRadius: dsRadius || '8px', border: `1px solid ${isDark ? `${textColor}18` : ds.borderColor || `${textColor}18`}`, overflow: 'hidden', boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)' }
                 }
               >
                 <div
                   className="aspect-square mb-0 overflow-hidden flex items-center justify-center"
                   style={{
-                    backgroundColor: isDark ? '#111111' : `${textColor}06`,
+                    backgroundColor: isDark ? '#111111' : `${textColor}08`,
                     borderRadius: templateId === 'playful' || templateId === 'bold' ? '0' : `${imgRadius} ${imgRadius} 0 0`,
                     marginBottom: 0,
                   }}
@@ -1272,7 +1272,7 @@ export default function BrandHomePage() {
     if (templateId === 'playful' || templateId === 'wellness' || templateId === 'startup') return null;
     return (
       <div className={`${templateId === 'bold' || templateId === 'tech' ? 'max-w-7xl' : 'max-w-6xl'} mx-auto px-5 sm:px-8`}>
-        <div className="t-divider" style={{ backgroundColor: `${textColor}06` }} />
+        <div className="t-divider" style={{ backgroundColor: `${textColor}08` }} />
       </div>
     );
   };

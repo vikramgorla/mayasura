@@ -206,7 +206,7 @@ function QuickViewModal({ product, onClose, tc, ac, bgColor, tid, isBold, brand 
                   onClick={onClose}
                   aria-label="Close quick view"
                   className="p-2 transition-opacity hover:opacity-60 rounded-lg"
-                  style={{ backgroundColor: `${tc}06` }}
+                  style={{ backgroundColor: `${tc}08` }}
                 >
                   <XIcon color={tc} />
                 </button>
@@ -217,7 +217,7 @@ function QuickViewModal({ product, onClose, tc, ac, bgColor, tid, isBold, brand 
                 <div
                   className="aspect-square overflow-hidden flex items-center justify-center"
                   style={{
-                    backgroundColor: isBold ? '#111' : `${tc}06`,
+                    backgroundColor: isBold ? '#111' : `${tc}08`,
                     borderRadius: isBold ? '0' : tid === 'playful' ? '16px' : '8px',
                   }}
                 >
@@ -533,7 +533,7 @@ export default function ProductsPage() {
                           <div className="group flex items-center gap-5 p-4 transition-colors"
                             style={{ backgroundColor: isDark ? '#FFFFFF06' : `${tc}03`, borderRadius: cardRadius, border: `1px solid ${isBold ? `${tc}12` : `${tc}10`}` }}>
                             <div className="w-20 h-20 sm:w-24 sm:h-24 flex-shrink-0 overflow-hidden flex items-center justify-center"
-                              style={{ backgroundColor: isDark ? '#111' : `${tc}06`, borderRadius: tid === 'playful' ? '12px' : tid === 'classic' ? '6px' : isBold ? '0' : dsRadius }}>
+                              style={{ backgroundColor: isDark ? '#111' : `${tc}08`, borderRadius: tid === 'playful' ? '12px' : tid === 'classic' ? '6px' : isBold ? '0' : dsRadius }}>
                               {p.image_url ? <img src={p.image_url} alt={p.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" /> : <BoxIcon color={tc} />}
                             </div>
                             <div className="flex-1 min-w-0">
@@ -575,13 +575,13 @@ export default function ProductsPage() {
                                 ? { backgroundColor: '#FFF', borderRadius: cardRadius, overflow: 'hidden', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }
                                 : isBold
                                 ? { border: `2px solid ${tc}12`, borderRadius: cardRadius }
-                                : { backgroundColor: isDark ? '#FFFFFF08' : '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid ${isDark ? `${tc}15` : `${tc}12`}`, boxShadow: isDark ? 'none' : '0 2px 8px rgba(0,0,0,0.06)' }
+                                : { backgroundColor: isDark ? '#FFFFFF08' : '#FFFFFF', borderRadius: cardRadius, overflow: 'hidden', border: `1px solid ${isDark ? `${tc}18` : `${tc}18`}`, boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)' }
                             }
                           >
                             {/* Image wrapper */}
                             <div
                               className="t-product-image mb-0 overflow-hidden relative"
-                              style={{ backgroundColor: isDark ? '#111' : `${tc}06`, borderRadius: `${imgRadius} ${imgRadius} 0 0` }}
+                              style={{ backgroundColor: isDark ? '#111' : `${tc}08`, borderRadius: `${imgRadius} ${imgRadius} 0 0` }}
                             >
                               {p.image_url
                                 ? <img src={p.image_url} alt={p.name} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
