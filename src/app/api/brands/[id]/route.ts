@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getBrand, updateBrand, deleteBrandCascade, isSlugAvailable } from '@/lib/db';
+import { getBrand, updateBrand, deleteBrandCascade, isSlugAvailable, isReservedSlug, sanitizeSlug } from '@/lib/db';
 import { requireBrandOwner, sanitizeObject } from '@/lib/api-auth';
 
 export async function GET(
@@ -35,12 +35,15 @@ export async function PUT(
 
     // Validate slug if being changed
     if (body.slug) {
-      const slug = body.slug.toLowerCase().replace(/[^a-z0-9-]/g, '').replace(/^-|-$/g, '');
+      const slug = sanitizeSlug(body.slug);
       if (slug.length < 2) {
         return NextResponse.json({ error: 'Slug must be at least 2 characters' }, { status: 400 });
       }
-      if (slug.length > 64) {
-        return NextResponse.json({ error: 'Slug must be under 64 characters' }, { status: 400 });
+      if (slug.length > 100) {
+        return NextResponse.json({ error: 'Slug must be under 100 characters' }, { status: 400 });
+      }
+      if (isReservedSlug(slug)) {
+        return NextResponse.json({ error: 'This slug is reserved and cannot be used' }, { status: 400 });
       }
       if (!isSlugAvailable(slug, id)) {
         return NextResponse.json({ error: 'Slug is already taken' }, { status: 409 });
