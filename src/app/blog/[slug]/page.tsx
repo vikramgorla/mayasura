@@ -7,6 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { useBlogSite } from './layout';
 import { BlogPost } from '@/lib/types';
 import { BlogIndexMeta, BreadcrumbMeta } from '@/components/site/site-meta';
+import { BORDER_RADIUS_MAP } from '@/lib/design-settings';
 import { Search, Clock, Share2, ChevronDown, X } from 'lucide-react';
 import { getTextOnColor } from '@/lib/color-utils';
 
@@ -133,10 +134,11 @@ function AuthorCard({
 
 /* ─── Blog Post Card (grid) ─────────────────────────────────── */
 function BlogCard({
-  post, slug, textColor, accentColor, templateId, bgColor, index,
+  post, slug, textColor, accentColor, templateId, bgColor, index, dsRadius, dsBorderColor,
 }: {
   post: BlogPost; slug: string; textColor: string; accentColor: string;
   templateId: string; bgColor: string; index: number;
+  dsRadius?: string; dsBorderColor?: string;
 }) {
   const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const tags = (() => { try { return JSON.parse(post.tags || '[]'); } catch { return []; } })();
@@ -167,9 +169,9 @@ function BlogCard({
         href={`/blog/${slug}/${post.slug}`}
         className="group block h-full"
         style={{
-          borderRadius: templateId === 'playful' ? '20px' : templateId === 'classic' ? '12px' : templateId === 'bold' ? '0' : '0',
+          borderRadius: templateId === 'playful' ? '20px' : templateId === 'classic' ? '12px' : templateId === 'bold' ? '0' : (dsRadius || '0'),
           overflow: 'hidden',
-          border: templateId === 'bold' ? `2px solid ${textColor}10` : `1px solid ${textColor}06`,
+          border: templateId === 'bold' ? `2px solid ${textColor}10` : `1px solid ${dsBorderColor || `${textColor}06`}`,
           display: 'flex',
           flexDirection: 'column',
         }}
@@ -283,7 +285,7 @@ export default function BlogListingPage() {
   }, []);
 
   if (!data) return null;
-  const { brand, websiteTemplate: template } = data;
+  const { brand, websiteTemplate: template, designSettings } = data;
   const templateId = template?.id || 'minimal';
   const tp = template?.preview;
 
@@ -291,6 +293,8 @@ export default function BlogListingPage() {
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const bgColor = isDark ? (templateId === 'tech' ? '#0A0F1A' : templateId === 'neon' ? '#050510' : '#000000') : brand.secondary_color;
   const accentColor = brand.accent_color || textColor;
+  const dsRadius = BORDER_RADIUS_MAP[designSettings.borderRadius];
+  const dsBorderColor = designSettings.borderColor;
 
   const headingStyle: React.CSSProperties = {
     fontFamily: brand.font_heading,
@@ -632,6 +636,8 @@ export default function BlogListingPage() {
                     templateId={templateId}
                     bgColor={bgColor}
                     index={i}
+                    dsRadius={dsRadius}
+                    dsBorderColor={dsBorderColor}
                   />
                 ))}
               </motion.div>
