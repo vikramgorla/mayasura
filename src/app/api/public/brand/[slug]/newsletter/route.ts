@@ -15,13 +15,19 @@ export async function POST(
     }
 
     const body = await request.json();
-    const { email } = body;
+    const { email, name } = body;
 
     if (!email) {
       return NextResponse.json({ error: 'Email is required' }, { status: 400 });
     }
 
-    addNewsletterSubscriber(brand.id, email);
+    // Basic email validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      return NextResponse.json({ error: 'Invalid email format' }, { status: 400 });
+    }
+
+    addNewsletterSubscriber(brand.id, email.toLowerCase().trim(), name?.trim());
 
     return NextResponse.json({ success: true, message: 'Successfully subscribed!' });
   } catch (error) {

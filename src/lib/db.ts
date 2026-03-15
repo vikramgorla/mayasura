@@ -348,6 +348,16 @@ function runMigrations(db: Database.Database) {
     console.log('[DB] Adding subject column to contact_submissions');
     db.exec("ALTER TABLE contact_submissions ADD COLUMN subject TEXT");
   }
+
+  // V7: Add name and status columns to newsletter_subscribers
+  if (!hasColumn(db, 'newsletter_subscribers', 'name')) {
+    console.log('[DB] Adding name column to newsletter_subscribers');
+    db.exec("ALTER TABLE newsletter_subscribers ADD COLUMN name TEXT");
+  }
+  if (!hasColumn(db, 'newsletter_subscribers', 'status')) {
+    console.log('[DB] Adding status column to newsletter_subscribers');
+    db.exec("ALTER TABLE newsletter_subscribers ADD COLUMN status TEXT DEFAULT 'active'");
+  }
   
   console.log('[DB] Migrations complete');
 }
@@ -1119,18 +1129,60 @@ export function updateContactSubmission(id: string, status: string) {
 
 // ==================== Newsletter operations ====================
 
-export function addNewsletterSubscriber(brandId: string, email: string) {
+export function addNewsletterSubscriber(brandId: string, email: string, name?: string) {
   const db = getDb();
   const id = `${brandId}_${email}`;
-  db.prepare(`
-    INSERT OR IGNORE INTO newsletter_subscribers (id, brand_id, email)
-    VALUES (?, ?, ?)
-  `).run(id, brandId, email);
+  // Check if name column exists to handle older DBs gracefully
+  const cols = db.prepare("PRAGMA table_info(newsletter_subscribers)").all() as Array<{ name: string }>;
+  const colNames = new Set(cols.map(c => c.name));
+  if (colNames.has('name') && colNames.has('status')) {
+    db.prepare(`
+      INSERT INTO newsletter_subscribers (id, brand_id, email, name, status)
+      VALUES (?, ?, ?, ?, 'active')
+      ON CONFLICT(brand_id, email) DO UPDATE SET
+        name = COALESCE(excluded.name, newsletter_subscribers.name),
+        status = 'active'
+    `).run(id, brandId, email, name || null);
+  } else {
+    db.prepare(`
+      INSERT OR IGNORE INTO newsletter_subscribers (id, brand_id, email)
+      VALUES (?, ?, ?)
+    `).run(id, brandId, email);
+  }
 }
 
 export function getNewsletterSubscribers(brandId: string) {
   const db = getDb();
   return db.prepare('SELECT * FROM newsletter_subscribers WHERE brand_id = ? ORDER BY subscribed_at DESC').all(brandId);
+}
+
+export function getNewsletterSubscriberCount(brandId: string): number {
+  const db = getDb();
+  const row = db.prepare('SELECT COUNT(*) as count FROM newsletter_subscribers WHERE brand_id = ?').get(brandId) as { count: number };
+  return row.count;
+}
+
+export function getActiveSubscriberCount(brandId: string): number {
+  const db = getDb();
+  // Check if status column exists
+  const cols = db.prepare("PRAGMA table_info(newsletter_subscribers)").all() as Array<{ name: string }>;
+  if (cols.some(c => c.name === 'status')) {
+    const row = db.prepare("SELECT COUNT(*) as count FROM newsletter_subscribers WHERE brand_id = ? AND (status = 'active' OR status IS NULL)").get(brandId) as { count: number };
+    return row.count;
+  }
+  const row = db.prepare('SELECT COUNT(*) as count FROM newsletter_subscribers WHERE brand_id = ?').get(brandId) as { count: number };
+  return row.count;
+}
+
+export function removeNewsletterSubscriber(brandId: string, email: string) {
+  const db = getDb();
+  // Check if status column exists — soft-delete if possible
+  const cols = db.prepare("PRAGMA table_info(newsletter_subscribers)").all() as Array<{ name: string }>;
+  if (cols.some(c => c.name === 'status')) {
+    db.prepare("UPDATE newsletter_subscribers SET status = 'unsubscribed' WHERE brand_id = ? AND email = ?").run(brandId, email);
+  } else {
+    db.prepare('DELETE FROM newsletter_subscribers WHERE brand_id = ? AND email = ?').run(brandId, email);
+  }
 }
 
 // ==================== Chatbot FAQ operations ====================
