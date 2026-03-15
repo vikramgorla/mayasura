@@ -438,6 +438,41 @@ function runMigrations(db: Database.Database) {
     db.exec("ALTER TABLE brands ADD COLUMN chatbot_business_hours TEXT");
   }
 
+  // Slug uniqueness migration — deduplicate existing slugs then add unique index
+  const hasSlugUniqueIdx = db.prepare(
+    "SELECT name FROM sqlite_master WHERE type='index' AND name='idx_brands_slug_unique'"
+  ).get();
+  if (!hasSlugUniqueIdx) {
+    console.log('[DB] Enforcing unique slugs...');
+    // First, fix any existing duplicate slugs
+    const slugCounts = db.prepare(
+      "SELECT slug, COUNT(*) as cnt FROM brands WHERE slug IS NOT NULL GROUP BY slug HAVING cnt > 1"
+    ).all() as Array<{ slug: string; cnt: number }>;
+    
+    for (const { slug } of slugCounts) {
+      const dupes = db.prepare(
+        "SELECT id FROM brands WHERE slug = ? ORDER BY created_at ASC"
+      ).all(slug) as Array<{ id: string }>;
+      // Keep first, rename rest
+      for (let i = 1; i < dupes.length; i++) {
+        const newSlug = `${slug}-${i + 1}`;
+        db.prepare('UPDATE brands SET slug = ? WHERE id = ?').run(newSlug, dupes[i].id);
+        console.log(`[DB] Renamed duplicate slug: ${slug} -> ${newSlug} for brand ${dupes[i].id}`);
+      }
+    }
+    
+    // Also fix any NULL slugs
+    const nullSlugs = db.prepare('SELECT id, name FROM brands WHERE slug IS NULL').all() as Array<{ id: string; name: string }>;
+    for (const brand of nullSlugs) {
+      const slug = brand.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || brand.id;
+      db.prepare('UPDATE brands SET slug = ? WHERE id = ?').run(slug, brand.id);
+    }
+    
+    // Now safe to add unique index
+    db.exec("CREATE UNIQUE INDEX IF NOT EXISTS idx_brands_slug_unique ON brands(slug)");
+    console.log('[DB] Unique slug index created');
+  }
+
   console.log('[DB] Migrations complete');
 }
 
@@ -1065,6 +1100,65 @@ export function isSlugAvailable(slug: string, excludeBrandId?: string): boolean 
   }
   const row = db.prepare('SELECT id FROM brands WHERE slug = ?').get(slug);
   return !row;
+}
+
+/**
+ * Reserved slugs that cannot be used as brand slugs.
+ */
+const RESERVED_SLUGS = new Set([
+  'admin', 'api', 'dashboard', 'create', 'login', 'signup', 'settings',
+  'null', 'undefined', 'site', 'shop', 'blog', 'chat', 'templates',
+  'app', 'auth', 'public', 'static', 'assets', 'images', 'fonts',
+  'robots', 'sitemap', 'favicon', 'manifest', 'sw', 'service-worker',
+]);
+
+/**
+ * Sanitize a string into a valid slug.
+ */
+export function sanitizeSlug(input: string): string {
+  return input
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-')  // Replace non-alphanumeric with hyphens
+    .replace(/^-+|-+$/g, '')       // Remove leading/trailing hyphens
+    .replace(/-{2,}/g, '-')        // Collapse consecutive hyphens
+    .slice(0, 100);                // Max 100 chars
+}
+
+/**
+ * Generate a unique slug for a brand. If the base slug is taken or reserved,
+ * appends -2, -3, etc. until a unique slug is found.
+ */
+export function generateUniqueSlug(name: string, excludeBrandId?: string): string {
+  const baseSlug = sanitizeSlug(name);
+  
+  if (!baseSlug) {
+    // Fallback for names that produce empty slugs
+    const fallback = 'brand-' + Date.now().toString(36);
+    return fallback;
+  }
+
+  // Check if base slug is available and not reserved
+  if (!RESERVED_SLUGS.has(baseSlug) && isSlugAvailable(baseSlug, excludeBrandId)) {
+    return baseSlug;
+  }
+
+  // Try numbered suffixes
+  for (let i = 2; i <= 100; i++) {
+    const candidate = `${baseSlug}-${i}`;
+    if (!RESERVED_SLUGS.has(candidate) && isSlugAvailable(candidate, excludeBrandId)) {
+      return candidate;
+    }
+  }
+
+  // Extremely unlikely fallback
+  return `${baseSlug}-${Date.now().toString(36)}`;
+}
+
+/**
+ * Check if a slug is reserved.
+ */
+export function isReservedSlug(slug: string): boolean {
+  return RESERVED_SLUGS.has(slug);
 }
 
 // ==================== Brand Settings operations ====================

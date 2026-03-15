@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { createBrand, getAllBrands } from '@/lib/db';
+import { createBrand, getAllBrands, generateUniqueSlug } from '@/lib/db';
 import { requireAuth, sanitizeInput, validateLength } from '@/lib/api-auth';
 import { nanoid } from 'nanoid';
 
@@ -42,6 +42,9 @@ export async function POST(request: NextRequest) {
 
     const id = nanoid(12);
 
+    // Generate a unique slug — handles collisions automatically
+    const slug = generateUniqueSlug(name);
+
     createBrand({
       id,
       name,
@@ -58,9 +61,10 @@ export async function POST(request: NextRequest) {
       channels: body.channels ? JSON.stringify(body.channels) : undefined,
       status: body.status || 'draft',
       user_id: session.userId,
+      slug,
     });
 
-    const brand = { id, ...body, name, tagline, description };
+    const brand = { id, slug, ...body, name, tagline, description };
     return NextResponse.json({ brand }, { status: 201 });
   } catch (error) {
     console.error('Error creating brand:', error);

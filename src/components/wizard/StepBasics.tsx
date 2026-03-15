@@ -1,7 +1,7 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Sparkles, ArrowRight, AlertCircle, ChevronDown } from 'lucide-react';
+import { useState, useRef, useEffect, useCallback } from 'react';
+import { Sparkles, ArrowRight, AlertCircle, ChevronDown, Globe, Check, X as XIcon } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -110,6 +110,48 @@ function getFieldAnim(i: number) {
 }
 
 export default function StepBasics({ data, updateData, onNext }: Props) {
+  // Slug preview state
+  const [slugPreview, setSlugPreview] = useState('');
+  const [slugAvailable, setSlugAvailable] = useState<boolean | null>(null);
+  const [slugChecking, setSlugChecking] = useState(false);
+  const slugTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  // Debounced slug check
+  const checkSlug = useCallback((name: string) => {
+    if (slugTimerRef.current) clearTimeout(slugTimerRef.current);
+    if (!name || name.trim().length < 2) {
+      setSlugPreview('');
+      setSlugAvailable(null);
+      return;
+    }
+    // Immediate preview (client-side)
+    const preview = name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '').slice(0, 100);
+    setSlugPreview(preview);
+    setSlugAvailable(null);
+    setSlugChecking(true);
+
+    // Debounced API check
+    slugTimerRef.current = setTimeout(async () => {
+      try {
+        const res = await fetch(`/api/brands/slug-check?name=${encodeURIComponent(name)}`);
+        if (res.ok) {
+          const result = await res.json();
+          setSlugPreview(result.suggested || result.slug);
+          setSlugAvailable(result.available);
+        }
+      } catch {
+        // Silent fail — slug preview is optional
+      } finally {
+        setSlugChecking(false);
+      }
+    }, 500);
+  }, []);
+
+  // Check slug when name changes
+  useEffect(() => {
+    checkSlug(data.name);
+  }, [data.name, checkSlug]);
+
   const [loadingNames, setLoadingNames] = useState(false);
   const [loadingTaglines, setLoadingTaglines] = useState(false);
   const [suggestedNames, setSuggestedNames] = useState<string[]>([]);
@@ -392,6 +434,22 @@ export default function StepBasics({ data, updateData, onNext }: Props) {
             aria-describedby={errors.name ? 'name-error' : undefined}
           />
           <FieldError message={touched.name ? errors.name : undefined} />
+          {/* Slug preview */}
+          {slugPreview && (
+            <div className="mt-2 flex items-center gap-2 text-xs text-zinc-400">
+              <Globe className="h-3 w-3 flex-shrink-0" />
+              <span className="truncate">
+                your-domain.com/<span className="font-mono text-zinc-600 dark:text-zinc-300">{slugPreview}</span>
+              </span>
+              {slugChecking ? (
+                <span className="text-zinc-400 ml-1">checking…</span>
+              ) : slugAvailable === true ? (
+                <span className="flex items-center gap-0.5 text-emerald-500 ml-1"><Check className="h-3 w-3" /> available</span>
+              ) : slugAvailable === false ? (
+                <span className="flex items-center gap-0.5 text-amber-500 ml-1"><XIcon className="h-3 w-3" /> taken — will use {slugPreview}</span>
+              ) : null}
+            </div>
+          )}
           <AnimatePresence>
             {suggestedNames.length > 0 && (
               <motion.div
