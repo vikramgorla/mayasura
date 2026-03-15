@@ -419,7 +419,7 @@ function BrandFooter({ brand, template, designSettings }: { brand: Brand; templa
                 {templateId === 'playful' ? '✨ Subscribed! Thank you.' : '✓ Subscribed. Thank you.'}
               </p>
             ) : (
-              <form onSubmit={handleNewsletter} className="flex gap-2 max-w-sm" aria-label="Newsletter signup">
+              <form onSubmit={handleNewsletter} className="flex flex-col sm:flex-row gap-2 max-w-sm" aria-label="Newsletter signup">
                 <label htmlFor="footer-newsletter-email" className="sr-only">Email address</label>
                 <input
                   id="footer-newsletter-email"
@@ -439,7 +439,7 @@ function BrandFooter({ brand, template, designSettings }: { brand: Brand; templa
                 />
                 <button
                   type="submit"
-                  className="px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-80"
+                  className="px-5 py-2.5 text-sm font-medium transition-opacity hover:opacity-80 flex-shrink-0"
                   style={{
                     backgroundColor: isDark ? accentColor : textColor,
                     color: isDark ? getTextOnColor(accentColor) : bgColor,

@@ -8,6 +8,7 @@ import { useBlogSite } from './layout';
 import { BlogPost } from '@/lib/types';
 import { BlogIndexMeta, BreadcrumbMeta } from '@/components/site/site-meta';
 import { Search, Clock, Share2, ChevronDown, X } from 'lucide-react';
+import { getTextOnColor } from '@/lib/color-utils';
 
 /* ─── Helpers ───────────────────────────────────────────────── */
 function readingTime(content: string | null): string {
@@ -542,7 +543,7 @@ export default function BlogListingPage() {
                         className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest"
                         style={{
                           backgroundColor: accentColor,
-                          color: '#FFFFFF',
+                          color: getTextOnColor(accentColor),
                           borderRadius: templateId === 'playful' ? '9999px' : templateId === 'bold' ? '0' : '6px',
                         }}
                       >

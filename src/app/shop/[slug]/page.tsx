@@ -8,6 +8,7 @@ import { useShop } from './layout';
 import { ShopMeta, BreadcrumbMeta } from '@/components/site/site-meta';
 import { getBaseUrl } from '@/lib/seo';
 import { usePrefetch } from '@/lib/use-prefetch';
+import { getTextOnColor } from '@/lib/color-utils';
 
 function getProductBadge(product: { name: string; price?: number | null; created_at?: string }, index: number): { label: string; type: 'new' | 'sale' | 'best' } | null {
   // Simple heuristic: first 2 products = "Best Seller", next 2 = "New", products with low price = "Sale"
@@ -107,16 +108,16 @@ export default function ShopPage() {
   // Add to cart button style
   const addBtnStyle: React.CSSProperties = (() => {
     if (templateId === 'bold') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '0',
+      backgroundColor: accentColor, color: getTextOnColor(accentColor), borderRadius: '0',
       fontWeight: 700, letterSpacing: '0.08em', textTransform: 'uppercase' as const,
       fontSize: '0.6875rem',
     };
     if (templateId === 'playful') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '9999px',
+      backgroundColor: accentColor, color: getTextOnColor(accentColor), borderRadius: '9999px',
       fontWeight: 600, fontSize: '0.75rem',
     };
     if (templateId === 'classic') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '8px',
+      backgroundColor: accentColor, color: getTextOnColor(accentColor), borderRadius: '8px',
       fontWeight: 500, fontSize: '0.75rem',
     };
     return {

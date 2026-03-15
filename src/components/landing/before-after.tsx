@@ -40,7 +40,7 @@ export function BeforeAfter() {
   const totalCost = beforeTools.reduce((sum, t) => sum + parseInt(t.cost.replace(/[^0-9]/g, '')), 0);
 
   return (
-    <section className="py-20 sm:py-28 px-4 sm:px-6 bg-[var(--bg-secondary)]">
+    <section className="py-20 sm:py-28 px-4 sm:px-6 bg-[var(--bg-secondary)] overflow-hidden">
       <div className="max-w-6xl mx-auto">
         <motion.div
           initial="hidden"

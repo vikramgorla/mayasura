@@ -93,6 +93,7 @@ function TestimonialsCarousel({
   testimonials,
   brand,
   template,
+  designSettings: ds,
 }: {
   testimonials: Array<{
     id: string;
@@ -105,12 +106,14 @@ function TestimonialsCarousel({
   }>;
   brand: Brand;
   template?: { id: string; preview?: { borderRadius: string; typography: { headingWeight: string; headingTracking: string } } };
+  designSettings: import('@/lib/design-settings').ResolvedDesignSettings;
 }) {
   const templateId = template?.id || 'minimal';
   const isDark = templateId === 'bold' || templateId === 'tech' || templateId === 'neon';
   const textColor = isDark ? '#FFFFFF' : brand.primary_color;
   const accentColor = brand.accent_color || textColor;
   const tp = template?.preview;
+  const dsRadius = BORDER_RADIUS_MAP[ds.borderRadius];
   const [activeIndex, setActiveIndex] = useState(0);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
@@ -165,8 +168,8 @@ function TestimonialsCarousel({
                 style={{
                   backgroundColor: templateId === 'playful' ? ['#FFF7ED', '#EFF6FF', '#F0FDF4'][i % 3]
                     : isDark ? '#111111' : `${textColor}04`,
-                  borderRadius: templateId === 'playful' ? '20px' : templateId === 'classic' ? '16px' : tp?.borderRadius || '8px',
-                  border: templateId === 'bold' ? `2px solid ${textColor}10` : undefined,
+                  borderRadius: templateId === 'playful' ? '20px' : templateId === 'classic' ? '16px' : templateId === 'bold' ? '0' : dsRadius,
+                  border: templateId === 'bold' ? `2px solid ${textColor}10` : `1px solid ${ds.borderColor}`,
                   boxShadow: templateId === 'classic' ? '6px 6px 12px rgba(0,0,0,0.04), -6px -6px 12px rgba(255,255,255,0.7)' : undefined,
                 }}
               >
@@ -919,7 +922,7 @@ export default function BrandHomePage() {
   const renderProducts = () => {
     if (products.length === 0) return null;
 
-    const imgRadius = templateId === 'playful' ? '16px' : templateId === 'classic' ? '10px' : '0';
+    const imgRadius = templateId === 'playful' ? '16px' : templateId === 'classic' ? '10px' : templateId === 'bold' ? '0' : dsRadius;
     const containerClass = templateId === 'bold' ? 'max-w-7xl' : 'max-w-6xl';
 
     return (
@@ -968,7 +971,8 @@ export default function BrandHomePage() {
                 style={
                   templateId === 'bold' ? { border: `2px solid ${textColor}10` }
                   : templateId === 'playful' ? { backgroundColor: '#FFFFFF', borderRadius: '20px', overflow: 'hidden', boxShadow: '0 2px 8px rgba(0,0,0,0.04)' }
-                  : {}
+                  : templateId === 'minimal' || templateId === 'editorial' ? {}
+                  : { backgroundColor: ds.surfaceColor, borderRadius: dsRadius, border: `1px solid ${ds.borderColor}`, overflow: 'hidden' }
                 }
               >
                 <div
@@ -1257,6 +1261,7 @@ export default function BrandHomePage() {
             testimonials={testimonials}
             brand={brand}
             template={template ? { id: template.id, preview: template.preview } : undefined}
+            designSettings={designSettings}
           />
           <Divider />
         </>

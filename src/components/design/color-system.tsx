@@ -353,8 +353,59 @@ export function ColorSystemEditor({
         </div>
       </div>
 
+      {/* Accessibility warning */}
+      <ContrastWarning colors={colors} />
+
       {/* Live color preview */}
       <ColorSchemePreview colors={colors} />
+    </div>
+  );
+}
+
+// ─── Contrast Warning Banner ─────────────────────────────────────
+function ContrastWarning({ colors }: { colors: ColorSystem }) {
+  const issues = validateColorSystem(colors);
+  const errors = issues.filter(i => i.type === 'error');
+  const warnings = issues.filter(i => i.type === 'warning');
+
+  if (issues.length === 0) return null;
+
+  return (
+    <div
+      className={cn(
+        'rounded-lg p-3 text-xs',
+        errors.length > 0
+          ? 'bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800'
+          : 'bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800',
+      )}
+    >
+      <div className="flex items-start gap-2">
+        <span className="text-sm flex-shrink-0">
+          {errors.length > 0 ? '⚠️' : 'ℹ️'}
+        </span>
+        <div>
+          <p className={cn(
+            'font-medium mb-1',
+            errors.length > 0
+              ? 'text-amber-800 dark:text-amber-200'
+              : 'text-blue-800 dark:text-blue-200',
+          )}>
+            {errors.length > 0
+              ? 'Low contrast — colors will be auto-adjusted for readability'
+              : 'Minor contrast suggestions'}
+          </p>
+          <ul className={cn(
+            'space-y-0.5',
+            errors.length > 0
+              ? 'text-amber-700 dark:text-amber-300'
+              : 'text-blue-700 dark:text-blue-300',
+          )}>
+            {issues.map((issue, i) => (
+              <li key={i}>• {issue.message}</li>
+            ))}
+          </ul>
+        </div>
+      </div>
     </div>
   );
 }
@@ -375,7 +426,7 @@ export function ColorSchemePreview({ colors }: { colors: ColorSystem }) {
           <div className="flex items-center gap-2">
             <div
               className="h-5 w-5 rounded flex items-center justify-center text-[8px] font-bold"
-              style={{ backgroundColor: colors.accent, color: '#FFFFFF' }}
+              style={{ backgroundColor: colors.accent, color: getTextOnColor(colors.accent) }}
             >
               B
             </div>
@@ -400,7 +451,7 @@ export function ColorSchemePreview({ colors }: { colors: ColorSystem }) {
           </p>
           <button
             className="px-3 py-1 rounded text-[9px] font-medium"
-            style={{ backgroundColor: colors.accent, color: '#FFFFFF' }}
+            style={{ backgroundColor: colors.accent, color: getTextOnColor(colors.accent) }}
           >
             Get Started
           </button>

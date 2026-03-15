@@ -3,6 +3,7 @@
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { Check } from 'lucide-react';
+import { getTextOnColor } from '@/lib/color-utils';
 
 // ─── Button Style Types ──────────────────────────────────────────
 export type ButtonShape = 'rounded' | 'pill' | 'sharp' | 'soft';
@@ -109,7 +110,7 @@ export function ButtonStyleEditor({
       transition: 'all 0.2s',
     };
     if (variant === 'solid') {
-      return { ...base, backgroundColor: accentColor, color: '#FFFFFF', border: 'none' };
+      return { ...base, backgroundColor: accentColor, color: getTextOnColor(accentColor), border: 'none' };
     }
     if (variant === 'outline') {
       return { ...base, backgroundColor: 'transparent', color: accentColor, border: `2px solid ${accentColor}` };

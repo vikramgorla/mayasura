@@ -247,50 +247,52 @@
 /* ==================== Section ==================== */
 .t-section {
   position: relative;
+  /* Design Studio spacing density controls section padding */
+  padding: var(--brand-section-padding, 48px) 0;
 }
 
 [data-template="minimal"] .t-section {
-  padding: 6rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="minimal"] .t-section {
-    padding: 8rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
 [data-template="editorial"] .t-section {
-  padding: 4rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="editorial"] .t-section {
-    padding: 5rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
 [data-template="bold"] .t-section {
-  padding: 4rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="bold"] .t-section {
-    padding: 5rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
 [data-template="classic"] .t-section {
-  padding: 4rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="classic"] .t-section {
-    padding: 5rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
 [data-template="playful"] .t-section {
-  padding: 3.5rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="playful"] .t-section {
-    padding: 5rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
@@ -814,11 +816,11 @@
 }
 
 [data-template="startup"] .t-section {
-  padding: 4rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="startup"] .t-section {
-    padding: 6rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
@@ -899,11 +901,11 @@
 }
 
 [data-template="portfolio"] .t-section {
-  padding: 5rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="portfolio"] .t-section {
-    padding: 7rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
@@ -972,11 +974,11 @@
 }
 
 [data-template="magazine"] .t-section {
-  padding: 3.5rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="magazine"] .t-section {
-    padding: 4.5rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
@@ -1049,11 +1051,11 @@
 }
 
 [data-template="boutique"] .t-section {
-  padding: 5rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="boutique"] .t-section {
-    padding: 7rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
@@ -1129,11 +1131,11 @@
 }
 
 [data-template="tech"] .t-section {
-  padding: 4rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="tech"] .t-section {
-    padding: 5rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
@@ -1220,11 +1222,11 @@
 }
 
 [data-template="wellness"] .t-section {
-  padding: 5rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="wellness"] .t-section {
-    padding: 7rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
@@ -1303,11 +1305,11 @@
 }
 
 [data-template="restaurant"] .t-section {
-  padding: 4rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="restaurant"] .t-section {
-    padding: 5rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
@@ -1394,11 +1396,11 @@
 }
 
 [data-template="artisan"] .t-section {
-  padding: 5rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="artisan"] .t-section {
-    padding: 6.5rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 
@@ -1494,11 +1496,11 @@
 }
 
 [data-template="corporate"] .t-section {
-  padding: 3.5rem 0;
+  padding: var(--brand-section-padding, 48px) 0;
 }
 @media (min-width: 768px) {
   [data-template="corporate"] .t-section {
-    padding: 5rem 0;
+    padding: var(--brand-section-padding, 48px) 0;
   }
 }
 

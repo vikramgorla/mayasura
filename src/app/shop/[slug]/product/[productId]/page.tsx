@@ -7,6 +7,7 @@ import Image from 'next/image';
 import { motion, AnimatePresence } from 'framer-motion';
 import { useShop } from '../../layout';
 import { ProductMeta, BreadcrumbMeta } from '@/components/site/site-meta';
+import { getTextOnColor } from '@/lib/color-utils';
 
 // ── Star Input ────────────────────────────────────────────────────────────────
 function StarInput({ value, onChange, color }: { value: number; onChange: (v: number) => void; color: string }) {
@@ -907,17 +908,17 @@ export default function ProductDetailPage() {
 
   const addBtnStyle: React.CSSProperties = (() => {
     if (templateId === 'bold') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '0',
+      backgroundColor: accentColor, color: getTextOnColor(accentColor), borderRadius: '0',
       fontWeight: 700, letterSpacing: '0.1em', textTransform: 'uppercase' as const,
       fontSize: '0.75rem', padding: '1rem 2.5rem',
     };
     if (templateId === 'playful') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '9999px',
+      backgroundColor: accentColor, color: getTextOnColor(accentColor), borderRadius: '9999px',
       fontWeight: 600, fontSize: '0.9375rem', padding: '0.875rem 2.5rem',
       boxShadow: `0 8px 32px ${accentColor}30`,
     };
     if (templateId === 'classic') return {
-      backgroundColor: accentColor, color: '#FFFFFF', borderRadius: '8px',
+      backgroundColor: accentColor, color: getTextOnColor(accentColor), borderRadius: '8px',
       fontWeight: 500, fontSize: '0.9375rem', padding: '0.875rem 2.5rem',
       boxShadow: '3px 3px 6px rgba(0,0,0,0.06), -3px -3px 6px rgba(255,255,255,0.6)',
     };

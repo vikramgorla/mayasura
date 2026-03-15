@@ -8,7 +8,7 @@ import {
   Sparkles, Code2, Puzzle, Check, ChevronDown, Star, Zap, Shield, Palette,
   MousePointerClick, Bot, Building2, ShoppingCart, Utensils, Briefcase,
   Stethoscope, GraduationCap, Camera, Music, Dumbbell, Leaf, Heart,
-  Github, Twitter, Linkedin, ExternalLink, Play, Monitor, X, Volume2, TrendingUp
+  Github, Twitter, Linkedin, ExternalLink, Play, Monitor, X, Volume2, TrendingUp, Menu
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { UserNav } from "@/components/user-nav";
@@ -472,6 +472,7 @@ export default function Home() {
   const [activeTemplate, setActiveTemplate] = useState(0);
   const [showBanner, setShowBanner] = useState(true);
   const [billingAnnual, setBillingAnnual] = useState(false);
+  const [mobileNavOpen, setMobileNavOpen] = useState(false);
 
   return (
     <div className="min-h-screen bg-[var(--bg-primary)]">
@@ -512,12 +513,50 @@ export default function Home() {
             <Link href="#faq" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hidden sm:inline transition-colors">
               FAQ
             </Link>
-            <Link href="/dashboard" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors">
+            <Link href="/dashboard" className="text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] hidden sm:inline transition-colors">
               Dashboard
             </Link>
             <UserNav />
+            <button
+              onClick={() => setMobileNavOpen(!mobileNavOpen)}
+              className="sm:hidden p-1.5 -mr-1.5 rounded-md hover:bg-[var(--bg-secondary)] transition-colors"
+              aria-label={mobileNavOpen ? 'Close menu' : 'Open menu'}
+              aria-expanded={mobileNavOpen}
+            >
+              {mobileNavOpen ? <X className="h-5 w-5 text-[var(--text-primary)]" /> : <Menu className="h-5 w-5 text-[var(--text-primary)]" />}
+            </button>
           </div>
         </div>
+        {/* Mobile nav dropdown */}
+        <AnimatePresence>
+          {mobileNavOpen && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: 'auto' }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.2, ease: [0.25, 0.46, 0.45, 0.94] }}
+              className="sm:hidden border-t border-[var(--border-primary)] overflow-hidden bg-[var(--bg-primary)]"
+            >
+              <div className="px-4 py-3 space-y-1">
+                {[
+                  { href: '/templates', label: 'Templates' },
+                  { href: '#pricing', label: 'Pricing' },
+                  { href: '#faq', label: 'FAQ' },
+                  { href: '/dashboard', label: 'Dashboard' },
+                ].map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    onClick={() => setMobileNavOpen(false)}
+                    className="block py-2.5 text-sm text-[var(--text-secondary)] hover:text-[var(--text-primary)] transition-colors"
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </nav>
 
       {/* ═══════════ HERO ═══════════ */}

@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import type { Brand } from '@/lib/types';
+import { getTextOnColor } from '@/lib/color-utils';
 
 interface NewsletterPopupProps {
   brand: Brand;
@@ -234,7 +235,7 @@ export function NewsletterPopup({ brand, templateId = 'minimal', delay = 30000 }
                           className="w-full px-6 py-3 text-sm font-semibold transition-all hover:opacity-90 hover:shadow-lg disabled:opacity-60"
                           style={{
                             backgroundColor: accentColor,
-                            color: '#FFFFFF',
+                            color: getTextOnColor(accentColor),
                             borderRadius: templateId === 'playful' ? '12px' : '8px',
                           }}
                         >
