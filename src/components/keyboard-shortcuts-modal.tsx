@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, Keyboard, Command } from 'lucide-react';
+import { X, Keyboard } from 'lucide-react';
 
 interface ShortcutGroup {
   label: string;
@@ -11,32 +11,53 @@ interface ShortcutGroup {
 
 const shortcutGroups: ShortcutGroup[] = [
   {
-    label: 'Navigation',
+    label: 'Command Palette',
     shortcuts: [
       { keys: ['⌘', 'K'], description: 'Open command palette' },
-      { keys: ['⌘', 'J'], description: 'Open AI assistant' },
+      { keys: ['⌃', '/'], description: 'Open command palette (alt)' },
       { keys: ['⌘', '?'], description: 'Show keyboard shortcuts' },
+    ],
+  },
+  {
+    label: 'Navigation',
+    shortcuts: [
       { keys: ['G', 'H'], description: 'Go to dashboard home' },
       { keys: ['G', 'P'], description: 'Go to products' },
       { keys: ['G', 'B'], description: 'Go to blog' },
+      { keys: ['⌘', 'J'], description: 'Open AI assistant' },
+    ],
+  },
+  {
+    label: 'Quick Create',
+    shortcuts: [
+      { keys: ['⌃', 'N'], description: 'New product' },
+      { keys: ['⌃', 'B'], description: 'New blog post' },
+      { keys: ['⌃', 'D'], description: 'Open design editor' },
+    ],
+  },
+  {
+    label: 'Dashboard Sections',
+    shortcuts: [
+      { keys: ['⌘', '⇧', 'P'], description: 'Products' },
+      { keys: ['⌘', '⇧', 'B'], description: 'Blog' },
+      { keys: ['⌘', '⇧', 'D'], description: 'Design Studio' },
+      { keys: ['⌘', '⇧', 'A'], description: 'Analytics' },
+      { keys: ['⌘', '⇧', 'S'], description: 'Settings' },
     ],
   },
   {
     label: 'Actions',
     shortcuts: [
       { keys: ['⌘', 'S'], description: 'Save current changes' },
-      { keys: ['⌘', 'N'], description: 'Create new item' },
       { keys: ['⌘', 'E'], description: 'Export brand data' },
-      { keys: ['⌘', '/'], description: 'Toggle dark / light mode' },
       { keys: ['Esc'], description: 'Close modal / palette' },
     ],
   },
   {
     label: 'View',
     shortcuts: [
-      { keys: ['⌘', 'D'], description: 'Toggle debug info' },
-      { keys: ['⌘', 'Shift', 'P'], description: 'Preview live site' },
-      { keys: ['⌘', 'Shift', 'A'], description: 'View analytics' },
+      { keys: ['⌘', '⇧', 'P'], description: 'Preview live site' },
+      { keys: ['⌘', '/'], description: 'Toggle dark / light mode' },
     ],
   },
 ];
