@@ -7,7 +7,16 @@ export async function GET(
   request: NextRequest,
   { params }: { params: Promise<{ slug: string }> }
 ) {
-  const { slug } = await params;
+  let slug: string;
+  try {
+    ({ slug } = await params);
+  } catch {
+    return new NextResponse('// Invalid request', {
+      status: 400,
+      headers: { 'Content-Type': 'application/javascript' },
+    });
+  }
+
   const brand = getBrandBySlug(slug) as Brand | undefined;
 
   if (!brand) {
@@ -60,11 +69,19 @@ export async function GET(
 })();
 `.trim();
 
-  return new NextResponse(widgetScript, {
-    headers: {
-      'Content-Type': 'application/javascript',
-      'Cache-Control': 'public, max-age=3600',
-      'Access-Control-Allow-Origin': '*',
-    },
-  });
+  try {
+    return new NextResponse(widgetScript, {
+      headers: {
+        'Content-Type': 'application/javascript',
+        'Cache-Control': 'public, max-age=3600',
+        'Access-Control-Allow-Origin': '*',
+      },
+    });
+  } catch (err) {
+    console.error('Widget generation error:', err);
+    return new NextResponse('// Error generating widget', {
+      status: 500,
+      headers: { 'Content-Type': 'application/javascript' },
+    });
+  }
 }

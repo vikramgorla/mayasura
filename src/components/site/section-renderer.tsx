@@ -165,20 +165,44 @@ function NewsletterSection({ section, brand, template }: { section: PageSection 
   const tp = template?.preview;
   const slug = brand.slug || brand.id;
   const [email, setEmail] = useState('');
+  const [name, setName] = useState('');
   const [subscribed, setSubscribed] = useState(false);
+  const [error, setError] = useState('');
+  const [submitting, setSubmitting] = useState(false);
+
+  const inputRadius = templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : tp?.borderRadius || '0';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     if (!email) return;
+
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(email)) {
+      setError('Please enter a valid email address');
+      return;
+    }
+
+    setSubmitting(true);
     try {
-      await fetch(`/api/public/brand/${slug}/newsletter`, {
+      const res = await fetch(`/api/public/brand/${slug}/newsletter`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email }),
+        body: JSON.stringify({ email, name: name || undefined }),
       });
+      const result = await res.json();
+      if (!res.ok) {
+        setError(result.error || 'Something went wrong. Please try again.');
+        return;
+      }
       setSubscribed(true);
       setEmail('');
-    } catch { /* silent */ }
+      setName('');
+    } catch {
+      setError('Network error. Please try again.');
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   return (
@@ -196,8 +220,9 @@ function NewsletterSection({ section, brand, template }: { section: PageSection 
             borderRadius: templateId === 'playful' ? '24px' : templateId === 'classic' ? '16px' : tp?.borderRadius || '8px',
           }}
         >
-          {/* Decorative gradient blob */}
+          {/* Decorative gradient blobs */}
           <div className="absolute top-0 right-0 w-64 h-64 rounded-full blur-[80px] pointer-events-none" style={{ backgroundColor: `${accentColor}10` }} />
+          <div className="absolute bottom-0 left-0 w-48 h-48 rounded-full blur-[60px] pointer-events-none" style={{ backgroundColor: `${textColor}06` }} />
           <div className="relative z-10">
             <h2
               className="text-xl sm:text-2xl mb-3"
@@ -216,42 +241,108 @@ function NewsletterSection({ section, brand, template }: { section: PageSection 
               {subscribed ? (
                 <motion.div
                   key="success"
-                  initial={{ opacity: 0, scale: 0.9 }}
+                  initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  className="flex flex-col items-center gap-2"
+                  transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                  className="flex flex-col items-center gap-3"
                 >
-                  <span className="text-3xl mb-2">✨</span>
-                  <p className="text-sm font-medium" style={{ color: accentColor }}>
+                  <motion.div
+                    initial={{ scale: 0 }}
+                    animate={{ scale: 1 }}
+                    transition={{ delay: 0.15, type: 'spring', stiffness: 250, damping: 12 }}
+                    className="h-16 w-16 rounded-full flex items-center justify-center"
+                    style={{ backgroundColor: `${accentColor}15` }}
+                  >
+                    <motion.svg width="32" height="32" viewBox="0 0 32 32" fill="none">
+                      <motion.path
+                        d="M8 16L14 22L24 10"
+                        stroke={accentColor}
+                        strokeWidth="3"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        initial={{ pathLength: 0 }}
+                        animate={{ pathLength: 1 }}
+                        transition={{ delay: 0.3, duration: 0.5, ease: 'easeOut' }}
+                      />
+                    </motion.svg>
+                  </motion.div>
+                  <motion.p
+                    initial={{ opacity: 0, y: 5 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.5 }}
+                    className="text-sm font-medium"
+                    style={{ color: accentColor }}
+                  >
                     You&apos;re subscribed! Thank you for joining.
-                  </p>
+                  </motion.p>
+                  <motion.p
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.7 }}
+                    className="text-xs"
+                    style={{ color: `${textColor}40` }}
+                  >
+                    Check your inbox for a welcome message.
+                  </motion.p>
                 </motion.div>
               ) : (
-                <motion.form key="form" onSubmit={handleSubmit} className="flex gap-2 max-w-md mx-auto">
-                  <input
-                    type="email"
-                    placeholder="Enter your email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    className="flex-1 px-4 py-3 text-sm border outline-none transition-all focus:ring-2"
-                    style={{
-                      borderColor: `${textColor}12`,
-                      color: textColor,
-                      backgroundColor: isDark ? '#FFFFFF08' : '#FFFFFF',
-                      borderRadius: templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : tp?.borderRadius || '0',
-                    }}
-                    required
-                  />
+                <motion.form key="form" onSubmit={handleSubmit} className="max-w-md mx-auto space-y-3">
+                  <div className="flex gap-2">
+                    <input
+                      type="text"
+                      placeholder="Name (optional)"
+                      value={name}
+                      onChange={e => setName(e.target.value)}
+                      className="w-1/3 px-4 py-3 text-sm border outline-none transition-all focus:ring-2"
+                      style={{
+                        borderColor: `${textColor}12`,
+                        color: textColor,
+                        backgroundColor: isDark ? '#FFFFFF08' : '#FFFFFF',
+                        borderRadius: inputRadius,
+                      }}
+                    />
+                    <input
+                      type="email"
+                      placeholder="your@email.com"
+                      value={email}
+                      onChange={e => { setEmail(e.target.value); setError(''); }}
+                      className={`flex-1 px-4 py-3 text-sm border outline-none transition-all focus:ring-2 ${error ? 'ring-2 ring-red-400' : ''}`}
+                      style={{
+                        borderColor: error ? '#ef4444' : `${textColor}12`,
+                        color: textColor,
+                        backgroundColor: isDark ? '#FFFFFF08' : '#FFFFFF',
+                        borderRadius: inputRadius,
+                      }}
+                      required
+                    />
+                  </div>
+                  <AnimatePresence>
+                    {error && (
+                      <motion.p
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        className="text-xs text-red-500 text-left"
+                      >
+                        {error}
+                      </motion.p>
+                    )}
+                  </AnimatePresence>
                   <button
                     type="submit"
-                    className="px-6 py-3 text-sm font-medium transition-all hover:opacity-90 hover:shadow-lg"
+                    disabled={submitting}
+                    className="w-full px-6 py-3 text-sm font-medium transition-all hover:opacity-90 hover:shadow-lg disabled:opacity-60"
                     style={{
                       backgroundColor: isDark ? accentColor : textColor,
                       color: isDark ? '#FFFFFF' : bgColor,
-                      borderRadius: templateId === 'playful' ? '9999px' : templateId === 'classic' ? '8px' : tp?.borderRadius || '0',
+                      borderRadius: inputRadius,
                     }}
                   >
-                    {config.buttonText || 'Subscribe'}
+                    {submitting ? 'Subscribing...' : (config.buttonText || 'Subscribe')}
                   </button>
+                  <p className="text-[10px]" style={{ color: `${textColor}30` }}>
+                    No spam, unsubscribe anytime.
+                  </p>
                 </motion.form>
               )}
             </AnimatePresence>

@@ -11,6 +11,7 @@ import { type PageLayout, getDefaultLayout } from '@/lib/page-layout';
 import { useScrollAnimation } from '@/lib/use-scroll-animation';
 import { ScrollToTop } from '@/components/site/scroll-to-top';
 import { CookieConsent } from '@/components/site/cookie-consent';
+import { NewsletterPopup } from '@/components/site/newsletter-popup';
 import { SiteMeta, SitemapHint } from '@/components/site/site-meta';
 import {
   resolveDesignSettings,
@@ -647,6 +648,11 @@ export default function BrandSiteLayout({ children }: { children: React.ReactNod
           accentColor={data.brand.accent_color || '#6366F1'}
           bgColor={data.brand.secondary_color || '#FFFFFF'}
           textColor={data.brand.primary_color || '#000000'}
+        />
+        <NewsletterPopup
+          brand={data.brand}
+          templateId={data.websiteTemplate?.id}
+          delay={30000}
         />
       </div>
     </BrandSiteContext.Provider>
