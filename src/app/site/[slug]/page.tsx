@@ -515,85 +515,172 @@ export default function BrandHomePage() {
       );
     }
 
-    // STARTUP — Gradient pill style, centered, with floating orbs
+    // STARTUP — Gradient mesh, metric counters, pill CTAs, SaaS aesthetic
     if (templateId === 'startup') {
       return (
         <section className="t-hero relative overflow-hidden">
-          <FloatingOrbs color1={accentColor} templateId="startup" />
-          <div className="absolute inset-0 opacity-[0.03]" style={{ background: `radial-gradient(ellipse at 30% 50%, ${accentColor}, transparent 70%), radial-gradient(ellipse at 70% 50%, #818CF8, transparent 70%)` }} />
-          <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center relative z-10">
+          {/* Gradient mesh background */}
+          <div className="absolute inset-0 opacity-[0.06]" style={{
+            background: `radial-gradient(ellipse at 20% 50%, ${accentColor}, transparent 60%), radial-gradient(ellipse at 80% 20%, #818CF8, transparent 50%), radial-gradient(ellipse at 50% 80%, #06B6D4, transparent 60%)`,
+          }} />
+          {/* Stripe-style diagonal lines */}
+          <div className="absolute inset-0 opacity-[0.02]" style={{
+            backgroundImage: 'repeating-linear-gradient(135deg, currentColor 0px, currentColor 1px, transparent 1px, transparent 40px)',
+          }} />
+          <div className="max-w-5xl mx-auto px-5 sm:px-8 text-center relative z-10">
             {brand.industry && (
-              <span className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium mb-8" style={{ backgroundColor: `${accentColor}10`, color: accentColor, border: `1px solid ${accentColor}20` }}>
+              <motion.span
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.4 }}
+                className="inline-flex items-center gap-1.5 px-4 py-1.5 rounded-full text-xs font-medium mb-8"
+                style={{ backgroundColor: `${accentColor}10`, color: accentColor, border: `1px solid ${accentColor}20` }}
+              >
                 🚀 {brand.industry}
-              </span>
+              </motion.span>
             )}
-            <h1 className="t-hero-heading mb-6" style={headingStyle}>
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="t-hero-heading mb-6"
+              style={headingStyle}
+            >
               {brand.tagline || brand.name}
-            </h1>
-            <p className="t-hero-desc" style={{ color: `${textColor}55` }}>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.4, delay: 0.25 }}
+              className="t-hero-desc"
+              style={{ color: `${textColor}55` }}
+            >
               {brand.description || `Welcome to ${brand.name}.`}
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 mt-10">
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.4, delay: 0.4 }}
+              className="flex flex-wrap justify-center gap-4 mt-10"
+            >
               {channels.includes('ecommerce') && (
                 <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
-                  Get Started
+                  Get Started Free
                 </Link>
               )}
               <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}15`, color: textColor }}>
-                Learn More →
+                See How It Works →
               </Link>
-            </div>
+            </motion.div>
+            {/* Metric counters — SaaS social proof */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="flex flex-wrap justify-center gap-8 sm:gap-12 mt-14 pt-10"
+              style={{ borderTop: `1px solid ${textColor}08` }}
+            >
+              {[
+                { value: '10K+', label: 'Active Users' },
+                { value: '99.9%', label: 'Uptime' },
+                { value: '4.9/5', label: 'Rating' },
+              ].map((m, i) => (
+                <div key={i} className="text-center">
+                  <div className="text-2xl sm:text-3xl font-bold" style={{ color: textColor, fontFamily: brand.font_heading }}>{m.value}</div>
+                  <div className="text-xs mt-1" style={{ color: `${textColor}40` }}>{m.label}</div>
+                </div>
+              ))}
+            </motion.div>
           </div>
         </section>
       );
     }
 
-    // PORTFOLIO — Full-bleed, left-aligned minimal, with floating orb
+    // PORTFOLIO — Full-bleed gradient hero, minimal text overlay, ultra clean
     if (templateId === 'portfolio') {
       return (
-        <section className="t-hero relative">
-          <FloatingOrbs color1={textColor} templateId="portfolio" />
-          <div className="max-w-6xl mx-auto px-5 sm:px-8">
-            <div className="max-w-2xl">
-              <h1 className="t-hero-heading mb-8" style={{ ...headingStyle, fontWeight: 400 }}>
+        <section className="t-hero relative overflow-hidden">
+          {/* Full-bleed gradient background */}
+          <div className="absolute inset-0" style={{
+            background: `linear-gradient(135deg, ${textColor}08 0%, ${textColor}03 50%, ${textColor}06 100%)`,
+          }} />
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 relative z-10">
+            <motion.div
+              className="max-w-2xl"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1.2 }}
+            >
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="text-[10px] uppercase tracking-[0.3em] mb-10 block"
+                style={{ color: `${textColor}30` }}
+              >
+                {brand.industry || 'Selected Work'}
+              </motion.span>
+              <motion.h1
+                initial={{ opacity: 0, y: 15 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.5 }}
+                className="t-hero-heading mb-8"
+                style={{ ...headingStyle, fontWeight: 400 }}
+              >
                 {brand.tagline || brand.name}
-              </h1>
-              <p className="t-hero-desc" style={{ color: `${textColor}40` }}>
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.8 }}
+                className="t-hero-desc"
+                style={{ color: `${textColor}35` }}
+              >
                 {brand.description || `Welcome to ${brand.name}.`}
-              </p>
-              <div className="flex flex-wrap gap-4 mt-12">
+              </motion.p>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 1.1 }}
+                className="flex flex-wrap gap-6 mt-14"
+              >
                 <Link href={`/site/${slug}/products`} className="t-btn-primary" style={{ backgroundColor: textColor, color: bgColor }}>
                   View Work
                 </Link>
-                <Link href={`/site/${slug}/contact`} className="t-btn-secondary border" style={{ borderColor: `${textColor}15`, color: textColor }}>
-                  Contact
+                <Link href={`/site/${slug}/contact`} className="text-sm transition-opacity hover:opacity-60" style={{ color: `${textColor}50`, lineHeight: '2.5' }}>
+                  Get in Touch ↗
                 </Link>
-              </div>
-            </div>
+              </motion.div>
+            </motion.div>
           </div>
         </section>
       );
     }
 
-    // MAGAZINE — Split with serif focus, with floating orb
+    // MAGAZINE — Multi-column newspaper layout with featured story
     if (templateId === 'magazine') {
       return (
         <section className="t-hero relative">
-          <FloatingOrbs color1={textColor} templateId="magazine" />
           <div className="max-w-6xl mx-auto px-5 sm:px-8">
-            <div className="t-hero-split">
+            {/* Newspaper masthead */}
+            <div className="text-center mb-8 pb-4" style={{ borderBottom: `2px solid ${textColor}` }}>
+              <span className="text-[10px] font-medium uppercase tracking-[0.2em]" style={{ color: `${textColor}40` }}>
+                {brand.industry || 'Culture & Living'}
+              </span>
+            </div>
+            <div className="grid md:grid-cols-[2fr_1fr] gap-8 md:gap-12">
               <div>
-                <div className="h-0.5 w-10 mb-6" style={{ backgroundColor: accentColor }} />
                 <h1 className="t-hero-heading mb-6" style={headingStyle}>
                   {brand.tagline || brand.name}
                 </h1>
-                <p className="t-hero-desc" style={{ color: `${textColor}55`, fontFamily: brand.font_body }}>
+                <div className="h-px w-full mb-6" style={{ backgroundColor: `${textColor}15` }} />
+                <p className="t-hero-desc text-lg" style={{ color: `${textColor}55`, fontFamily: brand.font_body, lineHeight: 1.8, fontSize: '1.125rem' }}>
                   {brand.description || `Welcome to ${brand.name}.`}
                 </p>
                 <div className="flex flex-wrap gap-4 mt-10">
                   {channels.includes('ecommerce') && (
                     <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
-                      Explore
+                      Read More
                     </Link>
                   )}
                   <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}15`, color: textColor }}>
@@ -601,12 +688,21 @@ export default function BrandHomePage() {
                   </Link>
                 </div>
               </div>
-              <div className="t-hero-image flex items-center justify-center" style={{ backgroundColor: `${textColor}04` }}>
-                {brand.logo_url ? (
-                  <img src={brand.logo_url} alt={brand.name} className="max-w-[60%] max-h-[60%] object-contain" />
-                ) : (
-                  <BrandPlaceholder color={textColor} className="w-full h-full" variant="hero" />
-                )}
+              {/* Sidebar stories */}
+              <div className="hidden md:block space-y-0" style={{ borderLeft: `1px solid ${textColor}12`, paddingLeft: '2rem' }}>
+                {['Latest Updates', 'Behind the Scenes', 'Community Spotlight'].map((story, i) => (
+                  <div key={i} className="py-5" style={{ borderBottom: i < 2 ? `1px solid ${textColor}08` : undefined }}>
+                    <span className="text-[9px] font-bold uppercase tracking-[0.15em] block mb-2" style={{ color: accentColor }}>
+                      {['Feature', 'Culture', 'People'][i]}
+                    </span>
+                    <h3 className="text-sm font-bold leading-tight" style={{ fontFamily: brand.font_heading }}>
+                      {story}
+                    </h3>
+                    <p className="text-xs mt-1.5" style={{ color: `${textColor}40` }}>
+                      {['Stay up to date with the latest.', 'Discover how it all comes together.', 'Stories from our community.'][i]}
+                    </p>
+                  </div>
+                ))}
               </div>
             </div>
           </div>
@@ -647,103 +743,515 @@ export default function BrandHomePage() {
       );
     }
 
-    // TECH — Terminal-style, left-aligned
+    // TECH — Developer/terminal aesthetic with grid bg, command-line CTAs
     if (templateId === 'tech') {
       return (
-        <section className="t-hero" style={{ backgroundColor: '#0A0F1A' }}>
-          <div className="max-w-6xl mx-auto px-5 sm:px-8">
-            <span className="inline-block text-xs font-mono mb-6" style={{ color: accentColor }}>
-              {'>'} {brand.industry || brand.name} _
-            </span>
-            <h1 className="t-hero-heading mb-6" style={{ ...headingStyle, color: '#E2E8F0' }}>
-              {brand.tagline || brand.name}
-            </h1>
-            <p className="t-hero-desc" style={{ color: '#64748B' }}>
-              {brand.description || `Welcome to ${brand.name}.`}
-            </p>
-            <div className="flex flex-wrap gap-4 mt-10">
-              {channels.includes('ecommerce') && (
-                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: '#0A0F1A' }}>
-                  Get Started
-                </Link>
-              )}
-              <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: '#1E293B', color: '#94A3B8' }}>
-                Learn More →
-              </Link>
+        <section className="t-hero relative overflow-hidden" style={{ backgroundColor: '#0A0F1A' }}>
+          {/* Subtle grid background */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{
+            backgroundImage: `linear-gradient(${accentColor}30 1px, transparent 1px), linear-gradient(90deg, ${accentColor}30 1px, transparent 1px)`,
+            backgroundSize: '50px 50px',
+          }} />
+          {/* Accent glow */}
+          <div className="absolute top-0 right-0 w-96 h-96 rounded-full opacity-[0.05] blur-[100px]" style={{ backgroundColor: accentColor }} />
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 relative z-10">
+            <div className="grid md:grid-cols-[1.2fr_1fr] gap-8 md:gap-16 items-center">
+              <div>
+                <motion.span
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.3 }}
+                  className="inline-block text-xs font-mono mb-6"
+                  style={{ color: accentColor }}
+                >
+                  <span style={{ color: '#64748B' }}>~/</span>{brand.industry || brand.name}<span className="animate-pulse">_</span>
+                </motion.span>
+                <motion.h1
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.1 }}
+                  className="t-hero-heading mb-6"
+                  style={{ ...headingStyle, color: '#E2E8F0' }}
+                >
+                  {brand.tagline || brand.name}
+                </motion.h1>
+                <motion.p
+                  initial={{ opacity: 0 }}
+                  animate={{ opacity: 1 }}
+                  transition={{ duration: 0.4, delay: 0.3 }}
+                  className="t-hero-desc"
+                  style={{ color: '#64748B' }}
+                >
+                  {brand.description || `Welcome to ${brand.name}.`}
+                </motion.p>
+                <motion.div
+                  initial={{ opacity: 0, y: 15 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.4, delay: 0.5 }}
+                  className="flex flex-wrap gap-4 mt-10"
+                >
+                  {channels.includes('ecommerce') && (
+                    <Link href={`/shop/${slug}`} className="t-btn-primary font-mono text-sm" style={{
+                      backgroundColor: accentColor, color: '#0A0F1A',
+                      boxShadow: `0 0 20px ${accentColor}30`,
+                    }}>
+                      $ get-started
+                    </Link>
+                  )}
+                  <Link href={`/site/${slug}/about`} className="t-btn-secondary border font-mono text-sm" style={{ borderColor: '#1E293B', color: '#94A3B8' }}>
+                    $ learn-more
+                  </Link>
+                </motion.div>
+              </div>
+              {/* Terminal window mockup */}
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, delay: 0.3 }}
+                className="hidden md:block rounded-lg overflow-hidden"
+                style={{ backgroundColor: '#111827', border: '1px solid #1E293B' }}
+              >
+                <div className="flex items-center gap-2 px-4 py-3" style={{ backgroundColor: '#0D1117', borderBottom: '1px solid #1E293B' }}>
+                  <div className="w-3 h-3 rounded-full bg-red-500/60" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/60" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/60" />
+                  <span className="text-[11px] ml-2 font-mono" style={{ color: '#64748B' }}>terminal</span>
+                </div>
+                <div className="p-5 font-mono text-[13px] leading-relaxed space-y-2">
+                  <div><span style={{ color: accentColor }}>$</span> <span style={{ color: '#94A3B8' }}>npm install {brand.name.toLowerCase().replace(/\s+/g, '-')}</span></div>
+                  <div style={{ color: '#64748B' }}>→ Installing dependencies...</div>
+                  <div style={{ color: '#64748B' }}>→ Building project...</div>
+                  <div><span style={{ color: accentColor }}>✓</span> <span style={{ color: '#22C55E' }}>Ready in 2.3s</span></div>
+                  <div className="pt-2"><span style={{ color: accentColor }}>$</span> <span className="animate-pulse" style={{ color: '#94A3B8' }}>_</span></div>
+                </div>
+              </motion.div>
             </div>
           </div>
         </section>
       );
     }
 
-    // WELLNESS — Zen, centered, breathing room, with subtle floating orb
+    // WELLNESS — Organic shapes, leaf SVG, circular image frame, breathing room
     if (templateId === 'wellness') {
       return (
-        <section className="t-hero relative">
-          <FloatingOrbs color1={accentColor} templateId="wellness" />
-          <div className="max-w-3xl mx-auto px-5 sm:px-8 text-center">
+        <section className="t-hero relative overflow-hidden">
+          {/* Decorative leaf/wave SVG */}
+          <svg className="absolute top-0 right-0 w-64 h-64 opacity-[0.04]" viewBox="0 0 200 200" fill={accentColor}>
+            <path d="M100 0C100 0 100 100 0 100C0 100 100 100 100 200C100 200 100 100 200 100C200 100 100 100 100 0Z" />
+          </svg>
+          <svg className="absolute bottom-0 left-0 w-48 h-48 opacity-[0.03]" viewBox="0 0 200 200" fill={accentColor}>
+            <path d="M0 200C0 200 50 100 100 100C150 100 200 0 200 0L200 200Z" />
+          </svg>
+          <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center relative z-10">
+            {/* Circular image frame */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.8 }}
+              className="w-28 h-28 mx-auto mb-10 rounded-full flex items-center justify-center"
+              style={{ backgroundColor: `${accentColor}08`, border: `2px solid ${accentColor}15` }}
+            >
+              {brand.logo_url ? (
+                <img src={brand.logo_url} alt={brand.name} className="w-20 h-20 rounded-full object-cover" />
+              ) : (
+                <svg className="w-10 h-10" viewBox="0 0 24 24" fill="none" stroke={accentColor} strokeWidth={1} strokeLinecap="round">
+                  <path d="M12 2C6.5 2 2 6.5 2 12s4.5 10 10 10 10-4.5 10-10" />
+                  <path d="M12 2c3 5 4 10 0 20" />
+                  <path d="M2 12h20" />
+                </svg>
+              )}
+            </motion.div>
             {brand.industry && (
-              <span className="inline-block text-xs font-light tracking-[0.15em] mb-8" style={{ color: accentColor }}>
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.6, delay: 0.2 }}
+                className="inline-block text-xs font-light tracking-[0.2em] mb-8"
+                style={{ color: accentColor }}
+              >
                 {brand.industry}
-              </span>
+              </motion.span>
             )}
-            <h1 className="t-hero-heading mb-8" style={{ ...headingStyle, fontWeight: 300 }}>
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.3 }}
+              className="t-hero-heading mb-8"
+              style={{ ...headingStyle, fontWeight: 300 }}
+            >
               {brand.tagline || brand.name}
-            </h1>
-            <p className="t-hero-desc mx-auto" style={{ color: `${textColor}50`, fontWeight: 300 }}>
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="t-hero-desc mx-auto"
+              style={{ color: `${textColor}50`, fontWeight: 300 }}
+            >
               {brand.description || `Welcome to ${brand.name}.`}
-            </p>
-            <div className="flex flex-wrap justify-center gap-4 mt-12">
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="flex flex-wrap justify-center gap-4 mt-12"
+            >
               {channels.includes('ecommerce') && (
                 <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
-                  Explore
+                  Begin Your Journey
                 </Link>
               )}
               <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}12`, color: textColor }}>
-                Our Story
+                Our Philosophy
               </Link>
-            </div>
+            </motion.div>
           </div>
         </section>
       );
     }
 
-    // RESTAURANT — Split with warm vibes
+    // RESTAURANT — Menu-style layout, warm amber, serif headers, decorative elements
     if (templateId === 'restaurant') {
       return (
-        <section className="t-hero">
+        <section className="t-hero relative overflow-hidden">
+          {/* Warm amber gradient overlay */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{
+            background: `radial-gradient(ellipse at 50% 50%, ${accentColor}, transparent 70%)`,
+          }} />
+          <div className="max-w-5xl mx-auto px-5 sm:px-8 text-center relative z-10">
+            {/* Decorative flourish */}
+            <motion.div
+              initial={{ opacity: 0, scaleX: 0 }}
+              animate={{ opacity: 1, scaleX: 1 }}
+              transition={{ duration: 0.6 }}
+              className="flex items-center justify-center gap-4 mb-10"
+            >
+              <div className="h-px flex-1 max-w-20" style={{ backgroundColor: `${accentColor}30` }} />
+              <span className="text-lg" style={{ color: `${accentColor}60` }}>✦</span>
+              <div className="h-px flex-1 max-w-20" style={{ backgroundColor: `${accentColor}30` }} />
+            </motion.div>
+            {brand.industry && (
+              <motion.span
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+                className="inline-block text-[10px] font-medium uppercase tracking-[0.2em] mb-6"
+                style={{ color: accentColor }}
+              >
+                {brand.industry}
+              </motion.span>
+            )}
+            <motion.h1
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="t-hero-heading mb-6"
+              style={{ ...headingStyle, fontStyle: 'italic' }}
+            >
+              {brand.tagline || brand.name}
+            </motion.h1>
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="h-px w-20 mx-auto mb-6"
+              style={{ backgroundColor: accentColor }}
+            />
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.6 }}
+              className="t-hero-desc mx-auto"
+              style={{ color: `${textColor}50`, fontFamily: brand.font_body }}
+            >
+              {brand.description || `Welcome to ${brand.name}.`}
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.8 }}
+              className="flex flex-wrap justify-center gap-4 mt-10"
+            >
+              <Link href={`/site/${slug}/contact`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
+                Reserve a Table
+              </Link>
+              {channels.includes('ecommerce') && (
+                <Link href={`/shop/${slug}`} className="t-btn-secondary border" style={{ borderColor: `${textColor}15`, color: textColor }}>
+                  View Menu
+                </Link>
+              )}
+            </motion.div>
+            {/* Opening hours hint */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 1 }}
+              className="mt-12 text-xs tracking-wide"
+              style={{ color: `${textColor}30` }}
+            >
+              Open Daily · Lunch & Dinner
+            </motion.div>
+          </div>
+        </section>
+      );
+    }
+
+    // NEON — Cyberpunk dark hero with glow effects and scanline overlay
+    if (templateId === 'neon') {
+      return (
+        <section className="t-hero relative overflow-hidden" style={{ backgroundColor: '#050510' }}>
+          {/* Scanline overlay */}
+          <div className="absolute inset-0 pointer-events-none opacity-[0.03]" style={{
+            backgroundImage: 'repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(255,255,255,0.03) 2px, rgba(255,255,255,0.03) 4px)',
+          }} />
+          {/* Glowing orbs */}
+          <div className="absolute top-1/4 left-1/4 w-64 h-64 rounded-full opacity-20 blur-[80px]" style={{ backgroundColor: accentColor }} />
+          <div className="absolute bottom-1/4 right-1/4 w-48 h-48 rounded-full opacity-15 blur-[60px]" style={{ backgroundColor: '#EC4899' }} />
+          {/* Grid pattern */}
+          <div className="absolute inset-0 opacity-[0.04]" style={{
+            backgroundImage: `linear-gradient(${accentColor}20 1px, transparent 1px), linear-gradient(90deg, ${accentColor}20 1px, transparent 1px)`,
+            backgroundSize: '60px 60px',
+          }} />
+          <div className="max-w-5xl mx-auto px-5 sm:px-8 text-center relative z-10">
+            {brand.industry && (
+              <motion.span
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="inline-block text-xs font-bold uppercase tracking-[0.2em] mb-8 px-4 py-1.5"
+                style={{ color: accentColor, border: `1px solid ${accentColor}40`, boxShadow: `0 0 20px ${accentColor}20` }}
+              >
+                {brand.industry}
+              </motion.span>
+            )}
+            <motion.h1
+              initial={{ opacity: 0, y: 40, filter: 'blur(8px)' }}
+              animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
+              transition={{ duration: 0.6, delay: 0.1 }}
+              className="t-hero-heading mb-6"
+              style={{ ...headingStyle, color: '#F0F0FF', textShadow: `0 0 40px ${accentColor}30` }}
+            >
+              {brand.tagline || brand.name}
+            </motion.h1>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="t-hero-desc mx-auto"
+              style={{ color: '#F0F0FF60' }}
+            >
+              {brand.description || `Welcome to ${brand.name}.`}
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.5 }}
+              className="flex flex-wrap justify-center gap-4 mt-10"
+            >
+              {channels.includes('ecommerce') && (
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{
+                  backgroundColor: accentColor, color: '#050510',
+                  boxShadow: `0 0 30px ${accentColor}40, 0 0 60px ${accentColor}20`,
+                }}>
+                  Enter the Grid
+                </Link>
+              )}
+              <Link href={`/site/${slug}/about`} className="t-btn-secondary" style={{
+                borderColor: `${accentColor}40`, color: '#F0F0FF',
+                border: `1px solid ${accentColor}40`,
+              }}>
+                Learn More
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+      );
+    }
+
+    // ORGANIC — Earth tones, rounded irregular shapes, warm handwritten feel
+    if (templateId === 'organic') {
+      return (
+        <section className="t-hero relative overflow-hidden">
+          {/* Organic blob shapes */}
+          <div className="absolute -top-20 -right-20 w-80 h-80 opacity-[0.06] rounded-[40%_60%_70%_30%/40%_50%_60%_50%]" style={{ backgroundColor: accentColor }} />
+          <div className="absolute -bottom-16 -left-16 w-64 h-64 opacity-[0.04] rounded-[60%_40%_30%_70%/50%_60%_40%_50%]" style={{ backgroundColor: accentColor }} />
+          <div className="max-w-4xl mx-auto px-5 sm:px-8 text-center relative z-10">
+            {brand.industry && (
+              <motion.span
+                initial={{ opacity: 0, y: 10, scale: 0.96 }}
+                animate={{ opacity: 1, y: 0, scale: 1 }}
+                transition={{ duration: 0.8 }}
+                className="inline-block text-xs font-medium tracking-[0.1em] mb-8 px-5 py-2"
+                style={{ color: accentColor, backgroundColor: `${accentColor}08`, borderRadius: '30px' }}
+              >
+                🌿 {brand.industry}
+              </motion.span>
+            )}
+            <motion.h1
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="t-hero-heading mb-6"
+              style={headingStyle}
+            >
+              {brand.tagline || brand.name}
+            </motion.h1>
+            <motion.div
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.6, delay: 0.4 }}
+              className="h-0.5 w-20 mx-auto mb-8 rounded-full"
+              style={{ backgroundColor: accentColor, opacity: 0.4 }}
+            />
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.6, delay: 0.5 }}
+              className="t-hero-desc mx-auto"
+              style={{ color: `${textColor}55` }}
+            >
+              {brand.description || `Welcome to ${brand.name}.`}
+            </motion.p>
+            <motion.div
+              initial={{ opacity: 0, y: 15 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.7 }}
+              className="flex flex-wrap justify-center gap-4 mt-12"
+            >
+              {channels.includes('ecommerce') && (
+                <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText, borderRadius: '24px' }}>
+                  Explore Our Farm
+                </Link>
+              )}
+              <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}12`, color: textColor, borderRadius: '24px' }}>
+                Our Story
+              </Link>
+            </motion.div>
+          </div>
+        </section>
+      );
+    }
+
+    // ARTISAN — Craft/maker with thick borders, split layout, stamp elements
+    if (templateId === 'artisan') {
+      return (
+        <section className="t-hero relative">
+          {/* Decorative stamp-like circle */}
+          <div className="absolute top-12 right-12 w-24 h-24 rounded-full border-2 border-dashed opacity-[0.08] hidden md:block" style={{ borderColor: accentColor }} />
           <div className="max-w-6xl mx-auto px-5 sm:px-8">
-            <div className="t-hero-split">
-              <div>
+            <div className="grid md:grid-cols-[1.2fr_1fr] gap-8 md:gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8 }}
+              >
                 {brand.industry && (
-                  <span className="text-xs font-medium uppercase tracking-[0.15em] mb-6 block" style={{ color: accentColor }}>
+                  <span className="inline-block text-[10px] font-bold uppercase tracking-[0.2em] mb-6 px-3 py-1 border-2" style={{ color: accentColor, borderColor: accentColor }}>
                     {brand.industry}
                   </span>
                 )}
                 <h1 className="t-hero-heading mb-6" style={headingStyle}>
                   {brand.tagline || brand.name}
                 </h1>
-                <p className="t-hero-desc" style={{ color: `${textColor}50` }}>
+                <div className="h-1 w-16 mb-6" style={{ backgroundColor: accentColor }} />
+                <p className="t-hero-desc" style={{ color: `${textColor}55` }}>
                   {brand.description || `Welcome to ${brand.name}.`}
                 </p>
                 <div className="flex flex-wrap gap-4 mt-10">
-                  <Link href={`/site/${slug}/contact`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
-                    Reserve a Table
-                  </Link>
                   {channels.includes('ecommerce') && (
-                    <Link href={`/shop/${slug}`} className="t-btn-secondary border" style={{ borderColor: `${textColor}12`, color: textColor }}>
-                      View Menu
+                    <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
+                      Shop Collection
                     </Link>
                   )}
+                  <Link href={`/site/${slug}/about`} className="t-btn-secondary border" style={{ borderColor: `${textColor}20`, color: textColor }}>
+                    Our Craft →
+                  </Link>
                 </div>
-              </div>
-              <div className="t-hero-image flex items-center justify-center rounded" style={{ backgroundColor: `${textColor}04`, borderRadius: '4px' }}>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+                className="aspect-[4/5] flex items-center justify-center border-2 p-8"
+                style={{ backgroundColor: `${textColor}02`, borderColor: `${textColor}08` }}
+              >
                 {brand.logo_url ? (
-                  <img src={brand.logo_url} alt={brand.name} className="max-w-[60%] max-h-[60%] object-contain" />
+                  <img src={brand.logo_url} alt={brand.name} className="max-w-[65%] max-h-[65%] object-contain" />
                 ) : (
-                  <BrandPlaceholder color={textColor} className="w-full h-full" variant="hero" />
+                  <div className="text-center">
+                    <div className="w-20 h-20 mx-auto rounded-full border-2 border-dashed flex items-center justify-center mb-4" style={{ borderColor: `${accentColor}30` }}>
+                      <span className="text-2xl" style={{ color: accentColor }}>✦</span>
+                    </div>
+                    <span className="text-xs tracking-[0.15em] uppercase" style={{ color: `${textColor}25` }}>Handcrafted</span>
+                  </div>
                 )}
-              </div>
+              </motion.div>
+            </div>
+          </div>
+        </section>
+      );
+    }
+
+    // CORPORATE — Clean professional, split with stats, structured grid
+    if (templateId === 'corporate') {
+      return (
+        <section className="t-hero relative">
+          {/* Subtle grid background */}
+          <div className="absolute inset-0 opacity-[0.015]" style={{
+            backgroundImage: 'linear-gradient(#2563EB 1px, transparent 1px), linear-gradient(90deg, #2563EB 1px, transparent 1px)',
+            backgroundSize: '40px 40px',
+          }} />
+          <div className="max-w-6xl mx-auto px-5 sm:px-8 relative z-10">
+            <div className="grid md:grid-cols-[1.3fr_1fr] gap-8 md:gap-16 items-center">
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65 }}
+              >
+                {brand.industry && (
+                  <span className="inline-block text-xs font-semibold uppercase tracking-[0.1em] mb-6" style={{ color: accentColor }}>
+                    {brand.industry}
+                  </span>
+                )}
+                <h1 className="t-hero-heading mb-5" style={headingStyle}>
+                  {brand.tagline || brand.name}
+                </h1>
+                <p className="t-hero-desc" style={{ color: `${textColor}55` }}>
+                  {brand.description || `Welcome to ${brand.name}.`}
+                </p>
+                <div className="flex flex-wrap gap-3 mt-8">
+                  {channels.includes('ecommerce') && (
+                    <Link href={`/shop/${slug}`} className="t-btn-primary" style={{ backgroundColor: accentColor, color: accentBtnText }}>
+                      Get Started
+                    </Link>
+                  )}
+                  <Link href={`/site/${slug}/contact`} className="t-btn-secondary border" style={{ borderColor: `${textColor}15`, color: textColor }}>
+                    Contact Sales
+                  </Link>
+                </div>
+              </motion.div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.65, delay: 0.2 }}
+                className="grid grid-cols-2 gap-4"
+              >
+                {[
+                  { label: 'Years Experience', value: '15+' },
+                  { label: 'Team Members', value: '200+' },
+                  { label: 'Clients Served', value: '500+' },
+                  { label: 'Countries', value: '30+' },
+                ].map((stat, i) => (
+                  <div key={i} className="p-5 text-center" style={{
+                    backgroundColor: ds.surfaceColor || '#F8FAFC',
+                    border: `1px solid ${ds.borderColor || `${textColor}10`}`,
+                    borderRadius: '6px',
+                  }}>
+                    <div className="text-2xl font-bold mb-1" style={{ color: accentColor, fontFamily: brand.font_heading }}>{stat.value}</div>
+                    <div className="text-[11px] font-medium uppercase tracking-wider" style={{ color: `${textColor}40` }}>{stat.label}</div>
+                  </div>
+                ))}
+              </motion.div>
             </div>
           </div>
         </section>
@@ -914,8 +1422,8 @@ export default function BrandHomePage() {
             </div>
           )}
 
-          {/* GENERIC FALLBACK — For all other templates (startup, portfolio, magazine, boutique, tech, wellness, restaurant, neon, organic, artisan, corporate) */}
-          {!['minimal', 'editorial', 'bold', 'classic', 'playful'].includes(templateId) && (
+          {/* STARTUP — Horizontal cards with large numbers */}
+          {templateId === 'startup' && (
             <motion.div
               variants={scrollStagger}
               initial="hidden"
@@ -927,31 +1435,219 @@ export default function BrandHomePage() {
                 <motion.div
                   key={f.title}
                   variants={scrollItem}
-                  className="p-8 transition-all hover:translate-y-[-2px]"
+                  className="p-8 text-center transition-all hover:translate-y-[-3px]"
                   style={{
-                    backgroundColor: isDark ? `${textColor}04` : ds.surfaceColor || '#FFFFFF',
-                    borderRadius: tp?.borderRadius || dsRadius || '8px',
-                    border: `1px solid ${isDark ? `${textColor}18` : ds.borderColor || `${textColor}18`}`,
-                    boxShadow: isDark ? 'none' : '0 2px 12px rgba(0,0,0,0.08)',
-                    textAlign: templateId === 'wellness' || templateId === 'organic' || templateId === 'startup' ? 'center' as const : undefined,
+                    backgroundColor: ds.surfaceColor || '#F8FAFC',
+                    borderRadius: '12px',
+                    border: `1px solid ${ds.borderColor || `${textColor}10`}`,
+                    borderLeft: `4px solid ${accentColor}`,
+                    boxShadow: '0 4px 16px rgba(0,0,0,0.04)',
                   }}
                 >
-                  <div
-                    className={`w-10 h-10 rounded-lg flex items-center justify-center mb-4 text-lg ${templateId === 'wellness' || templateId === 'organic' || templateId === 'startup' ? 'mx-auto' : ''}`}
-                    style={{ backgroundColor: `${accentColor}12`, color: accentColor }}
-                  >
-                    {templateId === 'neon' || templateId === 'tech' ? f.icon : f.emoji}
-                  </div>
-                  <h3 className="text-sm font-semibold mb-2" style={{
-                    fontFamily: brand.font_heading,
-                    fontWeight: tp?.typography.headingWeight || '600',
-                    textTransform: templateId === 'corporate' ? 'uppercase' as const : undefined,
-                    letterSpacing: templateId === 'corporate' ? '0.02em' : undefined,
-                  }}>{f.title}</h3>
-                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}55` }}>{f.desc}</p>
+                  <span className="text-4xl font-bold block mb-3" style={{ color: `${accentColor}20`, fontFamily: brand.font_heading }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </span>
+                  <h3 className="text-sm font-semibold mb-2" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}50` }}>{f.desc}</p>
                 </motion.div>
               ))}
             </motion.div>
+          )}
+
+          {/* PORTFOLIO — Minimal text-only, no cards */}
+          {templateId === 'portfolio' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+              {features.map((f, i) => (
+                <div key={f.title}>
+                  <div className="h-px w-8 mb-6" style={{ backgroundColor: `${textColor}15` }} />
+                  <h3 className="text-sm font-normal mb-3" style={{ fontFamily: brand.font_heading, fontWeight: 400 }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}35` }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* MAGAZINE — Editorial-style columns with pull-quote feel */}
+          {templateId === 'magazine' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8" style={{ borderTop: `1px solid ${textColor}10`, paddingTop: '2rem' }}>
+              {features.map((f, i) => (
+                <div key={f.title} style={{ borderRight: i < 2 ? `1px solid ${textColor}08` : undefined, paddingRight: i < 2 ? '2rem' : undefined }}>
+                  <span className="text-[9px] font-bold uppercase tracking-[0.15em] block mb-3" style={{ color: accentColor }}>
+                    {['Feature', 'Perspective', 'Insight'][i]}
+                  </span>
+                  <h3 className="text-base font-bold mb-3" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}50`, fontFamily: brand.font_body }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* BOUTIQUE — Elegant, spaced, divider-separated */}
+          {templateId === 'boutique' && (
+            <div className="space-y-0">
+              {features.map((f, i) => (
+                <div key={f.title} className="py-8 text-center" style={{ borderBottom: i < 2 ? `1px solid ${textColor}08` : undefined }}>
+                  <h3 className="text-[11px] font-medium uppercase tracking-[0.15em] mb-3" style={{ fontFamily: brand.font_heading, color: accentColor }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed max-w-md mx-auto" style={{ color: `${textColor}45`, letterSpacing: '0.01em' }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* TECH — Terminal/code-block styled feature blocks */}
+          {templateId === 'tech' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {features.map((f, i) => (
+                <div
+                  key={f.title}
+                  className="p-6 transition-all hover:translate-y-[-2px]"
+                  style={{
+                    backgroundColor: '#111827',
+                    borderRadius: '8px',
+                    border: `1px solid #1E293B`,
+                  }}
+                >
+                  <div className="flex items-center gap-2 mb-4">
+                    <span className="text-xs font-mono" style={{ color: accentColor }}>{f.icon}</span>
+                    <span className="text-xs font-mono" style={{ color: '#64748B' }}>// feature-{i + 1}</span>
+                  </div>
+                  <h3 className="text-sm font-bold mb-2" style={{ fontFamily: brand.font_heading, color: '#E2E8F0' }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#64748B' }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* WELLNESS — Soft rounded cards with nature-inspired icons */}
+          {templateId === 'wellness' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {features.map((f, i) => (
+                <div
+                  key={f.title}
+                  className="p-8 text-center transition-all hover:translate-y-[-2px]"
+                  style={{
+                    backgroundColor: `${accentColor}04`,
+                    borderRadius: '20px',
+                    border: `1px solid ${accentColor}10`,
+                  }}
+                >
+                  <div className="w-14 h-14 mx-auto mb-5 rounded-full flex items-center justify-center" style={{ backgroundColor: `${accentColor}08` }}>
+                    <span className="text-xl">{['🌿', '🧘', '✨'][i]}</span>
+                  </div>
+                  <h3 className="text-sm font-light tracking-wide mb-3" style={{ fontFamily: brand.font_heading, letterSpacing: '0.02em' }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}45`, fontWeight: 300 }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* RESTAURANT — Menu-section styled with decorative dividers */}
+          {templateId === 'restaurant' && (
+            <div className="max-w-3xl mx-auto space-y-0">
+              {features.map((f, i) => (
+                <div key={f.title} className="py-6 text-center" style={{ borderBottom: i < 2 ? `1px solid ${textColor}08` : undefined }}>
+                  <div className="flex items-center justify-center gap-3 mb-3">
+                    <div className="h-px w-6" style={{ backgroundColor: `${accentColor}30` }} />
+                    <h3 className="text-sm font-bold" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                    <div className="h-px w-6" style={{ backgroundColor: `${accentColor}30` }} />
+                  </div>
+                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}50`, fontFamily: brand.font_body }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* NEON — Glowing bordered cards on dark bg */}
+          {templateId === 'neon' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {features.map((f, i) => (
+                <div
+                  key={f.title}
+                  className="p-8 text-center transition-all hover:translate-y-[-2px]"
+                  style={{
+                    backgroundColor: `${accentColor}04`,
+                    borderRadius: '8px',
+                    border: `1px solid ${accentColor}20`,
+                    boxShadow: `0 0 20px ${accentColor}08`,
+                    background: `linear-gradient(135deg, ${accentColor}06 0%, transparent 50%, #EC489906 100%)`,
+                  }}
+                >
+                  <span className="text-2xl mb-4 block" style={{ color: accentColor, textShadow: `0 0 20px ${accentColor}40` }}>{f.icon}</span>
+                  <h3 className="text-sm font-bold uppercase tracking-wider mb-2" style={{ fontFamily: brand.font_heading, color: '#F0F0FF' }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: '#F0F0FF50' }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ORGANIC — Warm rounded cards with earth-tone accents */}
+          {templateId === 'organic' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+              {features.map((f, i) => (
+                <div
+                  key={f.title}
+                  className="p-8 text-center transition-all hover:translate-y-[-2px]"
+                  style={{
+                    backgroundColor: `${accentColor}05`,
+                    borderRadius: '24px',
+                    border: `1px solid ${accentColor}10`,
+                  }}
+                >
+                  <span className="text-2xl mb-4 block">{['🌾', '🌻', '🍃'][i]}</span>
+                  <h3 className="text-sm font-bold mb-2" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}50` }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* ARTISAN — Thick-bordered catalog-style entries */}
+          {templateId === 'artisan' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {features.map((f, i) => (
+                <div
+                  key={f.title}
+                  className="p-8 transition-all hover:translate-y-[-3px]"
+                  style={{
+                    border: `2px solid ${textColor}10`,
+                    borderRadius: '8px',
+                    backgroundColor: `${textColor}02`,
+                  }}
+                >
+                  <div className="w-10 h-10 rounded-full border-2 border-dashed flex items-center justify-center mb-5" style={{ borderColor: `${accentColor}30` }}>
+                    <span className="text-sm" style={{ color: accentColor }}>
+                      {String(i + 1).padStart(2, '0')}
+                    </span>
+                  </div>
+                  <h3 className="text-sm font-bold mb-2" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}50` }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {/* CORPORATE — Clean bordered with blue accent on hover */}
+          {templateId === 'corporate' && (
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {features.map((f, i) => (
+                <div
+                  key={f.title}
+                  className="p-6 transition-all hover:translate-y-[-2px]"
+                  style={{
+                    backgroundColor: ds.surfaceColor || '#F8FAFC',
+                    borderRadius: '6px',
+                    border: `1px solid ${ds.borderColor || `${textColor}10`}`,
+                    borderTop: `3px solid ${accentColor}`,
+                  }}
+                >
+                  <div className="w-10 h-10 rounded-md flex items-center justify-center mb-4" style={{ backgroundColor: `${accentColor}08` }}>
+                    <span className="text-lg" style={{ color: accentColor }}>{f.icon}</span>
+                  </div>
+                  <h3 className="text-xs font-bold uppercase tracking-wider mb-2" style={{ fontFamily: brand.font_heading }}>{f.title}</h3>
+                  <p className="text-sm leading-relaxed" style={{ color: `${textColor}50` }}>{f.desc}</p>
+                </div>
+              ))}
+            </div>
           )}
         </div>
       </section>
