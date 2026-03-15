@@ -19,7 +19,9 @@ import {
   Percent,
   Settings,
   ArrowLeft,
+  Users,
 } from "lucide-react";
+import { NotificationBell } from "@/components/dashboard/notification-bell";
 
 interface Brand {
   id: string;
@@ -38,6 +40,7 @@ const NAV_ITEMS = [
   { label: "Analytics", icon: BarChart3, href: "/analytics" },
   { label: "Chatbot", icon: MessageCircle, href: "/chatbot" },
   { label: "Social", icon: Share2, href: "/social" },
+  { label: "Subscribers", icon: Users, href: "/subscribers" },
   { label: "Support", icon: Headphones, href: "/support" },
   { label: "Testimonials", icon: Star, href: "/testimonials" },
   { label: "Reviews", icon: MessageSquare, href: "/reviews" },
@@ -140,10 +143,16 @@ export default function BrandDashboardLayout({
             <ArrowLeft className="h-5 w-5" />
           </Link>
           {brand && (
-            <h2 className="font-semibold text-[var(--text-primary)] truncate">
+            <h2 className="font-semibold text-[var(--text-primary)] truncate flex-1">
               {brand.name}
             </h2>
           )}
+          <NotificationBell />
+        </div>
+
+        {/* Desktop Header Bar */}
+        <div className="hidden lg:flex items-center justify-end px-8 py-3 border-b border-[var(--border-primary)] bg-[var(--bg-surface)]">
+          <NotificationBell />
         </div>
 
         <div className="p-6 lg:p-8">{children}</div>
