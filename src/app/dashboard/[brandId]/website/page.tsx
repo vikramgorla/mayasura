@@ -260,22 +260,13 @@ export default function WebsitePage() {
   const [quickEditSection, setQuickEditSection] = useState<string | null>(null);
   const toast = useToast();
 
-  // Performance scores — seeded from brand but deterministic
-  const [perfScores, setPerfScores] = useState({ performance: 0, accessibility: 0, bestPractices: 0, seo: 0 });
+  // Estimated performance scores — these are baseline estimates for Mayasura-generated sites,
+  // not actual Lighthouse measurements. Real Lighthouse integration is a future feature.
+  const [perfScores] = useState({ performance: 92, accessibility: 95, bestPractices: 92, seo: 95 });
 
   const loadData = () => {
     fetch(`/api/brands/${brandId}`).then(r => r.json()).then(d => {
       setBrand(d.brand);
-      // Generate deterministic perf scores from brand name
-      if (d.brand) {
-        const seed = d.brand.name.split('').reduce((a: number, c: string) => a + c.charCodeAt(0), 0);
-        setPerfScores({
-          performance: 85 + (seed % 15),
-          accessibility: 90 + (seed % 10),
-          bestPractices: 88 + (seed % 12),
-          seo: 92 + (seed % 8),
-        });
-      }
     });
     fetch(`/api/brands/${brandId}/content?type=landing`).then(r => r.json()).then(d => {
       if (d.content?.length) setLandingContent(d.content[0]);
@@ -610,9 +601,10 @@ export default function WebsitePage() {
                         <h2 className="text-sm font-semibold text-zinc-900 dark:text-white flex items-center gap-2">
                           <Gauge className="h-4 w-4 text-emerald-500" />
                           Site Performance
+                          <span className="text-[10px] font-normal text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded ml-auto">Baseline</span>
                         </h2>
                         <p className="text-[11px] text-zinc-400 mt-0.5">
-                          Lighthouse-style score
+                          Estimated scores for Mayasura-generated sites
                         </p>
                       </div>
                       <div className="p-4">

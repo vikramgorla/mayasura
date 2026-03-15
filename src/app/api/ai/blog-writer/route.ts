@@ -2,7 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import Anthropic from '@anthropic-ai/sdk';
 import { requireAuth } from '@/lib/api-auth';
 
-const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+// Lazy-initialize to avoid crash when ANTHROPIC_API_KEY is not set
+let _client: Anthropic | null = null;
+function getClient(): Anthropic {
+  if (!process.env.ANTHROPIC_API_KEY) {
+    throw new Error(
+      'ANTHROPIC_API_KEY is not configured. Add it in Settings → Integrations or set it as an environment variable.'
+    );
+  }
+  if (!_client) {
+    _client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
+  }
+  return _client;
+}
 
 type BlogWriterMode = 'outline' | 'article' | 'improve' | 'seo';
 
@@ -42,7 +54,7 @@ export async function POST(request: NextRequest) {
     if (mode === 'outline') {
       if (!topic) return NextResponse.json({ error: 'topic is required for outline mode' }, { status: 400 });
 
-      const message = await client.messages.create({
+      const message = await getClient().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         messages: [{
@@ -88,7 +100,7 @@ Use 4-6 sections. Make the title compelling and SEO-friendly.`,
         professional: 'authoritative, formal, precise, industry-credible',
       }[tone];
 
-      const message = await client.messages.create({
+      const message = await getClient().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 4096,
         messages: [{
@@ -124,7 +136,7 @@ Return ONLY the markdown content, no preamble.`,
         return NextResponse.json({ error: 'sectionContent is required for improve mode' }, { status: 400 });
       }
 
-      const message = await client.messages.create({
+      const message = await getClient().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 1024,
         messages: [{
@@ -155,7 +167,7 @@ Return ONLY the improved markdown section content, no preamble or explanation.`,
         return NextResponse.json({ error: 'topic and sectionContent are required for seo mode' }, { status: 400 });
       }
 
-      const message = await client.messages.create({
+      const message = await getClient().messages.create({
         model: 'claude-sonnet-4-20250514',
         max_tokens: 512,
         messages: [{

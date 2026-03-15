@@ -358,8 +358,9 @@ function RevenueChart({ data }: { data: DashboardData }) {
   }));
 
   if (chartData.length < 2) {
+    // Not enough data — show empty placeholder instead of fake data
     const days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
-    chartData.push(...days.map((day, i) => ({ day, views: Math.floor(Math.random() * 30 + i * 5), revenue: Math.floor(Math.random() * 20 + i * 3) })));
+    chartData.push(...days.map((day) => ({ day, views: 0, revenue: 0 })));
   }
 
   return (

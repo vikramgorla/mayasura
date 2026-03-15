@@ -105,7 +105,7 @@ function RealtimeVisitors({ count }: { count: number }) {
         </AnimatePresence>
         {' '}active now
       </span>
-      <Zap className="h-3.5 w-3.5 text-emerald-500" />
+      <span className="text-[10px] text-emerald-500/60 ml-1">(estimated)</span>
     </div>
   );
 }
@@ -639,7 +639,8 @@ export default function AnalyticsPage() {
 
   useEffect(() => { loadData(); }, [loadData]);
 
-  // Simulate real-time visitor count
+  // Estimated real-time active count (derived from total unique visitors).
+  // TODO: Replace with actual WebSocket/SSE real-time tracking when available.
   useEffect(() => {
     const base = Math.max(1, Math.floor((data?.uniqueVisitors || 0) * 0.02));
     setRealtimeCount(base);
@@ -665,6 +666,8 @@ export default function AnalyticsPage() {
 
   const hasTraffic = (data?.pageViews?.total || 0) > 0 || (data?.uniqueVisitors || 0) > 0;
 
+  // Note: Funnel steps, traffic sources, geo, and top products are estimated/simulated.
+  // Real tracking for these requires integration with analytics providers (future feature).
   const funnelSteps = [
     { label: 'Visitors', value: data?.uniqueVisitors || 0, color: '#3b82f6', icon: Users },
     { label: 'Page Views', value: data?.pageViews.total || 0, color: '#8b5cf6', icon: Eye },
@@ -694,10 +697,12 @@ export default function AnalyticsPage() {
     { name: 'Starter Kit', revenue: Math.round((data.currentRevenue || 0) * 0.27), orders: Math.round(data.orderCount * 0.35), trend: [3, 2, 4, 3, 5, 4, 6, 5, 7, 6] },
   ] : [];
 
+  // Previous period data for comparison chart — estimated from current data
   const prevDayData = data?.pageViews.byDay
-    ? data.pageViews.byDay.map(d => ({
+    ? data.pageViews.byDay.map((d, i) => ({
         day: d.day,
-        count: Math.round(d.count * (0.7 + Math.random() * 0.4)),
+        // Use a deterministic offset based on day index instead of random
+        count: Math.round(d.count * (0.7 + (i % 5) * 0.08)),
       }))
     : [];
 
@@ -800,6 +805,7 @@ export default function AnalyticsPage() {
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Filter className="h-4 w-4 text-amber-600" />
                   Conversion Funnel
+                  <span className="ml-auto text-[10px] font-normal text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">Estimated</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -815,6 +821,7 @@ export default function AnalyticsPage() {
                 <CardTitle className="text-sm flex items-center gap-2">
                   <Share2 className="h-4 w-4 text-cyan-600" />
                   Traffic Sources
+                  <span className="ml-auto text-[10px] font-normal text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">Estimated</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -827,6 +834,7 @@ export default function AnalyticsPage() {
                 <CardTitle className="text-sm flex items-center gap-2">
                   <ShoppingBag className="h-4 w-4 text-amber-600" />
                   Top Products by Revenue
+                  <span className="ml-auto text-[10px] font-normal text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">Estimated</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
@@ -854,6 +862,7 @@ export default function AnalyticsPage() {
                 <CardTitle className="text-sm flex items-center gap-2">
                   <MapPin className="h-4 w-4 text-blue-600" />
                   Where Customers Are
+                  <span className="ml-auto text-[10px] font-normal text-zinc-400 bg-zinc-100 dark:bg-zinc-800 px-1.5 py-0.5 rounded">Estimated</span>
                 </CardTitle>
               </CardHeader>
               <CardContent>
