@@ -8,7 +8,7 @@ import {
   Check, Copy, ExternalLink, Eye, Trash2, MessageSquare,
   ShoppingBag, FileText, Mail, Share2, ChevronRight,
   Newspaper, Download, Upload, Clock, Key, RefreshCw, Bell,
-  Webhook,
+  Webhook, Camera, Pencil, Search,
 } from 'lucide-react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -19,8 +19,327 @@ import { WEBSITE_TEMPLATES } from '@/lib/website-templates';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { PageTransition } from '@/components/ui/page-transition';
 
+// ─── Avatar Upload ────────────────────────────────────────────────
+function AvatarUpload({ brand, onSave }: { brand: Brand; onSave: (updates: Record<string, unknown>) => Promise<boolean> }) {
+  const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const [previewUrl, setPreviewUrl] = useState<string | null>(brand.logo_url || null);
+  const fileInputRef = useState<HTMLInputElement | null>(null);
+  const toast = useToast();
+
+  const handleFile = async (file: File) => {
+    if (!file.type.startsWith('image/')) {
+      toast.error('Please upload an image file');
+      return;
+    }
+    setUploading(true);
+    // Preview immediately
+    const reader = new FileReader();
+    reader.onload = (e) => setPreviewUrl(e.target?.result as string);
+    reader.readAsDataURL(file);
+
+    // Upload via FormData
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+      const res = await fetch('/api/upload', { method: 'POST', body: formData });
+      if (res.ok) {
+        const data = await res.json();
+        await onSave({ logo_url: data.url });
+        toast.success('Avatar updated');
+      } else {
+        // Fallback: use data URL as logo
+        const dataUrl = previewUrl;
+        if (dataUrl) await onSave({ logo_url: dataUrl });
+        toast.success('Avatar updated (stored locally)');
+      }
+    } catch {
+      toast.error('Upload failed');
+    }
+    setUploading(false);
+  };
+
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    setDragging(false);
+    const file = e.dataTransfer.files[0];
+    if (file) handleFile(file);
+  };
+
+  return (
+    <div className="flex items-center gap-5">
+      {/* Avatar circle */}
+      <div className="relative flex-shrink-0">
+        <div
+          className={`h-20 w-20 rounded-2xl overflow-hidden flex items-center justify-center border-2 transition-colors ${
+            dragging
+              ? 'border-violet-400 bg-violet-50 dark:bg-violet-900/20'
+              : 'border-zinc-200 dark:border-zinc-700 bg-zinc-50 dark:bg-zinc-800'
+          }`}
+          onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+          onDragLeave={() => setDragging(false)}
+          onDrop={handleDrop}
+        >
+          {previewUrl ? (
+            // eslint-disable-next-line @next/next/no-img-element
+            <img src={previewUrl} alt="Brand logo" className="w-full h-full object-cover" />
+          ) : (
+            <span className="text-3xl">{brand.name?.[0]?.toUpperCase() || '?'}</span>
+          )}
+          {uploading && (
+            <div className="absolute inset-0 bg-black/40 flex items-center justify-center rounded-2xl">
+              <Loader2 className="h-6 w-6 text-white animate-spin" />
+            </div>
+          )}
+        </div>
+        {/* Camera overlay */}
+        <label className="absolute -bottom-1 -right-1 h-6 w-6 rounded-full bg-violet-600 flex items-center justify-center cursor-pointer hover:bg-violet-700 transition-colors shadow-md">
+          <Camera className="h-3 w-3 text-white" />
+          <input
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) handleFile(file);
+            }}
+          />
+        </label>
+      </div>
+
+      {/* Drop zone text */}
+      <div
+        className={`flex-1 border-2 border-dashed rounded-xl p-4 text-center transition-colors ${
+          dragging
+            ? 'border-violet-400 bg-violet-50 dark:bg-violet-900/10'
+            : 'border-zinc-200 dark:border-zinc-700 hover:border-violet-300 dark:hover:border-violet-700'
+        }`}
+        onDragOver={(e) => { e.preventDefault(); setDragging(true); }}
+        onDragLeave={() => setDragging(false)}
+        onDrop={handleDrop}
+      >
+        <Upload className="h-5 w-5 mx-auto mb-1.5 text-zinc-300 dark:text-zinc-600" />
+        <p className="text-xs text-zinc-500 dark:text-zinc-400">
+          Drag & drop or{' '}
+          <label className="text-violet-600 cursor-pointer hover:underline">
+            browse
+            <input
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) handleFile(file);
+              }}
+            />
+          </label>
+        </p>
+        <p className="text-[10px] text-zinc-400 mt-1">PNG, JPG, SVG up to 2MB</p>
+      </div>
+    </div>
+  );
+}
+
+// ─── Inline Name Edit ─────────────────────────────────────────────
+function InlineNameEdit({
+  value,
+  onSave,
+  textClassName,
+}: {
+  value: string;
+  onSave: (name: string) => Promise<void>;
+  textClassName?: string;
+}) {
+  const [editing, setEditing] = useState(false);
+  const [draft, setDraft] = useState(value);
+  const [saving, setSaving] = useState(false);
+  const inputRef = useState<HTMLInputElement | null>(null);
+
+  const handleSubmit = async () => {
+    if (!draft.trim()) return;
+    setSaving(true);
+    await onSave(draft.trim());
+    setSaving(false);
+    setEditing(false);
+  };
+
+  if (editing) {
+    return (
+      <div className="flex items-center gap-2">
+        <input
+          autoFocus
+          type="text"
+          value={draft}
+          onChange={(e) => setDraft(e.target.value)}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter') handleSubmit();
+            if (e.key === 'Escape') { setEditing(false); setDraft(value); }
+          }}
+          className="text-2xl font-bold bg-transparent border-b-2 border-violet-500 outline-none text-zinc-900 dark:text-white"
+        />
+        <button
+          onClick={handleSubmit}
+          disabled={saving}
+          className="p-1.5 rounded-lg bg-violet-100 dark:bg-violet-900/30 text-violet-600 hover:bg-violet-200"
+        >
+          {saving ? <Loader2 className="h-4 w-4 animate-spin" /> : <Check className="h-4 w-4" />}
+        </button>
+      </div>
+    );
+  }
+
+  return (
+    <button
+      onClick={() => setEditing(true)}
+      className={`group flex items-center gap-2 ${textClassName || ''}`}
+      title="Click to edit brand name"
+    >
+      <span className="text-2xl font-bold text-zinc-900 dark:text-white">{value}</span>
+      <Pencil className="h-4 w-4 text-zinc-300 dark:text-zinc-600 opacity-0 group-hover:opacity-100 transition-opacity" />
+    </button>
+  );
+}
+
+// ─── SEO Defaults ─────────────────────────────────────────────────
+function SEODefaultsSection({
+  brand,
+  settings,
+  onSaveSetting,
+}: {
+  brand: Brand;
+  settings: Record<string, string>;
+  onSaveSetting: (key: string, value: string) => Promise<void>;
+}) {
+  const [form, setForm] = useState({
+    seo_default_title: settings.seo_default_title || `{{page}} | ${brand.name}`,
+    seo_default_description: settings.seo_default_description || brand.description || '',
+    seo_og_title: settings.seo_og_title || brand.name,
+    seo_og_description: settings.seo_og_description || brand.tagline || '',
+  });
+  const [saving, setSaving] = useState(false);
+  const toast = useToast();
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await Promise.all(
+        Object.entries(form).map(([key, value]) => onSaveSetting(key, value))
+      );
+      toast.success('SEO defaults saved');
+    } catch {
+      toast.error('Failed to save');
+    }
+    setSaving(false);
+  };
+
+  const charCount = (str: string, max: number) => (
+    <span className={`text-[10px] ${str.length > max ? 'text-red-500' : 'text-zinc-400'}`}>
+      {str.length}/{max}
+    </span>
+  );
+
+  return (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-sm flex items-center gap-2">
+          <Search className="h-4 w-4 text-blue-500" />
+          SEO Defaults
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <p className="text-xs text-zinc-400">
+          Default meta tags applied across your site. Use <code className="bg-zinc-100 dark:bg-zinc-800 px-1 rounded text-[10px]">{'{{page}}'}</code> as a placeholder for the page name.
+        </p>
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300">Default Title Template</label>
+            {charCount(form.seo_default_title, 70)}
+          </div>
+          <input
+            type="text"
+            value={form.seo_default_title}
+            onChange={(e) => setForm(f => ({ ...f, seo_default_title: e.target.value }))}
+            className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+            placeholder={`{{page}} | ${brand.name}`}
+          />
+          <p className="text-[10px] text-zinc-400 mt-1">Ideal length: 50–60 characters</p>
+        </div>
+        <div>
+          <div className="flex items-center justify-between mb-1.5">
+            <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300">Default Meta Description</label>
+            {charCount(form.seo_default_description, 160)}
+          </div>
+          <textarea
+            value={form.seo_default_description}
+            onChange={(e) => setForm(f => ({ ...f, seo_default_description: e.target.value }))}
+            rows={3}
+            className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none resize-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+            placeholder="A brief description of your brand and what you offer..."
+          />
+          <p className="text-[10px] text-zinc-400 mt-1">Ideal length: 120–160 characters</p>
+        </div>
+        <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800">
+          <p className="text-xs font-medium text-zinc-500 dark:text-zinc-400 mb-3">Open Graph (Social Sharing)</p>
+          <div className="space-y-3">
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300">OG Title</label>
+                {charCount(form.seo_og_title, 60)}
+              </div>
+              <input
+                type="text"
+                value={form.seo_og_title}
+                onChange={(e) => setForm(f => ({ ...f, seo_og_title: e.target.value }))}
+                className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                placeholder={brand.name}
+              />
+            </div>
+            <div>
+              <div className="flex items-center justify-between mb-1.5">
+                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-300">OG Description</label>
+                {charCount(form.seo_og_description, 200)}
+              </div>
+              <textarea
+                value={form.seo_og_description}
+                onChange={(e) => setForm(f => ({ ...f, seo_og_description: e.target.value }))}
+                rows={2}
+                className="w-full px-3 py-2 rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-800 text-sm outline-none resize-none focus:ring-2 focus:ring-violet-500/20 focus:border-violet-500"
+                placeholder={brand.tagline || 'Your brand description for social sharing'}
+              />
+            </div>
+          </div>
+        </div>
+        {/* Preview */}
+        <div className="p-3 rounded-xl bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700">
+          <p className="text-[10px] font-medium text-zinc-400 uppercase tracking-wider mb-2">Google Preview</p>
+          <p className="text-sm text-blue-600 dark:text-blue-400 truncate">
+            {form.seo_default_title.replace('{{page}}', 'Home')}
+          </p>
+          <p className="text-[10px] text-green-600 dark:text-green-500 mb-0.5">
+            mayasura.app/site/{brand.slug || brand.id} ›
+          </p>
+          <p className="text-xs text-zinc-500 dark:text-zinc-400 line-clamp-2">
+            {form.seo_default_description || 'No description set.'}
+          </p>
+        </div>
+        <div className="flex justify-end">
+          <Button onClick={handleSave} disabled={saving}>
+            {saving ? <Loader2 className="h-4 w-4 animate-spin mr-2" /> : <Save className="h-4 w-4 mr-2" />}
+            Save SEO Defaults
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+}
+
 // ─── General Tab ─────────────────────────────────────────────────
-function GeneralTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<string, unknown>) => Promise<boolean> }) {
+function GeneralTab({ brand, onSave, settings, onSaveSetting }: {
+  brand: Brand;
+  onSave: (updates: Record<string, unknown>) => Promise<boolean>;
+  settings: Record<string, string>;
+  onSaveSetting: (key: string, value: string) => Promise<void>;
+}) {
   const [form, setForm] = useState({
     name: brand.name || '',
     tagline: brand.tagline || '',
@@ -55,6 +374,26 @@ function GeneralTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<
 
   return (
     <div className="space-y-6">
+      {/* ── Profile / Avatar ── */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-sm">Brand Profile</CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <AvatarUpload brand={brand} onSave={onSave} />
+          <div className="pt-2 border-t border-zinc-100 dark:border-zinc-800">
+            <label className="block text-xs font-medium text-zinc-400 uppercase tracking-wider mb-2">Brand Name</label>
+            <InlineNameEdit
+              value={form.name}
+              onSave={async (name) => {
+                setForm(f => ({ ...f, name }));
+                await onSave({ name });
+              }}
+            />
+          </div>
+        </CardContent>
+      </Card>
+
       <Card>
         <CardHeader>
           <CardTitle className="text-sm">Brand Details</CardTitle>
@@ -209,6 +548,13 @@ function GeneralTab({ brand, onSave }: { brand: Brand; onSave: (updates: Record<
           Save Changes
         </Button>
       </div>
+
+      {/* ── SEO Defaults ── */}
+      <SEODefaultsSection
+        brand={brand}
+        settings={settings}
+        onSaveSetting={onSaveSetting}
+      />
     </div>
   );
 }
@@ -1441,6 +1787,19 @@ export default function SettingsPage() {
     }
   }, [brandId, toast]);
 
+  const saveSetting = useCallback(async (key: string, value: string): Promise<void> => {
+    try {
+      await fetch(`/api/brands/${brandId}/settings`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ key, value }),
+      });
+      setSettings(s => ({ ...s, [key]: value }));
+    } catch {
+      // silently fail; individual components show their own toasts
+    }
+  }, [brandId]);
+
   if (!brand) return null;
 
   const tabs = [
@@ -1520,7 +1879,7 @@ export default function SettingsPage() {
             exit={{ opacity: 0, y: -5 }}
             transition={{ duration: 0.2 }}
           >
-            {activeTab === 'general' && <GeneralTab brand={brand} onSave={saveBrand} />}
+            {activeTab === 'general' && <GeneralTab brand={brand} onSave={saveBrand} settings={settings} onSaveSetting={saveSetting} />}
             {activeTab === 'design' && <DesignTab brand={brand} onSave={saveBrand} />}
             {activeTab === 'channels' && <ChannelsTab brand={brand} onSave={saveBrand} />}
             {activeTab === 'notifications' && <NotificationsTab brandId={brandId} settings={settings} />}
