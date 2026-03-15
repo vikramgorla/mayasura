@@ -14,6 +14,7 @@ import { useToast } from '@/components/ui/toast';
 import { Breadcrumbs } from '@/components/ui/breadcrumbs';
 import { motion, AnimatePresence } from 'framer-motion';
 import { PageTransition } from '@/components/ui/page-transition';
+import { MilestoneCelebration, useMilestoneCelebration } from '@/components/ui/milestone-celebration';
 
 interface Product {
   id: string;
@@ -31,6 +32,7 @@ export default function ProductsPage() {
   const params = useParams();
   const brandId = params.brandId as string;
   const [products, setProducts] = useState<Product[]>([]);
+  const { celebrating, celebrate, done } = useMilestoneCelebration();
   const [showForm, setShowForm] = useState(false);
   const [editingProduct, setEditingProduct] = useState<Product | null>(null);
   const [form, setForm] = useState({
@@ -114,6 +116,10 @@ export default function ProductsPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
         });
+        // Celebrate first product!
+        if (products.length === 0) {
+          celebrate('First product added! 🛍️');
+        }
         toast.success('Product added');
       }
       resetForm();
@@ -245,6 +251,12 @@ export default function ProductsPage() {
 
   return (
     <PageTransition>
+    <MilestoneCelebration
+      show={celebrating.show}
+      onDone={done}
+      message={celebrating.message}
+      emoji={celebrating.emoji}
+    />
     <div className="p-4 sm:p-8">
       <Breadcrumbs
         items={[

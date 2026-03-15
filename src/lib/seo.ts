@@ -154,3 +154,20 @@ export function breadcrumbJsonLd(items: Array<{ name: string; url: string }>): R
     })),
   };
 }
+
+// ─── OG Image URL helper ──────────────────────────────────────
+
+/**
+ * Generate the OG image URL for a brand page.
+ * Uses the /api/og/[slug] endpoint for template-based generation.
+ */
+export function getOgImageUrl(slug: string, options?: {
+  title?: string;
+  type?: 'site' | 'product' | 'blog';
+}): string {
+  const params = new URLSearchParams();
+  if (options?.title) params.set('title', options.title);
+  if (options?.type) params.set('type', options.type);
+  const query = params.toString();
+  return `${BASE_URL}/api/og/${slug}${query ? `?${query}` : ''}`;
+}
