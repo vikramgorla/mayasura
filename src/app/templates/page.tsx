@@ -10,7 +10,7 @@ import {
 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
-import { UserNav } from '@/components/user-nav';
+import { SharedNav } from '@/components/shared-nav';
 import { STARTER_TEMPLATES, StarterTemplate } from '@/lib/templates';
 
 /* ─── Category definitions ──────────────────────────────────── */
@@ -224,25 +224,7 @@ export default function TemplatesPage() {
   return (
     <div className="min-h-screen bg-zinc-50 dark:bg-zinc-900">
       {/* Nav */}
-      <nav className="bg-white/80 dark:bg-[#09090B]/80 backdrop-blur-lg border-b border-zinc-200 dark:border-zinc-800 sticky top-0 z-30">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between">
-          <Link href="/" className="flex items-center gap-2">
-            <div className="h-7 w-7 rounded-md bg-violet-700 flex items-center justify-center">
-              <span className="text-white text-xs font-bold">M</span>
-            </div>
-            <span className="font-display font-semibold text-base tracking-tight">Mayasura</span>
-          </Link>
-          <div className="flex items-center gap-3">
-            <Link href="/create">
-              <Button variant="brand" size="sm">
-                Start from Scratch
-                <ArrowRight className="h-3.5 w-3.5" />
-              </Button>
-            </Link>
-            <UserNav />
-          </div>
-        </div>
-      </nav>
+      <SharedNav />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
         {/* Hero section */}

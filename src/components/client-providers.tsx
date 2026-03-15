@@ -7,6 +7,7 @@ import { CommandPalette } from './command-palette';
 import { ErrorBoundary } from './error-boundary';
 import { AuthProvider } from './auth-provider';
 import { OfflineBanner } from './offline-banner';
+import { NavProgress } from './nav-progress';
 
 export function ClientProviders({ children }: { children: ReactNode }) {
   return (
@@ -14,6 +15,7 @@ export function ClientProviders({ children }: { children: ReactNode }) {
       <ThemeProvider>
         <AuthProvider>
           <ToastProvider>
+            <NavProgress />
             {children}
             <CommandPalette />
             <OfflineBanner />
