@@ -6,10 +6,9 @@ This workspace is for designing and building **Mayasura** — an open-source fra
 
 ## Every Session
 
-1. Read `SOUL.md` — who you are
-2. Read `RESEARCH.md` — current research and findings
-3. Read `ARCHITECTURE.md` — current architecture decisions
-4. Read `memory/` — recent session logs
+1. Read `RESEARCH.md` + `ARCHITECTURE.md` for current state
+2. Read `memory/` — recent session logs
+*(SOUL.md auto-injected — don't re-read)*
 
 ## Working Rules
 
