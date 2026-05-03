@@ -18,6 +18,16 @@ This workspace is for designing and building **Mayasura** — an open-source fra
 - Document architectural decisions with rationale
 - Keep research separate from decisions
 
+### ⚠️ Before Editing Files — Check if Changed!
+
+**CRITICAL:** Before calling the `edit` tool on ANY file:
+1. Read the current content first
+2. Compare: is the content **actually different** from what you're writing?
+3. If identical → **skip the edit** (don't call edit tool)
+4. If different → proceed with edit
+
+The edit tool **fails** with "replacement produced identical content".
+
 ## Git Identity — CRITICAL
 
 **Always run `source ~/.openclaw/scripts/github-apps/setup-agent-git.sh mayasura` before any git/gh operation in every session.**

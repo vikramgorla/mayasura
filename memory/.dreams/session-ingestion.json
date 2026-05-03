@@ -1,0 +1,22 @@
+{
+  "version": 3,
+  "files": {
+    "mayasura:sessions/ba0e81a4-61ab-42e8-be04-f5f50db85e83.jsonl": {
+      "mtimeMs": 1774210866223,
+      "size": 5006,
+      "contentHash": "65f683552ecea18a92059ca901b1844b6d52dbeeb98a4050a19fb83924f6970d",
+      "lineCount": 2,
+      "lastContentLine": 2
+    },
+    "mayasura:sessions/c1d56891-5ad5-48c0-b86b-6e34b618e693.jsonl.deleted.2026-05-01T01-03-35.789Z": {
+      "mtimeMs": 1774210866229,
+      "size": 81158,
+      "contentHash": "75a11da44c802486bc6f65640aa48a730f0f684c5c07a42ba3cd1735eb3fb070",
+      "lineCount": 0,
+      "lastContentLine": 0
+    }
+  },
+  "seenMessages": {
+    "mayasura:c1d56891-5ad5-48c0-b86b-6e34b618e693": []
+  }
+}
